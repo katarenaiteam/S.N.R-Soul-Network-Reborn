@@ -32,10 +32,9 @@ export default class Madotsuki extends Personagem {
         offsetX: 7,
         offsetY: -4,
         escala: 3,
-        hurtboxLargura: 50,
-        hurtboxAltura: 80,
-        hurtboxOffsetX: 0,
-        hurtboxOffsetY: -40,
+          hurtboxes: [
+          { largura: 48, altura: 70, offsetX: 0, offsetY: -35 }, // corpo regular
+        ],
       },
 
       walk: {
@@ -44,10 +43,9 @@ export default class Madotsuki extends Personagem {
         offsetX: 7,
         offsetY: -4,
         escala: 3,
-        hurtboxLargura: 50,
-        hurtboxAltura: 80,
-        hurtboxOffsetX: 0,
-        hurtboxOffsetY: -40,
+         hurtboxes: [
+          { largura: 48, altura: 70, offsetX: 0, offsetY: -35 }, // corpo regular
+        ],
       },
 
       jump: {
@@ -56,10 +54,9 @@ export default class Madotsuki extends Personagem {
         offsetX: 7,
         offsetY: -4,
         escala: 3,
-        hurtboxLargura: 50,
-        hurtboxAltura: 80,
-        hurtboxOffsetX: 0,
-        hurtboxOffsetY: -40,
+        hurtboxes: [
+          { largura: 48, altura: 70, offsetX: 0, offsetY: -35 }, // corpo regular
+        ],
       },
 
       crouch: {
@@ -68,10 +65,9 @@ export default class Madotsuki extends Personagem {
         offsetX: 7,
         offsetY: 9,
         escala: 3,
-        hurtboxLargura: 50,
-        hurtboxAltura: 60,
-        hurtboxOffsetX: 0,
-        hurtboxOffsetY: -30,
+        hurtboxes: [
+          { largura: 48, altura: 54, offsetX: 0, offsetY: -27 }, // corpo regular
+        ],
       },
 
       atack: {
@@ -80,10 +76,9 @@ export default class Madotsuki extends Personagem {
         offsetX: 7,
         offsetY: -4,
         escala: 3,
-        hurtboxLargura: 50,
-        hurtboxAltura: 60,
-        hurtboxOffsetX: 0,
-        hurtboxOffsetY: -30,
+          hurtboxes: [
+          { largura: 48, altura: 70, offsetX: 0, offsetY: -35 }, // corpo regular
+        ],
       },
       dash: {
         largura: 18,
@@ -91,10 +86,9 @@ export default class Madotsuki extends Personagem {
         offsetX: 7,
         offsetY: -4,
         escala: 3,
-        hurtboxLargura: 50,
-        hurtboxAltura: 60,
-        hurtboxOffsetX: 0,
-        hurtboxOffsetY: -30,
+          hurtboxes: [
+          { largura: 48, altura: 54, offsetX: 0, offsetY: -27 }, // corpo regular
+        ],
       },
 
       dano: {
@@ -103,10 +97,42 @@ export default class Madotsuki extends Personagem {
         offsetX: 7,
         offsetY: -4,
         escala: 3,
-        hurtboxLargura: 5,
-        hurtboxAltura: 80,
-        hurtboxOffsetX: 0,
-        hurtboxOffsetY: -40,
+         hurtboxes: [
+          { largura: 48, altura: 70, offsetX: 0, offsetY: -35 }, // corpo regular
+        ],
+      },
+
+      sideAtack: {
+        largura: 18,
+        altura: 36,
+        offsetX: 7,
+        offsetY: -4,
+        escala: 3,
+         hurtboxes: [
+          { largura: 48, altura: 70, offsetX: 0, offsetY: -35 }, // corpo regular
+        ],
+      },
+
+      downAtack: {
+        largura: 18,
+        altura: 36,
+        offsetX: 7,
+        offsetY: -4,
+        escala: 3,
+         hurtboxes: [
+          { largura: 48, altura: 54, offsetX: 0, offsetY: -27 }, // corpo regular
+        ],
+      },
+
+      neutralAir: {
+        largura: 18,
+        altura: 36,
+        offsetX: 7,
+        offsetY: -4,
+        escala: 3,
+         hurtboxes: [
+          { largura: 48, altura: 70, offsetX: 0, offsetY: -35 }, // corpo regular
+        ],
       },
     };
 

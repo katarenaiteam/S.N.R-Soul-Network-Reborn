@@ -32,11 +32,12 @@ export default class Dio extends Personagem {
         offsetX: 6,
         offsetY: -5,
         escala: 1,
-        hurtboxLargura: 65,
-        hurtboxAltura: 120,
-        hurtboxOffsetX: 0,
-        hurtboxOffsetY: -65,
+         hurtboxes: [
+          { largura: 43, altura: 115, offsetX: -3, offsetY: -60 }, // Tronco reto
+        ],
       },
+
+
 
       walk: {
         largura: 55,
@@ -44,10 +45,9 @@ export default class Dio extends Personagem {
         offsetX: 18,
         offsetY: -5,
         escala: 1,
-        hurtboxLargura: 65,
-        hurtboxAltura: 120,
-        hurtboxOffsetX: 0,
-        hurtboxOffsetY: -65,
+         hurtboxes: [
+          { largura: 46, altura: 115, offsetX: 3, offsetY: -60 }, // Tronco reto
+        ],
       },
 
       jump: {
@@ -56,10 +56,9 @@ export default class Dio extends Personagem {
         offsetX: 18,
         offsetY: 26,
         escala: 1,
-        hurtboxLargura: 65,
-        hurtboxAltura: 120,
-        hurtboxOffsetX: 0,
-        hurtboxOffsetY: -65,
+         hurtboxes: [
+          { largura: 46, altura: 125, offsetX: 3, offsetY: -70 }, // Tronco reto
+        ],
       },
 
       crouch: {
@@ -68,10 +67,10 @@ export default class Dio extends Personagem {
         offsetX: 18,
         offsetY: 59.5,
         escala: 1,
-        hurtboxLargura: 81,
-        hurtboxAltura: 75,
-        hurtboxOffsetX: 4,
-        hurtboxOffsetY: -45,
+           hurtboxes: [
+          { largura: 56, altura: 65, offsetX: 3, offsetY: -40 }, // encolhido
+        ],
+        
       },
 
       atack: {
@@ -80,10 +79,9 @@ export default class Dio extends Personagem {
         offsetX: 115,
         offsetY: -5,
         escala: 1,
-        hurtboxLargura: 65,
-        hurtboxAltura: 120,
-        hurtboxOffsetX: 0,
-        hurtboxOffsetY: -65,
+          hurtboxes: [
+          { largura: 43, altura: 115, offsetX: 4, offsetY: -60 }, // Tronco reto
+        ],
       },
 
       dash: {
@@ -104,10 +102,9 @@ export default class Dio extends Personagem {
         offsetX: 70, // Ajuste esse offset para casar com a imagem TH30_atack4!
         offsetY: 46,
         escala: 1,
-        hurtboxLargura: 81,
-        hurtboxAltura: 75,
-        hurtboxOffsetX: 4,
-        hurtboxOffsetY: -45,
+           hurtboxes: [
+          { largura: 56, altura: 65, offsetX: 3, offsetY: -40 }, // encolhido
+        ],
       },
 
       sideAtack: {
@@ -116,16 +113,15 @@ export default class Dio extends Personagem {
         offsetX: 68, // Ajuste conforme o tamanho do frame de Mantra_atack2
         offsetY: -5,
         escala: 1,
-        hurtboxLargura: 65,
-        hurtboxAltura: 120,
-        hurtboxOffsetX: 0,
-        hurtboxOffsetY: -65,
+         hurtboxes: [
+          { largura: 43, altura: 115, offsetX: -3, offsetY: -60 }, // Tronco reto
+        ],
       },
     };
 
-    // tabela de golpes Madotsuki
+    // tabela de golpes
     this.golpes = {
-      neutro1: {
+      neutro: {
         animacao: "dio_atack", // Ajuste para o nome da SUA animação no Phaser
         frameHitbox: 2, // Frame exato onde a faca acerta (começa em 1)
         offsetX: 64, // Distância pra frente
