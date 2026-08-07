@@ -1,0 +1,389 @@
+{
+  "textures": [
+    {
+      "image": "atlas-1.png",
+      "size": {
+        "w": 59,
+        "h": 823
+      },
+      "scale": 1,
+      "frames": [
+        {
+          "filename": "mo_dash0",
+          "frame": {
+            "x": 2,
+            "y": 2,
+            "w": 45,
+            "h": 41
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 45,
+            "h": 41
+          },
+          "sourceSize": {
+            "w": 45,
+            "h": 41
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_dash1",
+          "frame": {
+            "x": 2,
+            "y": 47,
+            "w": 53,
+            "h": 50
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 53,
+            "h": 50
+          },
+          "sourceSize": {
+            "w": 53,
+            "h": 50
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_idle0",
+          "frame": {
+            "x": 2,
+            "y": 101,
+            "w": 55,
+            "h": 48
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 55,
+            "h": 48
+          },
+          "sourceSize": {
+            "w": 55,
+            "h": 48
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_idle1",
+          "frame": {
+            "x": 2,
+            "y": 153,
+            "w": 34,
+            "h": 48
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 34,
+            "h": 48
+          },
+          "sourceSize": {
+            "w": 34,
+            "h": 48
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_idle2",
+          "frame": {
+            "x": 2,
+            "y": 205,
+            "w": 47,
+            "h": 48
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 47,
+            "h": 48
+          },
+          "sourceSize": {
+            "w": 47,
+            "h": 48
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_idle3",
+          "frame": {
+            "x": 2,
+            "y": 257,
+            "w": 47,
+            "h": 48
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 47,
+            "h": 48
+          },
+          "sourceSize": {
+            "w": 47,
+            "h": 48
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_jump0",
+          "frame": {
+            "x": 2,
+            "y": 309,
+            "w": 38,
+            "h": 63
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 38,
+            "h": 63
+          },
+          "sourceSize": {
+            "w": 38,
+            "h": 63
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_jump1",
+          "frame": {
+            "x": 2,
+            "y": 376,
+            "w": 50,
+            "h": 52
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 50,
+            "h": 52
+          },
+          "sourceSize": {
+            "w": 50,
+            "h": 52
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_jump2",
+          "frame": {
+            "x": 2,
+            "y": 432,
+            "w": 51,
+            "h": 59
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 51,
+            "h": 59
+          },
+          "sourceSize": {
+            "w": 51,
+            "h": 59
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_jump3",
+          "frame": {
+            "x": 2,
+            "y": 495,
+            "w": 47,
+            "h": 43
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 47,
+            "h": 43
+          },
+          "sourceSize": {
+            "w": 47,
+            "h": 43
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_jump4",
+          "frame": {
+            "x": 2,
+            "y": 542,
+            "w": 41,
+            "h": 48
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 41,
+            "h": 48
+          },
+          "sourceSize": {
+            "w": 41,
+            "h": 48
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_wlk0",
+          "frame": {
+            "x": 2,
+            "y": 594,
+            "w": 44,
+            "h": 47
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 44,
+            "h": 47
+          },
+          "sourceSize": {
+            "w": 44,
+            "h": 47
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_wlk1",
+          "frame": {
+            "x": 2,
+            "y": 645,
+            "w": 50,
+            "h": 56
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 50,
+            "h": 56
+          },
+          "sourceSize": {
+            "w": 50,
+            "h": 56
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_wlk2",
+          "frame": {
+            "x": 2,
+            "y": 705,
+            "w": 49,
+            "h": 56
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 49,
+            "h": 56
+          },
+          "sourceSize": {
+            "w": 49,
+            "h": 56
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        },
+        {
+          "filename": "mo_wlk3",
+          "frame": {
+            "x": 2,
+            "y": 765,
+            "w": 49,
+            "h": 56
+          },
+          "rotated": false,
+          "trimmed": false,
+          "spriteSourceSize": {
+            "x": 0,
+            "y": 0,
+            "w": 49,
+            "h": 56
+          },
+          "sourceSize": {
+            "w": 49,
+            "h": 56
+          },
+          "anchor": {
+            "x": 0.5,
+            "y": 0.5
+          }
+        }
+      ]
+    }
+  ]
+}
