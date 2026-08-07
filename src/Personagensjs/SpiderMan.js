@@ -104,34 +104,6 @@ export default class SpiderMan extends Personagem {
           knockbackY: 0,
         },
       },
-      neutro2: {
-        animacao: "spy_atack2",
-        frameHitbox: 2,
-        offsetX: 40,
-        offsetY: -60,
-        largura: 50,
-        altura: 30,
-        cooldown: 0,
-        propriedades: {
-          dano: 3,
-          knockbackX: 40,
-          knockbackY: 0,
-        },
-      },
-      neutro3: {
-        animacao: "spy_atack3",
-        frameHitbox: 2,
-        offsetX: 40,
-        offsetY: -60,
-        largura: 50,
-        altura: 30,
-        cooldown: 0,
-        propriedades: {
-          dano: 3,
-          knockbackX: 40,
-          knockbackY: 0,
-        },
-      },
       agachado: {
         animacao: "dio_downAtack",
         frameHitbox: 1,
@@ -162,7 +134,7 @@ export default class SpiderMan extends Personagem {
       },
 
       air_neutro: {
-        animacao: "dio_atack",
+        animacao: "spy_neutralAir",
         frameHitbox: 20,
         offsetX: 64,
         offsetY: -95,
@@ -247,12 +219,32 @@ export default class SpiderMan extends Personagem {
     });
 
     scene.anims.create({
-      key: "spy_atack2",
-      frames: scene.anims.generateFrameNumbers("SpiderMan_atack2", {
+      key: "spy_neutralAir",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_neutralAir", {
         start: 0,
-        end: 8,
+        end: 4,
       }),
-      frameRate: 16,
+      frameRate: 12,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "spy_atack3",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_atack3", {
+        start: 0,
+        end: 6,
+      }),
+      frameRate: 13,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "spy_atack3",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_atack3", {
+        start: 0,
+        end: 6,
+      }),
+      frameRate: 13,
       repeat: 0,
     });
 

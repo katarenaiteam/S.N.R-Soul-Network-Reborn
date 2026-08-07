@@ -53,7 +53,10 @@ export default class CenaPreload extends Phaser.Scene {
         this.load.spritesheet("SpiderMan_atack1", "assets/personagens/SpiderMan/SpiderMan_atack1.png", { frameWidth: 200, frameHeight: 200 },);
         this.load.spritesheet("SpiderMan_atack2", "assets/personagens/SpiderMan/SpiderMan_atack2.png", { frameWidth: 200, frameHeight: 200 },);
         this.load.spritesheet("SpiderMan_atack3", "assets/personagens/SpiderMan/SpiderMan_atack3.png", { frameWidth: 200, frameHeight: 200 },);
-      
+        this.load.spritesheet("SpiderMan_neutralAir", "assets/personagens/SpiderMan/SpiderMan_neutralAir.png", { frameWidth: 200, frameHeight: 200 },);
+        this.load.spritesheet("SpiderMan_upAir", "assets/personagens/SpiderMan/SpiderMan_upAir.png", { frameWidth: 200, frameHeight: 200 },);
+        this.load.spritesheet("SpiderMan_downAir", "assets/personagens/SpiderMan/SpiderMan_downAir.png", { frameWidth: 200, frameHeight: 200 },); 
+        this.load.spritesheet("SpiderMan_sideAir", "assets/personagens/SpiderMan/SpiderMan_sideAir.png", { frameWidth: 200, frameHeight: 200 },);     
         
 
          // ===== Spider =====
