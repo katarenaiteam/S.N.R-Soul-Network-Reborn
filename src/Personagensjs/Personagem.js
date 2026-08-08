@@ -222,17 +222,13 @@ export default class Personagem {
   }
 
   inputJustDown(nome) {
-    return (
-      this.controle?.acabouDeApertar(nome) ||
-      Phaser.Input.Keyboard.JustDown(this.teclas?.[nome])
-    );
+    if (this.controle) return this.controle.acabouDeApertar(nome);
+    return Phaser.Input.Keyboard.JustDown(this.teclas?.[nome]);
   }
 
   inputJustUp(nome) {
-    return (
-      this.controle?.acabouDeSoltar(nome) ||
-      Phaser.Input.Keyboard.JustUp(this.teclas?.[nome])
-    );
+    if (this.controle) return this.controle.acabouDeSoltar(nome);
+    return Phaser.Input.Keyboard.JustUp(this.teclas?.[nome]);
   }
 
   // --- AÇÕES E CONTROLES ---

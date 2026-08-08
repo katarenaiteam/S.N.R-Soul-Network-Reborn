@@ -86,6 +86,18 @@ export default class SpiderMan extends Personagem {
           { largura: 80, altura: 50, offsetX: 0, offsetY: -25 }, // fechadinho
         ],
       },
+
+      neutralAir: {
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: 96,
+        escala: 1,
+        hurtboxes: [
+          { largura: 60, altura: 70, offsetX: -20, offsetY: -90 }, // Tronco/cabeça
+          { largura: 80, altura: 50, offsetX: 0, offsetY: -25 }, // perna dano
+        ],
+      },
     };
 
     // ============================ tabela de golpes =====================================
@@ -135,18 +147,18 @@ export default class SpiderMan extends Personagem {
 
       air_neutro: {
         animacao: "spy_neutralAir",
-        frameHitbox: 20,
-        offsetX: 64,
-        offsetY: -95,
-        largura: 70,
-        altura: 18,
+        frameHitbox: 2,
+        offsetX: 34,
+        offsetY: -70,
+        largura: 60,
+        altura: 70,
 
         cooldown: 500,
 
         propriedades: {
           dano: 12,
-          knockbackX: 250,
-          knockbackY: -100,
+          knockbackX: 200,
+          knockbackY: -300,
         },
       },
     };
@@ -224,7 +236,7 @@ export default class SpiderMan extends Personagem {
         start: 0,
         end: 4,
       }),
-      frameRate: 12,
+      frameRate: 16,
       repeat: 0,
     });
 
