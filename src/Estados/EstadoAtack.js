@@ -3,24 +3,38 @@ import EstadoBase from "./EstadoBase.js";
 export default class EstadoAtack extends EstadoBase {
   enter(dados = {}) {
     const noChao = this.personagem.sprite.body.blocked.down;
-    const teclas = this.personagem.teclas;
     const direcaoOlhar = this.personagem.sprite.flipX ? -1 : 1;
 
-    // 1. Identifica a direção do ataque
+    // =========================
+    // CONTROLE DO COMBO
+    // =========================
+
+    if (!this.comboIndex) {
+      this.comboIndex = 1;
+    }
+
     let tipoAtaque = dados?.tipo;
 
+    // Se estamos continuando um combo
+    if (dados?.combo) {
+      tipoAtaque = `neutro${this.comboIndex}`;
+    }
+
+    // Ataque normal
     if (!tipoAtaque) {
       const apertandoLado =
         this.personagem.inputDown("esquerda") ||
         this.personagem.inputDown("direita");
+
       const apertandoCima = this.personagem.inputDown("cima");
+
       const apertandoBaixo = this.personagem.inputDown("baixo");
 
       if (noChao) {
         if (apertandoCima) tipoAtaque = "cima";
         else if (apertandoBaixo) tipoAtaque = "agachado";
         else if (apertandoLado) tipoAtaque = "side";
-        else tipoAtaque = "neutro";
+        else tipoAtaque = "neutro1";
       } else {
         if (apertandoCima) tipoAtaque = "air_cima";
         else if (apertandoBaixo) tipoAtaque = "air_agachado";
@@ -29,50 +43,64 @@ export default class EstadoAtack extends EstadoBase {
       }
     }
 
-    if (!this.personagem.podeUsarAtaque(tipoAtaque)) {
-      // simplesmente cancela o ataque
-      this.personagem.maquinaEstados.mudarEstado(
-        this.personagem.sprite.body.blocked.down ? "idle" : "jump",
-      );
+    // =========================
+    // PEGA O GOLPE
+    // =========================
 
-      return;
-    }
-
-    // Salva o tipo do ataque atual
-    this.tipoAtaqueAtual = tipoAtaque;
-    //cooldown
-    this.personagem.iniciarCooldownAtaque(tipoAtaque);
-
-    // 2. Resgata dados do golpe
     this.golpeAtual =
       this.personagem.golpes?.[tipoAtaque] ||
-      this.personagem.golpes?.["neutro"];
-    this.jaAcertou = false;
+      this.personagem.golpes?.["neutro1"];
 
-    // 3. Anula a gravidade se o golpe pedir (ex: air_side)
+    this.tipoAtaqueAtual = tipoAtaque;
+
+    this.jaAcertou = false;
+    this.hitboxCriada = false;
+
+    // =========================
+    // COOLDOWN
+    // =========================
+
+    this.personagem.iniciarCooldownAtaque(tipoAtaque);
+
+    // =========================
+    // GRAVIDADE
+    // =========================
+
     if (this.golpeAtual?.propriedades?.anularGravidade) {
       this.anulouGravidade = true;
+
       this.personagem.sprite.body.setAllowGravity(false);
       this.personagem.sprite.body.setVelocityY(0);
     } else {
       this.anulouGravidade = false;
     }
 
-    // 4. Toca a Animação
+    // =========================
+    // ANIMAÇÃO
+    // =========================
+
     const animChave = this.golpeAtual?.animacao || "mado_atack";
+
     if (this.personagem.scene.anims.exists(animChave)) {
       this.personagem.tocarAnimacao("atack");
+
       this.personagem.sprite.anims.play(animChave, true);
     } else {
-      console.warn(`Animação ${animChave} não existe! Usando fallback.`);
+      console.warn(`Animação ${animChave} não existe!`);
+
       this.personagem.tocarAnimacao("atack");
     }
 
-    this.hitboxCriada = false;
+    // =========================
+    // HITBOX
+    // =========================
 
     this.personagem.sprite.on("animationupdate", this.atualizarHitbox, this);
 
-    // 5. Aplica Impulsos Iniciais
+    // =========================
+    // IMPULSO
+    // =========================
+
     if (this.golpeAtual?.propriedades?.impulsoX) {
       this.personagem.sprite.setVelocityX(
         direcaoOlhar * this.golpeAtual.propriedades.impulsoX,
@@ -87,15 +115,56 @@ export default class EstadoAtack extends EstadoBase {
       );
     }
 
+    // =========================
+    // FIM DA ANIMAÇÃO
+    // =========================
+
     this.personagem.sprite.once("animationcomplete", () => {
+      // Se o jogador apertou ataque
+      // durante a janela, continua.
+      if (this.comboBuffer) {
+        this.comboBuffer = false;
+
+        if (this.golpeAtual.comboProximo) {
+          this.comboIndex++;
+
+          this.personagem.maquinaEstados.mudarEstado("atack", {
+            tipo: this.golpeAtual.comboProximo,
+            combo: true,
+          });
+
+          return;
+        }
+      }
+
+      this.comboIndex = 1;
+
       this.finalizarAtaque();
     });
   }
 
-  update() {
+  // =========================
+  // UPDATE
+  // =========================
+
+  execute() {
     const noChao = this.personagem.sprite.body.blocked.down;
 
-    // Se estiver NO AR e NÃO FOR o air_side (nem golpe com impulso X fixo)
+    // =========================
+    // INPUT DO COMBO
+    // =========================
+
+    if (
+      this.golpeAtual?.comboProximo &&
+      this.personagem.inputJustDown("atack")
+    ) {
+      this.comboBuffer = true;
+    }
+
+    // =========================
+    // MOVIMENTO NO AR
+    // =========================
+
     if (
       !noChao &&
       this.tipoAtaqueAtual !== "air_side" &&
@@ -103,16 +172,17 @@ export default class EstadoAtack extends EstadoBase {
     ) {
       const vel = this.personagem.velocidade;
 
-      const movEsquerda = this.personagem.inputDown("esquerda");
-      const movDireita = this.personagem.inputDown("direita");
-
-      if (movEsquerda) {
+      if (this.personagem.inputDown("esquerda")) {
         this.personagem.sprite.setVelocityX(-vel);
-      } else if (movDireita) {
+      } else if (this.personagem.inputDown("direita")) {
         this.personagem.sprite.setVelocityX(vel);
       }
     }
   }
+
+  // =========================
+  // HITBOX
+  // =========================
 
   atualizarHitbox(anim, frame) {
     if (anim.key !== this.golpeAtual.animacao) return;
@@ -122,8 +192,6 @@ export default class EstadoAtack extends EstadoBase {
     if (frame.index !== this.golpeAtual.frameHitbox) return;
 
     this.hitboxCriada = true;
-
-    console.log("CRIANDO HITBOX");
 
     this.hitboxAtual = this.personagem.criarHitboxAtaque(
       this.golpeAtual.offsetX,
@@ -157,6 +225,10 @@ export default class EstadoAtack extends EstadoBase {
     );
   }
 
+  // =========================
+  // FINALIZA
+  // =========================
+
   finalizarAtaque() {
     if (this.personagem.sprite.body.blocked.down) {
       this.personagem.maquinaEstados.mudarEstado("idle");
@@ -165,6 +237,10 @@ export default class EstadoAtack extends EstadoBase {
     }
   }
 
+  // =========================
+  // SAÍDA
+  // =========================
+
   exit() {
     if (this.hitboxAtual && this.hitboxAtual.active) {
       this.hitboxAtual.destroy();
@@ -172,9 +248,13 @@ export default class EstadoAtack extends EstadoBase {
 
     if (this.anulouGravidade) {
       this.personagem.sprite.body.setAllowGravity(true);
+
       this.anulouGravidade = false;
     }
 
     this.personagem.sprite.off("animationupdate", this.atualizarHitbox, this);
+
+    this.hitboxAtual = null;
+    this.hitboxCriada = false;
   }
 }

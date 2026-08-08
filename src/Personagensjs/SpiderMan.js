@@ -102,18 +102,62 @@ export default class SpiderMan extends Personagem {
 
     // ============================ tabela de golpes =====================================
     this.golpes = {
-      neutro: {
+      neutro1: {
         animacao: "spy_atack1",
+
         frameHitbox: 2,
-        offsetX: 40,
+
+        offsetX: 70,
         offsetY: -60,
-        largura: 50,
-        altura: 30,
-        cooldown: 0,
+        largura: 60,
+        altura: 20,
+
         propriedades: {
           dano: 3,
           knockbackX: 40,
           knockbackY: 0,
+        },
+
+        comboProximo: "neutro2",
+        comboJanelaInicio: 2,
+        comboJanelaFim: 3,
+      },
+
+      neutro2: {
+        animacao: "spy_atack2",
+
+        frameHitbox: 2,
+
+        offsetX: 60,
+        offsetY: -60,
+        largura: 55,
+        altura: 30,
+
+        propriedades: {
+          dano: 4,
+          knockbackX: -10,
+          knockbackY: 0,
+        },
+
+        comboProximo: "neutro3",
+        comboJanelaInicio: 2,
+        comboJanelaFim: 4,
+      },
+
+      neutro3: {
+        animacao: "spy_atack3",
+
+        frameHitbox: 3,
+
+        offsetX: 55,
+        offsetY: -75,
+        largura: 35,
+        altura: 70,
+
+        propriedades: {
+          dano: 8,
+          knockbackX: 50,
+          knockbackY: -350,
         },
       },
       agachado: {
@@ -226,7 +270,7 @@ export default class SpiderMan extends Personagem {
         start: 0,
         end: 4,
       }),
-      frameRate: 16,
+      frameRate: 20,
       repeat: 0,
     });
 
@@ -241,12 +285,12 @@ export default class SpiderMan extends Personagem {
     });
 
     scene.anims.create({
-      key: "spy_atack3",
-      frames: scene.anims.generateFrameNumbers("SpiderMan_atack3", {
+      key: "spy_atack2",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_atack2", {
         start: 0,
-        end: 6,
+        end: 8,
       }),
-      frameRate: 13,
+      frameRate: 20,
       repeat: 0,
     });
 
@@ -256,17 +300,7 @@ export default class SpiderMan extends Personagem {
         start: 0,
         end: 6,
       }),
-      frameRate: 13,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "spy_atack3",
-      frames: scene.anims.generateFrameNumbers("SpiderMan_atack3", {
-        start: 0,
-        end: 6,
-      }),
-      frameRate: 13,
+      frameRate: 20,
       repeat: 0,
     });
   }
