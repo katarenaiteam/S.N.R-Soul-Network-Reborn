@@ -161,8 +161,8 @@ export default class SpiderMan extends Personagem {
         },
       },
       agachado: {
-        animacao: "dio_downAtack",
-        frameHitbox: 1,
+        animacao: "spy_downAtack",
+        frameHitbox: 2,
         offsetX: 60,
         offsetY: -45,
         largura: 75,
@@ -174,7 +174,7 @@ export default class SpiderMan extends Personagem {
         },
       },
       side: {
-        animacao: "dio_sideAtack",
+        animacao: "spy_sideAtack",
         frameHitbox: 4,
         offsetX: 52,
         offsetY: -90,
@@ -203,6 +203,23 @@ export default class SpiderMan extends Personagem {
           dano: 12,
           knockbackX: 200,
           knockbackY: -300,
+        },
+      },
+
+      air_agachado: {
+        animacao: "spy_downAir",
+        frameHitbox: 2,
+        offsetX: 34,
+        offsetY: -70,
+        largura: 60,
+        altura: 70,
+        cooldown: 500,
+        propriedades: {
+          dano: 12,
+          knockbackX: 200,
+          knockbackY: -300,
+          impulsoX: 100,
+          impulsoY: 500,
         },
       },
     };
@@ -275,16 +292,6 @@ export default class SpiderMan extends Personagem {
     });
 
     scene.anims.create({
-      key: "spy_neutralAir",
-      frames: scene.anims.generateFrameNumbers("SpiderMan_neutralAir", {
-        start: 0,
-        end: 4,
-      }),
-      frameRate: 16,
-      repeat: 0,
-    });
-
-    scene.anims.create({
       key: "spy_atack2",
       frames: scene.anims.generateFrameNumbers("SpiderMan_atack2", {
         start: 0,
@@ -301,6 +308,66 @@ export default class SpiderMan extends Personagem {
         end: 6,
       }),
       frameRate: 20,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "spy_sideAtack",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_sideAtack", {
+        start: 0,
+        end: 2,
+      }),
+      frameRate: 8,
+      repeat: 0,
+    });
+
+     scene.anims.create({
+      key: "spy_downAtack",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_downAtack", {
+        start: 0,
+        end: 6,
+      }),
+      frameRate: 16,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "spy_neutralAir",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_neutralAir", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 16,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "spy_downAir",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_downAir", {
+        start: 0,
+        end: 2,
+      }),
+      frameRate: 16,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "spy_upAir",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_upAir", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 16,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "spy_sideAir",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_sideAir", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 16,
       repeat: 0,
     });
   }
