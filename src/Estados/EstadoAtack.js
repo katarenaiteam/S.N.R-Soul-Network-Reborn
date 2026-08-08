@@ -47,11 +47,20 @@ export default class EstadoAtack extends EstadoBase {
     // PEGA O GOLPE
     // =========================
 
-    this.golpeAtual =
-      this.personagem.golpes?.[tipoAtaque] ||
-      this.personagem.golpes?.["neutro1"];
+    const tipoAtaqueEfetivo = this.personagem.golpes?.[tipoAtaque]
+      ? tipoAtaque
+      : "neutro1";
 
-    this.tipoAtaqueAtual = tipoAtaque;
+    this.golpeAtual = this.personagem.golpes?.[tipoAtaqueEfetivo];
+    this.tipoAtaqueAtual = tipoAtaqueEfetivo;
+
+    if (
+      !this.golpeAtual ||
+      !this.personagem.podeUsarAtaque(tipoAtaqueEfetivo)
+    ) {
+      this.finalizarAtaque();
+      return;
+    }
 
     this.jaAcertou = false;
     this.hitboxCriada = false;
@@ -60,7 +69,7 @@ export default class EstadoAtack extends EstadoBase {
     // COOLDOWN
     // =========================
 
-    this.personagem.iniciarCooldownAtaque(tipoAtaque);
+    this.personagem.iniciarCooldownAtaque(tipoAtaqueEfetivo);
 
     // =========================
     // GRAVIDADE
