@@ -341,6 +341,8 @@ export default class SpiderMan extends Personagem {
       repeat: 0,
     });
 
+
+    
     scene.anims.create({
       key: "spy_downAir",
       frames: scene.anims.generateFrameNumbers("SpiderMan_downAir", {
