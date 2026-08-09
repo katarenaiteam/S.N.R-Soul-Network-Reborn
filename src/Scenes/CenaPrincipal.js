@@ -84,7 +84,7 @@ export default class cenaPrincipal extends Phaser.Scene {
 
     this.musicaFase = this.sound.add(musicaParaTocar, {
       loop: true,
-      volume: 0.1,
+      volume: 0,
     });
     this.musicaFase.play();
 

@@ -4,12 +4,10 @@ export default class EstadoAtack extends EstadoBase {
   enter(dados = {}) {
     const noChao = this.personagem.sprite.body.blocked.down;
     const direcaoOlhar = this.personagem.sprite.flipX ? -1 : 1;
+    
 
-    // =========================
     // CONTROLE DO COMBO
-    // =========================
-
-    if (!this.comboIndex) {
+    if (!dados?.combo) {
       this.comboIndex = 1;
     }
 
@@ -43,7 +41,7 @@ export default class EstadoAtack extends EstadoBase {
       }
     }
 
-    // =========================
+   
     // PEGA O GOLPE
     // =========================
 
@@ -64,8 +62,12 @@ export default class EstadoAtack extends EstadoBase {
 
     this.jaAcertou = false;
     this.hitboxCriada = false;
+    this.tempoInicio = this.personagem.scene.time.now;
+    this.timerFinalizacaoChao = null;
+    this.finalizandoPorChao = false;
+    this.comboBuffer = false;
+    
 
-    // =========================
     // COOLDOWN
     // =========================
 
@@ -124,51 +126,90 @@ export default class EstadoAtack extends EstadoBase {
       );
     }
 
-    // =========================
-    // FIM DA ANIMAÇÃO
-    // =========================
-
-    this.personagem.sprite.once("animationcomplete", () => {
-      // Se o jogador apertou ataque
-      // durante a janela, continua.
-      if (this.comboBuffer) {
-        this.comboBuffer = false;
-
-        if (this.golpeAtual.comboProximo) {
-          this.comboIndex++;
-
-          this.personagem.maquinaEstados.mudarEstado("atack", {
-            tipo: this.golpeAtual.comboProximo,
-            combo: true,
-          });
-
-          return;
-        }
-      }
-
-      this.comboIndex = 1;
-
-      this.finalizarAtaque();
-    });
+  
   }
-
-  // =========================
-  // UPDATE
-  // =========================
 
   execute() {
     const noChao = this.personagem.sprite.body.blocked.down;
+    const agora = this.personagem.scene.time.now;
+    const body = this.personagem.sprite.body;
+
+  // =========================
+// INPUT DO COMBO
+// =========================
+
+if (
+  this.golpeAtual?.comboProximo &&
+  this.personagem.inputJustDown("atack")
+) {
+  this.comboBuffer = true;
+}
+
+
+// =========================
+// PROGRESSÃO DO COMBO
+// =========================
+
+if (
+  this.comboBuffer &&
+  this.golpeAtual?.comboProximo &&
+  this.golpeAtual?.comboJanelaInicio !== undefined &&
+  this.golpeAtual?.comboJanelaFim !== undefined
+) {
+  const tempo = agora - this.tempoInicio;
+
+  if (
+    tempo >= this.golpeAtual.comboJanelaInicio &&
+    tempo <= this.golpeAtual.comboJanelaFim
+  ) {
+    this.comboBuffer = false;
+
+    this.comboIndex++;
+
+    this.personagem.maquinaEstados.mudarEstado("atack", {
+      tipo: this.golpeAtual.comboProximo,
+      combo: true,
+    });
+
+    return;
+  }
+}
 
     // =========================
-    // INPUT DO COMBO
+    // FINALIZAÇÃO POR DURAÇÃO
     // =========================
 
     if (
-      this.golpeAtual?.comboProximo &&
-      this.personagem.inputJustDown("atack")
+      this.golpeAtual?.duracao !== undefined &&
+      agora - this.tempoInicio >= this.golpeAtual.duracao
     ) {
-      this.comboBuffer = true;
+      this.finalizarAtaque();
+      return;
     }
+
+    // =========================
+    // FINALIZAÇÃO AO TOCAR CHÃO
+    // =========================
+
+    if (
+      this.golpeAtual?.finalizarAoTocarChao &&
+      noChao &&
+      !this.finalizandoPorChao
+    ) {
+      this.finalizandoPorChao = true;
+
+      const atraso = this.golpeAtual.atrasoFinalizacaoChao ?? 0;
+
+      this.timerFinalizacaoChao = this.personagem.scene.time.delayedCall(
+        atraso,
+        () => {
+          if (this.personagem.maquinaEstados.estadoAtual === this) {
+            this.finalizarAtaque();
+          }
+        },
+      );
+    }
+
 
     // =========================
     // MOVIMENTO NO AR
@@ -230,6 +271,12 @@ export default class EstadoAtack extends EstadoBase {
         };
 
         oponente.receberDano(valorDano, this.golpeAtual.propriedades, origem);
+
+       if (this.golpeAtual.finalizarAoAcertarOponente) {
+         this.finalizarAtaque();
+         return;
+       }
+
       },
     );
   }
@@ -265,5 +312,12 @@ export default class EstadoAtack extends EstadoBase {
 
     this.hitboxAtual = null;
     this.hitboxCriada = false;
+
+    if (this.timerFinalizacaoChao) {
+      this.timerFinalizacaoChao.remove(false);
+      this.timerFinalizacaoChao = null;
+    }
+
+    this.finalizandoPorChao = false;
   }
 }

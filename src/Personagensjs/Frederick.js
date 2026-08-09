@@ -68,6 +68,8 @@ export default class Frederick extends Personagem {
         offsetY: -43, // Altura em relação ao centro
         largura: 50, // Alcance
         altura: 25, // Espessura
+        cooldown: 700,
+         duracao: 300,
         propriedades: {
           dano: 12,
           knockbackX: 600,

@@ -13,7 +13,7 @@ export default class EstadoDano extends EstadoBase {
 
         // 🟢 Quique SUAVE (0.2 no Y evita que ele voe pro teto ao tocar o chão)
         if (this.personagem.sprite.body) {
-            this.personagem.sprite.body.setBounce(0.4, 0.2);
+            this.personagem.sprite.body.setBounce(0.5, 0.4);
         }
     }
 

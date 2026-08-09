@@ -14,7 +14,7 @@ export default class SpiderMan extends Personagem {
       "spy_idle",
       "0",
       {
-        velocidade: 140,
+        velocidade: 170,
         forcaPulo: -600,
         maxPulos: 3,
         maxDash: 1,
@@ -98,29 +98,64 @@ export default class SpiderMan extends Personagem {
           { largura: 80, altura: 50, offsetX: 0, offsetY: -25 }, // perna dano
         ],
       },
+
+      sideAtack: {
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: 96,
+        escala: 1,
+        hurtboxes: [{ largura: 60, altura: 80, offsetX: -20, offsetY: -40 }],
+      },
+
+      downAtack: {
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: 96,
+        escala: 1,
+        hurtboxes: [{ largura: 80, altura: 60, offsetX: 0, offsetY: -40 }],
+      },
+
+      sideAir: {
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: 96,
+        escala: 1,
+        hurtboxes: [{ largura: 80, altura: 60, offsetX: 0, offsetY: -40 }],
+      },
+
+      upAir: {  
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: 96,
+        escala: 1,
+        hurtboxes: [{ largura: 70, altura: 80, offsetX: 0, offsetY: -50 }],
+      },
     };
 
     // ============================ tabela de golpes =====================================
     this.golpes = {
       neutro1: {
         animacao: "spy_atack1",
-
         frameHitbox: 2,
-
         offsetX: 70,
         offsetY: -60,
         largura: 60,
         altura: 20,
-
+        cooldown: 800,
+        duracao: 300,
         propriedades: {
-          dano: 3,
+          dano: 4,
           knockbackX: 40,
           knockbackY: 0,
         },
 
         comboProximo: "neutro2",
-        comboJanelaInicio: 2,
-        comboJanelaFim: 3,
+        comboJanelaInicio: 200,
+        comboJanelaFim: 300,
       },
 
       neutro2: {
@@ -132,7 +167,7 @@ export default class SpiderMan extends Personagem {
         offsetY: -60,
         largura: 55,
         altura: 30,
-
+        duracao: 300,
         propriedades: {
           dano: 4,
           knockbackX: -10,
@@ -140,8 +175,8 @@ export default class SpiderMan extends Personagem {
         },
 
         comboProximo: "neutro3",
-        comboJanelaInicio: 2,
-        comboJanelaFim: 4,
+        comboJanelaInicio: 200,
+        comboJanelaFim: 400,
       },
 
       neutro3: {
@@ -153,7 +188,7 @@ export default class SpiderMan extends Personagem {
         offsetY: -75,
         largura: 35,
         altura: 70,
-
+        duracao: 250,
         propriedades: {
           dano: 8,
           knockbackX: 50,
@@ -162,11 +197,13 @@ export default class SpiderMan extends Personagem {
       },
       agachado: {
         animacao: "spy_downAtack",
-        frameHitbox: 2,
+        frameHitbox: 4,
         offsetX: 60,
-        offsetY: -45,
+        offsetY: -25,
         largura: 75,
-        altura: 20,
+        altura: 30,
+        cooldown: 700,
+        duracao: 560,
         propriedades: {
           dano: 8,
           knockbackX: 50,
@@ -175,16 +212,17 @@ export default class SpiderMan extends Personagem {
       },
       side: {
         animacao: "spy_sideAtack",
-        frameHitbox: 4,
+        frameHitbox: 2,
         offsetX: 52,
-        offsetY: -90,
-        largura: 90,
-        altura: 40,
-        cooldown: 1500,
+        offsetY: -60,
+        largura: 55,
+        altura: 25,
+        cooldown: 900,
+        duracao: 400,
         propriedades: {
-          dano: 30,
-          knockbackX: 700,
-          knockbackY: -400,
+          dano: 20,
+          knockbackX: 600,
+          knockbackY: -300,
           impulsoX: 0,
         },
       },
@@ -196,9 +234,8 @@ export default class SpiderMan extends Personagem {
         offsetY: -70,
         largura: 60,
         altura: 70,
-
         cooldown: 500,
-
+        duracao: 300,
         propriedades: {
           dano: 12,
           knockbackX: 200,
@@ -210,16 +247,63 @@ export default class SpiderMan extends Personagem {
         animacao: "spy_downAir",
         frameHitbox: 2,
         offsetX: 34,
+        offsetY: -30,
+        largura: 60,
+        altura: 70,
+        cooldown: 500,
+        // Finalização do ataque
+        duracao: 1000,
+        finalizarAoTocarChao: true,
+        atrasoFinalizacaoChao: 100,
+        finalizarAoAcertarOponente: true,
+        propriedades: {
+          dano: 12,
+          knockbackX: 50,
+          knockbackY: 400,
+          impulsoX: 100,
+          impulsoY: 550,
+        },
+      },
+
+      air_side: {
+        animacao: "spy_sideAir",
+        frameHitbox: 2,
+        offsetX: 34,
         offsetY: -70,
         largura: 60,
         altura: 70,
         cooldown: 500,
+        // Finalização do ataque
+        duracao: 300,
+        finalizarAoTocarChao: false,
+        atrasoFinalizacaoChao: 100,
+        finalizarAoAcertarOponente:false,
         propriedades: {
           dano: 12,
-          knockbackX: 200,
-          knockbackY: -300,
-          impulsoX: 100,
-          impulsoY: 500,
+          knockbackX: 300,
+          knockbackY: -50,
+          impulsoX: 300,
+        },
+      },
+
+      air_cima: {
+        animacao: "spy_upAir",
+        frameHitbox: 2,
+        offsetX: 24,
+        offsetY: -120,
+        largura: 25,
+        altura: 40,
+        cooldown: 900,
+        // Finalização do ataque
+        duracao: 300,
+        finalizarAoTocarChao: false,
+        atrasoFinalizacaoChao: 100,
+        finalizarAoAcertarOponente: false,
+        propriedades: {
+          dano: 12,
+          knockbackX: 50,
+          knockbackY: -400,
+          impulsoX: 30,
         },
       },
     };
@@ -317,7 +401,7 @@ export default class SpiderMan extends Personagem {
         start: 0,
         end: 2,
       }),
-      frameRate: 8,
+      frameRate: 10,
       repeat: 0,
     });
 
@@ -327,7 +411,7 @@ export default class SpiderMan extends Personagem {
         start: 0,
         end: 6,
       }),
-      frameRate: 16,
+      frameRate: 11,
       repeat: 0,
     });
 

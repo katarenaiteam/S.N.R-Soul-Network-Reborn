@@ -145,9 +145,8 @@ export default class Madotsuki extends Personagem {
         offsetY: -15, // Altura em relação ao centro
         largura: 30, // Alcance
         altura: 20,
-
         cooldown: 200,
-
+        duracao: 400,
         propriedades: {
           dano: 13.4,
           knockbackX: 250,
@@ -161,6 +160,8 @@ export default class Madotsuki extends Personagem {
         offsetY: -30,
         largura: 35,
         altura: 40,
+        cooldown: 600,
+        duracao: 600,
         propriedades: {
           dano: 80,
           knockbackX: 50,
@@ -174,6 +175,8 @@ export default class Madotsuki extends Personagem {
         offsetY: 0,
         largura: 40,
         altura: 40,
+        cooldown: 500,
+        duracao: 300,
         propriedades: {
           dano: 105,
           knockbackX: 50,
@@ -187,11 +190,13 @@ export default class Madotsuki extends Personagem {
         offsetY: -22,
         largura: 65,
         altura: 40,
+        cooldown: 600,
+        duracao: 600,
         propriedades: {
           dano: 15,
           knockbackX: 500,
           knockbackY: -50,
-          impulsoX: 180,
+          impulsoX: 350,
         },
       },
 
@@ -202,6 +207,8 @@ export default class Madotsuki extends Personagem {
         offsetY: -10, // Altura em relação ao centro
         largura: 30, // Alcance
         altura: 20, // Espessura
+        cooldown: 500,
+        duracao: 400,
         propriedades: {
           dano: 12,
           knockbackX: 250,
@@ -215,6 +222,9 @@ export default class Madotsuki extends Personagem {
         offsetY: 5,
         largura: 40,
         altura: 40,
+        finalizarAoTocarChao: true,
+        atrasoFinalizacaoChao: 100,
+        finalizarAoAcertarOponente: true,
         propriedades: {
           dano: 8,
           knockbackX: 50,
@@ -228,6 +238,8 @@ export default class Madotsuki extends Personagem {
         offsetY: -65,
         largura: 70,
         altura: 40,
+        cooldown: 900,
+        duracao: 300,
         propriedades: {
           dano: 15,
           knockbackX: 50,
@@ -243,6 +255,11 @@ export default class Madotsuki extends Personagem {
         largura: 60,
         altura: 50,
         cooldown: 1000,
+        duracao: 300,
+        finalizarAoTocarChao: false,
+        atrasoFinalizacaoChao: 100,
+        finalizarAoAcertarOponente: false,
+
         propriedades: {
           dano: 15,
           knockbackX: 350,
@@ -370,8 +387,8 @@ export default class Madotsuki extends Personagem {
         start: 9,
         end: 11,
       }),
-      frameRate: 12,
-      repeat: 0,
+      frameRate: 8,
+      repeat: -1,
     }); // receba dano
     scene.anims.create({
       key: "mado_upAir",
@@ -389,7 +406,7 @@ export default class Madotsuki extends Personagem {
         end: 19,
       }),
       frameRate: 12,
-      repeat: 0,
+      repeat: -1,
     });
     // neutroar
     scene.anims.create({
