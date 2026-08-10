@@ -256,6 +256,7 @@ export default class SpiderMan extends Personagem {
         finalizarAoTocarChao: true,
         atrasoFinalizacaoChao: 100,
         finalizarAoAcertarOponente: true,
+        atrasoFinalizacaoAcerto: 150,
         propriedades: {
           dano: 12,
           knockbackX: 50,
@@ -277,7 +278,7 @@ export default class SpiderMan extends Personagem {
         duracao: 300,
         finalizarAoTocarChao: false,
         atrasoFinalizacaoChao: 100,
-        finalizarAoAcertarOponente:false,
+        finalizarAoAcertarOponente: false,
         propriedades: {
           dano: 12,
           knockbackX: 300,
@@ -305,6 +306,32 @@ export default class SpiderMan extends Personagem {
           knockbackY: -400,
           impulsoX: 30,
         },
+      },
+    };
+
+
+    this.specials = {
+      neutro: {
+        animacao: "spy_special",
+        duracao: 1000,
+
+        propriedades: {
+          dano: 10,
+          knockbackX: 100,
+          knockbackY: -200,
+        },
+      },
+
+      agachado: {
+        
+      },
+
+      lado: {
+        // futuro
+      },
+
+      cima: {
+        // futuro
       },
     };
   }

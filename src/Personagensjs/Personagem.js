@@ -6,6 +6,7 @@ import EstadoDash from "../Estados/EstadoDash.js";
 import EstadoCrouch from "../Estados/EstadoCrouch.js";
 import EstadoAtack from "../Estados/EstadoAtack.js";
 import EstadoDano from "../Estados/EstadoDano.js";
+import EstadoSpecial from "../Estados/EstadoSpecial.js";
 
 export default class Personagem {
   constructor(
@@ -29,6 +30,8 @@ export default class Personagem {
     this.cooldownDash = 500;
     this.tempoUltimoDash = 0;
     this.cooldownsAtaque = {};
+    this.cooldownsSpecial = {};
+    this.specials = {};
 
     // Atributos
     this.velocidade = config.velocidade;
@@ -62,6 +65,7 @@ export default class Personagem {
     this.maquinaEstados.adicionarEstado("crouch", new EstadoCrouch(this));
     this.maquinaEstados.adicionarEstado("atack", new EstadoAtack(this));
     this.maquinaEstados.adicionarEstado("dano", new EstadoDano(this));
+    this.maquinaEstados.adicionarEstado("special", new EstadoSpecial(this));
 
     this.maquinaEstados.mudarEstado("idle");
   }

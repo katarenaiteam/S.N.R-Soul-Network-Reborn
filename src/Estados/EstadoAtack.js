@@ -65,6 +65,8 @@ export default class EstadoAtack extends EstadoBase {
     this.tempoInicio = this.personagem.scene.time.now;
     this.timerFinalizacaoChao = null;
     this.finalizandoPorChao = false;
+    this.timerFinalizacaoAcerto = null;
+    this.finalizandoPorAcerto = false;
     this.comboBuffer = false;
     
 
@@ -272,9 +274,22 @@ if (
 
         oponente.receberDano(valorDano, this.golpeAtual.propriedades, origem);
 
-       if (this.golpeAtual.finalizarAoAcertarOponente) {
-         this.finalizarAtaque();
-         return;
+       if (
+         this.golpeAtual.finalizarAoAcertarOponente &&
+         !this.finalizandoPorAcerto
+       ) {
+         this.finalizandoPorAcerto = true;
+
+         const atraso = this.golpeAtual.atrasoFinalizacaoAcerto ?? 0;
+
+         this.timerFinalizacaoAcerto = this.personagem.scene.time.delayedCall(
+           atraso,
+           () => {
+             if (this.personagem.maquinaEstados.estadoAtual === this) {
+               this.finalizarAtaque();
+             }
+           },
+         );
        }
 
       },
@@ -317,7 +332,14 @@ if (
       this.timerFinalizacaoChao.remove(false);
       this.timerFinalizacaoChao = null;
     }
-
+    
     this.finalizandoPorChao = false;
+
+    if (this.timerFinalizacaoAcerto) {
+      this.timerFinalizacaoAcerto.remove(false);
+      this.timerFinalizacaoAcerto = null;
+    }
+
+    this.finalizandoPorAcerto = false;
   }
 }
