@@ -145,7 +145,7 @@ export default class SpiderMan extends Personagem {
         offsetY: -60,
         largura: 60,
         altura: 20,
-        cooldown: 800,
+        cooldown: 700,
         duracao: 300,
         propriedades: {
           dano: 4,
@@ -312,8 +312,8 @@ export default class SpiderMan extends Personagem {
 
     this.specials = {
       neutro: {
-        animacao: "spy_special",
-        duracao: 1000,
+        animacao: "spy_neSpecial",
+        duracao: 700,
 
         propriedades: {
           dano: 10,
@@ -391,7 +391,7 @@ export default class SpiderMan extends Personagem {
       frameRate: 8,
       repeat: 0,
     });
-
+//golpes 
     scene.anims.create({
       key: "spy_atack1",
       frames: scene.anims.generateFrameNumbers("SpiderMan_atack1", {
@@ -479,6 +479,16 @@ export default class SpiderMan extends Personagem {
       frames: scene.anims.generateFrameNumbers("SpiderMan_sideAir", {
         start: 0,
         end: 4,
+      }),
+      frameRate: 16,
+      repeat: 0,
+    });
+//specials
+     scene.anims.create({
+      key: "spy_neSpecial",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_neSpecial", {
+        start: 0,
+        end: 9,
       }),
       frameRate: 16,
       repeat: 0,

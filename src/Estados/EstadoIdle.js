@@ -35,6 +35,11 @@ export default class EstadoIdle extends EstadoBase {
       return;
     }
 
+    if (this.personagem.inputJustDown("special")) {
+     this.personagem.maquinaEstados.mudarEstado("special");
+     return;
+    }
+
     if (this.personagem.inputJustDown("atack")) {
       this.personagem.maquinaEstados.mudarEstado("atack", { tipo: "neutro" });
       return;
