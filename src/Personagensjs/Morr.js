@@ -33,6 +33,9 @@ export default class Morrigan extends Personagem {
         offsetX: 15,
         offsetY: 18,
         escala: 2,
+         hurtboxes: [
+          { largura: 66, altura: 80, offsetX: -5, offsetY: -40 }, 
+        ],
       },
 
       walk: {
@@ -41,6 +44,9 @@ export default class Morrigan extends Personagem {
         offsetX: 15,
         offsetY: 18,
         escala: 2,
+         hurtboxes: [
+          { largura: 66, altura: 80, offsetX: 10, offsetY: -40 }, 
+        ],
       },
 
       jump: {
@@ -49,6 +55,9 @@ export default class Morrigan extends Personagem {
         offsetX: 15,
         offsetY: 18,
         escala: 2,
+         hurtboxes: [
+          { largura: 66, altura: 80, offsetX: -5, offsetY: -40 }, 
+        ],
       },
 
       crouch: {
@@ -57,6 +66,9 @@ export default class Morrigan extends Personagem {
         offsetX: 15,
         offsetY: 41,
         escala: 2,
+         hurtboxes: [
+          { largura: 66, altura: 60, offsetX: -5, offsetY: -30 }, 
+        ],
       },
     };
 
@@ -64,43 +76,19 @@ export default class Morrigan extends Personagem {
     this.golpes = {
       neutro: {
         animacao: "mo_atack", // Ajuste para o nome da SUA animação no Phaser
-        frameHitbox: 3, // Frame exato onde a faca acerta (começa em 1)
-        offsetX: 25, // Distância pra frente
-        offsetY: -35, // Altura em relação ao centro
-        largura: 30, // Alcance
-        altura: 20, // Espessura
+        frameHitbox: 2, // Frame exato onde a faca acerta (começa em 1)
+        offsetX: 27, // Distância pra frente
+        offsetY: -70, // Altura em relação ao centro
+        largura: 60, // Alcance
+        altura: 30, // Espessura
+        cooldown: 100,
+        duracao: 300,
         propriedades: {
           dano: 12,
           //        knockbackX: 250,
           //       knockbackY: -100
         },
       },
-      // agachado: {
-      //   animacao: 'mado_atack',
-      //    frameHitbox: 1,
-      //     offsetX: 20,
-      //     offsetY: 12,
-      //     largura: 35,
-      //     altura: 15,
-      //     propriedades: {
-      //        dano: 8,
-      //         knockbackX: 150,
-      //         knockbackY: -200
-      //     }
-      //   },
-      //      cima: {
-      //          animacao: 'mado_guarda_chuva_cima',
-      //          frameHitbox: 2,
-      //          offsetX: 0,
-      //          offsetY: -30,
-      //          largura: 40,
-      //         altura: 40,
-      //         propriedades: {
-      //            dano: 15,
-      //            knockbackX: 50,
-      //           knockbackY: -400
-      //        }
-      //      }
     };
   }
 

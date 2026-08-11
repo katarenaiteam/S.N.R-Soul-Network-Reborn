@@ -129,6 +129,7 @@ export default class Dio extends Personagem {
         largura: 70, // Alcance
         altura: 18,
         cooldown: 500,
+        duracao: 300,
         propriedades: {
           dano: 12,
           knockbackX: 250,
@@ -142,6 +143,7 @@ export default class Dio extends Personagem {
         offsetY: -45,
         largura: 75,
         altura: 20,
+        duracao: 300,
         propriedades: {
           dano: 8,
           knockbackX: 50,
@@ -156,7 +158,8 @@ export default class Dio extends Personagem {
         offsetY: -90,
         largura: 90,
         altura: 40,
-        cooldown: 1500,
+        cooldown: 1350,
+        duracao: 400,
         propriedades: {
           dano: 30,
           knockbackX: 700,
@@ -172,9 +175,8 @@ export default class Dio extends Personagem {
         offsetY: -95, // Altura em relação ao centro
         largura: 70, // Alcance
         altura: 18,
-
         cooldown: 500,
-
+        duracao: 300,
         propriedades: {
           dano: 12,
           knockbackX: 250,

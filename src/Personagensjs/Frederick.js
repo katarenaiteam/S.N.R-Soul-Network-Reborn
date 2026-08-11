@@ -32,6 +32,9 @@ export default class Frederick extends Personagem {
         offsetX: 15,
         offsetY: 18,
         escala: 2,
+        hurtboxes: [
+          { largura: 66, altura: 88, offsetX: 3, offsetY: -45 }, //frederick
+        ],
       },
 
       walk: {
@@ -40,6 +43,9 @@ export default class Frederick extends Personagem {
         offsetX: 15,
         offsetY: 18,
         escala: 2,
+        hurtboxes: [
+          { largura: 66, altura: 88, offsetX: 3, offsetY: -45 }, //frederick
+        ],
       },
 
       jump: {
@@ -48,6 +54,9 @@ export default class Frederick extends Personagem {
         offsetX: 15,
         offsetY: 18,
         escala: 2,
+        hurtboxes: [
+          { largura: 66, altura: 88, offsetX: 3, offsetY: -45 }, //frederick
+        ],
       },
 
       crouch: {
@@ -56,52 +65,29 @@ export default class Frederick extends Personagem {
         offsetX: 15,
         offsetY: 41,
         escala: 2,
+        hurtboxes: [
+          { largura: 66, altura: 74, offsetX: 3, offsetY: -70 }, //frederick
+        ],
       },
     };
 
     // tabela de golpes frederick
     this.golpes = {
       neutro: {
-        animacao: "FJ_atack", // Ajuste para o nome da SUA animação no Phaser
-        frameHitbox: 100, // Frame exato onde a faca acerta (começa em 1)
-        offsetX: 40, // Distância pra frente
-        offsetY: -43, // Altura em relação ao centro
-        largura: 50, // Alcance
-        altura: 25, // Espessura
+        animacao: "FJ_atack", 
+        frameHitbox: 3, 
+        offsetX: 40, 
+        offsetY: -43, 
+        largura: 50, 
+        altura: 25, 
         cooldown: 700,
-         duracao: 300,
+         duracao: 400,
         propriedades: {
-          dano: 12,
-          knockbackX: 600,
+          dano: 120,
+          knockbackX: 1000,
           knockbackY: -100,
         },
       },
-      // agachado: {
-      //   animacao: 'mado_atack',
-      //    frameHitbox: 1,
-      //     offsetX: 20,
-      //     offsetY: 12,
-      //     largura: 35,
-      //     altura: 15,
-      //     propriedades: {
-      //        dano: 8,
-      //         knockbackX: 150,
-      //         knockbackY: -200
-      //     }
-      //   },
-      //      cima: {
-      //          animacao: 'mado_guarda_chuva_cima',
-      //          frameHitbox: 2,
-      //          offsetX: 0,
-      //          offsetY: -30,
-      //          largura: 40,
-      //         altura: 40,
-      //         propriedades: {
-      //            dano: 15,
-      //            knockbackX: 50,
-      //           knockbackY: -400
-      //        }
-      //      }
     };
   }
 
