@@ -25,10 +25,9 @@ export default class EstadoIdle extends EstadoBase {
 
     // 2. Transição para DASH
     if (this.personagem.inputJustDown("dash") && this.personagem.podeDash) {
-      this.personagem.maquinaEstados.mudarEstado("dash");
-      return;
-    }
-
+  this.personagem.maquinaEstados.mudarEstado("dash");
+  return;
+  }
     // 3. Transição para PULO
     if (this.personagem.inputJustDown("cima")) {
       this.personagem.pular();

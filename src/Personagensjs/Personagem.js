@@ -28,10 +28,12 @@ export default class Personagem {
     this.porcentagemDano = 0;
     this.podeDash = true;
     this.cooldownDash = 500;
+    this.estavaNoChao = true;
     this.tempoUltimoDash = 0;
     this.cooldownsAtaque = {};
     this.cooldownsSpecial = {};
     this.specials = {};
+    this.logicasEspeciaisAtivas = [];
 
     // Atributos
     this.velocidade = config.velocidade;
@@ -99,10 +101,11 @@ export default class Personagem {
   update() {
     const noChao = this.sprite.body.blocked.down;
 
-    if (noChao) {
+    if (noChao && !this.estavaNoChao) {
       this.pulos = 0;
       this.dashs = 0;
     }
+    this.estavaNoChao = noChao;
 
     // Gravidade adicional ao cair
     if (!this.estaEmDash) {
@@ -116,6 +119,7 @@ export default class Personagem {
     this.sincronizarHurtbox();
     this.processarMovimentacaoAtaque(noChao);
     this.atualizarOffsetFisica();
+    this.atualizarLogicasEspeciais()
 
     this.maquinaEstados.update();
     this.controle?.salvarAnterior();
@@ -234,6 +238,13 @@ export default class Personagem {
     if (this.controle) return this.controle.acabouDeSoltar(nome);
     return Phaser.Input.Keyboard.JustUp(this.teclas?.[nome]);
   }
+
+ atualizarLogicasEspeciais() {
+  this.logicasEspeciaisAtivas.forEach((logica) => {
+    logica.atualizar?.();
+  });
+}
+
 
   // --- AÇÕES E CONTROLES ---
   pular() {

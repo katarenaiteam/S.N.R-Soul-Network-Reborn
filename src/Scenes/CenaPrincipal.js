@@ -48,7 +48,7 @@ export default class cenaPrincipal extends Phaser.Scene {
       cima: Phaser.Input.Keyboard.KeyCodes.I,
       baixo: Phaser.Input.Keyboard.KeyCodes.K,
       dash: Phaser.Input.Keyboard.KeyCodes.SHIFT,
-      atack: Phaser.Input.Keyboard.KeyCodes.O,
+      atack: Phaser.Input.Keyboard.KeyCodes.SEMICOLON,
       special: Phaser.Input.Keyboard.KeyCodes.P,
     });
 

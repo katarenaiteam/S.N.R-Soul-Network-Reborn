@@ -46,19 +46,14 @@ export default class EstadoSpecial extends EstadoBase {
 const animChave = this.specialAtual?.animacao;
 
 if (animChave && this.personagem.scene.anims.exists(animChave)) {
-
-  this.personagem.tocarAnimacao("special");
-
   this.personagem.sprite.anims.play(animChave, true);
-
 } else {
   console.warn(`Animação ${animChave} não existe!`);
 }
   }
 
   execute() {
-
-       const agora = this.personagem.scene.time.now;
+  const agora = this.personagem.scene.time.now;
 
   if (
     this.specialAtual?.duracao !== undefined &&
@@ -68,22 +63,24 @@ if (animChave && this.personagem.scene.anims.exists(animChave)) {
     return;
   }
 
+  if (this.specialAtual?.logica) {
+  if (!this.logicaSpecial) {
+    const LogicaSpecial = this.specialAtual.logica;
 
-// executar homem aranha 
-   if (
-  this.personagem.nomePersonagem === "Homem Aranha" &&
-  this.tipoSpecial === "neutro"
-) {
-  this.logicaSpecial = new WebShot(
-    this.personagem,
-    this.specialAtual
-  );
+    this.logicaSpecial = new LogicaSpecial(
+      this.personagem,
+      this.specialAtual,
+      this
+    );
 
-  this.logicaSpecial.executar();
-}
+    this.logicaSpecial.executar();
 
-
+    this.personagem.logicasEspeciaisAtivas.push(
+      this.logicaSpecial
+    );
   }
+}
+}
 
   finalizarSpecial() {
     if (this.personagem.sprite.body.blocked.down) {
@@ -93,5 +90,8 @@ if (animChave && this.personagem.scene.anims.exists(animChave)) {
     }
   }
 
-  exit() {}
+  exit() {
+
+  this.logicaSpecial = null;
+}
 }

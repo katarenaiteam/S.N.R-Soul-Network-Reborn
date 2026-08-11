@@ -11,8 +11,9 @@ export default class GerenciadorEstados {
    * @param {EstadoBase} estadoInstanciado - A instância da classe do estado
    */
   adicionarEstado(nome, estadoInstanciado) {
-    this.estados[nome] = estadoInstanciado;
-  }
+  estadoInstanciado.nome = nome;
+  this.estados[nome] = estadoInstanciado;
+}
 
   /**
    * Faz a transição de um estado para outro

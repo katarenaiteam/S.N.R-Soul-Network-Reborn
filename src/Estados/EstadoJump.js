@@ -11,14 +11,14 @@ export default class EstadoJump extends EstadoBase {
 
   execute() {
     // 1. Dash no ar
-    if (
-      this.personagem.inputJustDown("dash") &&
-      this.personagem.podeDash &&
-      this.personagem.dashs < this.personagem.maxDash
-    ) {
-      this.personagem.maquinaEstados.mudarEstado("dash");
-      return;
-    }
+  if (
+  this.personagem.inputJustDown("dash") &&
+  this.personagem.podeDash &&
+  this.personagem.dashs < this.personagem.maxDash
+ ) {
+  this.personagem.maquinaEstados.mudarEstado("dash");
+  return;
+ }
 
     // 2. Pulo Duplo (se apertar W de novo enquanto estiver no ar)
     if (

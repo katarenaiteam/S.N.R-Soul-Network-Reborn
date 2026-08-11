@@ -29,8 +29,8 @@ export default class EstadoCrouch extends EstadoBase {
 
     // Transição pro dash
     if (this.personagem.inputJustDown("dash") && this.personagem.podeDash) {
-      this.personagem.maquinaEstados.mudarEstado("dash");
-      return;
+    this.personagem.maquinaEstados.mudarEstado("dash");
+    return;
     }
 
     // Transição pro pulo usando a funçao pular

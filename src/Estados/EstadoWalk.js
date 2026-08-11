@@ -15,9 +15,9 @@ export default class EstadoWalk extends EstadoBase {
 
     // Dash
     if (this.personagem.inputJustDown("dash") && this.personagem.podeDash) {
-      this.personagem.maquinaEstados.mudarEstado("dash");
-      return;
-    }
+  this.personagem.maquinaEstados.mudarEstado("dash");
+  return;
+  }
 
     // atack
     if (this.personagem.inputJustDown("atack")) {

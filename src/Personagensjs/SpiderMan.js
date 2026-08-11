@@ -1,4 +1,5 @@
 import Personagem from "./Personagem.js";
+import WebShot from "./Specials/Spiderman/WebShot.js";
 
 export default class SpiderMan extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -11,7 +12,7 @@ export default class SpiderMan extends Personagem {
       scene,
       x,
       y,
-      "spy_idle",
+      "SpiderMan_idle",
       "0",
       {
         velocidade: 170,
@@ -134,8 +135,18 @@ export default class SpiderMan extends Personagem {
         escala: 1,
         hurtboxes: [{ largura: 70, altura: 80, offsetX: 0, offsetY: -50 }],
       },
-    };
 
+      neSpecial: {
+       largura: 110,
+        altura: 96,
+        offsetX: 45,
+        offsetY: 95,
+        escala: 1,
+    hurtboxes: [], // sem hurtbox por enquanto durante o special
+    },
+   };
+    
+  
     // ============================ tabela de golpes =====================================
     this.golpes = {
       neutro1: {
@@ -314,11 +325,15 @@ export default class SpiderMan extends Personagem {
       neutro: {
         animacao: "spy_neSpecial",
         duracao: 700,
+ 
+        logica: WebShot,
+
+         tempoProjetil: 5000,
 
         propriedades: {
           dano: 10,
-          knockbackX: 100,
-          knockbackY: -200,
+          knockbackX: 0,
+          knockbackY: 0,
         },
       },
 
@@ -493,5 +508,41 @@ export default class SpiderMan extends Personagem {
       frameRate: 16,
       repeat: 0,
     });
+
+    scene.anims.create({
+  key: "spy_webShot",
+  frames: scene.anims.generateFrameNumbers("webshot", {
+    start: 4,
+    end: 9,
+  }),
+  frameRate: 12,
+  repeat: -1,
+});
+
+// Animação 1: Teia cobrindo o alvo (trava no frame final enquanto estiver preso)
+    if (!scene.anims.exists("spy_web_trap_start")) {
+      scene.anims.create({
+        key: "spy_web_trap_start",
+        frames: scene.anims.generateFrameNumbers("webshot", {
+          start: 10,
+          end: 13,
+        }),
+        frameRate: 12,
+        repeat: 0,
+      });
+    }
+
+    // Animação 2: Teia se desfazendo / somindo
+    if (!scene.anims.exists("spy_web_trap_end")) {
+      scene.anims.create({
+        key: "spy_web_trap_end",
+        frames: scene.anims.generateFrameNumbers("webshot", {
+          start: 15,
+          end: 20,
+        }),
+        frameRate: 14,
+        repeat: 0,
+      });
+    }
   }
 }
