@@ -30,9 +30,9 @@ export default class SpiderMan extends Personagem {
     this.nomePersonagem = "Homem Aranha";
     this.configAnimacoes = {
       idle: {
-        largura: 110,
+        largura: 85,
         altura: 96,
-        offsetX: 45,
+        offsetX: 50,
         offsetY: 95,
         escala: 1,
         hurtboxes: [
@@ -200,6 +200,9 @@ export default class SpiderMan extends Personagem {
         largura: 35,
         altura: 70,
         duracao: 250,
+        bufferInputs: true,
+        bufferJanelaInicio: 50,
+        bufferJanelaFim: 350,
         propriedades: {
           dano: 8,
           knockbackX: 50,
@@ -325,7 +328,7 @@ export default class SpiderMan extends Personagem {
       neutro: {
         animacao: "spy_neSpecial",
         duracao: 700,
- 
+        cooldown: 2000,
         logica: WebShot,
 
          tempoProjetil: 5000,

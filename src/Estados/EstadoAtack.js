@@ -4,30 +4,28 @@ export default class EstadoAtack extends EstadoBase {
   enter(dados = {}) {
     const noChao = this.personagem.sprite.body.blocked.down;
     const direcaoOlhar = this.personagem.sprite.flipX ? -1 : 1;
-    
 
-    // CONTROLE DO COMBO
+    // reseta o combro pra 1, se o ataque vier sem dados(cima,baxo) ou se tiver combo false ! -> se nao for
     if (!dados?.combo) {
       this.comboIndex = 1;
     }
-
+    //guarda o tipo de ataque
     let tipoAtaque = dados?.tipo;
 
-    // Se estamos continuando um combo
+    // Se for como true neutro+ o numero do combo
     if (dados?.combo) {
       tipoAtaque = `neutro${this.comboIndex}`;
     }
 
-    // Ataque normal
+    // dita as constantes de imput direcionais
     if (!tipoAtaque) {
       const apertandoLado =
         this.personagem.inputDown("esquerda") ||
         this.personagem.inputDown("direita");
 
       const apertandoCima = this.personagem.inputDown("cima");
-
       const apertandoBaixo = this.personagem.inputDown("baixo");
-
+    // cria as variaçoes de ataque que uso na tabela de golpes
       if (noChao) {
         if (apertandoCima) tipoAtaque = "cima";
         else if (apertandoBaixo) tipoAtaque = "agachado";
@@ -41,14 +39,13 @@ export default class EstadoAtack extends EstadoBase {
       }
     }
 
-   
-    // PEGA O GOLPE
-    // =========================
-
+    //checagem de ataque na tabela de golpes do personagem, ?>verdadeiro mantem tipoAtaque / :>falso manda executar neutro1
     const tipoAtaqueEfetivo = this.personagem.golpes?.[tipoAtaque]
       ? tipoAtaque
       : "neutro1";
-
+   
+    // Pega o objeto com todos os dados do golpe de dentro da tabela do personagem e guarda dentro da classe do Estado de Ataque, 
+    // depois guarda o ataqueAtual como ataque efetivo, que vai ser usado
     this.golpeAtual = this.personagem.golpes?.[tipoAtaqueEfetivo];
     this.tipoAtaqueAtual = tipoAtaqueEfetivo;
 
@@ -69,51 +66,36 @@ export default class EstadoAtack extends EstadoBase {
     this.finalizandoPorAcerto = false;
     this.comboBuffer = false;
     
+    // Zera o buffer apenas na entrada do estado
+    this.inputBuffer = null;
 
     // COOLDOWN
-    // =========================
-
     this.personagem.iniciarCooldownAtaque(tipoAtaqueEfetivo);
 
-    // =========================
     // GRAVIDADE
-    // =========================
-
     if (this.golpeAtual?.propriedades?.anularGravidade) {
       this.anulouGravidade = true;
-
       this.personagem.sprite.body.setAllowGravity(false);
       this.personagem.sprite.body.setVelocityY(0);
     } else {
       this.anulouGravidade = false;
     }
 
-    // =========================
     // ANIMAÇÃO
-    // =========================
-
     const animChave = this.golpeAtual?.animacao || "mado_atack";
 
     if (this.personagem.scene.anims.exists(animChave)) {
       this.personagem.tocarAnimacao("atack");
-
       this.personagem.sprite.anims.play(animChave, true);
     } else {
       console.warn(`Animação ${animChave} não existe!`);
-
       this.personagem.tocarAnimacao("atack");
     }
 
-    // =========================
     // HITBOX
-    // =========================
-
     this.personagem.sprite.on("animationupdate", this.atualizarHitbox, this);
 
-    // =========================
     // IMPULSO
-    // =========================
-
     if (this.golpeAtual?.propriedades?.impulsoX) {
       this.personagem.sprite.setVelocityX(
         direcaoOlhar * this.golpeAtual.propriedades.impulsoX,
@@ -127,63 +109,73 @@ export default class EstadoAtack extends EstadoBase {
         this.golpeAtual.propriedades.impulsoY,
       );
     }
-
-  
   }
 
   execute() {
     const noChao = this.personagem.sprite.body.blocked.down;
     const agora = this.personagem.scene.time.now;
-    const body = this.personagem.sprite.body;
+    const tempoDecorrido = agora - this.tempoInicio;
 
-  // =========================
-// INPUT DO COMBO
-// =========================
+    // =========================
+    // INPUT DO COMBO DE ATAQUE
+    // =========================
+    if (
+      this.golpeAtual?.comboProximo &&
+      this.personagem.inputJustDown("atack")
+    ) {
+      this.comboBuffer = true;
+    }
 
-if (
-  this.golpeAtual?.comboProximo &&
-  this.personagem.inputJustDown("atack")
-) {
-  this.comboBuffer = true;
-}
+    // =========================
+    // BUFFER DE OUTROS INPUTS (PULO)
+    // =========================
+    if (this.golpeAtual?.bufferInputs) {
+      const inicio = this.golpeAtual.bufferJanelaInicio ?? 0;
+      const fim = this.golpeAtual.bufferJanelaFim ?? this.golpeAtual.duracao;
 
+      // Se estamos dentro da janela do buffer
+      if (tempoDecorrido >= inicio && tempoDecorrido <= fim) {
+        // Se a tecla de pulo for apertada OU mantida pressionada
+        if (
+          this.personagem.inputJustDown("cima") ||
+          this.personagem.inputDown("cima")
+        ) {
+          this.inputBuffer = "pulo";
+        }
+      }
+    }
 
-// =========================
-// PROGRESSÃO DO COMBO
-// =========================
+    // =========================
+    // PROGRESSÃO DO COMBO
+    // =========================
+    if (
+      this.comboBuffer &&
+      this.golpeAtual?.comboProximo &&
+      this.golpeAtual?.comboJanelaInicio !== undefined &&
+      this.golpeAtual?.comboJanelaFim !== undefined
+    ) {
+      if (
+        tempoDecorrido >= this.golpeAtual.comboJanelaInicio &&
+        tempoDecorrido <= this.golpeAtual.comboJanelaFim
+      ) {
+        this.comboBuffer = false;
+        this.comboIndex++;
 
-if (
-  this.comboBuffer &&
-  this.golpeAtual?.comboProximo &&
-  this.golpeAtual?.comboJanelaInicio !== undefined &&
-  this.golpeAtual?.comboJanelaFim !== undefined
-) {
-  const tempo = agora - this.tempoInicio;
+        this.personagem.maquinaEstados.mudarEstado("atack", {
+          tipo: this.golpeAtual.comboProximo,
+          combo: true,
+        });
 
-  if (
-    tempo >= this.golpeAtual.comboJanelaInicio &&
-    tempo <= this.golpeAtual.comboJanelaFim
-  ) {
-    this.comboBuffer = false;
-
-    this.comboIndex++;
-
-    this.personagem.maquinaEstados.mudarEstado("atack", {
-      tipo: this.golpeAtual.comboProximo,
-      combo: true,
-    });
-
-    return;
-  }
-}
+        return;
+      }
+    }
 
     // =========================
     // FINALIZAÇÃO POR DURAÇÃO
     // =========================
-
     if (
       this.golpeAtual?.duracao !== undefined &&
-      agora - this.tempoInicio >= this.golpeAtual.duracao
+      tempoDecorrido >= this.golpeAtual.duracao
     ) {
       this.finalizarAtaque();
       return;
@@ -192,14 +184,12 @@ if (
     // =========================
     // FINALIZAÇÃO AO TOCAR CHÃO
     // =========================
-
     if (
       this.golpeAtual?.finalizarAoTocarChao &&
       noChao &&
       !this.finalizandoPorChao
     ) {
       this.finalizandoPorChao = true;
-
       const atraso = this.golpeAtual.atrasoFinalizacaoChao ?? 0;
 
       this.timerFinalizacaoChao = this.personagem.scene.time.delayedCall(
@@ -212,11 +202,9 @@ if (
       );
     }
 
-
     // =========================
     // MOVIMENTO NO AR
     // =========================
-
     if (
       !noChao &&
       this.tipoAtaqueAtual !== "air_side" &&
@@ -235,12 +223,9 @@ if (
   // =========================
   // HITBOX
   // =========================
-
   atualizarHitbox(anim, frame) {
     if (anim.key !== this.golpeAtual.animacao) return;
-
     if (this.hitboxCriada) return;
-
     if (frame.index !== this.golpeAtual.frameHitbox) return;
 
     this.hitboxCriada = true;
@@ -264,9 +249,7 @@ if (
         if (this.jaAcertou) return;
 
         this.jaAcertou = true;
-
         const valorDano = this.golpeAtual.propriedades.dano || 0;
-
         const origem = {
           x: this.hitboxAtual.x,
           y: this.hitboxAtual.y,
@@ -274,43 +257,43 @@ if (
 
         oponente.receberDano(valorDano, this.golpeAtual.propriedades, origem);
 
-       if (
-         this.golpeAtual.finalizarAoAcertarOponente &&
-         !this.finalizandoPorAcerto
-       ) {
-         this.finalizandoPorAcerto = true;
+        if (
+          this.golpeAtual.finalizarAoAcertarOponente &&
+          !this.finalizandoPorAcerto
+        ) {
+          this.finalizandoPorAcerto = true;
+          const atraso = this.golpeAtual.atrasoFinalizacaoAcerto ?? 0;
 
-         const atraso = this.golpeAtual.atrasoFinalizacaoAcerto ?? 0;
-
-         this.timerFinalizacaoAcerto = this.personagem.scene.time.delayedCall(
-           atraso,
-           () => {
-             if (this.personagem.maquinaEstados.estadoAtual === this) {
-               this.finalizarAtaque();
-             }
-           },
-         );
-       }
-
+          this.timerFinalizacaoAcerto = this.personagem.scene.time.delayedCall(
+            atraso,
+            () => {
+              if (this.personagem.maquinaEstados.estadoAtual === this) {
+                this.finalizarAtaque();
+              }
+            },
+          );
+        }
       },
     );
   }
 
   // =========================
-  // FINALIZA
+  // FINALIZA ATAQUE
   // =========================
-
   finalizarAtaque() {
+    // Se registrou o pulo durante o ataque, executa o pulo ao sair do ataque
+    if (this.inputBuffer === "pulo") {
+      this.inputBuffer = null;
+      this.personagem.pular();
+      return;
+    }
+
     if (this.personagem.sprite.body.blocked.down) {
       this.personagem.maquinaEstados.mudarEstado("idle");
     } else {
       this.personagem.maquinaEstados.mudarEstado("jump");
     }
   }
-
-  // =========================
-  // SAÍDA
-  // =========================
 
   exit() {
     if (this.hitboxAtual && this.hitboxAtual.active) {
@@ -319,7 +302,6 @@ if (
 
     if (this.anulouGravidade) {
       this.personagem.sprite.body.setAllowGravity(true);
-
       this.anulouGravidade = false;
     }
 
@@ -332,7 +314,7 @@ if (
       this.timerFinalizacaoChao.remove(false);
       this.timerFinalizacaoChao = null;
     }
-    
+
     this.finalizandoPorChao = false;
 
     if (this.timerFinalizacaoAcerto) {

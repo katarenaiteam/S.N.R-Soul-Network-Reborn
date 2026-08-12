@@ -24,6 +24,10 @@ export default class cenaPrincipal extends Phaser.Scene {
     //criar o mapa que vou estar
     this.mapaAtual = new MapaCidade(this);
 
+
+    // --- CONTROLE DE VIDAS ---
+    this.vidasP1 = 3;
+    this.vidasP2 = 3;
     //musiquinha e vida nerrr
     //this.musica = this.sound.add('ClockTower', { loop: true, volume: 0.1 });
     //this.musica.play();
@@ -93,38 +97,43 @@ export default class cenaPrincipal extends Phaser.Scene {
     // 2. Cria a HUD do P1 na ESQUERDA
     const nomeP1 = this.jogador1.nomePersonagem || this.escolhaP1;
     this.hudP1_Nome = this.add
-      .text(80, 1000, nomeP1, {
+      .text(80, 950, nomeP1, {
         fontSize: "45px",
         fill: "#27F5F5",
         fontStyle: "bold",
       })
       .setScrollFactor(0);
     this.jogador1.textoDano = this.add
-      .text(80, 920, "0%", {
+      .text(80, 870, "0%", {
         fontSize: "100px",
         fill: "#ffffff",
         fontStyle: "bold",
       })
       .setScrollFactor(0);
+
+      // Texto para exibir as Vidas do P1
+    this.hudP1_Vidas = this.add.text(80, 820, `VIDAS: ${this.vidasP1}`, { fontSize: "32px", fill: "#00ff00", fontStyle: "bold" }).setScrollFactor(0);
 
     // 3. Cria a HUD do P2 na DIREITA
     const nomeP2 = this.jogador2.nomePersonagem || this.escolhaP2;
     const posXDireita = this.scale.width - 200; // Alinha perto da borda direita
 
     this.hudP2_Nome = this.add
-      .text(1600, 1000, nomeP2, {
+      .text(1600, 950, nomeP2, {
         fontSize: "45px",
         fill: "#F527F5",
         fontStyle: "bold",
       })
       .setScrollFactor(0);
     this.jogador2.textoDano = this.add
-      .text(1600, 920, "0%", {
+      .text(1600, 870, "0%", {
         fontSize: "100px",
         fill: "#ffffff",
         fontStyle: "bold",
       })
       .setScrollFactor(0);
+
+      this.hudP2_Vidas = this.add.text(1600, 820, `VIDAS: ${this.vidasP2}`, { fontSize: "32px", fill: "#00ff00", fontStyle: "bold" }).setScrollFactor(0);
 
     // --- COLISÃO ---
     // Diz que o sprite da Morrigan colide com o grupo de plataformas
@@ -169,7 +178,14 @@ export default class cenaPrincipal extends Phaser.Scene {
     this.camHUD = this.cameras.add(0, 0, this.scale.width, this.scale.height);
 
     // Diga para a câmera principal ignorar os elementos do HUD:
-    this.camJogo.ignore([this.jogador1.textoDano, this.jogador2.textoDano]);
+   this.camJogo.ignore([
+    this.jogador1.textoDano,
+    this.jogador2.textoDano,
+    this.hudP1_Vidas,
+    this.hudP2_Vidas,
+    this.hudP1_Nome,
+    this.hudP2_Nome
+  ]);
 
     // Diga para a câmera de HUD mostrar SOMENTE o HUD e ignorar o jogo/cenário/personagens:
     this.camHUD.ignore([
@@ -204,6 +220,7 @@ export default class cenaPrincipal extends Phaser.Scene {
   }
 
   // 3. LOOP DE ATUALIZAÇÃO
+  // 3. LOOP DE ATUALIZAÇÃO
   update() {
     // Manda o Personagem.js atualizar o movimento e animações a cada frame
     if (this.jogador1) this.jogador1.update();
@@ -211,45 +228,62 @@ export default class cenaPrincipal extends Phaser.Scene {
 
     this.atualizarCamera();
 
-    // Checa se alguém saiu da arena
-    this.verificarMorte(this.jogador1, this.pontoRespawnP1);
-    this.verificarMorte(this.jogador2, this.pontoRespawnP2);
+    // Checa se alguém saiu da arena (passando o número do jogador como 3º argumento)
+    this.verificarMorte(this.jogador1, this.pontoRespawnP1, 1);
+    this.verificarMorte(this.jogador2, this.pontoRespawnP2, 2);
   }
 
-  verificarMorte(jogador, pontoRespawn) {
+  verificarMorte(jogador, pontoRespawn, numJogador) {
     if (!jogador || !jogador.sprite) return;
 
     const x = jogador.sprite.x;
     const y = jogador.sprite.y;
     const lim = this.limitesArena;
 
-    // Se passou de QUALQUER um dos 4 limites fixa no MUNDO (não na câmera):
     if (x < lim.esquerda || x > lim.direita || y < lim.topo || y > lim.baixo) {
-      this.respawnar(jogador, pontoRespawn);
+      this.processarQueda(jogador, pontoRespawn, numJogador);
     }
   }
 
+  processarQueda(jogador, pontoRespawn, numJogador) {
+    // Desconta a vida do jogador correspondente
+    if (numJogador === 1) {
+      this.vidasP1--;
+      this.hudP1_Vidas.setText(`VIDAS: ${this.vidasP1}`);
+    } else {
+      this.vidasP2--;
+      this.hudP2_Vidas.setText(`VIDAS: ${this.vidasP2}`);
+    }
+
+    // Se as vidas acabarem, encerra a partida
+    if (this.vidasP1 <= 0 || this.vidasP2 <= 0) {
+      this.sound.stopAll();
+      this.scene.start("CenaGameOver");
+      return;
+    }
+
+    // Caso ainda tenha vidas, respawna normalmente
+    this.respawnar(jogador, pontoRespawn);
+  }
+
   respawnar(jogador, pontoRespawn) {
-    // 1. Oculta o jogador temporariamente ou desativa a física se quiser
     jogador.sprite.body.setVelocity(0, 0);
     jogador.sprite.setPosition(pontoRespawn.x, pontoRespawn.y);
 
-    // Reseta o dano
     if (jogador.porcentagemDano !== undefined) {
       jogador.porcentagemDano = 0;
       if (jogador.textoDano) jogador.textoDano.setText("0%");
     }
-    // 2. Toca a Animação na Tela Inteira
+
     if (this.overlayMorte) {
       this.overlayMorte.setVisible(true);
       this.overlayMorte.play("TVefect");
 
-      // Quando a animação terminar, esconde o sprite novamente
       this.overlayMorte.once(
         Phaser.Animations.Events.ANIMATION_COMPLETE,
         () => {
           this.overlayMorte.setVisible(false);
-        },
+        }
       );
     }
   }
@@ -259,37 +293,27 @@ export default class cenaPrincipal extends Phaser.Scene {
     const p2 = this.jogador2.sprite;
     const cam = this.cameras.main;
 
-    // 1. Ponto Médio
     const centroX = (p1.x + p2.x) / 2;
     const centroY = (p1.y + p2.y) / 2;
 
-    // Suavização do movimento (0.1 = velocidade de resposta)
     cam.scrollX = Phaser.Math.Linear(cam.scrollX, centroX - cam.width / 2, 0.1);
-    cam.scrollY = Phaser.Math.Linear(
-      cam.scrollY,
-      centroY - cam.height / 2,
-      0.1,
-    );
+    cam.scrollY = Phaser.Math.Linear(cam.scrollY, centroY - cam.height / 2, 0.1);
 
-    // 2. Distância física entre os dois
     const distancia = Phaser.Math.Distance.Between(p1.x, p1.y, p2.x, p2.y);
 
-    // 3. CONTROLES DO ZOOM (Ajuste estes valores facilmente):
-    const maxZoom = 3; // <-- QUÃO PERTO fica quando estão colados (Ex: 1.2 a 2.0)
-    const minZoom = 1; // <-- QUÃO LONGE fica quando se separam (Ex: 0.4 a 0.8)
+    const maxZoom = 3;
+    const minZoom = 1;
 
-    const distMinima = 100; // Distância onde a câmera atinge o zoom MÁXIMO
-    const distMaxima = 1200; // Distância onde a câmera atinge o zoom MÍNIMO
+    const distMinima = 100;
+    const distMaxima = 1200;
 
-    // Faz o mapeamento direto proporcional da distância para o Zoom
     const fatorDistancia = Phaser.Math.Clamp(
       (distancia - distMinima) / (distMaxima - distMinima),
       0,
-      1,
+      1
     );
     const zoomAlvo = Phaser.Math.Linear(maxZoom, minZoom, fatorDistancia);
 
-    // Aplica o Zoom suavemente (0.05 = transição leve)
     cam.setZoom(Phaser.Math.Linear(cam.zoom, zoomAlvo, 0.05));
   }
 }

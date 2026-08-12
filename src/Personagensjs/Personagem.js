@@ -277,6 +277,24 @@ export default class Personagem {
       this.scene.time.now + (golpe.cooldown || 0);
   }
 
+  iniciarCooldownSpecial(tipoSpecial) {
+    const special = this.specials?.[tipoSpecial];
+
+    if (!special) return;
+
+    this.cooldownsSpecial[tipoSpecial] =
+        this.scene.time.now + (special.cooldown || 0);
+}
+
+podeUsarSpecial(tipoSpecial) {
+    const agora = this.scene.time.now;
+
+    return (
+        !this.cooldownsSpecial?.[tipoSpecial] ||
+        agora >= this.cooldownsSpecial[tipoSpecial]
+    );
+ }
+
   aplicarConfiguracao(nomeAnim) {
     const cfg = this.configAnimacoes?.[nomeAnim];
     if (!cfg) return;

@@ -3,6 +3,7 @@ import CenaPrincipal from "./Scenes/CenaPrincipal.js";
 import CenaPreload from "./Scenes/CenaPreLoad.js";
 import Charmenu from "./Scenes/Charmenu.js";
 import CenaStart from "./Scenes/CenaStart.js";
+import CenaGameOver from "./Scenes/GameOver.js";
 
 const config = {
   type: Phaser.AUTO,
@@ -36,7 +37,7 @@ const config = {
     gamepad: true,
   },
 
-  scene: [CenaPreload, CenaStart, Charmenu, CenaPrincipal],
+  scene: [CenaPreload, CenaStart, Charmenu, CenaPrincipal, CenaGameOver],
 };
 
 new Phaser.Game(config);

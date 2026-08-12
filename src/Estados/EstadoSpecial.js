@@ -36,6 +36,13 @@ export default class EstadoSpecial extends EstadoBase {
       return;
     }
 
+    if (!this.personagem.podeUsarSpecial(tipoSpecial)) {
+    this.finalizarSpecial();
+    return;
+   }
+
+this.personagem.iniciarCooldownSpecial(tipoSpecial);
+
     console.log("Special:", this.tipoSpecial);
     console.log("Dados:", this.specialAtual);
 
