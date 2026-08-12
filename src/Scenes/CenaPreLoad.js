@@ -20,7 +20,7 @@ export default class CenaPreload extends Phaser.Scene {
     // Espera a fonte RetroFont carregar no navegador
     document.fonts.ready.then(() => {
       // --- CABEÇALHO ---
-      this.add.text(margemX, margemY, "RomWBW HBIOS v3.5.1, 2026-08-11", textStyle);
+      this.add.text(margemX, margemY, "RomSNR HBIOS v3.5.1, 2026-08-11", textStyle);
       this.add.text(margemX, margemY + 40, "Soul Network Computer [RCZ80_msx2] Z80 @ 3.579MHz", textStyle);
       this.add.text(margemX, margemY + 70, "0 MEM W/S, 1 I/O W/S, INT MODE 1, MSX MMU", textStyle);
       this.add.text(margemX, margemY + 100, "0KB ROM, 448KB RAM, HEAP=0x321A\n", textStyle);

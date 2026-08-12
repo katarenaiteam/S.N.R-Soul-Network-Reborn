@@ -2,30 +2,30 @@ import EstadoBase from "./EstadoBase.js";
 
 export default class EstadoAtack extends EstadoBase {
   enter(dados = {}) {
-    const noChao = this.personagem.sprite.body.blocked.down;
-    const direcaoOlhar = this.personagem.sprite.flipX ? -1 : 1;
+   const noChao = this.personagem.sprite.body.blocked.down;
+   const direcaoOlhar = this.personagem.sprite.flipX ? -1 : 1;
 
-    // reseta o combro pra 1, se o ataque vier sem dados(cima,baxo) ou se tiver combo false ! -> se nao for
-    if (!dados?.combo) {
+   // reseta o combro pra 1, se o ataque vier sem dados(cima,baxo) ou se tiver combo false ! -> se nao for
+   if (!dados?.combo) {
       this.comboIndex = 1;
     }
-    //guarda o tipo de ataque
-    let tipoAtaque = dados?.tipo;
+     //guarda o tipo de ataque
+     let tipoAtaque = dados?.tipo;
 
-    // Se for como true neutro+ o numero do combo
-    if (dados?.combo) {
+     // Se for como true neutro+ o numero do combo
+     if (dados?.combo) {
       tipoAtaque = `neutro${this.comboIndex}`;
-    }
-
-    // dita as constantes de imput direcionais
-    if (!tipoAtaque) {
+     }
+ 
+     // dita as constantes de imput direcionais
+     if (!tipoAtaque) {
       const apertandoLado =
         this.personagem.inputDown("esquerda") ||
         this.personagem.inputDown("direita");
 
       const apertandoCima = this.personagem.inputDown("cima");
       const apertandoBaixo = this.personagem.inputDown("baixo");
-    // cria as variaçoes de ataque que uso na tabela de golpes
+     // cria as variaçoes de ataque que uso na tabela de golpes
       if (noChao) {
         if (apertandoCima) tipoAtaque = "cima";
         else if (apertandoBaixo) tipoAtaque = "agachado";
@@ -37,49 +37,51 @@ export default class EstadoAtack extends EstadoBase {
         else if (apertandoLado) tipoAtaque = "air_side";
         else tipoAtaque = "air_neutro";
       }
-    }
+     }
 
-    //checagem de ataque na tabela de golpes do personagem, ?>verdadeiro mantem tipoAtaque / :>falso manda executar neutro1
-    const tipoAtaqueEfetivo = this.personagem.golpes?.[tipoAtaque]
+     //checagem de ataque na tabela de golpes do personagem, ?>verdadeiro mantem tipoAtaque / :>falso manda executar neutro1
+     const tipoAtaqueEfetivo = this.personagem.golpes?.[tipoAtaque]
       ? tipoAtaque
       : "neutro1";
    
-    // Pega o objeto com todos os dados do golpe de dentro da tabela do personagem e guarda dentro da classe do Estado de Ataque, 
-    // depois guarda o ataqueAtual como ataque efetivo, que vai ser usado
-    this.golpeAtual = this.personagem.golpes?.[tipoAtaqueEfetivo];
-    this.tipoAtaqueAtual = tipoAtaqueEfetivo;
+     // Pega o objeto com todos os dados do golpe de dentro da tabela do personagem e guarda dentro da classe do Estado de Ataque, 
+     // depois guarda o ataqueAtual como ataque efetivo, que vai ser usado
+     this.golpeAtual = this.personagem.golpes?.[tipoAtaqueEfetivo];
+     this.tipoAtaqueAtual = tipoAtaqueEfetivo;
 
-    if (
+     //impede de atacar se o boneco nao puder
+     if (
       !this.golpeAtual ||
       !this.personagem.podeUsarAtaque(tipoAtaqueEfetivo)
-    ) {
+     ) {
       this.finalizarAtaque();
       return;
-    }
+      }
 
-    this.jaAcertou = false;
-    this.hitboxCriada = false;
-    this.tempoInicio = this.personagem.scene.time.now;
-    this.timerFinalizacaoChao = null;
-    this.finalizandoPorChao = false;
-    this.timerFinalizacaoAcerto = null;
-    this.finalizandoPorAcerto = false;
-    this.comboBuffer = false;
     
-    // Zera o buffer apenas na entrada do estado
-    this.inputBuffer = null;
+     this.jaAcertou = false;
+     this.hitboxCriada = false;
+     this.tempoInicio = this.personagem.scene.time.now;
+     this.timerFinalizacaoChao = null;
+     this.finalizandoPorChao = false;
+     this.timerFinalizacaoAcerto = null;
+     this.finalizandoPorAcerto = false;
+     this.comboBuffer = false;
+    
+     // Zera o buffer apenas na entrada do estado
+     this.inputBuffer = null;
 
-    // COOLDOWN
-    this.personagem.iniciarCooldownAtaque(tipoAtaqueEfetivo);
+     // COOLDOWN
+     this.personagem.iniciarCooldownAtaque(tipoAtaqueEfetivo);
 
-    // GRAVIDADE
-    if (this.golpeAtual?.propriedades?.anularGravidade) {
+     // GRAVIDADE
+     if (this.golpeAtual?.propriedades?.anularGravidade) {
       this.anulouGravidade = true;
       this.personagem.sprite.body.setAllowGravity(false);
       this.personagem.sprite.body.setVelocityY(0);
-    } else {
+     } else {
       this.anulouGravidade = false;
-    }
+     }
 
     // ANIMAÇÃO
     const animChave = this.golpeAtual?.animacao || "mado_atack";
