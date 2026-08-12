@@ -2,12 +2,26 @@ export default class Cidade {
     constructor(scene) {
         this.scene = scene;
 
-        this.imagemFundo = scene.add.image(0, 0, 'cidade').setDisplaySize(1920, 640).setDepth(-100);
-        this.imagemFundo.setOrigin(0, 0);
-
+        // Plataformas
         this.plataformas = scene.physics.add.staticGroup();
         this.criarPlataformas();
 
+        // Cria a animação do fundo usando o gerenciador da cena (this.scene.anims)
+        if (!this.scene.anims.exists("tocarFundo")) {
+            this.scene.anims.create({
+                key: "tocarFundo",
+                frames: this.scene.anims.generateFrameNumbers("matrix"),
+                frameRate: 10,
+                repeat: -1
+            });
+        }
+
+        // Criamos um Sprite (em vez de Image) para que ele possa executar animações
+        this.imagemFundo = scene.add.sprite(960, 540, 'matrix')
+            .setDisplaySize(1920, 1080)
+            .setDepth(-100);
+
+        this.imagemFundo.play("tocarFundo");
     }
 
     criarPlataformas() {
@@ -21,5 +35,4 @@ export default class Cidade {
         this.scene.physics.add.existing(p, true);
         this.plataformas.add(p);
     }
-
 }

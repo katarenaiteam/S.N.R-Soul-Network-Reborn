@@ -31,8 +31,6 @@ export default class WebShot {
 
     this.projetil = this.scene.physics.add.sprite(x, y, "webshot", 4);
 
-    // FIX DO FANTASMA (CÂMERA HUD):
-    // Ignora a renderização do projétil na câmera da HUD para não duplicar visualmente na tela
     if (this.scene.camHUD) {
       this.scene.camHUD.ignore(this.projetil);
     }
@@ -44,13 +42,11 @@ export default class WebShot {
     this.projetil.body.setAllowGravity(false);
     this.projetil.body.setVelocityX(1000 * direcao);
 
-    // Ajuste de Hitbox centralizada no frame 200x200
     const larguraHitbox = 50;
     const alturaHitbox = 30;
     this.projetil.body.setSize(larguraHitbox, alturaHitbox, false);
     this.projetil.body.setOffset((200 - larguraHitbox) / 2, (200 - alturaHitbox) / 2);
 
-    // Detecção de colisão (Overlap)
     const jogador1 = this.scene.jogador1;
     const jogador2 = this.scene.jogador2;
 
@@ -79,6 +75,11 @@ export default class WebShot {
     if (alvo === this.personagem) return;
     if (this.acertou) return;
 
+    // NOVO: Se o alvo já está preso ou imune à teia, o tiro passa direto sem prender novamente
+    if (alvo.estaPresoNaTeia || alvo.imuneTeia) {
+      return;
+    }
+
     this.acertou = true;
     console.log("WEBSHOT PRENDEU:", alvo.nomePersonagem);
 
@@ -101,38 +102,36 @@ export default class WebShot {
   }
 
   prenderOponente(alvo) {
-    const tempoPreso = 2500; // Tempo em ms que o alvo fica preso
+    const tempoPreso = 2500; // Tempo preso em ms
+    const tempoImunidade = 900; // Tempo de invencibilidade à teia após ser solto (1.2s)
 
     if (!alvo || !alvo.sprite || !alvo.sprite.body) return;
 
+    // ATIVA A IMUNIDADE/ESTADO DE PRESO NO OPONENTE
+    alvo.estaPresoNaTeia = true;
+    alvo.imuneTeia = true;
+
     // 1. TRAVA ABSOLUTA DO OPONENTE
-    // Desativa a movimentação da física do Phaser para o alvo não sair do lugar
     alvo.sprite.body.setVelocity(0, 0);
     alvo.sprite.body.moves = false; 
 
     // 2. CÁLCULO DE ESCALA PARA BONECOS GRANDES
-    // Pega a altura da caixa física do alvo para ajustar o tamanho da teia
     const alturaAlvo = alvo.sprite.body.height || 95;
-    // O frame original da teia presa tem ~80px de altura utilizável
     const escalaTeia = Math.max(1, alturaAlvo / 80);
 
     // 3. CRIAÇÃO E POSICIONAMENTO DA TEIA OVERLAY
-    // Posiciona no centro vertical do corpo do oponente
     const centroY = alvo.sprite.y - (alturaAlvo / 2);
     const teiaPresa = this.scene.add.sprite(alvo.sprite.x, centroY, "webshot");
     
-    teiaPresa.setDepth(alvo.sprite.depth + 10); // Garante que fica totalmente na frente
-    teiaPresa.setScale(escalaTeia); // Ajusta o tamanho dinamicamente ao personagem
+    teiaPresa.setDepth(alvo.sprite.depth + 10);
+    teiaPresa.setScale(escalaTeia);
 
-    // Ignora na câmera da HUD
     if (this.scene.camHUD) {
       this.scene.camHUD.ignore(teiaPresa);
     }
 
-    // Toca a animação de entrada da teia
     teiaPresa.anims.play("spy_web_trap_start");
 
-    // Mantém a teia colada na posição do alvo caso o alvo seja empurrado por outro motivo
     const seguirOponente = () => {
       if (teiaPresa && teiaPresa.active && alvo.sprite) {
         const posY = alvo.sprite.y - ((alvo.sprite.body.height || 95) / 2);
@@ -144,23 +143,31 @@ export default class WebShot {
 
     // 4. DESCONGELAR APÓS O TEMPO
     this.scene.time.delayedCall(tempoPreso, () => {
-      // Remove o ouvinte de posição
       this.scene.events.off("update", seguirOponente);
 
-      // Reativa o movimento físico do oponente
+      // Reativa o movimento do oponente
       if (alvo.sprite && alvo.sprite.body) {
         alvo.sprite.body.moves = true;
       }
 
-      // Animação da teia desfazendo/sumindo
+      // Desmarca o estado de preso
+      alvo.estaPresoNaTeia = false;
+
+      // Animação da teia desfazendo
       if (teiaPresa && teiaPresa.active) {
         teiaPresa.anims.play("spy_web_trap_end");
         teiaPresa.once("animationcomplete", () => {
           teiaPresa.destroy();
         });
       }
+
+      // TIMER DE IMUNIDADE (Cooldown antes de poder ser preso de novo)
+      this.scene.time.delayedCall(tempoImunidade, () => {
+        alvo.imuneTeia = false;
+      });
     });
   }
+
   atualizar() {
     if (this.projetil && this.projetil.active) {
       if (Math.abs(this.projetil.x - this.personagem.sprite.x) > 1000) {

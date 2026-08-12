@@ -8,7 +8,7 @@ export default class Charmenu extends Phaser.Scene {
         this.add.image(0, 0, "Charmenu").setOrigin(0, 0).setDisplaySize(this.scale.width, this.scale.height);
 
         // 3. musicar
-        this.musica = this.sound.add('katarenai8bit', { loop: true, volume: 0 });
+        this.musica = this.sound.add('katarenai8bit', { loop: true, volume: 0.1 });
         this.musica.play();
 
         // 2. Mapeamento dos 3 personagens e as posições de suas miniaturas na tela

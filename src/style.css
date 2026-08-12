@@ -4,3 +4,25 @@ body {
   padding: 0;
   top: 0;
 }
+
+/* 1. Define a fonte retro */
+@font-face {
+  font-family: 'RetroFont';
+  src: url('../../assets/Menus/Perfect DOS VGA 437.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* 2. Classe invisível para pré-carregamento */
+.font-loader {
+  font-family: 'RetroFont';
+  position: absolute;
+  left: -9999px;
+  visibility: hidden;
+}
+
+/* 3. Garante pixels nítidos sem borrar no canvas do Phaser */
+canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
