@@ -2,51 +2,121 @@
 
 Revision: 0.0.1
 
-> GDD Template Written by: Benjamin “HeadClot” Stanley
+# Resumo do GDD
+
+GDD Template Written by: Benjamin “HeadClot” Stanley
 
 * Overview
 
   * Theme / Setting / Genre
+
+    * SNR é um jogo de temática Cyberpunk, do gênero platform fighter, ambientado no mundo virtual Soul Network Reborn.
   * Core Gameplay Mechanics Brief
+
+    * Modo História para até 2 jogadores em cooperação.
+    * Modo VS para 2 jogadores.
+    * Seleção de personagens com ataques e habilidades próprias.
+    * Arenas variadas.
+    * Sistema de combate baseado em dano percentual, knockback, combos, ataques especiais e Ultimate.
   * Targeted platforms
+
+    * Máquinas Arcade dedicadas ao jogo.
+    * PC e plataformas digitais, como Steam.
   * Monetization model (Brief/Document)
+
+    * Venda de cópias do jogo.
   * Project Scope
+
+    * Equipe composta por Gabriel Corrêa Abreu de Oliveira, responsável pela produção, direção de arte, história e enredo, e João Campos Neto, responsável pela programação, trilha e efeitos sonoros.
   * Influences (Brief)
 
-    * <Inf>
-    * <Influence #2>
-    * <Influence #3>
-    * <Influence #4>
+    * Super Smash Bros
+
+      * Principal influência no gênero platform fighter e nas mecânicas de combate.
+    * Brawlhalla
+
+      * Influência nas mecânicas do jogo.
+    * Matrix
+
+      * Influência na criação do mundo virtual e da ambientação de SNR.
   * The elevator Pitch
+
+    * SNR é um platform fighter cyberpunk onde jogadores entram em um mundo virtual e disputam um torneio em busca de fama, riqueza e poder.
   * Project Description (Brief):
+
+    * Platform fighter para até dois jogadores, com modo História cooperativo e modo Versus, utilizando personagens conhecidos da cultura como avatares dentro da Matrix.
   * Project Description (Detailed)
+
+    * SNR combina comandos simples com diferentes personagens, ataques, combos e estratégias, buscando ser acessível para jogadores casuais e familiarizados com o gênero, além de possuir alto fator replay.
+
 * What sets this project apart?
+
+  * Sistema de combate acessível e variado.
+
+  * Junção de vários personagens conhecidos e aclamados.
+
+  * História e ambientação Cyberpunk.
+
+  * Mundo virtual próprio inspirado em Matrix.
 
   * Core Gameplay Mechanics (Detailed)
 
-    * <Core Gameplay Mechanic #1>
-    * <Core Gameplay Mechanic #2>
-    * <Core Gameplay Mechanic #3>
-    * <Core Gameplay Mechanic #4>
+    * Movimentação baseada em andar, pular, agachar, dash e recuperação pelas bordas.
+    * Ataques normais, direcionais e combos.
+    * Specials próprios para cada personagem.
+    * Sistema de dano percentual e knockback.
+    * Ultimate com grande dano e impulso.
+
 * Story and Gameplay
 
   * Story (Brief)
+
+    * SNR é um mundo virtual criado pela Yume Labs, onde participantes disputam um torneio para ascender na hierarquia da sociedade.
   * Story (Detailed)
+
+    * A história acompanha Frederick Johnson, um usuário da SNR que possui um código capaz de libertar a humanidade da simulação controlada pela inteligência artificial TH30. Ele entra no torneio em busca de respostas e de uma forma de confrontar o sistema.
   * Gameplay (Brief)
+
+    * Platform fighter com combate dinâmico, personagens variados e diferentes ataques e habilidades.
   * Gameplay (Detailed)
+
+    * Os jogadores utilizam movimentação, ataques, combos, especiais e Ultimate para aumentar a porcentagem dos adversários e arremessá-los para fora das arenas.
+
 * Assets Needed
 
   * 2D
+
+    * Sprites dos personagens, efeitos visuais, plataformas, cenários, fundos e elementos de interface.
   * 3D
+
+    * Não aplicável ao projeto.
   * Sound
+
+    * Músicas, efeitos ambientais, sons de movimentação, ataques, impactos, dano, knockback, queda e derrota.
   * Code
+
+    * Sistemas de personagens, combate, dano, knockback, seleção, mapas, modos de jogo, HUD, arenas, respawn e detecção de queda.
   * Animation
+
+    * Animações dos ambientes, plataformas, efeitos e personagens.
+
 * Schedule
 
-  * <Object #1>
-  * <Object #2>
-  * <Object #3>
-  * <Object #4>
+  * Planejamento do jogo
+
+    * 1 semana (23/07 - 30/07)
+  * Criação dos fundamentos (programação)
+
+    * 3 semanas (31/07 - 21/08)
+  * Criação de personagens
+
+    * 2 semanas (22/08 - 02/09)
+  * Criação da história e revisão das mecânicas
+
+    * 1 mês (03/09 - 03/10)
+  * Porte para Arcade e revisão final das mecânicas
+
+    * Etapa final (03/10 - 03/11)
 
 # Overview
 
@@ -130,17 +200,14 @@ SNR será um platform fighter, inspirado em outros jogos do gênero como Super S
 * [Core Gameplay Mechanic #1]
 
   * [Details] /Describe in 2 Paragraphs or less/
-
 * [Modo História ]
 
   * O modo História apresenta a narrativa principal de SNR, permitindo que os jogadores acompanhem o desenvolvimento do enredo enquanto enfrentam diferentes desafios e combates. O modo poderá ser jogado por até dois jogadores em cooperação.
   * Os jogadores avançam por uma sequência de desafios e batalhas, enfrentando diferentes adversários e utilizando os personagens disponíveis para progredir pela história.
-
 * [Modo Versus ]
 
   * O modo Versus permite que dois jogadores se enfrentem diretamente em combates nas diferentes arenas disponíveis no jogo.
   * Os jogadores escolhem seus personagens e uma arena antes do início da partida. Após o início do combate, cada jogador utiliza as habilidades de seu personagem para derrotar o adversário.
-
 * [Seleção de Personagens ]
 
   * SNR contará com diferentes personagens que poderão ser escolhidos pelos jogadores, cada um apresentando seus próprios ataques e habilidades.
@@ -181,22 +248,18 @@ SNR mistura elementos de jogos no estilo plataforma com um combate dinâmico, va
   * O personagem pode andar livremente pela arena, dar pulos amplos, e utilizar dashs no chão e no ar, que vão auxiliar na movimentação permitindo que o jogador desvie de ataques inimigos e se mova mais rapidamente pela arena. O personagem também poderá se pendurar na borda da arena facilitando sua subida caso ele seja derrubado.
   * O personagem anda quando quando os jogador mexe os joysticks do arcade, e da mesma forma pode pular ou agachar dependendo da direção, que o joystick for movido. O dash terá um botão do arcade exclusivo pra sua ativação.
   * como funciona
-
 * [ataques]
 
   * Cada personagem tem a sua disposição uma variedade de golpes neutros e direcionais que se dividem entre combos e ataques direcionais que servirão para causar dano e arremessar o oponente para fora da arena.
   * haverá um botão para os golpes, ao apertá-lo enquanto o personagem está parado ele pode desferir um combo de alguns ataques, há também variações, apertando o botão de ataque enquanto mantém o joystick pressionado para alguma direção, muda o tipo e efeitos do ataque.
-
 * [special]
 
   * cada conta além dos golpes normais com ataques especiais, como projéteis, investidas poderosas entre outros, que tornaram cada personagem único.
   * de forma parecida com os golpes haverá um botão para os special com mecânica a mesma mecânica de variação direcional.
-
 * [Dano e Knockback]
 
   * Os personagens em vez de uma barra de vida tem um sistema de porcentagem, conforme jogador recebe dano essa porcentagem aumenta, isso torna os ataques que ele sofrem cada vez mais eficazes.
   * cada ataque terá em suas propriedade um dano específico que é somado a hud de porcentagem do jogador que receber o ataque, o knockback que um jogador receber ao ser atacado é multiplicado por sua porcentagem e dividido por uma constante fixa.
-
 * [Ultimate]
 
   * Cada personagem contará com um poderoso movimento, que pode ser acionado uma vez em um grande intervalo de tempo, ele dará uma grande quantidade de dano expulsará o adversário da arena praticamente garantindo uma queda.
@@ -209,17 +272,17 @@ SNR mistura elementos de jogos no estilo plataforma com um combate dinâmico, va
 * Character Assets
 
   * Sprites para cada personagem
+    -idle
 
-    * idle
     * andar
     * agachar
     * dash
     * ataques
-    * specials
-    * ultimate
+      -specials
+      -ultimate
     * dano
     * derrubado
-    * derrota
+      -derrota
   * Efeitos visuais dos personagens
 
     * Efeitos de ataque
