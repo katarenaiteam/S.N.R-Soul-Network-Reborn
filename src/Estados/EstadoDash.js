@@ -23,11 +23,10 @@ export default class EstadoDash extends EstadoBase {
     this.personagem.sprite.setVelocityY(0);
     this.personagem.sprite.setVelocityX(direcao * 700);
 
-    // Timer de 150ms do Dash
+    // Timer de 250ms do Dash
     this.personagem.scene.time.delayedCall(250, () => {
       this.personagem.estaEmDash = false;
       this.personagem.sprite.body.setAllowGravity(true);
-      this.personagem.sprite.setVelocityX(0);
 
       if (!this.personagem.sprite.body.blocked.down) {
         this.personagem.maquinaEstados.mudarEstado("jump");
@@ -35,8 +34,14 @@ export default class EstadoDash extends EstadoBase {
         this.personagem.inputDown("esquerda") ||
         this.personagem.inputDown("direita")
       ) {
+        // No chão andando: desacelera suavemente o excesso de velocidade do dash
+        const velAtual = this.personagem.sprite.body.velocity.x;
+        this.personagem.sprite.setVelocityX(velAtual * 0.5);
         this.personagem.maquinaEstados.mudarEstado("walk");
       } else {
+        // No chão parado: aplica desaceleração leve (menos brusca que zerar direto)
+        const velAtual = this.personagem.sprite.body.velocity.x;
+        this.personagem.sprite.setVelocityX(velAtual * 0.3);
         this.personagem.maquinaEstados.mudarEstado("idle");
       }
     });

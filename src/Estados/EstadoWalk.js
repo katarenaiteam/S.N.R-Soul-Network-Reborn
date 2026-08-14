@@ -15,17 +15,32 @@ export default class EstadoWalk extends EstadoBase {
 
     // Dash
     if (this.personagem.inputJustDown("dash") && this.personagem.podeDash) {
-  this.personagem.maquinaEstados.mudarEstado("dash");
-  return;
-  }
-
-    // atack
-    if (this.personagem.inputJustDown("atack")) {
-      this.personagem.maquinaEstados.mudarEstado("atack");
+      this.personagem.maquinaEstados.mudarEstado("dash");
       return;
     }
 
-    //  Movimentação no chão
+    // atack
+    if (this.personagem.inputJustDown("atack")) {
+      // Como está no EstadoWalk, se está segurando esquerda ou direita, é ataque de lado (side)
+      const esq = this.personagem.inputDown("esquerda");
+      const dir = this.personagem.inputDown("direita");
+      
+      let tipoAtaque = "neutro1";
+      
+      if (this.personagem.obterTipoAtaque) {
+        tipoAtaque = this.personagem.obterTipoAtaque();
+      } else if (esq || dir) {
+        tipoAtaque = "side"; // Força o ataque lateral se estiver andando
+      }
+
+      // SÓ entra no estado de atack se NÃO estiver em cooldown!
+      if (this.personagem.podeUsarAtaque(tipoAtaque)) {
+        this.personagem.maquinaEstados.mudarEstado("atack", { tipo: tipoAtaque });
+        return;
+      }
+    }
+
+    // Movimentação no chão
     if (this.personagem.inputDown("esquerda")) {
       this.personagem.sprite.setVelocityX(-this.personagem.velocidade);
       this.personagem.sprite.setFlipX(true);
@@ -38,14 +53,14 @@ export default class EstadoWalk extends EstadoBase {
       return;
     }
 
-    //  Se caiu de uma plataforma sem pular
+    // Se caiu de uma plataforma sem pular
     if (!this.personagem.sprite.body.blocked.down) {
       this.personagem.maquinaEstados.mudarEstado("jump");
       return;
     }
 
     if (this.personagem.inputDown("baixo")) {
-      this.personagem.maquinaEstados.mudarEstado("crouch"); // ou "agachado", dependendo de como registrou
+      this.personagem.maquinaEstados.mudarEstado("crouch");
       return;
     }
   }

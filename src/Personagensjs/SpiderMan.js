@@ -1,5 +1,6 @@
 import Personagem from "./Personagem.js";
 import WebShot from "./Specials/Spiderman/WebShot.js";
+import AirWebShot from "./Specials/Spiderman/AirWebshot.js";
 
 export default class SpiderMan extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -142,7 +143,10 @@ export default class SpiderMan extends Personagem {
         offsetX: 45,
         offsetY: 95,
         escala: 1,
-    hurtboxes: [], // sem hurtbox por enquanto durante o special
+    hurtboxes: [
+          { largura: 55, altura: 60, offsetX: 25, offsetY: -70 }, // Tronco/cabeça
+          { largura: 110, altura: 35, offsetX: 5, offsetY: -18 }, // Agachado / pernas abertas
+    ], 
     },
    };
     
@@ -323,7 +327,7 @@ export default class SpiderMan extends Personagem {
       },
     };
 
-
+  // --- tabela especiais ---
     this.specials = {
       neutro: {
         animacao: "spy_neSpecial",
@@ -350,6 +354,27 @@ export default class SpiderMan extends Personagem {
 
       cima: {
         // futuro
+      },
+
+       air_neutro: {
+        animacao: "spy_AneSpecial",
+        duracao: 300,
+        cooldown: 2000,
+        logica: AirWebShot,
+         tempoProjetil: 5000,
+        // finalizarAoTocarChao: true,       
+        // atrasoFinalizacaoChao: 50,
+        // finalizarAoAcertarOponente: false,
+
+        propriedades: {
+          dano: 10,
+          knockbackX: 0,
+          knockbackY: 0,
+          anularGravidade: true,
+          //impulsoX: 0,                    
+          //impulsoY: 0,
+          
+        },
       },
     };
   }
@@ -521,6 +546,16 @@ export default class SpiderMan extends Personagem {
   frameRate: 12,
   repeat: -1,
 });
+
+scene.anims.create({
+      key: "spy_AneSpecial",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_AneSpecial", {
+        start: 0,
+        end: 9,
+      }),
+      frameRate: 28,
+      repeat: 0,
+    });
 
 // Animação 1: Teia cobrindo o alvo (trava no frame final enquanto estiver preso)
     if (!scene.anims.exists("spy_web_trap_start")) {

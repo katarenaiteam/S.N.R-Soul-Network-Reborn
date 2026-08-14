@@ -8,22 +8,14 @@ export default class CenaStart extends Phaser.Scene {
   create() {
     this.cameras.main.setBackgroundColor("#05050a");
 
-    // 1. MÁSCARA DA ABA DO NAVEGADOR
-    const rectJanela = this.add.graphics();
-    rectJanela.fillStyle(0xffffff);
-    rectJanela.fillRect(0, 0, this.scale.width, this.scale.height);
-    this.mascara = rectJanela.createGeometryMask();
-
+    // 1. CONTAINER PARA O MENU
     this.conteudoMenu = this.add.container(0, 0);
-    this.conteudoMenu.setMask(this.mascara);
-
-    // Animação de entrada
-    rectJanela.scaleY = 0;
-    rectJanela.y = this.scale.height / 2;
+    
+    // Animação de entrada (scale Y simples, sem alterar posição/origem)
+    this.conteudoMenu.scaleY = 0;
     this.tweens.add({
-      targets: rectJanela,
+      targets: this.conteudoMenu,
       scaleY: 1,
-      y: 0,
       duration: 600,
       ease: "Cubic.easeOut"
     });
@@ -149,9 +141,8 @@ export default class CenaStart extends Phaser.Scene {
   }
 
   fecharAbaEAvancar() {
-    const rectJanela = this.mascara.template;
     this.tweens.add({
-      targets: rectJanela,
+      targets: this.conteudoMenu,
       scaleY: 0,
       y: this.scale.height / 2,
       duration: 400,

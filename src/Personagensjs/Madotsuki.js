@@ -138,7 +138,7 @@ export default class Madotsuki extends Personagem {
 
     // tabela de golpes Madotsuki
     this.golpes = {
-      neutro: {
+      neutro1: {
         animacao: "mado_atack", // Ajuste para o nome da SUA animação no Phaser
         frameHitbox: 2, // Frame exato onde a faca acerta (começa em 1)
         offsetX: 25, // Distância pra frente

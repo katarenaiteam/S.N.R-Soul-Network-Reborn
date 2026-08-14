@@ -20,7 +20,7 @@ export default class EstadoDano extends EstadoBase {
         const agora = this.personagem.scene.time.now;
 
         if (body) {
-            body.setVelocityX(body.velocity.x * 0.92);
+            body.setVelocityX(body.velocity.x * 0.95);
         }
 
         if (agora - this.tempoInicial >= this.duracaoStun) {

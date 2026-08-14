@@ -121,7 +121,7 @@ export default class Dio extends Personagem {
 
     // tabela de golpes
     this.golpes = {
-      neutro: {
+      neutro1: {
         animacao: "dio_atack", // Ajuste para o nome da SUA animação no Phaser
         frameHitbox: 2, // Frame exato onde a faca acerta (começa em 1)
         offsetX: 64, // Distância pra frente

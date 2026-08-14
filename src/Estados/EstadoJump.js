@@ -27,6 +27,9 @@ export default class EstadoJump extends EstadoBase {
     ) {
       this.personagem.sprite.setVelocityY(this.personagem.forcaPulo);
       this.personagem.pulos++;
+
+      // --- Chama o tocarAnimacao autorizando o RESTART! ---
+      this.personagem.tocarAnimacao("jump", true); 
     }
 
     // 3. Controle do Pulo Variável (Corta o pulo pela metade se soltar a tecla W)
@@ -45,15 +48,48 @@ export default class EstadoJump extends EstadoBase {
       return;
     }
 
+
+    // indo pro special
+    if (this.personagem.inputJustDown("special")) {
+    //  Pega o tipo do special primeiro
+    const tipoSpecial = this.personagem.obterTipoSpecial ? this.personagem.obterTipoSpecial() : "neutro";
+
+    // SÓ entra no estado de special se NÃO estiver em cooldown!
+    if (this.personagem.podeUsarSpecial(tipoSpecial)) {
+        this.personagem.maquinaEstados.mudarEstado("special");
+        return;
+    }
+    }
+
+
+
     // 4. Movimentação Horizontal no ar
     if (this.personagem.inputDown("esquerda")) {
-      this.personagem.sprite.setVelocityX(-this.personagem.velocidade);
       this.personagem.sprite.setFlipX(true);
+      const velAtual = this.personagem.sprite.body.velocity.x;
+      const velAlvo = -this.personagem.velocidade;
+
+      // Se vindo do dash estiver mais rápido que a velocidade normal, desacelera suavemente até ela
+      if (velAtual < velAlvo) {
+        this.personagem.sprite.setVelocityX(velAtual * 0.92);
+      } else {
+        this.personagem.sprite.setVelocityX(velAlvo);
+      }
     } else if (this.personagem.inputDown("direita")) {
-      this.personagem.sprite.setVelocityX(this.personagem.velocidade);
       this.personagem.sprite.setFlipX(false);
+      const velAtual = this.personagem.sprite.body.velocity.x;
+      const velAlvo = this.personagem.velocidade;
+
+      // Se vindo do dash estiver mais rápido que a velocidade normal, desacelera suavemente até ela
+      if (velAtual > velAlvo) {
+        this.personagem.sprite.setVelocityX(velAtual * 0.92);
+      } else {
+        this.personagem.sprite.setVelocityX(velAlvo);
+      }
     } else {
-      this.personagem.sprite.setVelocityX(0);
+      // Sem direcionais segurados: desaceleração suave da inércia no ar
+      const velX = this.personagem.sprite.body.velocity.x;
+      this.personagem.sprite.setVelocityX(velX * 0.95);
     }
 
     // 5. Transição de volta para o chão

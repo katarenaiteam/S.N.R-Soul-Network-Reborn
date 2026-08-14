@@ -1,36 +1,42 @@
-export default class WebShot {
-  constructor(personagem, special) {
+// AirWebshot.js
+export default class AirWebShot {
+  constructor(personagem, special, estado) {
     this.personagem = personagem;
     this.scene = personagem.scene;
     this.special = special;
+    this.estado = estado;
 
     this.projetil = null;
     this.acertou = false;
-    this.timer = null;
     this.overlaps = [];
   }
 
   executar() {
-    if (this.projetil || this.timer) return;
+    if (this.projetil) return;
 
-    // Delay de 400ms para casar com a animação do Homem-Aranha
-    this.timer = this.scene.time.delayedCall(400, () => {
-      this.timer = null;
-      this.criarProjetil();
-    });
+    // Só executa se o Homem-Aranha estiver no ar
+    if (this.personagem.sprite.body.blocked.down) return;
+
+    // Reduz a velocidade Y para dar a leve "flutuada" no ar
+    this.personagem.sprite.setVelocityY(40);
+
+    this.criarProjetil();
   }
 
   criarProjetil() {
-    if (!this.personagem || !this.personagem.sprite || !this.personagem.sprite.active) return;
+    if (!this.personagem?.sprite?.active) return;
 
     const sprite = this.personagem.sprite;
     const direcao = sprite.flipX ? -1 : 1;
 
-    const x = sprite.x + 30 * direcao;
-    const y = sprite.y - 60;
+    // Ponto de saída do tiro (mão no ar)
+    const x = sprite.x + (25 * direcao);
+    const y = sprite.y + -10;
 
+    // 1. Cria o projétil da teia
     this.projetil = this.scene.physics.add.sprite(x, y, "webshot", 4);
 
+    // Ignora a Câmera HUD para evitar o projétil fantasma na tela
     if (this.scene.camHUD) {
       this.scene.camHUD.ignore(this.projetil);
     }
@@ -38,15 +44,25 @@ export default class WebShot {
     this.projetil.setFlipX(direcao === -1);
     this.projetil.setOrigin(0.5, 0.5);
 
+    // Toca a animação da teia
     this.projetil.anims.play("spy_webShot");
     this.projetil.body.setAllowGravity(false);
-    this.projetil.body.setVelocityX(1000 * direcao);
 
-    const larguraHitbox = 50;
-    const alturaHitbox = 30;
-    this.projetil.body.setSize(larguraHitbox, alturaHitbox, false);
-    this.projetil.body.setOffset((200 - larguraHitbox) / 2, (200 - alturaHitbox) / 2);
+    // Trajetória diagonal para baixo
+    const velocidadeX = 450 * direcao;
+    const velocidadeY = 320;
+    this.projetil.setVelocity(velocidadeX, velocidadeY);
 
+    // Rotaciona o sprite na direção da trajetória
+    const angulo = direcao === 1 ? 35 : 145;
+    this.projetil.setAngle(angulo);
+
+    // Ajuste fino da Hitbox do Projétil
+    const larguraHitbox = 40;
+    const alturaHitbox = 40;
+    this.projetil.body.setSize(larguraHitbox, alturaHitbox, true);
+
+    // 2. Registra a colisão/overlap com os dois jogadores
     const jogador1 = this.scene.jogador1;
     const jogador2 = this.scene.jogador2;
 
@@ -75,15 +91,15 @@ export default class WebShot {
     if (alvo === this.personagem) return;
     if (this.acertou) return;
 
-    // NOVO: Se o alvo já está preso ou imune à teia, o tiro passa direto sem prender novamente
+    // Se o alvo já estiver preso ou imune à teia, o tiro ignora
     if (alvo.estaPresoNaTeia || alvo.imuneTeia) {
       return;
     }
 
     this.acertou = true;
-    console.log("WEBSHOT PRENDEU:", alvo.nomePersonagem);
+    console.log("AIR WEBSHOT PRENDEU:", alvo.nomePersonagem);
 
-    // 1. Aplica dano inicial
+    // 1. Dano inicial
     if (typeof alvo.receberDano === "function") {
       alvo.receberDano(
         this.special?.propriedades?.dano || 10,
@@ -91,10 +107,10 @@ export default class WebShot {
       );
     }
 
-    // 2. Prende e congela o oponente
+    // 2. Lógica de prender o oponente (idêntica à do WebShot do chão)
     this.prenderOponente(alvo);
 
-    // Destrói o projétil da teia que estava voando
+    // Destrói o projétil da teia em voo
     if (this.projetil && this.projetil.active) {
       this.projetil.destroy();
       this.projetil = null;
@@ -105,16 +121,17 @@ export default class WebShot {
     const tempoPreso = 2500;
     const tempoImunidade = 900;
 
-    if (!alvo || !alvo.sprite || !alvo.sprite.body) return;
+    if (!alvo?.sprite?.body) return;
 
-    // Se ele já tiver uma teia presa, destrói a antiga antes de aplicar
+    // Se ele já tiver uma teia presa ativada, desfaz antes de reaplicar
     if (alvo.estourarTeia) {
-      alvo.estourarTeia(false); // Estoura a teia anterior sem tocar a animação duplicada
+      alvo.estourarTeia(false);
     }
 
     alvo.estaPresoNaTeia = true;
     alvo.imuneTeia = true;
 
+    // Troca o estado do oponente para o "EstadoTeia"
     alvo.maquinaEstados.mudarEstado("teia");
     alvo.sprite.body.setVelocityX(0);
     alvo.sprite.body.setAllowGravity(true);
@@ -143,15 +160,14 @@ export default class WebShot {
 
     this.scene.events.on("update", seguirOponente);
 
-    // Guarda as referências no próprio oponente para que o estourarTeia possa acessar
+    // Referências armazenadas no oponente para o EstadoTeia manipular
     alvo.teiaPresaSprite = teiaPresa;
     alvo.seguirOponenteTeia = seguirOponente;
 
-    // Função para estourar/destruir a teia
+    // Função para desfazer a teia (se tomar dano ou acabar o tempo)
     alvo.estourarTeia = (tocarAnimacao = true) => {
       alvo.estaPresoNaTeia = false;
 
-      // Cancela o timer principal se ainda estiver ativo
       if (alvo.timerTeia) {
         alvo.timerTeia.remove(false);
         alvo.timerTeia = null;
@@ -172,13 +188,13 @@ export default class WebShot {
 
       alvo.teiaPresaSprite = null;
 
-      // Timer de imunidade
+      // Imunidade após sair
       this.scene.time.delayedCall(tempoImunidade, () => {
         alvo.imuneTeia = false;
       });
     };
 
-    // Timer natural de tempo esgotado (caso ninguém bata nele)
+    // Timer natural para soltar da teia
     alvo.timerTeia = this.scene.time.delayedCall(tempoPreso, () => {
       if (alvo.estaPresoNaTeia) {
         alvo.estourarTeia(true);
@@ -192,24 +208,11 @@ export default class WebShot {
     });
   }
 
-  atualizar() {
-    if (this.projetil && this.projetil.active) {
-      if (Math.abs(this.projetil.x - this.personagem.sprite.x) > 1000) {
-        this.destruir();
-      }
-    }
-  }
-
   destruir() {
     this.overlaps.forEach((overlap) => {
       if (overlap && overlap.active) overlap.destroy();
     });
     this.overlaps = [];
-
-    if (this.timer) {
-      this.timer.remove(false);
-      this.timer = null;
-    }
 
     if (this.projetil && this.projetil.active) {
       this.projetil.destroy();

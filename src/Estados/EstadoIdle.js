@@ -35,14 +35,26 @@ export default class EstadoIdle extends EstadoBase {
     }
 
     if (this.personagem.inputJustDown("special")) {
-     this.personagem.maquinaEstados.mudarEstado("special");
-     return;
+    // 🛑 Pega o tipo do special primeiro
+    const tipoSpecial = this.personagem.obterTipoSpecial ? this.personagem.obterTipoSpecial() : "neutro";
+
+    // SÓ entra no estado de special se NÃO estiver em cooldown!
+    if (this.personagem.podeUsarSpecial(tipoSpecial)) {
+        this.personagem.maquinaEstados.mudarEstado("special");
+        return;
+    }
     }
 
     if (this.personagem.inputJustDown("atack")) {
-      this.personagem.maquinaEstados.mudarEstado("atack", { tipo: "neutro" });
-      return;
+    // Pega o tipo de ataque se a função existir, senão usa "neutro"
+    const tipoAtaque = this.personagem.obterTipoAtaque ? this.personagem.obterTipoAtaque() : "neutro1";
+
+    // SÓ entra no estado de atack se NÃO estiver em cooldown!
+    if (this.personagem.podeUsarAtaque(tipoAtaque)) {
+        this.personagem.maquinaEstados.mudarEstado("atack", { tipo: tipoAtaque });
+        return;
     }
+   }
 
     // 4. Transição para ANDAR
     if (

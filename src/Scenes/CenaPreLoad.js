@@ -113,6 +113,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("SpiderMan_downAtack", "assets/personagens/SpiderMan/Sprites/SpiderMan_downAtack.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_sideAtack", "assets/personagens/SpiderMan/Sprites/SpiderMan_sideAtack.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_neSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_neSpecial.png", { frameWidth: 200, frameHeight: 200 });
+    this.load.spritesheet("SpiderMan_AneSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AneSpecial.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("webshot", "assets/personagens/SpiderMan/Sprites/webshot.png", { frameWidth: 200, frameHeight: 200 });
     // --- Miku ---
     this.load.spritesheet("Miku_idle", "assets/personagens/Miku/Sprites/Miku_idle.png", { frameWidth: 500, frameHeight: 500 });

@@ -6,21 +6,14 @@ export default class CenaGameOver extends Phaser.Scene {
   create() {
     this.cameras.main.setBackgroundColor("#05050a");
 
-    // 1. MÁSCARA DA ABA DO NAVEGADOR (Animação de entrada)
-    const rectJanela = this.add.graphics();
-    rectJanela.fillStyle(0xffffff);
-    rectJanela.fillRect(0, 0, this.scale.width, this.scale.height);
-    this.mascara = rectJanela.createGeometryMask();
-
+    // 1. CONTAINER PARA O MENU
     this.conteudoMenu = this.add.container(0, 0);
-    this.conteudoMenu.setMask(this.mascara);
-
-    rectJanela.scaleY = 0;
-    rectJanela.y = this.scale.height / 2;
+    
+    // Animação de entrada (scale Y simples, sem alterar posição/origem)
+    this.conteudoMenu.scaleY = 0;
     this.tweens.add({
-      targets: rectJanela,
+      targets: this.conteudoMenu,
       scaleY: 1,
-      y: 0,
       duration: 600,
       ease: "Cubic.easeOut"
     });
@@ -61,9 +54,8 @@ export default class CenaGameOver extends Phaser.Scene {
     this.bloqueado = true;
 
     // Transição de saída fechando a aba
-    const rectJanela = this.mascara.template;
     this.tweens.add({
-      targets: rectJanela,
+      targets: this.conteudoMenu,
       scaleY: 0,
       y: this.scale.height / 2,
       duration: 400,

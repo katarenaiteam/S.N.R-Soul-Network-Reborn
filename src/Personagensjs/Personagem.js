@@ -313,13 +313,22 @@ podeUsarSpecial(tipoSpecial) {
     }
   }
 
-  tocarAnimacao(nomeAnim) {
-    const chaveAnim = `${this.prefixoAnim}${nomeAnim}`;
-    if (this.sprite.anims.currentAnim?.key === chaveAnim) return;
+  tocarAnimacao(nomeAnim, forcarRestart = false) {
+  const chaveAnim = `${this.prefixoAnim}${nomeAnim}`;
 
-    this.sprite.play(chaveAnim, true);
-    this.aplicarConfiguracao(nomeAnim);
+  // 1. Se for a mesma animação e forçarRestart for true, REINICIA DO FRAME 0
+  if (this.sprite.anims.currentAnim?.key === chaveAnim) {
+    if (forcarRestart) {
+      this.sprite.anims.restart();
+      this.aplicarConfiguracao(nomeAnim);
+    }
+    return; // Se já estiver tocando e NÃO for para forçar, ignora
   }
+
+  // 2. Se for uma animação totalmente diferente, toca normalmente
+  this.sprite.play(chaveAnim, true);
+  this.aplicarConfiguracao(nomeAnim);
+}
 
   criarHitboxAtaque(offsetX, offsetY, largura, altura, dadosAtaque) {
     if (this.hitboxAtiva) {

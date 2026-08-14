@@ -21,27 +21,34 @@ export default class EstadoCrouch extends EstadoBase {
       return;
     }
 
-    //atacar
+    // Atacar agachado
     if (this.personagem.inputJustDown("atack")) {
-      this.personagem.maquinaEstados.mudarEstado("atack");
-      return;
+      let tipoAtaque = "agachado";
+
+      if (this.personagem.obterTipoAtaque) {
+        tipoAtaque = this.personagem.obterTipoAtaque();
+      }
+
+      // SÓ entra no estado de atack se NÃO estiver em cooldown!
+      if (this.personagem.podeUsarAtaque(tipoAtaque)) {
+        this.personagem.maquinaEstados.mudarEstado("atack", { tipo: tipoAtaque });
+        return;
+      }
     }
 
     // Transição pro dash
     if (this.personagem.inputJustDown("dash") && this.personagem.podeDash) {
-    this.personagem.maquinaEstados.mudarEstado("dash");
-    return;
+      this.personagem.maquinaEstados.mudarEstado("dash");
+      return;
     }
 
-    // Transição pro pulo usando a funçao pular
+    // Transição pro pulo usando a função pular
     if (this.personagem.inputJustDown("cima")) {
       this.personagem.pular();
       return;
     }
 
-    // Transição pra andar
-
-    // se sair da plataforma sem pular
+    // Se sair da plataforma sem pular
     if (
       !this.personagem.sprite.body.blocked.down &&
       !this.personagem.sprite.body.touching.down

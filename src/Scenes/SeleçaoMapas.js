@@ -17,28 +17,19 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
   create() {
     this.cameras.main.setBackgroundColor("#05050a");
 
-    // 1. MÁSCARA DA ABA DO NAVEGADOR
-    const rectJanela = this.add.graphics();
-    rectJanela.fillStyle(0xffffff);
-    rectJanela.fillRect(0, 0, this.scale.width, this.scale.height);
-    this.mascara = rectJanela.createGeometryMask();
-
+    // 1. CONTAINER PARA O MENU
     this.conteudoMenu = this.add.container(0, 0);
-    this.conteudoMenu.setMask(this.mascara);
-
-    // Animação de entrada
-    rectJanela.scaleY = 0;
-    rectJanela.y = this.scale.height / 2;
+    
+    // Animação de entrada (scale Y simples, sem alterar posição/origem)
+    this.conteudoMenu.scaleY = 0;
     this.tweens.add({
-      targets: rectJanela,
+      targets: this.conteudoMenu,
       scaleY: 1,
-      y: 0,
       duration: 600,
       ease: "Cubic.easeOut"
     });
 
     // 2. IMAGEM DE FUNDO DO MENU DE MAPAS
-    // Altere 'Start_menu' para a chave da imagem de fundo se tiver uma específica
     const fundo = this.add.image(0, 0, "Start_menu").setOrigin(0, 0).setDisplaySize(this.scale.width, this.scale.height);
     this.conteudoMenu.add(fundo);
 
@@ -46,8 +37,6 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
     this.mapas = [
       { id: "cidade", nome: "Cidade", classe: Cidade, chaveSprite: "thumb_cidade" },
       { id: "SkyTowers", nome: "SkyTowers", classe: SkyTowers, chaveSprite: "thumb_skytowers" },
-      // Adicione outros mapas aqui informando a imagem correspondente:
-      // { id: "floresta", nome: "Floresta", classe: Floresta, chaveSprite: "thumb_floresta" },
     ];
 
     this.indiceOpcao = 0; // Começa no primeiro mapa
@@ -194,9 +183,9 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
   }
 
   fecharAbaEAvancar() {
-    const rectJanela = this.mascara.template;
+    // Animamos o container diretamente
     this.tweens.add({
-      targets: rectJanela,
+      targets: this.conteudoMenu,
       scaleY: 0,
       y: this.scale.height / 2,
       duration: 400,

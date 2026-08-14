@@ -1,93 +1,188 @@
 import EstadoBase from "./EstadoBase.js";
-import WebShot from "../Personagensjs/Specials/Spiderman/WebShot.js";
 
 export default class EstadoSpecial extends EstadoBase {
   enter(dados = {}) {
+    const noChao = this.personagem.sprite.body.blocked.down;
+    const direcaoOlhar = this.personagem.sprite.flipX ? -1 : 1;
 
+    // Guarda o tipo de special enviado
     let tipoSpecial = dados?.tipo;
 
-    // Descobre o special pela direção
+    // Se não veio tipo nos dados, descobre pelas direções e pelo estado (chão vs ar)
     if (!tipoSpecial) {
-      const esquerda = this.personagem.inputDown("esquerda");
-      const direita = this.personagem.inputDown("direita");
-      const cima = this.personagem.inputDown("cima");
-      const baixo = this.personagem.inputDown("baixo");
+      const apertandoLado =
+        this.personagem.inputDown("esquerda") ||
+        this.personagem.inputDown("direita");
 
-      if (cima) {
-        tipoSpecial = "cima";
-      } else if (baixo) {
-        tipoSpecial = "baixo";
-      } else if (esquerda || direita) {
-        tipoSpecial = "lado";
+      const apertandoCima = this.personagem.inputDown("cima");
+      const apertandoBaixo = this.personagem.inputDown("baixo");
+
+      if (noChao) {
+        if (apertandoCima) tipoSpecial = "cima";
+        else if (apertandoBaixo) tipoSpecial = "agachado";
+        else if (apertandoLado) tipoSpecial = "lado";
+        else tipoSpecial = "neutro";
       } else {
-        tipoSpecial = "neutro";
+        if (apertandoCima) tipoSpecial = "air_cima";
+        else if (apertandoBaixo) tipoSpecial = "air_agachado";
+        else if (apertandoLado) tipoSpecial = "air_lado";
+        else tipoSpecial = "air_neutro";
       }
     }
 
-    this.tipoSpecial = tipoSpecial;
-    this.tempoInicio = this.personagem.scene.time.now;
+    // Checagem na tabela do personagem (mantém tipoSpecial ou usa neutro)
+    const tipoSpecialEfetivo = this.personagem.specials?.[tipoSpecial]
+      ? tipoSpecial
+      : "neutro";
 
-    // Pega o special na tabela do personagem
-    this.specialAtual = this.personagem.specials?.[tipoSpecial];
+    // Pega o objeto do especial e salva as referências
+    this.specialAtual = this.personagem.specials?.[tipoSpecialEfetivo];
+    this.tipoSpecialAtual = tipoSpecialEfetivo;
 
-    if (!this.specialAtual) {
-      console.warn(`Special "${tipoSpecial}" não existe!`);
+    // Impede de usar se não existir ou se estiver em cooldown
+    if (
+      !this.specialAtual ||
+      !this.personagem.podeUsarSpecial(tipoSpecialEfetivo)
+    ) {
       this.finalizarSpecial();
       return;
     }
 
-    if (!this.personagem.podeUsarSpecial(tipoSpecial)) {
-    this.finalizarSpecial();
-    return;
-   }
+    // Travas e Flags de Finalização/Física
+    this.tempoInicio = this.personagem.scene.time.now;
+    this.timerFinalizacaoChao = null;
+    this.finalizandoPorChao = false;
+    this.timerFinalizacaoAcerto = null;
+    this.finalizandoPorAcerto = false;
 
-this.personagem.iniciarCooldownSpecial(tipoSpecial);
+    // Inicia Cooldown
+    this.personagem.iniciarCooldownSpecial(tipoSpecialEfetivo);
 
-    console.log("Special:", this.tipoSpecial);
-    console.log("Dados:", this.specialAtual);
+    // ===================================
+    // GRAVIDADE E IMPULSOS (EXPORTADO DO ATAQUE)
+    // ===================================
+    if (this.specialAtual?.propriedades?.anularGravidade) {
+      this.anulouGravidade = true;
+      this.personagem.sprite.body.setAllowGravity(false);
+      this.personagem.sprite.body.setVelocityY(0);
+    } else {
+      this.anulouGravidade = false;
+    }
 
-    // =========================
-// ANIMAÇÃO
-// =========================
+    if (this.specialAtual?.propriedades?.impulsoX) {
+      this.personagem.sprite.setVelocityX(
+        direcaoOlhar * this.specialAtual.propriedades.impulsoX
+      );
+    } else if (noChao) {
+      this.personagem.sprite.setVelocityX(0);
+    }
 
-const animChave = this.specialAtual?.animacao;
+    if (this.specialAtual?.propriedades?.impulsoY) {
+      this.personagem.sprite.setVelocityY(
+        this.specialAtual.propriedades.impulsoY
+      );
+    }
 
-if (animChave && this.personagem.scene.anims.exists(animChave)) {
-  this.personagem.sprite.anims.play(animChave, true);
-} else {
-  console.warn(`Animação ${animChave} não existe!`);
-}
+    // ANIMAÇÃO
+    const animChave = this.specialAtual?.animacao;
+
+    if (animChave && this.personagem.scene.anims.exists(animChave)) {
+      this.personagem.sprite.anims.play(animChave, true);
+    } else {
+      console.warn(`Animação ${animChave} não existe!`);
+    }
   }
 
   execute() {
-  const agora = this.personagem.scene.time.now;
+    const noChao = this.personagem.sprite.body.blocked.down;
+    const agora = this.personagem.scene.time.now;
+    const tempoDecorrido = agora - this.tempoInicio;
 
-  if (
-    this.specialAtual?.duracao !== undefined &&
-    agora - this.tempoInicio >= this.specialAtual.duracao
-  ) {
-    this.finalizarSpecial();
-    return;
+    // ===================================
+    // INSTANCIA A LÓGICA DO ESPECIAL
+    // ===================================
+    if (this.specialAtual?.logica && !this.logicaSpecial) {
+      const LogicaSpecial = this.specialAtual.logica;
+
+      this.logicaSpecial = new LogicaSpecial(
+        this.personagem,
+        this.specialAtual,
+        this
+      );
+
+      this.logicaSpecial.executar();
+      this.personagem.logicasEspeciaisAtivas.push(this.logicaSpecial);
+    }
+
+    // ===================================
+    // FINALIZAÇÃO POR DURAÇÃO
+    // ===================================
+    if (
+      this.specialAtual?.duracao !== undefined &&
+      tempoDecorrido >= this.specialAtual.duracao
+    ) {
+      this.finalizarSpecial();
+      return;
+    }
+
+    // ===================================
+    // FINALIZAÇÃO AO TOCAR O CHÃO
+    // ===================================
+    if (
+      this.specialAtual?.finalizarAoTocarChao &&
+      noChao &&
+      !this.finalizandoPorChao
+    ) {
+      this.finalizandoPorChao = true;
+      const atraso = this.specialAtual.atrasoFinalizacaoChao ?? 0;
+
+      this.timerFinalizacaoChao = this.personagem.scene.time.delayedCall(
+        atraso,
+        () => {
+          if (this.personagem.maquinaEstados.estadoAtual === this) {
+            this.finalizarSpecial();
+          }
+        }
+      );
+    }
+
+    // ===================================
+    // MOVIMENTAÇÃO LATERAL NO AR (CASO NÃO TENHA IMPULSO X FIXO)
+    // ===================================
+    if (
+      !noChao &&
+      !this.specialAtual?.propriedades?.impulsoX &&
+      !this.specialAtual?.propriedades?.travarMovimentoAir
+    ) {
+      const vel = this.personagem.velocidade;
+
+      if (this.personagem.inputDown("esquerda")) {
+        this.personagem.sprite.setVelocityX(-vel);
+      } else if (this.personagem.inputDown("direita")) {
+        this.personagem.sprite.setVelocityX(vel);
+      }
+    }
   }
 
-  if (this.specialAtual?.logica) {
-  if (!this.logicaSpecial) {
-    const LogicaSpecial = this.specialAtual.logica;
+  // Permite que a classe do Projétil (ex: AirWebShot) avise quando o tiro acertou
+  notificarAcerto() {
+    if (
+      this.specialAtual?.finalizarAoAcertarOponente &&
+      !this.finalizandoPorAcerto
+    ) {
+      this.finalizandoPorAcerto = true;
+      const atraso = this.specialAtual.atrasoFinalizacaoAcerto ?? 0;
 
-    this.logicaSpecial = new LogicaSpecial(
-      this.personagem,
-      this.specialAtual,
-      this
-    );
-
-    this.logicaSpecial.executar();
-
-    this.personagem.logicasEspeciaisAtivas.push(
-      this.logicaSpecial
-    );
+      this.timerFinalizacaoAcerto = this.personagem.scene.time.delayedCall(
+        atraso,
+        () => {
+          if (this.personagem.maquinaEstados.estadoAtual === this) {
+            this.finalizarSpecial();
+          }
+        }
+      );
+    }
   }
-}
-}
 
   finalizarSpecial() {
     if (this.personagem.sprite.body.blocked.down) {
@@ -98,7 +193,25 @@ if (animChave && this.personagem.scene.anims.exists(animChave)) {
   }
 
   exit() {
+    // Restaura a gravidade se ela tiver sido anulada
+    if (this.anulouGravidade) {
+      this.personagem.sprite.body.setAllowGravity(true);
+      this.anulouGravidade = false;
+    }
 
-  this.logicaSpecial = null;
-}
+    // Limpeza de timers
+    if (this.timerFinalizacaoChao) {
+      this.timerFinalizacaoChao.remove(false);
+      this.timerFinalizacaoChao = null;
+    }
+    this.finalizandoPorChao = false;
+
+    if (this.timerFinalizacaoAcerto) {
+      this.timerFinalizacaoAcerto.remove(false);
+      this.timerFinalizacaoAcerto = null;
+    }
+    this.finalizandoPorAcerto = false;
+
+    this.logicaSpecial = null;
+  }
 }
