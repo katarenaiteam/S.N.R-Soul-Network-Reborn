@@ -7,6 +7,8 @@ import EstadoCrouch from "../Estados/EstadoCrouch.js";
 import EstadoAtack from "../Estados/EstadoAtack.js";
 import EstadoDano from "../Estados/EstadoDano.js";
 import EstadoSpecial from "../Estados/EstadoSpecial.js";
+import EstadoTeia from "../Estados/EstadoTeia.js";
+
 
 export default class Personagem {
   constructor(
@@ -68,6 +70,7 @@ export default class Personagem {
     this.maquinaEstados.adicionarEstado("atack", new EstadoAtack(this));
     this.maquinaEstados.adicionarEstado("dano", new EstadoDano(this));
     this.maquinaEstados.adicionarEstado("special", new EstadoSpecial(this));
+    this.maquinaEstados.adicionarEstado("teia", new EstadoTeia(this));
 
     this.maquinaEstados.mudarEstado("idle");
   }

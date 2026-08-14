@@ -114,7 +114,7 @@ export default class Charmenu extends Phaser.Scene {
 
             // Espera 1 segundo com as bordas em verde e inicia a cenaPrincipal
             this.time.delayedCall(1000, () => {
-                this.scene.start("cenaPrincipal", escolhas);
+                this.scene.start("CenaSelecaoMapa", escolhas);
             });
         }
     }

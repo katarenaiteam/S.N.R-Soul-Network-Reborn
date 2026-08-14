@@ -58,10 +58,13 @@ export default class EstadoAtack extends EstadoBase {
       return;
       }
 
-    
+     // verifica se já foi acertado o inimigo
      this.jaAcertou = false;
+      // verifica se já foi criada a hitbox
      this.hitboxCriada = false;
+     //define o tempo para imediato no relogio interno do phaser
      this.tempoInicio = this.personagem.scene.time.now;
+     //trava que verifica instancia a finalizaçao no chao
      this.timerFinalizacaoChao = null;
      this.finalizandoPorChao = false;
      this.timerFinalizacaoAcerto = null;

@@ -17,12 +17,21 @@ export default class cenaPrincipal extends Phaser.Scene {
     // Usa as escolhas passadas; se não houver, usa padrões para evitar erros
     this.escolhaP1 = dados.p1 || "Frederick";
     this.escolhaP2 = dados.p2 || "Madotsuki";
+
+    this.ClasseMapa = dados.ClasseMapa || dados.mapa || MapaCidade;
+
   }
 
   create() {
     this.physics.world.setBounds(0, 0, 1920, 640);
     //criar o mapa que vou estar
-    this.mapaAtual = new MapaCidade(this);
+    // 1. Instancia o mapa dinâmico trazido do init
+   this.mapaAtual = new this.ClasseMapa(this);
+
+   // 2. Lê os limites e pontos de respawn do mapa instanciado
+   this.limitesArena = this.mapaAtual.limitesArena;
+   this.pontoRespawnP1 = this.mapaAtual.spawnsRespawn.p1;
+   this.pontoRespawnP2 = this.mapaAtual.spawnsRespawn.p2;
 
 
     // --- CONTROLE DE VIDAS ---
@@ -35,7 +44,7 @@ export default class cenaPrincipal extends Phaser.Scene {
     // --- PLATAFORMAS ESTÁTICAS ---
     this.plataformas = this.physics.add.staticGroup();
 
-    //telcas dos personagem atribuir imputs
+    //teclcas dos personagem atribuir imputs
     const teclasP1 = this.input.keyboard.addKeys({
       esquerda: Phaser.Input.Keyboard.KeyCodes.A,
       direita: Phaser.Input.Keyboard.KeyCodes.D,
@@ -61,38 +70,39 @@ export default class cenaPrincipal extends Phaser.Scene {
 
     //========instanciar fodinhas============
     this.jogador1 = this.criarPersonagem(
-      this.escolhaP1,
-      500,
-      200,
-      teclasP1,
-      200,
-      600,
-      controleP1,
-    );
-    this.jogador2 = this.criarPersonagem(
-      this.escolhaP2,
-      600,
-      200,
-      teclasP2,
-      600,
-      600,
-      controleP2,
-    );
+  this.escolhaP1,
+  this.mapaAtual.spawnsIniciais.p1.x, // Lê o X dinâmico do mapa
+  this.mapaAtual.spawnsIniciais.p1.y, // Lê o Y dinâmico do mapa
+  teclasP1,
+  200,
+  600,
+  controleP1
+);
+
+this.jogador2 = this.criarPersonagem(
+  this.escolhaP2,
+  this.mapaAtual.spawnsIniciais.p2.x, // Lê o X dinâmico do mapa
+  this.mapaAtual.spawnsIniciais.p2.y, // Lê o Y dinâmico do mapa
+  teclasP2,
+  600,
+  600,
+  controleP2
+);
 
     //efeito aura==================
     // Verifica se a Madotsuki foi escolhida no P1 ou no P2
-    const temDio =
-      this.jogador1.nomePersonagem === "Dio" ||
-      this.jogador2.nomePersonagem === "Dio";
+  //  const temDio =
+  //    this.jogador1.nomePersonagem === "Dio" ||
+  //    this.jogador2.nomePersonagem === "Dio";
 
     // Se ela estiver na partida, usa a música dela, senão usa a normal da fase
-    const musicaParaTocar = temDio ? "DiosAmendment" : "ClockTower";
+ //   const musicaParaTocar = temDio ? "DiosAmendment" : "ClockTower";
 
-    this.musicaFase = this.sound.add(musicaParaTocar, {
-      loop: true,
-      volume: 0.1,
-    });
-    this.musicaFase.play();
+  //  this.musicaFase = this.sound.add(musicaParaTocar, {
+  //    loop: true,
+  //    volume: 0.1,
+  //  });
+  //  this.musicaFase.play();
 
     // 2. Cria a HUD do P1 na ESQUERDA
     const nomeP1 = this.jogador1.nomePersonagem || this.escolhaP1;
@@ -140,22 +150,14 @@ export default class cenaPrincipal extends Phaser.Scene {
     this.physics.add.collider(this.jogador1.sprite, this.mapaAtual.plataformas);
     this.physics.add.collider(this.jogador2.sprite, this.mapaAtual.plataformas);
 
-    // camera bordas
-    // 1. Câmera do Jogo
+    // camera limite bordas ate onde ela vai
     this.camJogo = this.cameras.main;
-    this.camJogo.setBounds(0, 0, 1920, 640);
 
-    // === LIMITES DA ARENA (BLAST ZONES) === (sistema de morrer)
-    // Defina quanto o personagem pode ir além do cenário antes de morrer:
-    this.limitesArena = {
-      esquerda: -200, // Quantos pixels à esquerda do cenário (0) pode ir
-      direita: 2000, // Quantos pixels à direita (cenário de 800 + 200)
-      topo: -300, // Quanto para CIMA ele pode voar antes de morrer
-      baixo: 1000, // Quanto para BAIXO (cair do chasm) ele pode ir
-    };
-    // Ponto de Respawn (Onde o personagem renasce)
-    this.pontoRespawnP1 = { x: 500, y: 100 };
-    this.pontoRespawnP2 = { x: 600, y: 100 };
+    // Aplica os limites dinâmicos se o mapa configurou 'configCamera'
+    if (this.mapaAtual.configCamera && this.mapaAtual.configCamera.limites) {
+    const limCam = this.mapaAtual.configCamera.limites;
+    this.camJogo.setBounds(limCam.x, limCam.y, limCam.largura, limCam.altura);
+    }
 
     this.anims.create({
       key: "TVefect",
@@ -220,7 +222,6 @@ export default class cenaPrincipal extends Phaser.Scene {
   }
 
   // 3. LOOP DE ATUALIZAÇÃO
-  // 3. LOOP DE ATUALIZAÇÃO
   update() {
     // Manda o Personagem.js atualizar o movimento e animações a cada frame
     if (this.jogador1) this.jogador1.update();
@@ -234,16 +235,24 @@ export default class cenaPrincipal extends Phaser.Scene {
   }
 
   verificarMorte(jogador, pontoRespawn, numJogador) {
-    if (!jogador || !jogador.sprite) return;
+  if (!jogador || !jogador.sprite) return;
 
-    const x = jogador.sprite.x;
-    const y = jogador.sprite.y;
-    const lim = this.limitesArena;
+  const x = jogador.sprite.x;
+  const y = jogador.sprite.y;
+  const lim = this.limitesArena;
 
-    if (x < lim.esquerda || x > lim.direita || y < lim.topo || y > lim.baixo) {
-      this.processarQueda(jogador, pontoRespawn, numJogador);
-    }
+  if (!lim) return;
+
+  // Lê minX/maxX/minY/maxY e tem fallback para esquerda/direita/topo/baixo
+  const minX = lim.minX !== undefined ? lim.minX : lim.esquerda;
+  const maxX = lim.maxX !== undefined ? lim.maxX : lim.direita;
+  const minY = lim.minY !== undefined ? lim.minY : lim.topo;
+  const maxY = lim.maxY !== undefined ? lim.maxY : lim.baixo;
+
+  if (x < minX || x > maxX || y < minY || y > maxY) {
+    this.processarQueda(jogador, pontoRespawn, numJogador);
   }
+}
 
   processarQueda(jogador, pontoRespawn, numJogador) {
     // Desconta a vida do jogador correspondente
@@ -288,32 +297,59 @@ export default class cenaPrincipal extends Phaser.Scene {
     }
   }
 
-  atualizarCamera() {
+ atualizarCamera() {
+    if (!this.jogador1 || !this.jogador2) return;
+
     const p1 = this.jogador1.sprite;
     const p2 = this.jogador2.sprite;
     const cam = this.cameras.main;
 
-    const centroX = (p1.x + p2.x) / 2;
-    const centroY = (p1.y + p2.y) / 2;
+    // 1. Lê as configurações do mapa
+    const configCam = this.mapaAtual.configCamera || {};
+    const lim = configCam.limites || { x: 0, y: 0, largura: 6000, altura: 3000 };
+    const maxZoom = configCam.maxZoom !== undefined ? configCam.maxZoom : 2.0;
+    const minZoom = configCam.minZoom !== undefined ? configCam.minZoom : 1.0;
+    const distMinima = configCam.distMinima !== undefined ? configCam.distMinima : 100;
+    const distMaxima = configCam.distMaxima !== undefined ? configCam.distMaxima : 1200;
 
-    cam.scrollX = Phaser.Math.Linear(cam.scrollX, centroX - cam.width / 2, 0.1);
-    cam.scrollY = Phaser.Math.Linear(cam.scrollY, centroY - cam.height / 2, 0.1);
-
+    // 2. Calcula e aplica o Zoom primeiro
     const distancia = Phaser.Math.Distance.Between(p1.x, p1.y, p2.x, p2.y);
-
-    const maxZoom = 3;
-    const minZoom = 1;
-
-    const distMinima = 100;
-    const distMaxima = 1200;
-
     const fatorDistancia = Phaser.Math.Clamp(
-      (distancia - distMinima) / (distMaxima - distMinima),
-      0,
-      1
+        (distancia - distMinima) / (distMaxima - distMinima),
+        0,
+        1
     );
     const zoomAlvo = Phaser.Math.Linear(maxZoom, minZoom, fatorDistancia);
+    cam.zoom = Phaser.Math.Linear(cam.zoom, zoomAlvo, 0.05);
 
-    cam.setZoom(Phaser.Math.Linear(cam.zoom, zoomAlvo, 0.05));
-  }
+    // 3. Calcula o ponto central ideal entre P1 e P2
+    const centroAlvoX = (p1.x + p2.x) / 2;
+    const centroAlvoY = (p1.y + p2.y) / 2;
+
+    // 4. Calcula o tamanho da visão da câmera com base no zoom atual
+    const metadeMetragemVisivelX = (cam.width / cam.zoom) / 2;
+    const metadeMetragemVisivelY = (cam.height / cam.zoom) / 2;
+
+    // 5. Clampa o PONTO CENTRAL para não ultrapassar as bordas da imagem de 6000x3000
+    const centroXTravado = Phaser.Math.Clamp(
+        centroAlvoX,
+        lim.x + metadeMetragemVisivelX,
+        lim.x + lim.largura - metadeMetragemVisivelX
+    );
+
+    const centroYTravado = Phaser.Math.Clamp(
+        centroAlvoY,
+        lim.y + metadeMetragemVisivelY,
+        lim.y + lim.altura - metadeMetragemVisivelY
+    );
+
+    // 6. Centraliza a câmera com interpolação suave (Lerp)
+    const centroAtualX = cam.midPoint.x;
+    const centroAtualY = cam.midPoint.y;
+
+    const novoCentroX = Phaser.Math.Linear(centroAtualX, centroXTravado, 0.1);
+    const novoCentroY = Phaser.Math.Linear(centroAtualY, centroYTravado, 0.1);
+
+    cam.centerOn(novoCentroX, novoCentroY);
+}
 }

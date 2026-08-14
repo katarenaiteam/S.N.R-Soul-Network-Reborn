@@ -111,9 +111,11 @@ export default class WebShot {
     alvo.estaPresoNaTeia = true;
     alvo.imuneTeia = true;
 
-    // 1. TRAVA ABSOLUTA DO OPONENTE
-    alvo.sprite.body.setVelocity(0, 0);
-    alvo.sprite.body.moves = false; 
+    alvo.maquinaEstados.mudarEstado("teia");
+     // 1. TRAVA O MOVIMENTO HORIZONTAL,
+    // MAS MANTÉM A FÍSICA E A GRAVIDADE
+    alvo.sprite.body.setVelocityX(0);
+    alvo.sprite.body.setAllowGravity(true);
 
     // 2. CÁLCULO DE ESCALA PARA BONECOS GRANDES
     const alturaAlvo = alvo.sprite.body.height || 95;
@@ -139,19 +141,22 @@ export default class WebShot {
       }
     };
 
+
     this.scene.events.on("update", seguirOponente);
 
     // 4. DESCONGELAR APÓS O TEMPO
     this.scene.time.delayedCall(tempoPreso, () => {
       this.scene.events.off("update", seguirOponente);
 
-      // Reativa o movimento do oponente
-      if (alvo.sprite && alvo.sprite.body) {
-        alvo.sprite.body.moves = true;
-      }
 
       // Desmarca o estado de preso
       alvo.estaPresoNaTeia = false;
+
+      if (alvo.sprite.body.blocked.down) {
+      alvo.maquinaEstados.mudarEstado("idle");
+      } else {
+      alvo.maquinaEstados.mudarEstado("jump");
+      }
 
       // Animação da teia desfazendo
       if (teiaPresa && teiaPresa.active) {
