@@ -36,122 +36,103 @@ export default class WebShot {
     }
 
     this.projetil.setFlipX(direcao === -1);
-    this.projetil.setOrigin(0.5, 0.5);
-
     this.projetil.anims.play("spy_webShot");
+
     this.projetil.body.setAllowGravity(false);
-    this.projetil.body.setVelocityX(1000 * direcao);
+    this.projetil.body.setSize(30, 30);
+    this.projetil.body.setVelocityX(600 * direcao);
 
-    const larguraHitbox = 50;
-    const alturaHitbox = 30;
-    this.projetil.body.setSize(larguraHitbox, alturaHitbox, false);
-    this.projetil.body.setOffset((200 - larguraHitbox) / 2, (200 - alturaHitbox) / 2);
+    // Colisão com Inimigos
+    const oponentes = [this.scene.jogador1, this.scene.jogador2].filter(
+      (j) => j && j !== this.personagem
+    );
 
- const jogador1 = this.scene.jogador1;
-    const jogador2 = this.scene.jogador2;
+    this.overlaps = [];
 
-    if (jogador1?.grupoHurtbox && jogador1 !== this.personagem) {
-      this.overlaps.push(
-        this.scene.physics.add.overlap(
-          this.projetil,
-          jogador1.grupoHurtbox, // 👈 Ajustado de jogador1.sprite para grupoHurtbox
-          () => this.acertar(jogador1)
-        )
+    oponentes.forEach((oponente) => {
+      if (!oponente) return;
+
+      const overlap = this.scene.physics.add.overlap(
+        this.projetil,
+        oponente.grupoHurtbox,
+        () => {
+          this.processarAcerto(oponente, this.projetil);
+        },
+        null,
+        this
       );
-    }
 
-    if (jogador2?.grupoHurtbox && jogador2 !== this.personagem) {
-      this.overlaps.push(
-        this.scene.physics.add.overlap(
-          this.projetil,
-          jogador2.grupoHurtbox, // 👈 Ajustado de jogador2.sprite para grupoHurtbox
-          () => this.acertar(jogador2)
-        )
-      );
-    }
+      this.overlaps.push(overlap);
+    });
   }
 
-  acertar(alvo) {
-    if (alvo === this.personagem) return;
+  processarAcerto(alvo, projetil) {
     if (this.acertou) return;
-
-    // NOVO: Se o alvo já está preso ou imune à teia, o tiro passa direto sem prender novamente
-    if (alvo.estaPresoNaTeia || alvo.imuneTeia) {
-      return;
-    }
-
     this.acertou = true;
-    console.log("WEBSHOT PRENDEU:", alvo.nomePersonagem);
 
-    // 1. Aplica dano inicial
-    if (typeof alvo.receberDano === "function") {
-      alvo.receberDano(
-        this.special?.propriedades?.dano || 10,
-        this.special?.propriedades
-      );
+    // Remove os overlaps para evitar acertos múltiplos
+    this.overlaps.forEach((ov) => {
+      if (ov && ov.active) ov.destroy();
+    });
+    this.overlaps = [];
+
+    const props = this.special?.propriedades || {};
+
+    // 1. Aplica o dano no alvo e verifica se foi bloqueado pela Guarda
+    const defendeu = alvo.receberDano(props.dano || 8, props);
+
+    // 2. SÓ PRENDE SE NÃO TIVER DEFENDIDO NA GUARDA!
+    if (!defendeu && !alvo.estaPresoNaTeia && !alvo.imuneTeia) {
+      this.prenderOponente(alvo);
     }
 
-    // 2. Prende e congela o oponente
-    this.prenderOponente(alvo);
-
-    // Destrói o projétil da teia que estava voando
-    if (this.projetil && this.projetil.active) {
-      this.projetil.destroy();
+    // Destrói o projétil no impacto
+    if (projetil && projetil.active) {
+      projetil.destroy();
       this.projetil = null;
     }
   }
 
   prenderOponente(alvo) {
-    const tempoPreso = 2500;
-    const tempoImunidade = 900;
-
-    if (!alvo || !alvo.sprite || !alvo.sprite.body) return;
-
-    // Se ele já tiver uma teia presa, destrói a antiga antes de aplicar
-    if (alvo.estourarTeia) {
-      alvo.estourarTeia(false); // Estoura a teia anterior sem tocar a animação duplicada
-    }
-
     alvo.estaPresoNaTeia = true;
     alvo.imuneTeia = true;
 
+    const tempoPreso = this.special?.propriedades?.duracaoTeia || 1500;
+    const tempoImunidade = 1000;
+
+    // Força o oponente a ir para o EstadoTeia
     alvo.maquinaEstados.mudarEstado("teia");
-    alvo.sprite.body.setVelocityX(0);
-    alvo.sprite.body.setAllowGravity(true);
 
-    const alturaAlvo = alvo.sprite.body.height || 95;
-    const escalaTeia = Math.max(1, alturaAlvo / 80);
-
-    const centroY = alvo.sprite.y - (alturaAlvo / 2);
-    const teiaPresa = this.scene.add.sprite(alvo.sprite.x, centroY, "webshot");
-    
-    teiaPresa.setDepth(alvo.sprite.depth + 10);
-    teiaPresa.setScale(escalaTeia);
+    // Cria a animação visual da teia no oponente
+    const teiaPresa = this.scene.add.sprite(
+      alvo.sprite.x,
+      alvo.sprite.y - 40,
+      "spider_effects"
+    );
 
     if (this.scene.camHUD) {
       this.scene.camHUD.ignore(teiaPresa);
     }
 
+    teiaPresa.setDepth(alvo.sprite.depth + 1);
     teiaPresa.anims.play("spy_web_trap_start");
 
+    alvo.teiaPresaSprite = teiaPresa;
+
+    // Atualiza a posição da teia junto com o oponente
     const seguirOponente = () => {
       if (teiaPresa && teiaPresa.active && alvo.sprite) {
-        const posY = alvo.sprite.y - ((alvo.sprite.body.height || 95) / 2);
-        teiaPresa.setPosition(alvo.sprite.x, posY);
+        teiaPresa.setPosition(alvo.sprite.x, alvo.sprite.y - 40);
       }
     };
-
     this.scene.events.on("update", seguirOponente);
 
-    // Guarda as referências no próprio oponente para que o estourarTeia possa acessar
-    alvo.teiaPresaSprite = teiaPresa;
-    alvo.seguirOponenteTeia = seguirOponente;
+    alvo.atualizarTeia = seguirOponente;
 
-    // Função para estourar/destruir a teia
+    // Função para desfazer a teia (se tomar dano ou acabar o tempo)
     alvo.estourarTeia = (tocarAnimacao = true) => {
       alvo.estaPresoNaTeia = false;
 
-      // Cancela o timer principal se ainda estiver ativo
       if (alvo.timerTeia) {
         alvo.timerTeia.remove(false);
         alvo.timerTeia = null;
@@ -195,26 +176,9 @@ export default class WebShot {
   atualizar() {
     if (this.projetil && this.projetil.active) {
       if (Math.abs(this.projetil.x - this.personagem.sprite.x) > 1000) {
-        this.destruir();
+        this.projetil.destroy();
+        this.projetil = null;
       }
     }
-  }
-
-  destruir() {
-    this.overlaps.forEach((overlap) => {
-      if (overlap && overlap.active) overlap.destroy();
-    });
-    this.overlaps = [];
-
-    if (this.timer) {
-      this.timer.remove(false);
-      this.timer = null;
-    }
-
-    if (this.projetil && this.projetil.active) {
-      this.projetil.destroy();
-    }
-
-    this.projetil = null;
   }
 }

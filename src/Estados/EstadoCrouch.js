@@ -48,6 +48,11 @@ export default class EstadoCrouch extends EstadoBase {
       return;
     }
 
+    if (this.personagem.inputDown("guard")) {
+    this.personagem.maquinaEstados.mudarEstado("guard");
+    return;
+    }
+
     // Se sair da plataforma sem pular
     if (
       !this.personagem.sprite.body.blocked.down &&

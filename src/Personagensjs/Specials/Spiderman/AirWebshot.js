@@ -40,131 +40,116 @@ export default class AirWebShot {
       this.scene.camHUD.ignore(this.projetil);
     }
 
+    this.projetil.setFlipX(direcao === -1);
     this.projetil.anims.play("spy_webShot");
+
     this.projetil.body.setAllowGravity(false);
+    this.projetil.body.setSize(30, 30);
 
-    // FIX 1: Trajetória na diagonal (X para frente, Y para baixo)
-    const velocidadeX = 600 * direcao;
-    const velocidadeY = 400;
-    this.projetil.body.setVelocity(velocidadeX, velocidadeY);
+    // Trajetória na diagonal para baixo
+    const velX = 500 * direcao;
+    const velY = 400; // Vai para baixo
+    this.projetil.body.setVelocity(velX, velY);
 
-    // FIX 2: Ajuste de rotação e espelhamento sem ficar invertido
-    if (direcao === -1) {
-      this.projetil.setFlipX(true);
-      this.projetil.setFlipY(true);
-      this.projetil.setAngle(-35);
-    } else {
-      this.projetil.setFlipX(false);
-      this.projetil.setFlipY(false);
-      this.projetil.setAngle(35);
-    }
+    // 2. Colisão/Overlap com Inimigos
+    const oponentes = [this.scene.jogador1, this.scene.jogador2].filter(
+      (j) => j && j !== this.personagem
+    );
 
-    // Ajuste da Hitbox do Projétil
-    const larguraHitbox = 40;
-    const alturaHitbox = 40;
-    this.projetil.body.setSize(larguraHitbox, alturaHitbox, true);
+    this.overlaps = [];
 
-    // 2. Registra o overlap exclusivamente com a HURTBOX dos alvos
-    const jogador1 = this.scene.jogador1;
-    const jogador2 = this.scene.jogador2;
+    oponentes.forEach((oponente) => {
+      if (!oponente) return;
 
-    if (jogador1?.grupoHurtbox && jogador1 !== this.personagem) {
-      this.overlaps.push(
-        this.scene.physics.add.overlap(
-          this.projetil,
-          jogador1.grupoHurtbox,
-          () => this.acertar(jogador1)
-        )
+      const overlap = this.scene.physics.add.overlap(
+        this.projetil,
+        oponente.grupoHurtbox,
+        () => {
+          this.processarAcerto(oponente, this.projetil);
+        },
+        null,
+        this
       );
-    }
 
-    if (jogador2?.grupoHurtbox && jogador2 !== this.personagem) {
-      this.overlaps.push(
-        this.scene.physics.add.overlap(
-          this.projetil,
-          jogador2.grupoHurtbox,
-          () => this.acertar(jogador2)
-        )
-      );
-    }
+      this.overlaps.push(overlap);
+    });
+
+    // 3. Destrói o projétil se tocar no chão
+    this.scene.physics.add.collider(
+      this.projetil,
+      this.scene.plataformas || this.scene.chao,
+      () => {
+        if (this.projetil && this.projetil.active) {
+          this.projetil.destroy();
+          this.projetil = null;
+        }
+      }
+    );
   }
 
-  acertar(alvo) {
-    if (alvo === this.personagem) return;
+  processarAcerto(alvo, projetil) {
     if (this.acertou) return;
-
-    // Se o alvo já estiver preso ou imune à teia, o tiro ignora
-    if (alvo.estaPresoNaTeia || alvo.imuneTeia) {
-      return;
-    }
-
     this.acertou = true;
-    console.log("AIR WEBSHOT PRENDEU:", alvo.nomePersonagem);
 
-    // 1. Dano inicial
-    if (typeof alvo.receberDano === "function") {
-      alvo.receberDano(
-        this.special?.propriedades?.dano || 10,
-        this.special?.propriedades
-      );
+    // Destrói os overlaps para evitar múltiplos acertos no mesmo frame
+    this.overlaps.forEach((ov) => {
+      if (ov && ov.active) ov.destroy();
+    });
+    this.overlaps = [];
+
+    const props = this.special?.propriedades || {};
+
+    // 1. Aplica o dano no alvo e verifica se foi bloqueado pela Guarda
+    // Se o alvo estiver em 'guard', receberDano() retorna TRUE
+    const defendeu = alvo.receberDano(props.dano || 8, props);
+
+    // 2. SÓ PRENDE SE NÃO TIVER DEFENDIDO NA GUARDA!
+    if (!defendeu && !alvo.estaPresoNaTeia && !alvo.imuneTeia) {
+      this.prenderOponente(alvo);
     }
 
-    // 2. Lógica de prender o oponente (idêntica à do WebShot do chão)
-    this.prenderOponente(alvo);
-
-    // Destrói o projétil da teia em voo
-    if (this.projetil && this.projetil.active) {
-      this.projetil.destroy();
+    // Destrói o projétil no impacto
+    if (projetil && projetil.active) {
+      projetil.destroy();
       this.projetil = null;
     }
   }
 
   prenderOponente(alvo) {
-    const tempoPreso = 2500;
-    const tempoImunidade = 900;
-
-    if (!alvo?.sprite?.body) return;
-
-    // Se ele já tiver uma teia presa ativada, desfaz antes de reaplicar
-    if (alvo.estourarTeia) {
-      alvo.estourarTeia(false);
-    }
-
     alvo.estaPresoNaTeia = true;
     alvo.imuneTeia = true;
 
-    // Troca o estado do oponente para o "EstadoTeia"
+    const tempoPreso = this.special?.propriedades?.duracaoTeia || 1500;
+    const tempoImunidade = 1000;
+
+    // Muda o oponente para o EstadoTeia
     alvo.maquinaEstados.mudarEstado("teia");
-    alvo.sprite.body.setVelocityX(0);
-    alvo.sprite.body.setAllowGravity(true);
 
-    const alturaAlvo = alvo.sprite.body.height || 95;
-    const escalaTeia = Math.max(1, alturaAlvo / 80);
-
-    const centroY = alvo.sprite.y - (alturaAlvo / 2);
-    const teiaPresa = this.scene.add.sprite(alvo.sprite.x, centroY, "webshot");
-    
-    teiaPresa.setDepth(alvo.sprite.depth + 10);
-    teiaPresa.setScale(escalaTeia);
+    // Cria o sprite visual da teia
+    const teiaPresa = this.scene.add.sprite(
+      alvo.sprite.x,
+      alvo.sprite.y - 40,
+      "spider_effects"
+    );
 
     if (this.scene.camHUD) {
       this.scene.camHUD.ignore(teiaPresa);
     }
 
+    teiaPresa.setDepth(alvo.sprite.depth + 1);
     teiaPresa.anims.play("spy_web_trap_start");
 
+    alvo.teiaPresaSprite = teiaPresa;
+
+    // Faz o efeito visual seguir a posição do oponente
     const seguirOponente = () => {
       if (teiaPresa && teiaPresa.active && alvo.sprite) {
-        const posY = alvo.sprite.y - ((alvo.sprite.body.height || 95) / 2);
-        teiaPresa.setPosition(alvo.sprite.x, posY);
+        teiaPresa.setPosition(alvo.sprite.x, alvo.sprite.y - 40);
       }
     };
-
     this.scene.events.on("update", seguirOponente);
 
-    // Referências armazenadas no oponente para o EstadoTeia manipular
-    alvo.teiaPresaSprite = teiaPresa;
-    alvo.seguirOponenteTeia = seguirOponente;
+    alvo.atualizarTeia = seguirOponente;
 
     // Função para desfazer a teia (se tomar dano ou acabar o tempo)
     alvo.estourarTeia = (tocarAnimacao = true) => {
@@ -210,16 +195,12 @@ export default class AirWebShot {
     });
   }
 
-  destruir() {
-    this.overlaps.forEach((overlap) => {
-      if (overlap && overlap.active) overlap.destroy();
-    });
-    this.overlaps = [];
-
+  atualizar() {
     if (this.projetil && this.projetil.active) {
-      this.projetil.destroy();
+      if (Math.abs(this.projetil.x - this.personagem.sprite.x) > 1000) {
+        this.projetil.destroy();
+        this.projetil = null;
+      }
     }
-
-    this.projetil = null;
   }
 }

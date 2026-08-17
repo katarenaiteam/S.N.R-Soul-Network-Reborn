@@ -103,6 +103,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("SpiderMan_jump", "assets/personagens/SpiderMan/Sprites/SpiderMan_jump.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_down", "assets/personagens/SpiderMan/Sprites/SpiderMan_down.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_dash2", "assets/personagens/SpiderMan/Sprites/SpiderMan_dash2.png", { frameWidth: 200, frameHeight: 200 });
+     this.load.spritesheet("SpiderMan_hurt", "assets/personagens/SpiderMan/Sprites/SpiderMan_hurt.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_atack1", "assets/personagens/SpiderMan/Sprites/SpiderMan_atack1.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_atack2", "assets/personagens/SpiderMan/Sprites/SpiderMan_atack2.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_atack3", "assets/personagens/SpiderMan/Sprites/SpiderMan_atack3.png", { frameWidth: 200, frameHeight: 200 });
@@ -114,6 +115,8 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("SpiderMan_sideAtack", "assets/personagens/SpiderMan/Sprites/SpiderMan_sideAtack.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_neSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_neSpecial.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_AneSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AneSpecial.png", { frameWidth: 200, frameHeight: 200 });
+    this.load.spritesheet("SpiderMan_guard", "assets/personagens/SpiderMan/Sprites/SpiderMan_guard.png", { frameWidth: 200, frameHeight: 200 });
+    // spy_effects
     this.load.spritesheet("webshot", "assets/personagens/SpiderMan/Sprites/webshot.png", { frameWidth: 200, frameHeight: 200 });
     // --- Miku ---
     this.load.spritesheet("Miku_idle", "assets/personagens/Miku/Sprites/Miku_idle.png", { frameWidth: 500, frameHeight: 500 });

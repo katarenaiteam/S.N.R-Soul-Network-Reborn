@@ -53,6 +53,11 @@ export default class EstadoWalk extends EstadoBase {
       return;
     }
 
+    if (this.personagem.inputDown("guard")) {
+    this.personagem.maquinaEstados.mudarEstado("guard");
+    return;
+    }
+
     // Se caiu de uma plataforma sem pular
     if (!this.personagem.sprite.body.blocked.down) {
       this.personagem.maquinaEstados.mudarEstado("jump");

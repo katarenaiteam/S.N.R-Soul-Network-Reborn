@@ -16,7 +16,7 @@ export default class SpiderMan extends Personagem {
       "SpiderMan_idle",
       "0",
       {
-        velocidade: 170,
+        velocidade: 240,
         forcaPulo: -600,
         maxPulos: 3,
         maxDash: 1,
@@ -74,6 +74,30 @@ export default class SpiderMan extends Personagem {
         escala: 1,
         hurtboxes: [
           { largura: 80, altura: 50, offsetX: 0, offsetY: -25 }, // fechadinho
+        ],
+      },
+
+      guard: {
+      largura: 85,
+      altura: 95,
+      offsetX: 50,
+      offsetY: 96,
+      escala: 1,
+      hurtboxes: [
+          { largura: 55, altura: 60, offsetX: 25, offsetY: -70 }, // Tronco/cabeça
+          { largura: 110, altura: 35, offsetX: 5, offsetY: -18 }, // Agachado / pernas abertas
+     ]
+      },
+
+      dano: {
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: 96,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
+          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
 
@@ -426,6 +450,16 @@ export default class SpiderMan extends Personagem {
     });
 
     scene.anims.create({
+      key: "spy_crouch",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_down", {
+        start: 0,
+        end: 3,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
+    scene.anims.create({
       key: "spy_dash",
       frames: scene.anims.generateFrameNumbers("SpiderMan_dash2", {
         start: 0,
@@ -434,6 +468,27 @@ export default class SpiderMan extends Personagem {
       frameRate: 8,
       repeat: 0,
     });
+
+     scene.anims.create({
+      key: "spy_guard",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_guard", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 16,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "spy_dano",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_hurt", {
+        start: 0,
+        end: 2,
+      }),
+      frameRate: 6,
+      repeat: 0,
+    });
+
 //golpes 
     scene.anims.create({
       key: "spy_atack1",

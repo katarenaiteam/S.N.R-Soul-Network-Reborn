@@ -73,5 +73,10 @@ export default class EstadoIdle extends EstadoBase {
       this.personagem.maquinaEstados.mudarEstado("jump");
       return;
     }
+
+    if (this.personagem.inputDown("guard")) {
+    this.personagem.maquinaEstados.mudarEstado("guard");
+    return;
+    }
   }
 }

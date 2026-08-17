@@ -8,7 +8,7 @@ import EstadoAtack from "../Estados/EstadoAtack.js";
 import EstadoDano from "../Estados/EstadoDano.js";
 import EstadoSpecial from "../Estados/EstadoSpecial.js";
 import EstadoTeia from "../Estados/EstadoTeia.js";
-
+import EstadoGuard from "../Estados/EstadoGuard.js";
 
 export default class Personagem {
   constructor(
@@ -43,6 +43,11 @@ export default class Personagem {
     this.maxPulos = config.maxPulos;
     this.maxDash = config.maxDash;
     this.textoDano = null;
+    this.guardMaximo = 50;
+    this.vidaGuard = this.guardMaximo;
+    this.taxaRegeneracaoGuard = 0.04; 
+    this.tempoCooldownGuard = 3000;  
+    this.tempoLiberacaoGuard = 0;
 
     // Sprite e física
     this.sprite = scene.physics.add.sprite(x, y, keyAtlas, frameInicial);
@@ -54,7 +59,6 @@ export default class Personagem {
       immovable: true,
     });
     this.hurtboxesAtivas = [];
-    //this.hurtbox.body.debugBodyColor = 0x00ff00;
 
     // Contadores
     this.pulos = 0;
@@ -71,37 +75,63 @@ export default class Personagem {
     this.maquinaEstados.adicionarEstado("dano", new EstadoDano(this));
     this.maquinaEstados.adicionarEstado("special", new EstadoSpecial(this));
     this.maquinaEstados.adicionarEstado("teia", new EstadoTeia(this));
+    this.maquinaEstados.adicionarEstado("guard", new EstadoGuard(this));
 
     this.maquinaEstados.mudarEstado("idle");
   }
 
   // --- RECEBIMENTO DE DANO ---
   receberDano(quantidade, propriedades = {}) {
-    this.porcentagemDano += quantidade;
+    // 🛡️ SE ESTIVER EM ESTADO DE GUARD:
+    if (this.maquinaEstados.estadoAtual?.nome === "guard") {
+      this.vidaGuard -= quantidade;
 
-    if (this.textoDano) {
-      this.textoDano.setText(`${Math.floor(this.porcentagemDano)}%`);
+      // QUEBRA DE GUARDA:
+      if (this.vidaGuard <= 0) {
+        this.vidaGuard = 0; // Trava a vida em 0
+        
+        // Define que a guarda fica bloqueada por 3 segundos a partir de agora
+        this.tempoLiberacaoGuard = this.scene.time.now + this.tempoCooldownGuard;
+
+        // Entra no estado de Dano/Stun por 1 segundo
+        this.maquinaEstados.mudarEstado("dano");
+        const estadoDano = this.maquinaEstados.estados["dano"];
+        if (estadoDano) {
+          estadoDano.duracaoStun = 1000;
+          estadoDano.tempoInicial = this.scene.time.now;
+        }
+        return false; // Escudo quebrou
+      }
+
+      // Repulsão de impacto leve ao defender o golpe
+      const oponente = this.scene.jogador1 === this ? this.scene.jogador2 : this.scene.jogador1;
+      const direcaoX = this.sprite.x > oponente.sprite.x ? 1 : -1;
+      this.sprite.body.setVelocityX(direcaoX * 120);
+
+      return true; // Bloqueado com sucesso
     }
 
-    const oponente =
-      this.scene.jogador1 === this ? this.scene.jogador2 : this.scene.jogador1;
+    // LÓGICA PADRÃO DE DANO (Quando toma golpe fora do escudo)
+    this.porcentagemDano += quantidade;
+    if (this.textoDano) this.textoDano.setText(`${Math.floor(this.porcentagemDano)}%`);
+
+    const oponente = this.scene.jogador1 === this ? this.scene.jogador2 : this.scene.jogador1;
     const direcaoX = this.sprite.x > oponente.sprite.x ? 1 : -1;
 
     const kbX = propriedades.knockbackX ?? 250;
     const kbY = propriedades.knockbackY ?? -100;
 
-    const multiplicadorX = 1 + this.porcentagemDano / 30;
-    const multiplicadorY = 1 + this.porcentagemDano / 150;
-
     this.sprite.body.setVelocity(
-      direcaoX * kbX * multiplicadorX,
-      kbY * multiplicadorY,
+      direcaoX * kbX * (1 + this.porcentagemDano / 30),
+      kbY * (1 + this.porcentagemDano / 150)
     );
     this.maquinaEstados.mudarEstado("dano");
+
+    return false;
   }
 
   // --- LOOP PRINCIPAL ---
-  update() {
+ update() {
     const noChao = this.sprite.body.blocked.down;
 
     if (noChao && !this.estavaNoChao) {
@@ -110,24 +140,38 @@ export default class Personagem {
     }
     this.estavaNoChao = noChao;
 
-    // Gravidade adicional ao cair
+    // --- LÓGICA REGENERATIVA DO ESCUDO ---
+    const emGuarda = this.maquinaEstados.estadoAtual?.nome === "guard";
+    const emCooldown = this.scene.time.now < this.tempoLiberacaoGuard;
+
+    if (!emGuarda) {
+      // 1. Se o escudo foi QUEBRADO, mas o tempo de cooldown ACABOU de terminar:
+      if (!emCooldown && this.vidaGuard <= 0) {
+        this.vidaGuard = this.guardMaximo; // ⚡ VOLTA 100% INTEIRO INSTANTANEAMENTE!
+      } 
+      // 2. Se o escudo NÃO foi quebrado, regenera rapidamente com o tempo:
+      else if (!emCooldown && this.vidaGuard < this.guardMaximo) {
+        this.vidaGuard = Math.min(
+          this.guardMaximo,
+          this.vidaGuard + this.taxaRegeneracaoGuard
+        );
+      }
+    }
+
+    // Gravidade ao cair
     if (!this.estaEmDash) {
       this.sprite.body.setGravityY(this.sprite.body.velocity.y > 0 ? 200 : 0);
     }
 
-    // Atualização do controle antes de ler a entrada
     this.controle?.atualizar();
-
-    // Atualização da Hurtbox e Hitbox do Ataque
     this.sincronizarHurtbox();
     this.processarMovimentacaoAtaque(noChao);
     this.atualizarOffsetFisica();
-    this.atualizarLogicasEspeciais()
+    this.atualizarLogicasEspeciais();
 
     this.maquinaEstados.update();
     this.controle?.salvarAnterior();
   }
-
   // --- MÉTODOS DE SUPORTE AO UPDATE ---
 
   // Pega a config atual baseada na animação tocando
@@ -242,12 +286,11 @@ export default class Personagem {
     return Phaser.Input.Keyboard.JustUp(this.teclas?.[nome]);
   }
 
- atualizarLogicasEspeciais() {
-  this.logicasEspeciaisAtivas.forEach((logica) => {
-    logica.atualizar?.();
-  });
-}
-
+  atualizarLogicasEspeciais() {
+    this.logicasEspeciaisAtivas.forEach((logica) => {
+      logica.atualizar?.();
+    });
+  }
 
   // --- AÇÕES E CONTROLES ---
   pular() {
@@ -286,17 +329,17 @@ export default class Personagem {
     if (!special) return;
 
     this.cooldownsSpecial[tipoSpecial] =
-        this.scene.time.now + (special.cooldown || 0);
-}
+      this.scene.time.now + (special.cooldown || 0);
+  }
 
-podeUsarSpecial(tipoSpecial) {
+  podeUsarSpecial(tipoSpecial) {
     const agora = this.scene.time.now;
 
     return (
-        !this.cooldownsSpecial?.[tipoSpecial] ||
-        agora >= this.cooldownsSpecial[tipoSpecial]
+      !this.cooldownsSpecial?.[tipoSpecial] ||
+      agora >= this.cooldownsSpecial[tipoSpecial]
     );
- }
+  }
 
   aplicarConfiguracao(nomeAnim) {
     const cfg = this.configAnimacoes?.[nomeAnim];
@@ -314,21 +357,21 @@ podeUsarSpecial(tipoSpecial) {
   }
 
   tocarAnimacao(nomeAnim, forcarRestart = false) {
-  const chaveAnim = `${this.prefixoAnim}${nomeAnim}`;
+    const chaveAnim = `${this.prefixoAnim}${nomeAnim}`;
 
-  // 1. Se for a mesma animação e forçarRestart for true, REINICIA DO FRAME 0
-  if (this.sprite.anims.currentAnim?.key === chaveAnim) {
-    if (forcarRestart) {
-      this.sprite.anims.restart();
-      this.aplicarConfiguracao(nomeAnim);
+    // 1. Se for a mesma animação e forçarRestart for true, REINICIA DO FRAME 0
+    if (this.sprite.anims.currentAnim?.key === chaveAnim) {
+      if (forcarRestart) {
+        this.sprite.anims.restart();
+        this.aplicarConfiguracao(nomeAnim);
+      }
+      return; // Se já estiver tocando e NÃO for para forçar, ignora
     }
-    return; // Se já estiver tocando e NÃO for para forçar, ignora
-  }
 
-  // 2. Se for uma animação totalmente diferente, toca normalmente
-  this.sprite.play(chaveAnim, true);
-  this.aplicarConfiguracao(nomeAnim);
-}
+    // 2. Se for uma animação totalmente diferente, toca normalmente
+    this.sprite.play(chaveAnim, true);
+    this.aplicarConfiguracao(nomeAnim);
+  }
 
   criarHitboxAtaque(offsetX, offsetY, largura, altura, dadosAtaque) {
     if (this.hitboxAtiva) {
