@@ -31,56 +31,58 @@ export default class AirWebShot {
 
     // Ponto de saída do tiro (mão no ar)
     const x = sprite.x + (25 * direcao);
-    const y = sprite.y + -10;
+    const y = sprite.y - 10;
 
     // 1. Cria o projétil da teia
     this.projetil = this.scene.physics.add.sprite(x, y, "webshot", 4);
 
-    // Ignora a Câmera HUD para evitar o projétil fantasma na tela
     if (this.scene.camHUD) {
       this.scene.camHUD.ignore(this.projetil);
     }
 
-    this.projetil.setFlipX(direcao === -1);
-    this.projetil.setOrigin(0.5, 0.5);
-
-    // Toca a animação da teia
     this.projetil.anims.play("spy_webShot");
     this.projetil.body.setAllowGravity(false);
 
-    // Trajetória diagonal para baixo
-    const velocidadeX = 450 * direcao;
-    const velocidadeY = 320;
-    this.projetil.setVelocity(velocidadeX, velocidadeY);
+    // FIX 1: Trajetória na diagonal (X para frente, Y para baixo)
+    const velocidadeX = 600 * direcao;
+    const velocidadeY = 400;
+    this.projetil.body.setVelocity(velocidadeX, velocidadeY);
 
-    // Rotaciona o sprite na direção da trajetória
-    const angulo = direcao === 1 ? 35 : 145;
-    this.projetil.setAngle(angulo);
+    // FIX 2: Ajuste de rotação e espelhamento sem ficar invertido
+    if (direcao === -1) {
+      this.projetil.setFlipX(true);
+      this.projetil.setFlipY(true);
+      this.projetil.setAngle(-35);
+    } else {
+      this.projetil.setFlipX(false);
+      this.projetil.setFlipY(false);
+      this.projetil.setAngle(35);
+    }
 
-    // Ajuste fino da Hitbox do Projétil
+    // Ajuste da Hitbox do Projétil
     const larguraHitbox = 40;
     const alturaHitbox = 40;
     this.projetil.body.setSize(larguraHitbox, alturaHitbox, true);
 
-    // 2. Registra a colisão/overlap com os dois jogadores
+    // 2. Registra o overlap exclusivamente com a HURTBOX dos alvos
     const jogador1 = this.scene.jogador1;
     const jogador2 = this.scene.jogador2;
 
-    if (jogador1?.sprite && jogador1 !== this.personagem) {
+    if (jogador1?.grupoHurtbox && jogador1 !== this.personagem) {
       this.overlaps.push(
         this.scene.physics.add.overlap(
           this.projetil,
-          jogador1.sprite,
+          jogador1.grupoHurtbox,
           () => this.acertar(jogador1)
         )
       );
     }
 
-    if (jogador2?.sprite && jogador2 !== this.personagem) {
+    if (jogador2?.grupoHurtbox && jogador2 !== this.personagem) {
       this.overlaps.push(
         this.scene.physics.add.overlap(
           this.projetil,
-          jogador2.sprite,
+          jogador2.grupoHurtbox,
           () => this.acertar(jogador2)
         )
       );

@@ -47,24 +47,24 @@ export default class WebShot {
     this.projetil.body.setSize(larguraHitbox, alturaHitbox, false);
     this.projetil.body.setOffset((200 - larguraHitbox) / 2, (200 - alturaHitbox) / 2);
 
-    const jogador1 = this.scene.jogador1;
+ const jogador1 = this.scene.jogador1;
     const jogador2 = this.scene.jogador2;
 
-    if (jogador1?.sprite && jogador1 !== this.personagem) {
+    if (jogador1?.grupoHurtbox && jogador1 !== this.personagem) {
       this.overlaps.push(
         this.scene.physics.add.overlap(
           this.projetil,
-          jogador1.sprite,
+          jogador1.grupoHurtbox, // 👈 Ajustado de jogador1.sprite para grupoHurtbox
           () => this.acertar(jogador1)
         )
       );
     }
 
-    if (jogador2?.sprite && jogador2 !== this.personagem) {
+    if (jogador2?.grupoHurtbox && jogador2 !== this.personagem) {
       this.overlaps.push(
         this.scene.physics.add.overlap(
           this.projetil,
-          jogador2.sprite,
+          jogador2.grupoHurtbox, // 👈 Ajustado de jogador2.sprite para grupoHurtbox
           () => this.acertar(jogador2)
         )
       );
