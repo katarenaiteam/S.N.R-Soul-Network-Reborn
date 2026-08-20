@@ -228,7 +228,7 @@ export default class Madotsuki extends Personagem {
         propriedades: {
           dano: 8,
           knockbackX: 50,
-          knockbackY: -300,
+          knockbackY: 300,
         },
       },
       air_cima: {

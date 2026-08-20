@@ -101,6 +101,31 @@ export default class SpiderMan extends Personagem {
         ],
       },
 
+      danoUp: {
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: 96,
+        escala: 1,
+        hurtboxes: [{ largura: 60, altura: 50, offsetX: 0, offsetY: -30 }],
+      },
+      danoDown: {
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: 96,
+        escala: 1,
+        hurtboxes: [{ largura: 60, altura: 50, offsetX: 0, offsetY: -30 }], 
+      },
+      danoSide: {
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: 96,
+        escala: 1,
+        hurtboxes: [{ largura: 60, altura: 50, offsetX: 0, offsetY: -30 }],
+      },
+
       atack: {
         largura: 85,
         altura: 95,
@@ -263,7 +288,7 @@ export default class SpiderMan extends Personagem {
         duracao: 400,
         propriedades: {
           dano: 20,
-          knockbackX: 600,
+          knockbackX: 400,
           knockbackY: -300,
           impulsoX: 0,
         },
@@ -303,7 +328,7 @@ export default class SpiderMan extends Personagem {
           dano: 12,
           knockbackX: 50,
           knockbackY: 400,
-          impulsoX: 100,
+          impulsoX: 50,
           impulsoY: 550,
         },
       },
@@ -488,6 +513,27 @@ export default class SpiderMan extends Personagem {
       frameRate: 6,
       repeat: 0,
     });
+
+    scene.anims.create({
+     key: "spy_danoUp",
+     frames: scene.anims.generateFrameNumbers("SpiderMan_hurts", { start: 3, end: 8 }),
+     frameRate: 12,
+     repeat: 0,
+   });
+
+    scene.anims.create({
+     key: "spy_danoSide",
+     frames: scene.anims.generateFrameNumbers("SpiderMan_hurts", { start: 0, end: 2 }),
+     frameRate: 10,
+     repeat: 0,
+   });
+
+      scene.anims.create({
+     key: "spy_danoDown",
+     frames: scene.anims.generateFrameNumbers("SpiderMan_hurts", { start: 9, end: 15 }),
+     frameRate: 10,
+     repeat: 0,
+   });
 
 //golpes 
     scene.anims.create({

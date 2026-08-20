@@ -81,8 +81,9 @@ export default class Personagem {
   }
 
   // --- RECEBIMENTO DE DANO ---
+  // --- RECEBIMENTO DE DANO ---
   receberDano(quantidade, propriedades = {}) {
-    // 🛡️ SE ESTIVER EM ESTADO DE GUARD:
+    // 🛡️ 1. SE ESTIVER EM ESTADO DE GUARD:
     if (this.maquinaEstados.estadoAtual?.nome === "guard") {
       this.vidaGuard -= quantidade;
 
@@ -90,11 +91,16 @@ export default class Personagem {
       if (this.vidaGuard <= 0) {
         this.vidaGuard = 0; // Trava a vida em 0
         
-        // Define que a guarda fica bloqueada por 3 segundos a partir de agora
+        // Define que a guarda fica bloqueada por 3 segundos
         this.tempoLiberacaoGuard = this.scene.time.now + this.tempoCooldownGuard;
 
-        // Entra no estado de Dano/Stun por 1 segundo
+        // Ao quebrar o escudo, zera a velocidade antes de dar o Stun
+        this.sprite.body.setVelocity(0, 0);
+
+        // Mudar para o estado de Dano
         this.maquinaEstados.mudarEstado("dano");
+        
+        // Sobrescreve a duração do Stun especificamente para a Quebra de Guarda (1 segundo)
         const estadoDano = this.maquinaEstados.estados["dano"];
         if (estadoDano) {
           estadoDano.duracaoStun = 1000;
@@ -103,7 +109,7 @@ export default class Personagem {
         return false; // Escudo quebrou
       }
 
-      // Repulsão de impacto leve ao defender o golpe
+      // Repulsão de impacto leve ao defender o golpe sem quebrar
       const oponente = this.scene.jogador1 === this ? this.scene.jogador2 : this.scene.jogador1;
       const direcaoX = this.sprite.x > oponente.sprite.x ? 1 : -1;
       this.sprite.body.setVelocityX(direcaoX * 120);
@@ -111,7 +117,7 @@ export default class Personagem {
       return true; // Bloqueado com sucesso
     }
 
-    // LÓGICA PADRÃO DE DANO (Quando toma golpe fora do escudo)
+    // 💥 2. LÓGICA PADRÃO DE DANO (Quando toma golpe sem escudo):
     this.porcentagemDano += quantidade;
     if (this.textoDano) this.textoDano.setText(`${Math.floor(this.porcentagemDano)}%`);
 
@@ -121,10 +127,14 @@ export default class Personagem {
     const kbX = propriedades.knockbackX ?? 250;
     const kbY = propriedades.knockbackY ?? -100;
 
+    // APLICA A VELOCIDADE PRIMEIRO NO CORPO FÍSICO
     this.sprite.body.setVelocity(
       direcaoX * kbX * (1 + this.porcentagemDano / 30),
       kbY * (1 + this.porcentagemDano / 150)
     );
+
+    // DEPOIS MUDA PARA O ESTADO DE DANO
+    // O enter() do EstadoDano vai ler a velocidade aplicada acima para decidir qual animação tocar
     this.maquinaEstados.mudarEstado("dano");
 
     return false;
