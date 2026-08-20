@@ -83,7 +83,7 @@ export default class Personagem {
   // --- RECEBIMENTO DE DANO ---
   // --- RECEBIMENTO DE DANO ---
   receberDano(quantidade, propriedades = {}) {
-    // 🛡️ 1. SE ESTIVER EM ESTADO DE GUARD:
+    //  SE ESTIVER EM ESTADO DE GUARD:
     if (this.maquinaEstados.estadoAtual?.nome === "guard") {
       this.vidaGuard -= quantidade;
 
@@ -117,7 +117,7 @@ export default class Personagem {
       return true; // Bloqueado com sucesso
     }
 
-    // 💥 2. LÓGICA PADRÃO DE DANO (Quando toma golpe sem escudo):
+    //. LÓGICA PADRÃO DE DANO (Quando toma golpe sem escudo):
     this.porcentagemDano += quantidade;
     if (this.textoDano) this.textoDano.setText(`${Math.floor(this.porcentagemDano)}%`);
 
@@ -127,6 +127,9 @@ export default class Personagem {
     const kbX = propriedades.knockbackX ?? 250;
     const kbY = propriedades.knockbackY ?? -100;
 
+    //  Salva se o golpe exige recuperação manual por comandos
+    this.isTumbling = propriedades.tumbling ?? false;
+
     // APLICA A VELOCIDADE PRIMEIRO NO CORPO FÍSICO
     this.sprite.body.setVelocity(
       direcaoX * kbX * (1 + this.porcentagemDano / 30),
@@ -134,7 +137,6 @@ export default class Personagem {
     );
 
     // DEPOIS MUDA PARA O ESTADO DE DANO
-    // O enter() do EstadoDano vai ler a velocidade aplicada acima para decidir qual animação tocar
     this.maquinaEstados.mudarEstado("dano");
 
     return false;

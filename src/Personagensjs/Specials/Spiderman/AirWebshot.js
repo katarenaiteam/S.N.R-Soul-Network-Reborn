@@ -41,6 +41,11 @@ export default class AirWebShot {
     }
 
     this.projetil.setFlipX(direcao === -1);
+
+    // 📐 INCLINAÇÃO DO PROJÉTIL:
+    const anguloInclinacao = 35; 
+    this.projetil.setAngle(direcao === 1 ? anguloInclinacao : -anguloInclinacao);
+
     this.projetil.anims.play("spy_webShot");
 
     this.projetil.body.setAllowGravity(false);
@@ -48,7 +53,7 @@ export default class AirWebShot {
 
     // Trajetória na diagonal para baixo
     const velX = 500 * direcao;
-    const velY = 400; // Vai para baixo
+    const velY = 400;
     this.projetil.body.setVelocity(velX, velY);
 
     // 2. Colisão/Overlap com Inimigos
@@ -99,16 +104,12 @@ export default class AirWebShot {
 
     const props = this.special?.propriedades || {};
 
-    // 1. Aplica o dano no alvo e verifica se foi bloqueado pela Guarda
-    // Se o alvo estiver em 'guard', receberDano() retorna TRUE
     const defendeu = alvo.receberDano(props.dano || 8, props);
 
-    // 2. SÓ PRENDE SE NÃO TIVER DEFENDIDO NA GUARDA!
     if (!defendeu && !alvo.estaPresoNaTeia && !alvo.imuneTeia) {
       this.prenderOponente(alvo);
     }
 
-    // Destrói o projétil no impacto
     if (projetil && projetil.active) {
       projetil.destroy();
       this.projetil = null;
@@ -141,7 +142,6 @@ export default class AirWebShot {
 
     alvo.teiaPresaSprite = teiaPresa;
 
-    // Faz o efeito visual seguir a posição do oponente
     const seguirOponente = () => {
       if (teiaPresa && teiaPresa.active && alvo.sprite) {
         teiaPresa.setPosition(alvo.sprite.x, alvo.sprite.y - 40);
@@ -151,9 +151,14 @@ export default class AirWebShot {
 
     alvo.atualizarTeia = seguirOponente;
 
-    // Função para desfazer a teia (se tomar dano ou acabar o tempo)
+    // Função para desfazer a teia
     alvo.estourarTeia = (tocarAnimacao = true) => {
       alvo.estaPresoNaTeia = false;
+
+      // 👁️ Restaura visibilidade do personagem ao soltar
+      if (alvo.sprite) {
+        alvo.sprite.setVisible(true);
+      }
 
       if (alvo.timerTeia) {
         alvo.timerTeia.remove(false);
@@ -175,7 +180,6 @@ export default class AirWebShot {
 
       alvo.teiaPresaSprite = null;
 
-      // Imunidade após sair
       this.scene.time.delayedCall(tempoImunidade, () => {
         alvo.imuneTeia = false;
       });

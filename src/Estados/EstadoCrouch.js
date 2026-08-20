@@ -36,6 +36,18 @@ export default class EstadoCrouch extends EstadoBase {
       }
     }
 
+
+     if (this.personagem.inputJustDown("special")) {
+    // 🛑 Pega o tipo do special primeiro
+    const tipoSpecial = this.personagem.obterTipoSpecial ? this.personagem.obterTipoSpecial() : "neutro";
+
+    // SÓ entra no estado de special se NÃO estiver em cooldown!
+    if (this.personagem.podeUsarSpecial(tipoSpecial)) {
+        this.personagem.maquinaEstados.mudarEstado("special");
+        return;
+    }
+    }
+
     // Transição pro dash
     if (this.personagem.inputJustDown("dash") && this.personagem.podeDash) {
       this.personagem.maquinaEstados.mudarEstado("dash");

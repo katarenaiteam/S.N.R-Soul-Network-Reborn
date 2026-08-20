@@ -98,6 +98,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("TH30_hurt1", "assets/personagens/Dio/Sprites/TH30_hurt1.png", { frameWidth: 98, frameHeight: 120 });
     this.load.spritesheet("TH30_atack4", "assets/personagens/Dio/Sprites/TH30_atack4.png", { frameWidth: 200, frameHeight: 117 });
     // --- Homem Aranha ---
+    //base
     this.load.spritesheet("SpiderMan_idle", "assets/personagens/SpiderMan/Sprites/SpiderMan_idle.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_walk", "assets/personagens/SpiderMan/Sprites/SpiderMan_walk.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_jump", "assets/personagens/SpiderMan/Sprites/SpiderMan_jump.png", { frameWidth: 200, frameHeight: 200 });
@@ -105,6 +106,8 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("SpiderMan_dash2", "assets/personagens/SpiderMan/Sprites/SpiderMan_dash2.png", { frameWidth: 200, frameHeight: 200 });
 this.load.spritesheet("SpiderMan_hurt", "assets/personagens/SpiderMan/Sprites/SpiderMan_hurt.png", { frameWidth: 200, frameHeight: 200 });
 this.load.spritesheet("SpiderMan_hurts", "assets/personagens/SpiderMan/Sprites/SpiderMan_hurts.png", { frameWidth: 200, frameHeight: 200 });
+this.load.spritesheet("SpiderMan_guard", "assets/personagens/SpiderMan/Sprites/SpiderMan_guard.png", { frameWidth: 200, frameHeight: 200 });
+    //ataques
     this.load.spritesheet("SpiderMan_atack1", "assets/personagens/SpiderMan/Sprites/SpiderMan_atack1.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_atack2", "assets/personagens/SpiderMan/Sprites/SpiderMan_atack2.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_atack3", "assets/personagens/SpiderMan/Sprites/SpiderMan_atack3.png", { frameWidth: 200, frameHeight: 200 });
@@ -116,7 +119,9 @@ this.load.spritesheet("SpiderMan_hurts", "assets/personagens/SpiderMan/Sprites/S
     this.load.spritesheet("SpiderMan_sideAtack", "assets/personagens/SpiderMan/Sprites/SpiderMan_sideAtack.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_neSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_neSpecial.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_AneSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AneSpecial.png", { frameWidth: 200, frameHeight: 200 });
-    this.load.spritesheet("SpiderMan_guard", "assets/personagens/SpiderMan/Sprites/SpiderMan_guard.png", { frameWidth: 200, frameHeight: 200 });
+     this.load.spritesheet("SpiderMan_doSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_doSpecial.png", { frameWidth: 200, frameHeight: 200 });
+      this.load.spritesheet("Counter", "assets/personagens/SpiderMan/Sprites/Counter.png", { frameWidth: 200, frameHeight: 200 });
+    
     // spy_effects
     this.load.spritesheet("webshot", "assets/personagens/SpiderMan/Sprites/webshot.png", { frameWidth: 200, frameHeight: 200 });
     // --- Miku ---
