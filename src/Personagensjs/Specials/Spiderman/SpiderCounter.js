@@ -36,6 +36,11 @@ export default class SpiderCounter {
     this.hitboxCounter = this.scene.add.zone(sprite.x + (20 * direcao), sprite.y - 30, 60, 80);
     this.scene.physics.add.existing(this.hitboxCounter);
 
+    //  Desativa a gravidade e o movimento da Zone
+    this.hitboxCounter.body.allowGravity = false;
+    this.hitboxCounter.body.moves = false;
+
+    // Contorno amarelo para debug
     if (this.hitboxCounter.body) {
       this.hitboxCounter.body.debugBodyColor = 0xffff00;
     }

@@ -207,6 +207,18 @@ export default class SpiderMan extends Personagem {
           { largura: 110, altura: 35, offsetX: 5, offsetY: -18 }, // Agachado / pernas abertas
     ], 
     },
+
+    doSpecial: {
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: 96,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
+          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+        ],
+      },
    };
     
   

@@ -120,7 +120,7 @@ this.load.spritesheet("SpiderMan_guard", "assets/personagens/SpiderMan/Sprites/S
     this.load.spritesheet("SpiderMan_neSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_neSpecial.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_AneSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AneSpecial.png", { frameWidth: 200, frameHeight: 200 });
      this.load.spritesheet("SpiderMan_doSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_doSpecial.png", { frameWidth: 200, frameHeight: 200 });
-      this.load.spritesheet("Counter", "assets/personagens/SpiderMan/Sprites/Counter.png", { frameWidth: 200, frameHeight: 200 });
+      this.load.spritesheet("Counter", "assets/personagens/SpiderMan/Sprites/Counter.png", { frameWidth: 500, frameHeight: 200 });
     
     // spy_effects
     this.load.spritesheet("webshot", "assets/personagens/SpiderMan/Sprites/webshot.png", { frameWidth: 200, frameHeight: 200 });
