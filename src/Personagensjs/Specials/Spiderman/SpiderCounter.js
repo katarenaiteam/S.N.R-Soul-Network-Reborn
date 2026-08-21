@@ -8,23 +8,16 @@ export default class SpiderCounter {
     this.counterAtivo = false;
     this.hitboxCounter = null;
     this.timerBrilho = null;
-    this.colliderOverlap = null;
   }
 
   executar() {
+    // Garante reset de instâncias passadas
+    this.desativarCounter();
+
     this.counterAtivo = true;
 
     if (this.personagem) {
-      // 1. Apaga as hurtboxes para ficar invulnerável
       this.personagem.destruirHurtboxes();
-
-      // 2. Trava a chave do especial para garantir que a FSM saiba que é o agachado
-      if (this.special) {
-        this.special.tipo = "agachado";
-      }
-
-      // 3. Aplica o cooldown especificamente no container do agachado
-      this.personagem.iniciarCooldownSpecial("agachado");
     }
 
     const sprite = this.personagem.sprite;
@@ -40,31 +33,19 @@ export default class SpiderCounter {
       });
     }
 
-    // Cria a hitbox amarela do counter
-    this.hitboxCounter = this.scene.add.zone(sprite.x, sprite.y - 60, 80, 110);
+    // Cria a Zone do Counter
+    this.hitboxCounter = this.scene.add.zone(sprite.x, sprite.y - 45, 90, 130);
     this.scene.physics.add.existing(this.hitboxCounter);
     if (this.hitboxCounter.body) {
       this.hitboxCounter.body.allowGravity = false;
       this.hitboxCounter.body.debugBodyColor = 0xffff00;
     }
 
-    const oponente = this.scene.jogador1 === this.personagem ? this.scene.jogador2 : this.scene.jogador1;
-
-    if (oponente) {
-      this.colliderOverlap = this.scene.physics.add.overlap(
-        this.hitboxCounter,
-        oponente.sprite,
-        () => this.dispararContraAtaque(oponente),
-        () => oponente.maquinaEstados?.estadoAtual?.hitboxAtual?.active === true,
-        this
-      );
-    }
-
+    // Timer limite de duração do counter (600ms)
     this.scene.time.delayedCall(600, () => this.desativarCounter());
   }
 
   atualizar() {
-    // Apenas mantém a zone colada no Aranha
     if (!this.counterAtivo || !this.hitboxCounter?.active) return;
 
     if (this.personagem) {
@@ -72,7 +53,32 @@ export default class SpiderCounter {
     }
 
     const sprite = this.personagem.sprite;
-    this.hitboxCounter.setPosition(sprite.x, sprite.y - 60);
+    this.hitboxCounter.setPosition(sprite.x, sprite.y - 45);
+
+    // =========================================================
+    // CHECAGEM GEOMÉTRICA MANUAL (Sem travas de overlap do Phaser)
+    // =========================================================
+    const oponente = this.scene.jogador1 === this.personagem ? this.scene.jogador2 : this.scene.jogador1;
+    if (!oponente) return;
+
+    const estadoOponente = oponente.maquinaEstados?.estadoAtual;
+    
+    // Busca a hitbox de ataque do oponente (suporta hitbox única ou grupo de hitboxes)
+    let hitboxInimiga = estadoOponente?.hitboxAtual;
+    if (!hitboxInimiga?.active && estadoOponente?.grupoHitbox) {
+      hitboxInimiga = estadoOponente.grupoHitbox.getChildren().find(h => h.active);
+    }
+
+    // Se houver uma hitbox de ataque ATIVA no oponente
+    if (hitboxInimiga && hitboxInimiga.active) {
+      const boundsCounter = this.hitboxCounter.getBounds();
+      const boundsAtaque = hitboxInimiga.getBounds ? hitboxInimiga.getBounds() : hitboxInimiga.body;
+
+      // Teste de interseção entre os retângulos
+      if (Phaser.Geom.Intersects.RectangleToRectangle(boundsCounter, boundsAtaque)) {
+        this.dispararContraAtaque(oponente);
+      }
+    }
   }
 
   dispararContraAtaque(oponente) {
@@ -83,14 +89,12 @@ export default class SpiderCounter {
     const sprite = this.personagem.sprite;
     const oponenteEsquerda = oponente.sprite.x < sprite.x;
 
-    // Vira o Aranha para o lado do oponente
     sprite.setFlipX(oponenteEsquerda);
 
     if (sprite.body) {
       sprite.body.setVelocity(0, 0);
     }
 
-    // Toca a animação spy_counter
     if (this.scene.anims.exists("spy_counter")) {
       sprite.anims.play("spy_counter", true);
       if (typeof this.personagem.aplicarConfiguracao === 'function') {
@@ -98,7 +102,6 @@ export default class SpiderCounter {
       }
     }
 
-    // Envia o dano (Personagem.js calcula a direção do empurrão automaticamente)
     if (typeof oponente.receberDano === 'function') {
       oponente.receberDano(15, { 
         knockbackX: 650, 
@@ -110,11 +113,6 @@ export default class SpiderCounter {
 
   desativarCounter() {
     this.counterAtivo = false;
-
-    if (this.colliderOverlap) {
-      this.scene.physics.world.removeCollider(this.colliderOverlap);
-      this.colliderOverlap = null;
-    }
 
     if (this.timerBrilho) {
       this.timerBrilho.remove(false);
