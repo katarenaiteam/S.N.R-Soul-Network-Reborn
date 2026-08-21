@@ -298,6 +298,26 @@ export default class Personagem {
     return Phaser.Input.Keyboard.JustUp(this.teclas?.[nome]);
   }
 
+  obterTipoSpecial() {
+    const noChao = this.sprite.body.blocked.down;
+    const apertandoBaixo = this.inputDown("baixo");
+    const apertandoCima = this.inputDown("cima");
+    const apertandoLado =
+      this.inputDown("esquerda") || this.inputDown("direita");
+
+    if (noChao) {
+      if (apertandoBaixo) return "agachado";
+      if (apertandoCima) return "cima";
+      if (apertandoLado) return "lado";
+      return "neutro";
+    }
+
+    if (apertandoBaixo) return "air_agachado";
+    if (apertandoCima) return "air_cima";
+    if (apertandoLado) return "air_lado";
+    return "air_neutro";
+  }
+
   atualizarLogicasEspeciais() {
     this.logicasEspeciaisAtivas.forEach((logica) => {
       logica.atualizar?.();

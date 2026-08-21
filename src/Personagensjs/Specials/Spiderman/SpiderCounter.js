@@ -1,4 +1,3 @@
-// src/Personagensjs/Specials/SpiderMan/SpiderCounter.js
 export default class SpiderCounter {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
@@ -7,97 +6,104 @@ export default class SpiderCounter {
     this.estado = estado;
 
     this.counterAtivo = false;
-    this.timerCounter = null;
     this.hitboxCounter = null;
-    this.overlap = null;
+    this.timerBrilho = null;
+    this.colliderOverlap = null;
   }
 
   executar() {
     this.counterAtivo = true;
-    const sprite = this.personagem.sprite;
 
-    if (sprite) {
-      sprite.setTint(0xffffff);
+    if (this.personagem) {
+      // 1. Apaga as hurtboxes para ficar invulnerável
+      this.personagem.destruirHurtboxes();
+
+      // 2. Trava a chave do especial para garantir que a FSM saiba que é o agachado
+      if (this.special) {
+        this.special.tipo = "agachado";
+      }
+
+      // 3. Aplica o cooldown especificamente no container do agachado
+      this.personagem.iniciarCooldownSpecial("agachado");
     }
 
-    this.criarHitboxCounter();
-
-    const duracaoJanela = this.special?.propriedades?.duracaoCounter || 600;
-
-    this.timerCounter = this.scene.time.delayedCall(duracaoJanela, () => {
-      this.desativarCounter();
-    });
-  }
-
-  criarHitboxCounter() {
     const sprite = this.personagem.sprite;
-    const direcao = sprite.flipX ? -1 : 1;
+    if (sprite) {
+      this.timerBrilho = this.scene.time.addEvent({
+        delay: 70,
+        callback: () => {
+          if (!this.counterAtivo) return;
+          if (sprite.isTinted) sprite.clearTint();
+          else sprite.setTint(0x88ffff);
+        },
+        loop: true
+      });
+    }
 
-    this.hitboxCounter = this.scene.add.zone(sprite.x + (20 * direcao), sprite.y - 30, 60, 80);
+    // Cria a hitbox amarela do counter
+    this.hitboxCounter = this.scene.add.zone(sprite.x, sprite.y - 60, 80, 110);
     this.scene.physics.add.existing(this.hitboxCounter);
-
-    //  Desativa a gravidade e o movimento da Zone
-    this.hitboxCounter.body.allowGravity = false;
-    this.hitboxCounter.body.moves = false;
-
-    // Contorno amarelo para debug
     if (this.hitboxCounter.body) {
+      this.hitboxCounter.body.allowGravity = false;
       this.hitboxCounter.body.debugBodyColor = 0xffff00;
     }
 
     const oponente = this.scene.jogador1 === this.personagem ? this.scene.jogador2 : this.scene.jogador1;
-    if (!oponente) return;
 
-    // Detecta colisão contínua a cada frame da física
-    this.overlap = this.scene.physics.add.overlap(
-      this.hitboxCounter,
-      oponente.grupoHurtbox || oponente.sprite, // Usa a área de física do oponente para a busca
-      () => {
-        // Pega o estado atual de ataque do oponente
-        const estadoAtaque = oponente.maquinaEstados?.estadoAtual;
+    if (oponente) {
+      this.colliderOverlap = this.scene.physics.add.overlap(
+        this.hitboxCounter,
+        oponente.sprite,
+        () => this.dispararContraAtaque(oponente),
+        () => oponente.maquinaEstados?.estadoAtual?.hitboxAtual?.active === true,
+        this
+      );
+    }
 
-        // Só aciona se o oponente estiver atacando E a hitbox de ataque dele existir na cena
-        if (estadoAtaque && estadoAtaque.hitboxAtual && estadoAtaque.hitboxAtual.active) {
-          
-          // Confirma se a hitbox de ataque do oponente REALMENTE colidiu com a hitbox do counter
-          const encostouHitbox = this.scene.physics.overlap(this.hitboxCounter, estadoAtaque.hitboxAtual);
-
-          if (encostouHitbox) {
-            const danoInimigo = estadoAtaque.golpeAtual?.propriedades?.dano || 10;
-            this.processarAparada(danoInimigo, oponente);
-          }
-        }
-      }
-    );
+    this.scene.time.delayedCall(600, () => this.desativarCounter());
   }
 
-  processarAparada(danoRecebido, atacante) {
-    if (!this.counterAtivo) return;
+  atualizar() {
+    // Apenas mantém a zone colada no Aranha
+    if (!this.counterAtivo || !this.hitboxCounter?.active) return;
 
-    if (this.timerCounter) {
-      this.timerCounter.remove(false);
-      this.timerCounter = null;
+    if (this.personagem) {
+      this.personagem.destruirHurtboxes();
     }
+
+    const sprite = this.personagem.sprite;
+    this.hitboxCounter.setPosition(sprite.x, sprite.y - 60);
+  }
+
+  dispararContraAtaque(oponente) {
+    if (!this.counterAtivo) return;
 
     this.desativarCounter();
 
-    const danoRetorno = danoRecebido * 1.5;
-    this.executarContraAtaque(atacante, danoRetorno);
-  }
-
-  executarContraAtaque(alvo, dano) {
     const sprite = this.personagem.sprite;
-    const direcao = sprite.flipX ? -1 : 1;
+    const oponenteEsquerda = oponente.sprite.x < sprite.x;
 
-    if (this.scene.anims.exists("spy_counter")) {
-      sprite.anims.play("spy_counter", true);
+    // Vira o Aranha para o lado do oponente
+    sprite.setFlipX(oponenteEsquerda);
+
+    if (sprite.body) {
+      sprite.body.setVelocity(0, 0);
     }
 
-    if (alvo && alvo.receberDano) {
-      alvo.receberDano(dano, {
-        knockbackX: 650 * direcao,
-        knockbackY: -350,
-        tumbling: true
+    // Toca a animação spy_counter
+    if (this.scene.anims.exists("spy_counter")) {
+      sprite.anims.play("spy_counter", true);
+      if (typeof this.personagem.aplicarConfiguracao === 'function') {
+        this.personagem.aplicarConfiguracao("counter");
+      }
+    }
+
+    // Envia o dano (Personagem.js calcula a direção do empurrão automaticamente)
+    if (typeof oponente.receberDano === 'function') {
+      oponente.receberDano(15, { 
+        knockbackX: 650, 
+        knockbackY: -350, 
+        tumbling: true 
       });
     }
   }
@@ -105,28 +111,23 @@ export default class SpiderCounter {
   desativarCounter() {
     this.counterAtivo = false;
 
+    if (this.colliderOverlap) {
+      this.scene.physics.world.removeCollider(this.colliderOverlap);
+      this.colliderOverlap = null;
+    }
+
+    if (this.timerBrilho) {
+      this.timerBrilho.remove(false);
+      this.timerBrilho = null;
+    }
+
     if (this.personagem?.sprite) {
       this.personagem.sprite.clearTint();
     }
 
-    if (this.overlap && this.overlap.active) {
-      this.overlap.destroy();
-      this.overlap = null;
-    }
-
-    if (this.hitboxCounter && this.hitboxCounter.active) {
+    if (this.hitboxCounter?.active) {
       this.hitboxCounter.destroy();
       this.hitboxCounter = null;
-    }
-  }
-
-  atualizar() {
-    if (this.hitboxCounter && this.hitboxCounter.active && this.personagem.sprite) {
-      const direcao = this.personagem.sprite.flipX ? -1 : 1;
-      this.hitboxCounter.setPosition(
-        this.personagem.sprite.x + (20 * direcao),
-        this.personagem.sprite.y - 30
-      );
     }
   }
 }

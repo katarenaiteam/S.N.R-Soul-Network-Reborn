@@ -219,6 +219,16 @@ export default class SpiderMan extends Personagem {
           { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
+      counter: {
+      largura: 80,
+     altura: 95,
+     offsetX: 200,
+     offsetY: 96,
+      escala: 1,
+     hurtboxes: [
+    { largura: 60, altura: 80, offsetX: 0, offsetY: -40 }
+  ]
+}
    };
     
   
@@ -423,7 +433,7 @@ export default class SpiderMan extends Personagem {
 
       agachado: {
          animacao: "spy_doSpecial",
-         duracao: 700,
+         duracao: 600,
          cooldown: 2000,
          logica: SpiderCounter,
 

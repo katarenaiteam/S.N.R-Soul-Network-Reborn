@@ -5,41 +5,39 @@ export default class EstadoSpecial extends EstadoBase {
     const noChao = this.personagem.sprite.body.blocked.down;
     const direcaoOlhar = this.personagem.sprite.flipX ? -1 : 1;
 
-    // Guarda o tipo de special enviado
     let tipoSpecial = dados?.tipo;
 
-    // Se não veio tipo nos dados, descobre pelas direções e pelo estado (chão vs ar)
+    // Se não veio tipo nos dados, descobre pelas direções
     if (!tipoSpecial) {
+      const apertandoCima = this.personagem.inputDown("cima");
+      const apertandoBaixo = this.personagem.inputDown("baixo");
       const apertandoLado =
         this.personagem.inputDown("esquerda") ||
         this.personagem.inputDown("direita");
 
-      const apertandoCima = this.personagem.inputDown("cima");
-      const apertandoBaixo = this.personagem.inputDown("baixo");
-
       if (noChao) {
-        if (apertandoCima) tipoSpecial = "cima";
-        else if (apertandoBaixo) tipoSpecial = "agachado";
+        if (apertandoBaixo) tipoSpecial = "agachado";
+        else if (apertandoCima) tipoSpecial = "cima";
         else if (apertandoLado) tipoSpecial = "lado";
         else tipoSpecial = "neutro";
       } else {
-        if (apertandoCima) tipoSpecial = "air_cima";
-        else if (apertandoBaixo) tipoSpecial = "air_agachado";
+        if (apertandoBaixo) tipoSpecial = "air_agachado";
+        else if (apertandoCima) tipoSpecial = "air_cima";
         else if (apertandoLado) tipoSpecial = "air_lado";
         else tipoSpecial = "air_neutro";
       }
     }
 
-    // Checagem na tabela do personagem (mantém tipoSpecial ou usa neutro)
-    const tipoSpecialEfetivo = this.personagem.specials?.[tipoSpecial]
-      ? tipoSpecial
-      : "neutro";
+    // NUNCA faz fallback para "neutro" se a chave for agachado e existir no objeto
+    let tipoSpecialEfetivo = tipoSpecial;
+    if (!this.personagem.specials?.[tipoSpecialEfetivo]) {
+      tipoSpecialEfetivo = "neutro";
+    }
 
-    // Pega o objeto do especial e salva as referências
     this.specialAtual = this.personagem.specials?.[tipoSpecialEfetivo];
     this.tipoSpecialAtual = tipoSpecialEfetivo;
 
-    // Impede de usar se não existir ou se estiver em cooldown
+    // Valida permissão de uso da chave correta
     if (
       !this.specialAtual ||
       !this.personagem.podeUsarSpecial(tipoSpecialEfetivo)
@@ -48,14 +46,13 @@ export default class EstadoSpecial extends EstadoBase {
       return;
     }
 
-    // Travas e Flags de Finalização/Física
     this.tempoInicio = this.personagem.scene.time.now;
     this.timerFinalizacaoChao = null;
     this.finalizandoPorChao = false;
     this.timerFinalizacaoAcerto = null;
     this.finalizandoPorAcerto = false;
 
-    // Inicia Cooldown
+    // Inicia Cooldown especificamente da chave resolvida
     this.personagem.iniciarCooldownSpecial(tipoSpecialEfetivo);
 
     // ===================================
