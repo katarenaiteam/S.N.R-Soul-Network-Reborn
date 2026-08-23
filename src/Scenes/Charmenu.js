@@ -5,15 +5,17 @@ export default class Charmenu extends Phaser.Scene {
         super({ key: 'Charmenu' });
     }
 
+    init(data) {
+        this.modoJogo = data?.modo || "1v1";
+        this.numPlayers = data?.numPlayers || 2;
+    }
+
     create() {
-        // 1. Fundo com a imagem que já contém os textos desenhados
         this.add.image(0, 0, "Charmenu").setOrigin(0, 0).setDisplaySize(this.scale.width, this.scale.height);
 
-        // 2. Música
         this.musica = this.sound.add('katarenai8bit', { loop: true, volume: 0.1 });
         this.musica.play();
 
-        // 3. Mapeamento dos personagens e posições
         this.opcoesPersonagens = [
             { id: "Frederick", thumbKey: "FJmenu", x: 300, y: 750 },
             { id: "Madotsuki", thumbKey: "Madomenu", x: 620, y: 750 },
@@ -23,24 +25,26 @@ export default class Charmenu extends Phaser.Scene {
             { id: "Miku",       thumbKey: "Miku_idle",  x: 400, y: 1250 }
         ];
 
-        // Desenha as miniaturas
         this.opcoesPersonagens.forEach((char) => {
             this.add.image(char.x, char.y, char.thumbKey).setOrigin(0.5).setScale(0.5);
         });
 
-        // 4. Posições iniciais e estados de confirmação
-        this.indiceP1 = 0; // Frederick
-        this.indiceP2 = 1; // Madotsuki
+        this.indiceP1 = 0;
+        this.indiceP2 = 1;
 
         this.p1Confirmou = false;
-        this.p2Confirmou = false;
+        // No modo história com 1 player, P2 já vem "confirmado" por padrão
+        this.p2Confirmou = (this.modoJogo === "historia" && this.numPlayers === 1);
 
         this.bordaP1 = this.add.rectangle(0, 0, 235, 235).setStrokeStyle(4, 0xFF27F5F5);
         this.bordaP2 = this.add.rectangle(0, 0, 250, 250).setStrokeStyle(4, 0xffF527F5);
 
+        if (this.p2Confirmou) {
+            this.bordaP2.setVisible(false);
+        }
+
         this.atualizarPosicaoBordas();
 
-        // 5. Mapeamento das Teclas do Teclado
         this.teclasP1 = this.input.keyboard.addKeys({
             esquerda: Phaser.Input.Keyboard.KeyCodes.A,
             direita:  Phaser.Input.Keyboard.KeyCodes.D,
@@ -58,7 +62,6 @@ export default class Charmenu extends Phaser.Scene {
             direita: Phaser.Input.Keyboard.KeyCodes.RIGHT
         });
 
-        // Instancia os gerenciadores de controle (suporta teclado + gamepad)
         this.controleP1 = new ControleEntrada(this, this.teclasP1, 0);
         this.controleP2 = new ControleEntrada(this, this.teclasP2, 1);
     }
@@ -66,16 +69,12 @@ export default class Charmenu extends Phaser.Scene {
     update() {
         if (this.p1Confirmou && this.p2Confirmou) return;
 
-        // Atualiza os controles
         this.controleP1.atualizar();
-        this.controleP2.atualizar();
+        if (this.numPlayers === 2) this.controleP2.atualizar();
 
-        // --- CONTROLES P1 ---
         if (!this.p1Confirmou) {
             const esqP1 = Phaser.Input.Keyboard.JustDown(this.teclasP1.esquerda) || Phaser.Input.Keyboard.JustDown(this.teclasSetas.esquerda) || this.controleP1.acabouDeApertar("esquerda");
             const dirP1 = Phaser.Input.Keyboard.JustDown(this.teclasP1.direita) || Phaser.Input.Keyboard.JustDown(this.teclasSetas.direita) || this.controleP1.acabouDeApertar("direita");
-            
-            // Aceita a tecla F diretamente do teclado OU as ações do controle/gamepad
             const confP1 = Phaser.Input.Keyboard.JustDown(this.teclasP1.confirmar) || this.controleP1.acabouDeApertar("confirmar") || this.controleP1.acabouDeApertar("atack") || this.controleP1.acabouDeApertar("special");
 
             if (esqP1) {
@@ -88,17 +87,14 @@ export default class Charmenu extends Phaser.Scene {
             }
             if (confP1) {
                 this.p1Confirmou = true;
-                this.bordaP1.setStrokeStyle(5, 0x00ff88); // Verde ao confirmar
+                this.bordaP1.setStrokeStyle(5, 0x00ff88);
                 this.checarInicioJogo();
             }
         }
 
-        // --- CONTROLES P2 ---
-        if (!this.p2Confirmou) {
+        if (this.numPlayers === 2 && !this.p2Confirmou) {
             const esqP2 = Phaser.Input.Keyboard.JustDown(this.teclasP2.esquerda) || this.controleP2.acabouDeApertar("esquerda");
             const dirP2 = Phaser.Input.Keyboard.JustDown(this.teclasP2.direita) || this.controleP2.acabouDeApertar("direita");
-            
-            // Aceita a tecla O diretamente do teclado OU as ações do controle/gamepad
             const confP2 = Phaser.Input.Keyboard.JustDown(this.teclasP2.confirmar) || this.controleP2.acabouDeApertar("confirmar") || this.controleP2.acabouDeApertar("atack") || this.controleP2.acabouDeApertar("special");
 
             if (esqP2) {
@@ -111,36 +107,42 @@ export default class Charmenu extends Phaser.Scene {
             }
             if (confP2) {
                 this.p2Confirmou = true;
-                this.bordaP2.setStrokeStyle(5, 0x00ff88); // Verde ao confirmar
+                this.bordaP2.setStrokeStyle(5, 0x00ff88);
                 this.checarInicioJogo();
             }
         }
 
         this.controleP1.salvarAnterior();
-        this.controleP2.salvarAnterior();
+        if (this.numPlayers === 2) this.controleP2.salvarAnterior();
     }
 
     atualizarPosicaoBordas() {
         const charP1 = this.opcoesPersonagens[this.indiceP1];
-        const charP2 = this.opcoesPersonagens[this.indiceP2];
-
         this.bordaP1.setPosition(charP1.x, charP1.y);
-        this.bordaP2.setPosition(charP2.x, charP2.y);
+
+        if (this.numPlayers === 2) {
+            const charP2 = this.opcoesPersonagens[this.indiceP2];
+            this.bordaP2.setPosition(charP2.x, charP2.y);
+        }
     }
 
     checarInicioJogo() {
         if (this.p1Confirmou && this.p2Confirmou) {
+            if (this.musica) this.musica.stop();
+
             const escolhas = {
                 p1: this.opcoesPersonagens[this.indiceP1].id,
-                p2: this.opcoesPersonagens[this.indiceP2].id
+                p2: this.numPlayers === 2 ? this.opcoesPersonagens[this.indiceP2].id : null,
+                numPlayers: this.numPlayers,
+                modo: this.modoJogo
             };
 
-            if (this.musica) {
-                this.musica.stop();
-            }
-
             this.time.delayedCall(1000, () => {
-                this.scene.start("CenaSelecaoMapa", escolhas);
+                if (this.modoJogo === "historia") {
+                    this.scene.start("CenaHistoria", escolhas);
+                } else {
+                    this.scene.start("CenaSelecaoMapa", escolhas);
+                }
             });
         }
     }

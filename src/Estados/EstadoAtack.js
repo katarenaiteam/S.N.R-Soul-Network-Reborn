@@ -239,47 +239,62 @@ export default class EstadoAtack extends EstadoBase {
       this.golpeAtual.offsetX,
       this.golpeAtual.offsetY,
       this.golpeAtual.largura,
-      this.golpeAtual.altura,
+      this.golpeAtual.altura
     );
 
-    const oponente =
-      this.personagem.scene.jogador1 === this.personagem
-        ? this.personagem.scene.jogador2
-        : this.personagem.scene.jogador1;
+    if (this.personagem.scene.camHUD) {
+      this.personagem.scene.camHUD.ignore(this.hitboxAtual);
+    }
 
-    this.personagem.scene.physics.add.overlap(
-      this.hitboxAtual,
-      oponente.grupoHurtbox,
-      () => {
-        if (this.jaAcertou) return;
+    const cena = this.personagem.scene;
+    let alvos = [];
 
-        this.jaAcertou = true;
-        const valorDano = this.golpeAtual.propriedades.dano || 0;
-        const origem = {
-          x: this.hitboxAtual.x,
-          y: this.hitboxAtual.y,
-        };
+    // MODO HISTÓRIA: P1 e P2 batem só no Boss. Boss bate nos dois.
+    if (cena.scene.key === "CenaHistoria") {
+      const souPlayer = (this.personagem === cena.jogador1 || this.personagem === cena.jogador2);
+      alvos = souPlayer 
+        ? [cena.boss] 
+        : [cena.jogador1].filter(Boolean);
+    } 
+    // DEMAIS MODOS (Versus / Luta normal): Ataca qualquer outro personagem da cena
+    else {
+      alvos = [cena.jogador1, cena.jogador2, cena.jogador3, cena.jogador4]
+        ? [cena.jogador1, cena.jogador2, cena.jogador3, cena.jogador4].filter(p => p && p !== this.personagem)
+        : [];
+    }
 
-        oponente.receberDano(valorDano, this.golpeAtual.propriedades, origem);
+    alvos.forEach((alvo) => {
+      if (!alvo || !alvo.grupoHurtbox) return;
 
-        if (
-          this.golpeAtual.finalizarAoAcertarOponente &&
-          !this.finalizandoPorAcerto
-        ) {
-          this.finalizandoPorAcerto = true;
-          const atraso = this.golpeAtual.atrasoFinalizacaoAcerto ?? 0;
+      const colisor = cena.physics.add.overlap(
+        this.hitboxAtual,
+        alvo.grupoHurtbox,
+        () => {
+          if (this.jaAcertou) return;
 
-          this.timerFinalizacaoAcerto = this.personagem.scene.time.delayedCall(
-            atraso,
-            () => {
+          this.jaAcertou = true;
+          const valorDano = this.golpeAtual.propriedades?.dano || 0;
+          const origem = {
+            direcao: this.personagem.sprite.flipX ? -1 : 1,
+          };
+
+          alvo.receberDano(valorDano, this.golpeAtual.propriedades, origem);
+
+          if (this.golpeAtual.finalizarAoAcertarOponente && !this.finalizandoPorAcerto) {
+            this.finalizandoPorAcerto = true;
+            const atraso = this.golpeAtual.atrasoFinalizacaoAcerto ?? 0;
+
+            this.timerFinalizacaoAcerto = cena.time.delayedCall(atraso, () => {
               if (this.personagem.maquinaEstados.estadoAtual === this) {
                 this.finalizarAtaque();
               }
-            },
-          );
+            });
+          }
         }
-      },
-    );
+      );
+
+      this.colisorOverlap = colisor;
+    });
   }
 
   // =========================
@@ -294,15 +309,29 @@ export default class EstadoAtack extends EstadoBase {
     }
 
     if (this.personagem.sprite.body.blocked.down) {
-      this.personagem.maquinaEstados.mudarEstado("idle");
+      const segurandoBaixo = this.personagem.inputDown("baixo");
+
+      if (segurandoBaixo) {
+        // Passa a flag para o EstadoCrouch ir direto pro crouch_idle
+        this.personagem.maquinaEstados.mudarEstado("crouch", { vindoDeAtaque: true });
+      } else {
+        this.personagem.maquinaEstados.mudarEstado("idle");
+      }
     } else {
       this.personagem.maquinaEstados.mudarEstado("jump");
     }
   }
 
   exit() {
-    if (this.hitboxAtual && this.hitboxAtual.active) {
+    // Limpa o evento de colisão da física do Phaser
+    if (this.colisorOverlap) {
+      this.personagem.scene.physics.world.removeCollider(this.colisorOverlap);
+      this.colisorOverlap = null;
+    }
+
+    if (this.hitboxAtual) {
       this.hitboxAtual.destroy();
+      this.hitboxAtual = null;
     }
 
     if (this.anulouGravidade) {
@@ -312,7 +341,6 @@ export default class EstadoAtack extends EstadoBase {
 
     this.personagem.sprite.off("animationupdate", this.atualizarHitbox, this);
 
-    this.hitboxAtual = null;
     this.hitboxCriada = false;
 
     if (this.timerFinalizacaoChao) {

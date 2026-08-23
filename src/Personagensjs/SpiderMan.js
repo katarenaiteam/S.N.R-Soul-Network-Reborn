@@ -521,14 +521,25 @@ export default class SpiderMan extends Personagem {
     });
 
     scene.anims.create({
-      key: "spy_crouch",
+      key: "spy_crouch2",
       frames: scene.anims.generateFrameNumbers("SpiderMan_down", {
-        start: 0,
+        start: 3,
         end: 3,
       }),
-      frameRate: 12,
+      frameRate: 10,
       repeat: 0,
     });
+
+    scene.anims.create({
+      key: "spy_crouch3",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_down", {
+        start: 3,
+        end: 5,
+      }),
+      frameRate: 15,
+      repeat: 0,
+    });
+
 
     scene.anims.create({
       key: "spy_dash",

@@ -43,9 +43,13 @@ export default class WebShot {
     this.projetil.body.setVelocityX(600 * direcao);
 
     // Colisão com Inimigos
-    const oponentes = [this.scene.jogador1, this.scene.jogador2].filter(
-      (j) => j && j !== this.personagem
-    );
+    const oponentes = this.scene.scene.key === "CenaHistoria"
+      ? (this.personagem === this.scene.boss
+        ? [this.scene.jogador1]
+        : [this.scene.boss])
+      : [this.scene.jogador1, this.scene.jogador2].filter(
+        (j) => j && j !== this.personagem
+      );
 
     this.overlaps = [];
 

@@ -36,6 +36,7 @@ export default class Personagem {
     this.cooldownsSpecial = {};
     this.specials = {};
     this.logicasEspeciaisAtivas = [];
+    this.invulneravel = false;
 
     // Atributos
     this.velocidade = config.velocidade;
@@ -82,7 +83,9 @@ export default class Personagem {
 
   // --- RECEBIMENTO DE DANO ---
   // --- RECEBIMENTO DE DANO ---
-  receberDano(quantidade, propriedades = {}) {
+  receberDano(quantidade, propriedades = {}, origem = null) {
+    if (this.invulneravel) return true;
+
     //  SE ESTIVER EM ESTADO DE GUARD:
     if (this.maquinaEstados.estadoAtual?.nome === "guard") {
       this.vidaGuard -= quantidade;
@@ -111,7 +114,11 @@ export default class Personagem {
 
       // Repulsão de impacto leve ao defender o golpe sem quebrar
       const oponente = this.scene.jogador1 === this ? this.scene.jogador2 : this.scene.jogador1;
-      const direcaoX = this.sprite.x > oponente.sprite.x ? 1 : -1;
+      const direcaoX = origem?.direcao !== undefined
+        ? origem.direcao
+        : origem?.x !== undefined
+          ? (this.sprite.x >= origem.x ? 1 : -1)
+        : (oponente && this.sprite.x > oponente.sprite.x ? 1 : -1);
       this.sprite.body.setVelocityX(direcaoX * 120);
 
       return true; // Bloqueado com sucesso
@@ -122,7 +129,11 @@ export default class Personagem {
     if (this.textoDano) this.textoDano.setText(`${Math.floor(this.porcentagemDano)}%`);
 
     const oponente = this.scene.jogador1 === this ? this.scene.jogador2 : this.scene.jogador1;
-    const direcaoX = this.sprite.x > oponente.sprite.x ? 1 : -1;
+    const direcaoX = origem?.direcao !== undefined
+      ? origem.direcao * Math.sign(propriedades.knockbackX ?? 250)
+      : origem?.x !== undefined
+        ? (this.sprite.x >= origem.x ? 1 : -1)
+      : (oponente && this.sprite.x > oponente.sprite.x ? 1 : -1);
 
     const kbX = propriedades.knockbackX ?? 250;
     const kbY = propriedades.knockbackY ?? -100;
@@ -132,7 +143,7 @@ export default class Personagem {
 
     // APLICA A VELOCIDADE PRIMEIRO NO CORPO FÍSICO
     this.sprite.body.setVelocity(
-      direcaoX * kbX * (1 + this.porcentagemDano / 30),
+      direcaoX * Math.abs(kbX) * (1 + this.porcentagemDano / 30),
       kbY * (1 + this.porcentagemDano / 150)
     );
 
@@ -285,17 +296,22 @@ export default class Personagem {
   }
 
   inputDown(nome) {
-    return this.controle?.estaApertado(nome) || !!this.teclas?.[nome]?.isDown;
+    if (this.controle) return this.controle.estaApertado(nome);
+    const tecla = this.teclas?.[nome];
+    return tecla ? !!tecla.isDown : false;
   }
 
   inputJustDown(nome) {
     if (this.controle) return this.controle.acabouDeApertar(nome);
-    return Phaser.Input.Keyboard.JustDown(this.teclas?.[nome]);
+    const tecla = this.teclas?.[nome];
+    // Se a tecla não existe (ex: Bot/Boss), ignora em vez de dar erro no Phaser
+    return tecla ? Phaser.Input.Keyboard.JustDown(tecla) : false;
   }
 
   inputJustUp(nome) {
     if (this.controle) return this.controle.acabouDeSoltar(nome);
-    return Phaser.Input.Keyboard.JustUp(this.teclas?.[nome]);
+    const tecla = this.teclas?.[nome];
+    return tecla ? Phaser.Input.Keyboard.JustUp(tecla) : false;
   }
 
   obterTipoSpecial() {
@@ -408,6 +424,7 @@ export default class Personagem {
   criarHitboxAtaque(offsetX, offsetY, largura, altura, dadosAtaque) {
     if (this.hitboxAtiva) {
       this.hitboxAtiva.destroy();
+      this.hitboxAtiva = null;
     }
 
     this.hitboxOffset = { x: offsetX, y: offsetY };
@@ -420,14 +437,11 @@ export default class Personagem {
 
     hitbox.body.setAllowGravity(false);
     hitbox.body.setImmovable(true);
-    hitbox.body.setVelocity(0, 0);
+    
+    // Altera apenas a cor da linha de debug para vermelho
     hitbox.body.debugBodyColor = 0xff0000;
 
     this.hitboxAtiva = hitbox;
-    hitbox.once("destroy", () => {
-      this.hitboxAtiva = null;
-    });
-
     return hitbox;
   }
 }

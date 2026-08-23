@@ -8,10 +8,7 @@ export default class CenaStart extends Phaser.Scene {
   create() {
     this.cameras.main.setBackgroundColor("#05050a");
 
-    // 1. CONTAINER PARA O MENU
     this.conteudoMenu = this.add.container(0, 0);
-    
-    // Animação de entrada (scale Y simples, sem alterar posição/origem)
     this.conteudoMenu.scaleY = 0;
     this.tweens.add({
       targets: this.conteudoMenu,
@@ -20,48 +17,49 @@ export default class CenaStart extends Phaser.Scene {
       ease: "Cubic.easeOut"
     });
 
-    // 2. IMAGEM DE FUNDO DO MENU
     const fundo = this.add.image(0, 0, "Start_menu").setOrigin(0, 0).setDisplaySize(this.scale.width, this.scale.height);
     this.conteudoMenu.add(fundo);
 
-    // 3. ESTRUTURA DOS 2 BOTÕES (SPRITES)
     this.opcoesMenu = [
       { id: "1v1", chaveSprite: "Start_VSbuton", x: 300, y: 480, disponivel: true },
-      { id: "story", chaveSprite: "Start_Storybuton", x: 300, y: 640, disponivel: false }
+      { id: "story", chaveSprite: "Start_Storybuton", x: 300, y: 640, disponivel: true }
     ];
 
-    this.indiceOpcao = 0; // Começa no Play VS
+    this.emSelecaoPlayers = false;
+    this.numPlayersHistoria = 1;
+
+    this.indiceOpcao = 0;
     this.botoesSprites = [];
 
-    // Cria as sprites dos dois botões
     this.opcoesMenu.forEach((opcao) => {
       const btnSprite = this.add.image(opcao.x, opcao.y, opcao.chaveSprite).setOrigin(0, 0.5);
-      
-      // Se não for o botão ativo (Play Story), deixa levemente escurecido
-      if (!opcao.disponivel) {
-        btnSprite.setTint(0x888888);
-      }
-
       this.botoesSprites.push(btnSprite);
       this.conteudoMenu.add(btnSprite);
     });
 
-    // 4. CONTROLES (P1: Teclado + Gamepad)
+    // Submenu para quantidade de jogadores no modo História
+    this.textoNumPlayers = this.add.text(300, 720, "1 JOGADOR", { fontSize: "36px", fill: "#00ff88", fontStyle: "bold" }).setOrigin(0, 0.5);
+    this.textoNumPlayers.setVisible(false);
+    this.conteudoMenu.add(this.textoNumPlayers);
+
     const teclasP1 = this.input.keyboard.addKeys({
       cima: Phaser.Input.Keyboard.KeyCodes.W,
       baixo: Phaser.Input.Keyboard.KeyCodes.S,
+      esquerda: Phaser.Input.Keyboard.KeyCodes.A,
+      direita: Phaser.Input.Keyboard.KeyCodes.D,
       atack: Phaser.Input.Keyboard.KeyCodes.F,
       special: Phaser.Input.Keyboard.KeyCodes.ENTER
     });
 
     this.teclasSetas = this.input.keyboard.addKeys({
       cima: Phaser.Input.Keyboard.KeyCodes.UP,
-      baixo: Phaser.Input.Keyboard.KeyCodes.DOWN
+      baixo: Phaser.Input.Keyboard.KeyCodes.DOWN,
+      esquerda: Phaser.Input.Keyboard.KeyCodes.LEFT,
+      direita: Phaser.Input.Keyboard.KeyCodes.RIGHT
     });
 
     this.controleP1 = new ControleEntrada(this, teclasP1, 0);
 
-    // Destaque inicial
     this.atualizarDestaque();
     this.bloqueado = false;
   }
@@ -71,63 +69,65 @@ export default class CenaStart extends Phaser.Scene {
 
     this.controleP1.atualizar();
 
-    // Navegação Cima / Baixo
-    const apertouCima = this.controleP1.acabouDeApertar("cima") || Phaser.Input.Keyboard.JustDown(this.teclasSetas.cima);
-    const apertouBaixo = this.controleP1.acabouDeApertar("baixo") || Phaser.Input.Keyboard.JustDown(this.teclasSetas.baixo);
+    if (this.emSelecaoPlayers) {
+      const apertouEsq = this.controleP1.acabouDeApertar("esquerda") || Phaser.Input.Keyboard.JustDown(this.teclasSetas.esquerda);
+      const apertouDir = this.controleP1.acabouDeApertar("direita") || Phaser.Input.Keyboard.JustDown(this.teclasSetas.direita);
 
-    if (apertouCima) {
-      this.indiceOpcao = (this.indiceOpcao - 1 + this.opcoesMenu.length) % this.opcoesMenu.length;
-      this.atualizarDestaque();
-    } else if (apertouBaixo) {
-      this.indiceOpcao = (this.indiceOpcao + 1) % this.opcoesMenu.length;
-      this.atualizarDestaque();
-    }
+      if (apertouEsq || apertouDir) {
+        this.numPlayersHistoria = this.numPlayersHistoria === 1 ? 2 : 1;
+        this.textoNumPlayers.setText(`${this.numPlayersHistoria} JOGADOR${this.numPlayersHistoria > 1 ? "ES" : ""}`);
+      }
 
-    // Confirmar
-    const apertouConfirmar = this.controleP1.acabouDeApertar("atack") || this.controleP1.acabouDeApertar("special");
-    if (apertouConfirmar) {
-      this.confirmarSelecao();
+      const apertouConfirmar = this.controleP1.acabouDeApertar("atack") || this.controleP1.acabouDeApertar("special");
+      if (apertouConfirmar) {
+        this.bloqueado = true;
+        this.fecharAbaEAvancar("Charmenu", { modo: "historia", numPlayers: this.numPlayersHistoria });
+      }
+    } else {
+      const apertouCima = this.controleP1.acabouDeApertar("cima") || Phaser.Input.Keyboard.JustDown(this.teclasSetas.cima);
+      const apertouBaixo = this.controleP1.acabouDeApertar("baixo") || Phaser.Input.Keyboard.JustDown(this.teclasSetas.baixo);
+
+      if (apertouCima) {
+        this.indiceOpcao = (this.indiceOpcao - 1 + this.opcoesMenu.length) % this.opcoesMenu.length;
+        this.atualizarDestaque();
+      } else if (apertouBaixo) {
+        this.indiceOpcao = (this.indiceOpcao + 1) % this.opcoesMenu.length;
+        this.atualizarDestaque();
+      }
+
+      const apertouConfirmar = this.controleP1.acabouDeApertar("atack") || this.controleP1.acabouDeApertar("special");
+      if (apertouConfirmar) {
+        this.confirmarSelecao();
+      }
     }
 
     this.controleP1.salvarAnterior();
   }
 
-  // Destaque visual aumentando a escala da sprite selecionada
   atualizarDestaque() {
     this.botoesSprites.forEach((sprite, idx) => {
       const eOSelecionado = idx === this.indiceOpcao;
-
-      if (eOSelecionado) {
-        this.tweens.add({
-          targets: sprite,
-          scaleX: 1.15,
-          scaleY: 1.15,
-          duration: 120
-        });
-      } else {
-        this.tweens.add({
-          targets: sprite,
-          scaleX: 1.0,
-          scaleY: 1.0,
-          duration: 120
-        });
-      }
+      this.tweens.add({
+        targets: sprite,
+        scaleX: eOSelecionado ? 1.15 : 1.0,
+        scaleY: eOSelecionado ? 1.15 : 1.0,
+        duration: 120
+      });
     });
   }
 
   confirmarSelecao() {
     const opcao = this.opcoesMenu[this.indiceOpcao];
 
-    // Se selecionar o Play Story, não faz nada (bloqueado)
-    if (!opcao.disponivel) {
-      this.cameras.main.shake(100, 0.005);
+    if (opcao.id === "story") {
+      this.emSelecaoPlayers = true;
+      this.textoNumPlayers.setVisible(true);
       return;
     }
 
     this.bloqueado = true;
     const spriteSelecionada = this.botoesSprites[this.indiceOpcao];
 
-    // Efeito de piscar no Play VS antes de mudar de cena
     this.tweens.add({
       targets: spriteSelecionada,
       alpha: 0.2,
@@ -135,12 +135,12 @@ export default class CenaStart extends Phaser.Scene {
       repeat: 3,
       duration: 80,
       onComplete: () => {
-        this.fecharAbaEAvancar();
+        this.fecharAbaEAvancar("Charmenu", { modo: "1v1" });
       }
     });
   }
 
-  fecharAbaEAvancar() {
+  fecharAbaEAvancar(proximaCena, dados) {
     this.tweens.add({
       targets: this.conteudoMenu,
       scaleY: 0,
@@ -148,7 +148,7 @@ export default class CenaStart extends Phaser.Scene {
       duration: 400,
       ease: "Cubic.easeIn",
       onComplete: () => {
-        this.scene.start("Charmenu", { modo: "1v1" });
+        this.scene.start(proximaCena, dados);
       }
     });
   }
