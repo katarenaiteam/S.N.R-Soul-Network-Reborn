@@ -148,7 +148,10 @@ this.load.spritesheet("Spider_throw", "assets/personagens/SpiderMan/Sprites/Spid
     this.load.spritesheet("Ken_hurts2", "assets/personagens/Ken/Sprites/Ken_hurts2.png", { frameWidth: 140, frameHeight: 138 });
     this.load.spritesheet("Ken_dead", "assets/personagens/Ken/Sprites/Ken_dead.png", { frameWidth: 177, frameHeight: 76 });
     this.load.spritesheet("Ken_getup", "assets/personagens/Ken/Sprites/Ken_getup.png", { frameWidth: 137, frameHeight: 105 });
-
+    //golpes
+    this.load.spritesheet("Ken_combo1", "assets/personagens/Ken/Sprites/Ken_combo1.png", { frameWidth: 121, frameHeight: 107 });
+    this.load.spritesheet("Ken_combo2", "assets/personagens/Ken/Sprites/Ken_combo2.png", { frameWidth: 127, frameHeight: 107 });
+    this.load.spritesheet("Ken_combo3", "assets/personagens/Ken/Sprites/Ken_combo3.png", { frameWidth: 182, frameHeight: 121 });
 
     // --- MAPAS ---
     

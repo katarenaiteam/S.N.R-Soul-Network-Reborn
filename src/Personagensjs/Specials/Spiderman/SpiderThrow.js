@@ -8,6 +8,16 @@ export default class SpiderThrow {
     this.hitboxTeia = null;
     this.acertou = false;
     this.overlap = null;
+
+    this.alvoAtual = null;
+
+    // Guardar funções para remoção limpa
+    this.fnSiSpecial = null;
+    this.fnTeia = null;
+    this.fnMiss = null;
+    this.fnThrow = null;
+    this.fnUpdate = null;
+    this.fnMonitorHit = null;
   }
 
   executar() {
@@ -15,17 +25,32 @@ export default class SpiderThrow {
     if (!sprite) return;
 
     this.acertou = false;
+    this.alvoAtual = null;
 
     if (sprite.body) {
       sprite.body.setVelocity(0, 0);
       sprite.body.moves = false;
     }
 
+    // Monitora se o Homem-Aranha mudou de animação (tomou dano/interrupção)
+    this.fnMonitorHit = (anim) => {
+      const animsDoGolpe = [
+        "spy_siSpecial",
+        "spy_teia_side",
+        "spy_siSpecial_miss",
+        "spy_spider_throw",
+      ];
+      if (!animsDoGolpe.includes(anim.key)) {
+        this.cancelarInterrupcao();
+      }
+    };
+    sprite.on("animationstart", this.fnMonitorHit);
+
     sprite.anims.play("spy_siSpecial", true);
 
-    const aoConcluirSiSpecial = (anim) => {
+    this.fnSiSpecial = (anim) => {
       if (anim.key === "spy_siSpecial") {
-        sprite.off("animationcomplete", aoConcluirSiSpecial);
+        sprite.off("animationcomplete", this.fnSiSpecial);
         if (this.acertou) return;
 
         const direcao = sprite.flipX ? -1 : 1;
@@ -34,31 +59,31 @@ export default class SpiderThrow {
         sprite.anims.play("spy_teia_side", true);
         this.criarHitboxTeia();
 
-        const aoConcluirTeia = (animTeia) => {
+        this.fnTeia = (animTeia) => {
           if (animTeia.key === "spy_teia_side") {
-            sprite.off("animationcomplete", aoConcluirTeia);
+            sprite.off("animationcomplete", this.fnTeia);
             this.limparHitbox();
 
             if (!this.acertou) {
               sprite.setX(sprite.x - 80 * direcao);
               sprite.anims.play("spy_siSpecial_miss", true);
 
-              const aoConcluirMiss = (animMiss) => {
+              this.fnMiss = (animMiss) => {
                 if (animMiss.key === "spy_siSpecial_miss") {
-                  sprite.off("animationcomplete", aoConcluirMiss);
+                  sprite.off("animationcomplete", this.fnMiss);
                   sprite.setX(sprite.x - 10 * direcao);
                   this.finalizar();
                 }
               };
-              sprite.on("animationcomplete", aoConcluirMiss);
+              sprite.on("animationcomplete", this.fnMiss);
             }
           }
         };
-        sprite.on("animationcomplete", aoConcluirTeia);
+        sprite.on("animationcomplete", this.fnTeia);
       }
     };
 
-    sprite.on("animationcomplete", aoConcluirSiSpecial);
+    sprite.on("animationcomplete", this.fnSiSpecial);
   }
 
   criarHitboxTeia() {
@@ -94,7 +119,21 @@ export default class SpiderThrow {
   processarAgarre(alvo) {
     if (this.acertou || !alvo) return;
     this.acertou = true;
+    this.alvoAtual = alvo;
     this.limparHitbox();
+
+    this.alvoAtual.podeAtacar = false;
+
+    // 1. DESATIVA A COLISÃO DE ATAQUE E CORPO DO INIMIGO
+    if (this.alvoAtual.grupoHurtbox) {
+      this.alvoAtual.grupoHurtbox.getChildren().forEach((child) => {
+        if (child.body) child.body.enable = false;
+      });
+    }
+
+    if (this.alvoAtual.hitboxAtiva && this.alvoAtual.hitboxAtiva.body) {
+      this.alvoAtual.hitboxAtiva.body.enable = false;
+    }
 
     const sprite = this.personagem.sprite;
     const direcao = sprite.flipX ? -1 : 1;
@@ -115,61 +154,70 @@ export default class SpiderThrow {
     }
 
     const trajetoriaManual = [
-      { x: 300* direcao, y: -10 },  // Frame 1
-      { x: 300 * direcao, y: -10 }, //2
-      { x: 300 * direcao, y: -10 }, //3
-      { x: 268 * direcao, y: -10 }, //4
-      { x: 268 * direcao, y: -10 },//5
-      { x: 280 * direcao, y: -10 }, //6
-      { x: 285 * direcao, y: -10 }, //7
-      { x: 240 * direcao, y: -10 }, //8
-      { x: 230 * direcao, y: -10 }, //9
-      { x: 140 * direcao, y: -10 }, //10
-      { x: 60 * direcao, y: -10 }, //11
-      { x: -75 * direcao, y: -10 }, //12
-      { x: -105 * direcao, y: -10 }, //13
-      { x: -90 * direcao, y: -10 }, //14
-      { x: 40 * direcao, y: -10 }, //15
-      { x: 110 * direcao, y: -10 }, //16
-      { x: 140 * direcao, y: -10 }, //17
-      { x: 100 * direcao, y: -10 }, //8
-      { x: 40 * direcao, y: -10 }, //9
-      { x: -90 * direcao, y: -10 }, //20
-      { x: -120 * direcao, y: -10 }, //1
-      { x: -90 * direcao, y: -10 },//2
-      { x: 60 * direcao, y: -10 },  //3
-      { x: 140 * direcao, y: -10 }, //4
-      { x: 230 * direcao, y: -10 }, //5
-      { x: 240 * direcao, y: -10 }, //6
-      { x: 270 * direcao, y: -10 }, //7
-      { x: -250 * direcao, y: -10 }, //8
-      { x: -180 * direcao, y: -10 }, //9
-      { x: -180 * direcao, y: -10 }, //30
-      { x: -120 * direcao, y: -10 }, //
+      { x: 300 * direcao, y: -10 },
+      { x: 300 * direcao, y: -10 },
+      { x: 300 * direcao, y: -10 },
+      { x: 268 * direcao, y: -10 },
+      { x: 268 * direcao, y: -10 },
+      { x: 280 * direcao, y: -10 },
+      { x: 285 * direcao, y: -10 },
+      { x: 240 * direcao, y: -10 },
+      { x: 230 * direcao, y: -10 },
+      { x: 140 * direcao, y: -10 },
+      { x: 60 * direcao, y: -10 },
+      { x: -75 * direcao, y: -10 },
+      { x: -105 * direcao, y: -10 },
+      { x: -90 * direcao, y: -10 },
+      { x: 40 * direcao, y: -10 },
+      { x: 110 * direcao, y: -10 },
+      { x: 140 * direcao, y: -10 },
+      { x: 100 * direcao, y: -10 },
+      { x: 40 * direcao, y: -10 },
+      { x: -90 * direcao, y: -10 },
+      { x: -120 * direcao, y: -10 },
+      { x: -90 * direcao, y: -10 },
+      { x: 60 * direcao, y: -10 },
+      { x: 140 * direcao, y: -10 },
+      { x: 230 * direcao, y: -10 },
+      { x: 240 * direcao, y: -10 },
+      { x: 270 * direcao, y: -10 },
+      { x: -250 * direcao, y: -10 },
+      { x: -180 * direcao, y: -10 },
+      { x: -180 * direcao, y: -10 },
+      { x: -120 * direcao, y: -10 },
     ];
 
     let jaLancouOponente = false;
 
-    const atualizarTrajetoria = (anim, frame) => {
+    this.fnUpdate = (anim, frame) => {
       if (anim.key !== "spy_spider_throw" || !alvo.sprite) return;
+
+      alvo.podeAtacar = false;
 
       const index = frame.index - 1;
 
-      // FASE 1: ARREMESSO (Frames 1 ao 29)
       if (index < 29 && !jaLancouOponente) {
-        const ponto = trajetoriaManual[index] || trajetoriaManual[trajetoriaManual.length - 1];
+        const ponto =
+          trajetoriaManual[index] ||
+          trajetoriaManual[trajetoriaManual.length - 1];
         if (ponto) {
           alvo.sprite.setPosition(sprite.x + ponto.x, sprite.y + ponto.y);
         }
-      } 
-      // FASE 2: SOLTURA E LANÇAMENTO (Frame 30 em diante)
-      else if (index >= 29 && !jaLancouOponente) {
+      } else if (index >= 29 && !jaLancouOponente) {
         jaLancouOponente = true;
 
         if (alvo.sprite && alvo.sprite.body) {
           alvo.sprite.body.setAllowGravity(true);
           alvo.sprite.body.moves = true;
         }
+
+        // 2. REATIVA AS CAIXAS DE FÍSICA PARA O INIMIGO RECEBER DANO/KNOCKBACK
+        if (alvo.grupoHurtbox) {
+          alvo.grupoHurtbox.getChildren().forEach((child) => {
+            if (child.body) child.body.enable = true;
+          });
+        }
+        alvo.podeAtacar = true;
 
         const props = this.special?.propriedades || {};
         alvo.receberDano(props.dano || 18, {
@@ -180,13 +228,10 @@ export default class SpiderThrow {
       }
     };
 
-    sprite.on("animationupdate", atualizarTrajetoria);
+    sprite.on("animationupdate", this.fnUpdate);
 
-    const aoConcluirThrow = (anim) => {
+    this.fnThrow = (anim) => {
       if (anim.key === "spy_spider_throw") {
-        sprite.off("animationcomplete", aoConcluirThrow);
-        sprite.off("animationupdate", atualizarTrajetoria);
-
         const devolucaoIdeal = 40 * direcao;
         sprite.setX(sprite.x + devolucaoIdeal);
 
@@ -194,14 +239,85 @@ export default class SpiderThrow {
       }
     };
 
-    sprite.on("animationcomplete", aoConcluirThrow);
+    sprite.on("animationcomplete", this.fnThrow);
+  }
+
+  cancelarInterrupcao() {
+    this.limparHitbox();
+    this.removerListeners();
+
+    if (this.alvoAtual && this.alvoAtual.sprite) {
+      this.alvoAtual.podeAtacar = true;
+
+      // Restaura a físicas do inimigo caso o Aranha tome hit no meio
+      if (this.alvoAtual.grupoHurtbox) {
+        this.alvoAtual.grupoHurtbox.getChildren().forEach((child) => {
+          if (child.body) child.body.enable = true;
+        });
+      }
+
+      if (this.alvoAtual.sprite.body) {
+        this.alvoAtual.sprite.body.setAllowGravity(true);
+        this.alvoAtual.sprite.body.moves = true;
+      }
+      if (typeof this.alvoAtual.forcarEstado === "function") {
+        this.alvoAtual.forcarEstado("idle");
+      }
+    }
+
+    const sprite = this.personagem.sprite;
+    if (sprite && sprite.body) {
+      sprite.body.moves = true;
+      sprite.body.setAllowGravity(true);
+    }
+
+    this.alvoAtual = null;
+    this.acertou = false;
+  }
+
+  cancelarInterrupcao() {
+    this.limparHitbox();
+    this.removerListeners();
+
+    // Restaura o oponente se ele ficou preso no ar
+    if (this.alvoAtual && this.alvoAtual.sprite) {
+      if (this.alvoAtual.sprite.body) {
+        this.alvoAtual.sprite.body.setAllowGravity(true);
+        this.alvoAtual.sprite.body.moves = true;
+      }
+      if (typeof this.alvoAtual.forcarEstado === "function") {
+        this.alvoAtual.forcarEstado("idle");
+      }
+    }
+
+    // Restaura a física do Aranha
+    const sprite = this.personagem.sprite;
+    if (sprite && sprite.body) {
+      sprite.body.moves = true;
+      sprite.body.setAllowGravity(true);
+    }
+
+    this.alvoAtual = null;
+    this.acertou = false;
+  }
+
+  removerListeners() {
+    const sprite = this.personagem.sprite;
+    if (!sprite) return;
+
+    if (this.fnSiSpecial) sprite.off("animationcomplete", this.fnSiSpecial);
+    if (this.fnTeia) sprite.off("animationcomplete", this.fnTeia);
+    if (this.fnMiss) sprite.off("animationcomplete", this.fnMiss);
+    if (this.fnThrow) sprite.off("animationcomplete", this.fnThrow);
+    if (this.fnUpdate) sprite.off("animationupdate", this.fnUpdate);
+    if (this.fnMonitorHit) sprite.off("animationstart", this.fnMonitorHit);
   }
 
   finalizar() {
-    const sprite = this.personagem.sprite;
-
     this.limparHitbox();
+    this.removerListeners();
 
+    const sprite = this.personagem.sprite;
     if (sprite && sprite.body) {
       sprite.body.moves = true;
       sprite.body.setAllowGravity(true);
@@ -226,5 +342,3 @@ export default class SpiderThrow {
 
   atualizar() {}
 }
-
-

@@ -159,7 +159,7 @@ export default class SpiderMan extends Personagem {
         largura: 85,
         altura: 95,
         offsetX: 50,
-        offsetY: 96,
+        offsetY: 94,
         escala: 1,
         hurtboxes: [
           { largura: 60, altura: 70, offsetX: 0, offsetY: -90 }, // Tronco/cabeça
@@ -298,7 +298,6 @@ export default class SpiderMan extends Personagem {
      
    
    };
-    
   
     // ============================ tabela de golpes =====================================
     this.golpes = {
@@ -877,7 +876,7 @@ scene.anims.create({
    scene.anims.create({
      key: "spy_spider_throw",
      frames: scene.anims.generateFrameNumbers("Spider_throw", { start: 0, end: 34 }),
-     frameRate: 2,
+     frameRate: 16,
      repeat: 0,
    });
   }

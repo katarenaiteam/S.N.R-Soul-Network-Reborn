@@ -171,11 +171,35 @@ export default class Ken extends Personagem {
         hurtboxes: [],
       },
 
-      atack: {
+      atack1: {
         largura: 85,
-        altura: 120,
-        offsetX: 0,
-        offsetY: -10,
+        altura: 96,
+        offsetX: 50,
+        offsetY: 5,
+        escala: 1,
+        hurtboxes: [
+          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
+          { largura: 80, altura: 50, offsetX: 0, offsetY: -25 },
+        ],
+      },
+
+      atack2: {
+        largura: 85,
+        altura: 96,
+        offsetX: 50,
+        offsetY: 0,
+        escala: 1,
+        hurtboxes: [
+          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
+          { largura: 80, altura: 50, offsetX: 0, offsetY: -25 },
+        ],
+      },
+
+      atack3: {
+        largura: 85,
+        altura: 96,
+        offsetX: 50,
+        offsetY: 0,
         escala: 1,
         hurtboxes: [
           { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
@@ -259,7 +283,87 @@ export default class Ken extends Personagem {
     
   
     // ============================ tabela de golpes =====================================
-    //thisgolpes
+    this.golpes = {
+      neutro1: {
+        animacao: "ken_atack1",
+        frameHitbox: 2,
+        offsetX: 70,
+        offsetY: -60,
+        largura: 60,
+        altura: 20,
+        cooldown: 700,
+        duracao: 300,
+        propriedades: {
+          dano: 4,
+          knockbackX: 40,
+          knockbackY: 0,
+        },
+
+        comboProximo: "neutro2",
+        comboJanelaInicio: 200,
+        comboJanelaFim: 300,
+      },
+
+      neutro2: {
+        animacao: "ken_atack2",
+
+        frameHitbox: 2,
+
+        offsetX: 60,
+        offsetY: -60,
+        largura: 55,
+        altura: 30,
+        duracao: 300,
+        propriedades: {
+          dano: 4,
+          knockbackX: -10,
+          knockbackY: 0,
+        },
+
+        comboProximo: "neutro3",
+        comboJanelaInicio: 200,
+        comboJanelaFim: 400,
+      },
+
+      neutro3: {
+        animacao: "ken_atack3",
+
+        frameHitbox: 3,
+
+        offsetX: 55,
+        offsetY: -75,
+        largura: 35,
+        altura: 70,
+        duracao: 250,
+        bufferInputs: true,
+        bufferJanelaInicio: 50,
+        bufferJanelaFim: 350,
+        propriedades: {
+          dano: 8,
+          knockbackX: 50,
+          knockbackY: -350,
+          tumbling: true
+        },
+      },
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     //specials
 
@@ -395,6 +499,36 @@ scene.anims.create({
      repeat: 0,
    });
 
-    
+    scene.anims.create({
+      key: "ken_atack1",
+      frames: scene.anims.generateFrameNumbers("Ken_combo1", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 18,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_atack2",
+      frames: scene.anims.generateFrameNumbers("Ken_combo2", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 18,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_atack3",
+      frames: scene.anims.generateFrameNumbers("Ken_combo3", {
+        start: 0,
+        end: 13,
+      }),
+      frameRate: 20,
+      repeat: 0,
+    });
+   
+
   }
 }
