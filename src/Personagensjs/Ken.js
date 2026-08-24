@@ -173,9 +173,9 @@ export default class Ken extends Personagem {
 
       atack1: {
         largura: 85,
-        altura: 96,
-        offsetX: 50,
-        offsetY: 5,
+        altura: 120,
+        offsetX: 25,
+        offsetY: -20,
         escala: 1,
         hurtboxes: [
           { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
@@ -334,7 +334,7 @@ export default class Ken extends Personagem {
         offsetY: -75,
         largura: 35,
         altura: 70,
-        duracao: 250,
+        duracao: 500,
         bufferInputs: true,
         bufferJanelaInicio: 50,
         bufferJanelaFim: 350,
