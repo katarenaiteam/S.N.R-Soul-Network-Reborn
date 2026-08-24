@@ -8,7 +8,8 @@ import EstadoAtack from "../Estados/EstadoAtack.js";
 import EstadoDano from "../Estados/EstadoDano.js";
 import EstadoSpecial from "../Estados/EstadoSpecial.js";
 import EstadoTeia from "../Estados/EstadoTeia.js";
-import EstadoGuard from "../Estados/EstadoGuard.js";
+import EstadoGuard from "../Estados/EstadoGuard.js";    
+import EstadoDead from "../Estados/EstadoDead.js";
 
 export default class Personagem {
   constructor(
@@ -77,6 +78,7 @@ export default class Personagem {
     this.maquinaEstados.adicionarEstado("special", new EstadoSpecial(this));
     this.maquinaEstados.adicionarEstado("teia", new EstadoTeia(this));
     this.maquinaEstados.adicionarEstado("guard", new EstadoGuard(this));
+    this.maquinaEstados.adicionarEstado("dead", new EstadoDead(this));
 
     this.maquinaEstados.mudarEstado("idle");
   }
@@ -181,9 +183,12 @@ export default class Personagem {
       }
     }
 
-    // Gravidade ao cair
+    // Mantem a gravidade durante todo o tumbling aereo, inclusive na subida.
     if (!this.estaEmDash) {
-      this.sprite.body.setGravityY(this.sprite.body.velocity.y > 0 ? 200 : 0);
+      const tumblingNoAr = this.isTumbling && !noChao;
+      this.sprite.body.setGravityY(
+        this.sprite.body.velocity.y > 0 || tumblingNoAr ? 200 : 0
+      );
     }
 
     this.controle?.atualizar();
@@ -295,7 +300,7 @@ export default class Personagem {
     this.sprite.body.setOffset(offsetX, cfg.offsetY);
   }
 
-  inputDown(nome) {
+ inputDown(nome) {
     if (this.controle) return this.controle.estaApertado(nome);
     const tecla = this.teclas?.[nome];
     return tecla ? !!tecla.isDown : false;
@@ -304,14 +309,29 @@ export default class Personagem {
   inputJustDown(nome) {
     if (this.controle) return this.controle.acabouDeApertar(nome);
     const tecla = this.teclas?.[nome];
-    // Se a tecla não existe (ex: Bot/Boss), ignora em vez de dar erro no Phaser
-    return tecla ? Phaser.Input.Keyboard.JustDown(tecla) : false;
+    if (!tecla) return false;
+    
+    // SE FOR IA: lê a flag tratada pelo BotController sem passar pelo Phaser
+    if (tecla.isVirtual) {
+      return !!tecla.justDown;
+    }
+    
+    // SE FOR TECLADO REAL: usa a checagem nativa do Phaser
+    return Phaser.Input.Keyboard.JustDown(tecla);
   }
 
   inputJustUp(nome) {
     if (this.controle) return this.controle.acabouDeSoltar(nome);
     const tecla = this.teclas?.[nome];
-    return tecla ? Phaser.Input.Keyboard.JustUp(tecla) : false;
+    if (!tecla) return false;
+
+    // SE FOR IA: lê a flag tratada pelo BotController
+    if (tecla.isVirtual) {
+      return !!tecla.justUp;
+    }
+
+    // SE FOR TECLADO REAL: usa a checagem nativa do Phaser
+    return Phaser.Input.Keyboard.JustUp(tecla);
   }
 
   obterTipoSpecial() {
@@ -438,7 +458,7 @@ export default class Personagem {
     hitbox.body.setAllowGravity(false);
     hitbox.body.setImmovable(true);
     
-    // Altera apenas a cor da linha de debug para vermelho
+   
     hitbox.body.debugBodyColor = 0xff0000;
 
     this.hitboxAtiva = hitbox;

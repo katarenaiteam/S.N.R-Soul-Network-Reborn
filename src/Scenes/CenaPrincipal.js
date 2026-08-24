@@ -6,6 +6,7 @@ import Frederick from "../Personagensjs/Frederick.js";
 import Dio from "../Personagensjs/Dio.js";
 import SpiderMan from "../Personagensjs/SpiderMan.js";
 import Miku from "../Personagensjs/Miku.js";
+import Ken from "../Personagensjs/Ken.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 
 export default class cenaPrincipal extends Phaser.Scene {
@@ -218,6 +219,8 @@ this.jogador2 = this.criarPersonagem(
         return new SpiderMan(this, x, y, teclas, minDano, maxDano, controle);
       case "Miku":
         return new Miku(this, x, y, teclas, minDano, maxDano, controle);
+        case "Ken":
+        return new Ken(this, x, y, teclas, minDano, maxDano, controle);
       default:
         return new Frederick(this, x, y, teclas, minDano, maxDano, controle);
     }
@@ -280,6 +283,8 @@ this.jogador2 = this.criarPersonagem(
   respawnar(jogador, pontoRespawn) {
     jogador.sprite.body.setVelocity(0, 0);
     jogador.sprite.setPosition(pontoRespawn.x, pontoRespawn.y);
+    jogador.isTumbling = false;
+    jogador.maquinaEstados.mudarEstado("idle");
 
     if (jogador.porcentagemDano !== undefined) {
       jogador.porcentagemDano = 0;

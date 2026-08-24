@@ -1,80 +1,79 @@
+// Objetos/BotController.js
 export default class BotController {
-    constructor(scene, bot, alvo, nivelDificuldade = 'medio') {
-        this.scene = scene;
-        this.bot = bot;
-        this.alvo = alvo;
-        this.dificuldade = nivelDificuldade;
+  constructor(scene) {
+    this.scene = scene;
+    this.bot = null;
+    this.alvo = null;
+    this.cerebro = null; // Recebe qualquer IA específica (Spider_IA, Batman_IA, etc.)
 
-        // Simula a estrutura exata de teclas que os seus jogadores usam
-        this.teclas = {
-            esquerda: { isDown: false },
-            direita: { isDown: false },
-            cima: { isDown: false },
-            baixo: { isDown: false },
-            ataque: { isDown: false },
-            defesa: { isDown: false }
-        };
+    this.teclas = {
+      esquerda: { isDown: false, justDown: false, justUp: false, isVirtual: true },
+      direita:  { isDown: false, justDown: false, justUp: false, isVirtual: true },
+      cima:     { isDown: false, justDown: false, justUp: false, isVirtual: true },
+      baixo:    { isDown: false, justDown: false, justUp: false, isVirtual: true },
+      dash:     { isDown: false, justDown: false, justUp: false, isVirtual: true },
+      atack:    { isDown: false, justDown: false, justUp: false, isVirtual: true },
+      special:  { isDown: false, justDown: false, justUp: false, isVirtual: true },
+      guard:    { isDown: false, justDown: false, justUp: false, isVirtual: true }
+    };
 
-        // Cronômetro de tempo de reação (em milissegundos)
-        this.tempoUltimaDecisao = 0;
-        this.intervaloDecisao = 200; // Toma decisões a cada 200ms (1/5 de segundo)
+    this.teclasParaZerar = [];
+  }
+
+  // Define qual cérebro vai controlar este hardware virtual
+  setCerebro(InstanciaCerebro) {
+    this.cerebro = InstanciaCerebro;
+  }
+
+  update(time, delta) {
+    // Executa a limpeza dos impulsos de input
+    while (this.teclasParaZerar.length > 0) {
+      const item = this.teclasParaZerar.pop();
+      if (this.teclas[item.tecla]) {
+        this.teclas[item.tecla][item.prop] = false;
+      }
     }
 
-    update(time) {
-        if (!this.bot || !this.alvo || !this.bot.active || !this.alvo.active) {
-            this.zerarComandos();
-            return;
-        }
-
-        // Limita a tomada de decisão para simular o tempo de reação
-        if (time > this.tempoUltimaDecisao + this.intervaloDecisao) {
-            this.tomarDecisao();
-            this.tempoUltimaDecisao = time;
-        }
+    // Se houver um cérebro acoplado, delega a lógica para ele
+    if (this.cerebro) {
+      this.cerebro.update(time, delta);
     }
+  }
 
-    tomarDecisao() {
-        this.zerarComandos();
-
-        const dx = this.alvo.sprite.x - this.bot.sprite.x;
-        const dy = this.alvo.sprite.y - this.bot.sprite.y;
-        const distAbsolutaX = Math.abs(dx);
-
-        const alcanceAtaque = 120; // Ajuste conforme a área do hit do seu jogo
-
-        // LÓGICA DE DECISÃO
-        if (distAbsolutaX > alcanceAtaque) {
-            // Longe do jogador: anda na direção dele
-            if (dx > 0) {
-                this.teclas.direita.isDown = true;
-            } else {
-                this.teclas.esquerda.isDown = true;
-            }
-        } else {
-            // Perto do jogador: ataca ou defende
-            const sorteio = Math.random();
-
-            if (sorteio < 0.6) {
-                // 60% de chance de atacar
-                this.teclas.ataque.isDown = true;
-            } else {
-                // 40% de chance de defender
-                this.teclas.defesa.isDown = true;
-            }
-        }
-
-        // Se o alvo pulou e está acima, chance de pular/anti-aéreo
-        if (dy < -80 && Math.random() < 0.4) {
-            this.teclas.cima.isDown = true;
-        }
+  segurar(nomeTecla) {
+    if (this.teclas[nomeTecla]) {
+      this.teclas[nomeTecla].isDown = true;
     }
+  }
 
-    zerarComandos() {
-        this.teclas.esquerda.isDown = false;
-        this.teclas.direita.isDown = false;
-        this.teclas.cima.isDown = false;
-        this.teclas.baixo.isDown = false;
-        this.teclas.ataque.isDown = false;
-        this.teclas.defesa.isDown = false;
+  soltar(nomeTecla) {
+    if (this.teclas[nomeTecla] && this.teclas[nomeTecla].isDown) {
+      this.teclas[nomeTecla].isDown = false;
+      this.teclas[nomeTecla].justUp = true;
+      this.teclasParaZerar.push({ tecla: nomeTecla, prop: "justUp" });
     }
+  }
+
+  pulsar(nomeTecla) {
+    if (!this.teclas[nomeTecla]) return;
+
+    this.teclas[nomeTecla].isDown = true;
+    this.teclas[nomeTecla].justDown = true;
+    this.teclasParaZerar.push({ tecla: nomeTecla, prop: "justDown" });
+
+    this.scene.time.delayedCall(40, () => {
+      this.soltar(nomeTecla);
+    });
+  }
+
+  soltarTudo() {
+    for (let t in this.teclas) {
+      if (this.teclas[t].isDown) {
+        this.teclas[t].justUp = true;
+        this.teclasParaZerar.push({ tecla: t, prop: "justUp" });
+      }
+      this.teclas[t].isDown = false;
+      this.teclas[t].justDown = false;
+    }
+  }
 }

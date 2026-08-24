@@ -40,6 +40,17 @@ export default class EstadoWalk extends EstadoBase {
       }
     }
 
+    //special
+     if (this.personagem.inputJustDown("special")) {
+      const tipoSpecial = this.personagem.obterTipoSpecial ? this.personagem.obterTipoSpecial() : "neutro";
+
+      if (this.personagem.podeUsarSpecial(tipoSpecial)) {
+        this.personagem.maquinaEstados.mudarEstado("special");
+        return;
+      }
+    }
+
+
     // Movimentação no chão
     if (this.personagem.inputDown("esquerda")) {
       this.personagem.sprite.setVelocityX(-this.personagem.velocidade);

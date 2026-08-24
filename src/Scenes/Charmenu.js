@@ -17,12 +17,12 @@ export default class Charmenu extends Phaser.Scene {
         this.musica.play();
 
         this.opcoesPersonagens = [
-            { id: "Frederick", thumbKey: "FJmenu", x: 300, y: 750 },
-            { id: "Madotsuki", thumbKey: "Madomenu", x: 620, y: 750 },
-            { id: "Morrigan",  thumbKey: "Morrmenu",  x: 940, y: 750 },
-            { id: "Dio",        thumbKey: "Diomenu",  x: 1260, y: 750 },
-            { id: "SpiderMan",  thumbKey: "Spidermenu",  x: 1580, y: 750 },
-            { id: "Miku",       thumbKey: "Miku_idle",  x: 400, y: 1250 }
+    
+            { id: "Madotsuki", thumbKey: "Madomenu", x: 300, y: 750 },
+            { id: "Dio",        thumbKey: "Diomenu",  x: 620, y: 750 },
+            { id: "SpiderMan",  thumbKey: "Spidermenu",  x: 940, y: 750 },
+            { id: "Ken",  thumbKey: "Kenmenu",  x: 1260, y: 750 },
+            { id: "Miku",       thumbKey: "Miku_idle",  x: 1580, y: 750 }
         ];
 
         this.opcoesPersonagens.forEach((char) => {

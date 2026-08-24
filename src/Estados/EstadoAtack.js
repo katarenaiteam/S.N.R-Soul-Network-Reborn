@@ -90,11 +90,16 @@ export default class EstadoAtack extends EstadoBase {
     const animChave = this.golpeAtual?.animacao || "mado_atack";
 
     if (this.personagem.scene.anims.exists(animChave)) {
-      this.personagem.tocarAnimacao("atack");
       this.personagem.sprite.anims.play(animChave, true);
+      this.personagem.aplicarConfiguracao("atack");
     } else {
       console.warn(`Animação ${animChave} não existe!`);
-      this.personagem.tocarAnimacao("atack");
+      const animacaoGenerica = `${this.personagem.prefixoAnim}atack`;
+      if (this.personagem.scene.anims.exists(animacaoGenerica)) {
+        this.personagem.tocarAnimacao("atack");
+      } else {
+        this.personagem.tocarAnimacao("idle");
+      }
     }
 
     // HITBOX

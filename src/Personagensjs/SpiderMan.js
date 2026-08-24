@@ -2,6 +2,7 @@ import Personagem from "./Personagem.js";
 import WebShot from "./Specials/Spiderman/WebShot.js";
 import AirWebShot from "./Specials/Spiderman/AirWebshot.js"; 
 import SpiderCounter from "./Specials/Spiderman/SpiderCounter.js";
+import SpiderThrow from "./Specials/Spiderman/SpiderThrow.js";
 
 export default class SpiderMan extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -135,6 +136,24 @@ export default class SpiderMan extends Personagem {
           { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
+      dead: {
+        largura: 85,
+        altura: 42,
+        offsetX: 35,
+        offsetY: 3, // Ajustado para compensar a folha de 52px de altura
+        escala: 1,
+        hurtboxes: [
+          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 },
+        ],
+      },
+      getup: {
+        largura: 85,
+        altura: 95,  // Mantém a altura padrão da física igual aos outros estados em pé
+        offsetX: 30,
+        offsetY: -6,  // Compensação para os 96px do spritesheet do getup alinhar o pé com o chão
+        escala: 1,
+        hurtboxes: [],
+      },
 
       atack: {
         largura: 85,
@@ -227,8 +246,57 @@ export default class SpiderMan extends Personagem {
       escala: 1,
      hurtboxes: [
     { largura: 60, altura: 80, offsetX: 0, offsetY: -40 }
-  ]
-}
+       ]
+      },
+    siSpecial: {
+        largura: 85,
+        altura: 95,
+        offsetX: 40,
+        offsetY: -10,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
+          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+        ],
+      },
+     
+      teia_side: {
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: -25,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
+          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+        ],
+      },
+
+      spider_throw: {
+        largura: 85,
+        altura: 95,
+        offsetX: 250,
+        offsetY: 30,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
+          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+        ],
+      },
+
+      siSpecial_miss: {
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: -10,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
+          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+        ],
+      },
+     
+   
    };
     
   
@@ -444,8 +512,15 @@ export default class SpiderMan extends Personagem {
         },
       },
 
-      lado: {
-        // futuro
+       lado: {
+         animacao: "spy_siSpecial",
+         duracao: 99999, // A própria classe SpiderThrow controla o fim através do estado
+         cooldown: 2500,
+         logica: SpiderThrow,
+
+         propriedades: {
+           dano: 18,
+        },
       },
 
       cima: {
@@ -592,6 +667,21 @@ export default class SpiderMan extends Personagem {
      repeat: 0,
    });
 
+     scene.anims.create({
+     key: "spy_dead",
+     frames: scene.anims.generateFrameNumbers("SpiderMan_dead", { start: 0, end: 2 }),
+     frameRate: 10,
+     repeat: 0,
+   });
+
+     scene.anims.create({
+     key: "spy_getup",
+     frames: scene.anims.generateFrameNumbers("SpiderMan_getup", { start: 0, end: 6 }),
+     frameRate: 16,
+     repeat: 0,
+   });
+
+     
 //golpes 
     scene.anims.create({
       key: "spy_atack1",
@@ -751,7 +841,6 @@ scene.anims.create({
       repeat: 0,
     });
 
-
       if (!scene.anims.exists("spy_counter")) {
       scene.anims.create({
         key: "spy_counter",
@@ -763,7 +852,33 @@ scene.anims.create({
         repeat: 0,
       });
     }
+    
+    scene.anims.create({
+     key: "spy_siSpecial",
+     frames: scene.anims.generateFrameNumbers("SpiderMan_siSpecial", { start: 0, end: 5 }),
+     frameRate: 12,
+     repeat: 0,
+   });
 
+   scene.anims.create({
+     key: "spy_teia_side",
+     frames: scene.anims.generateFrameNumbers("Side_teia", { start: 0, end: 3 }),
+     frameRate: 12,
+     repeat: 0,
+   });
 
+   scene.anims.create({
+     key: "spy_siSpecial_miss",
+     frames: scene.anims.generateFrameNumbers("SpiderMan_siSpecial", { start: 5, end: 7 }),
+     frameRate: 16,
+     repeat: 0,
+   });
+
+   scene.anims.create({
+     key: "spy_spider_throw",
+     frames: scene.anims.generateFrameNumbers("Spider_throw", { start: 0, end: 34 }),
+     frameRate: 2,
+     repeat: 0,
+   });
   }
 }

@@ -4,15 +4,36 @@ export default class EstadoDano extends EstadoBase {
   enter() {
     this.tempoInicial = this.personagem.scene.time.now;
 
-    const acumulado = this.personagem.porcentagemDano || 0;
-    this.duracaoStun = 200 + acumulado * 3.5;
-
     const body = this.personagem.sprite.body;
+    const acumulado = this.personagem.porcentagemDano || 0;
+
+    // 1. CALCULA A FORÇA REAL DO IMPACTO DO GOLPE
+    let velImpacto = 0;
+    if (body) {
+      velImpacto = Math.sqrt(body.velocity.x ** 2 + body.velocity.y ** 2);
+    }
+
+    // 2. DURAÇÃO DINÂMICA:
+    // - Golpes fracos (pouca velocidade): Duração base curta (ex: 120ms + escala leve).
+    // - Golpes fortes (muita velocidade): Duram proporcionalmente à força enviada na física.
+    const stunPorVelocidade = velImpacto * 0.45; 
+    const stunPorPorcentagem = 120 + (acumulado * 1.5);
+
+    // Usa o maior valor entre a força do golpe e o dano acumulado, limitando o teto
+    let stunCalculado = Math.max(stunPorVelocidade, stunPorPorcentagem);
+
+    // TETO MÁXIMO (CAP):
+    // Se a velocidade for baixa (golpe fraco em local fechado/sem projeção), limita o stun a no máximo 280ms
+    if (velImpacto < 400) {
+      stunCalculado = Math.min(stunCalculado, 280);
+    }
+
+    this.duracaoStun = stunCalculado;
 
     // 🔒 Trava de controle para transição vertical sem passar pelo neutro
     this.trocaVerticalAtiva = false;
 
-    // 1. Virar o personagem para o oponente
+    // Virar o personagem para o oponente
     const oponente =
       this.personagem.scene.jogador1 === this.personagem
         ? this.personagem.scene.jogador2
@@ -45,9 +66,17 @@ export default class EstadoDano extends EstadoBase {
 
       const limiarMinimoVertical = 300;
       const limiarMinimoHorizontal = 500;
+      const animacaoAtual = this.personagem.sprite.anims.currentAnim?.key;
+      const estaEmDanoSide =
+        animacaoAtual === `${this.personagem.prefixoAnim}danoSide`;
 
       // 1. ATIVA O MODO VERTICAL: Se o golpe inicial te jogou forte para cima
       if (velY < -limiarMinimoVertical && absY > absX) {
+        this.trocaVerticalAtiva = true;
+      }
+
+      // 2. Ataques laterais tambem passam para danoDown ao iniciar a queda
+      if (estaEmDanoSide && velY > 80 && !noChao) {
         this.trocaVerticalAtiva = true;
       }
 
@@ -82,7 +111,7 @@ export default class EstadoDano extends EstadoBase {
     }
   }
 
-  execute() {
+ execute() {
     const body = this.personagem.sprite.body;
     const agora = this.personagem.scene.time.now;
     const tempoPassado = agora - this.tempoInicial;
@@ -94,8 +123,12 @@ export default class EstadoDano extends EstadoBase {
     // Atualiza a animação dinamicamente
     this.atualizarAnimacaoDano();
 
-    // REGRA ABSOLUTA: Enquanto o tempo de Stun não acabar, o personagem permanece no Estado de Dano
-    if (tempoPassado < this.duracaoStun) {
+    // CHECAGEM DE SEGURANÇA: Se encostou no chão e a velocidade zera, cancela o stun restante
+    const velTotal = body ? Math.sqrt(body.velocity.x ** 2 + body.velocity.y ** 2) : 0;
+    const parouNoChao = body && body.blocked.down && velTotal < 30 && tempoPassado > 100;
+
+    // Se o tempo de Stun ainda não acabou e não parou no chão, continua travado
+    if (tempoPassado < this.duracaoStun && !parouNoChao) {
       return;
     }
 
@@ -103,7 +136,7 @@ export default class EstadoDano extends EstadoBase {
     // A PARTIR DAQUI, O STUN JÁ ACABOU (tempoPassado >= duracaoStun)
     // -------------------------------------------------------------
 
-    // GOLPES COMUNS (tumbling = false ou undefined)
+    // 1. GOLPES COMUNS (sem tumbling) -> Volta pro IDLE se tiver no chão
     if (!this.personagem.isTumbling) {
       if (body && body.blocked.down) {
         this.personagem.maquinaEstados.mudarEstado("idle");
@@ -113,14 +146,24 @@ export default class EstadoDano extends EstadoBase {
       return;
     }
 
-    // GOLPES FORTES (tumbling = true)
-    if (body && body.blocked.down) {
+    // 2. GOLPES FORTES (com tumbling) -> Quando toca o chão, entra no DEAD
+    const limitesArena = this.personagem.scene.limitesArena;
+    const x = this.personagem.sprite.x;
+    const y = this.personagem.sprite.y;
+    const foraDaArena = limitesArena && (
+      x < (limitesArena.minX ?? limitesArena.esquerda) ||
+      x > (limitesArena.maxX ?? limitesArena.direita) ||
+      y < (limitesArena.minY ?? limitesArena.topo) ||
+      y > (limitesArena.maxY ?? limitesArena.baixo)
+    );
+
+    if (body && body.blocked.down && !foraDaArena) {
       this.personagem.isTumbling = false;
-      this.personagem.maquinaEstados.mudarEstado("idle");
+      this.personagem.maquinaEstados.mudarEstado("dead");
       return;
     }
 
-    // Recuperação aérea por input após o término do Stun
+    // Recuperação aérea por input após o término do Stun (apenas para golpes fortes no ar)
     const p = this.personagem;
     const apertouComando =
       p.inputJustDown("cima") ||
@@ -138,9 +181,16 @@ export default class EstadoDano extends EstadoBase {
   }
 
   exit() {
-    if (this.personagem.sprite.body) {
-      this.personagem.sprite.body.setBounce(0, 0);
+    const body = this.personagem.sprite.body;
+    if (body) {
+      // 1. Zera o quique nos dois eixos (X e Y) imediatamente
+      body.setBounce(0, 0);
+
+      // 2. Reseta o coeficiente de restituição (garante no motor físico do Phaser)
+      body.bounce.x = 0;
+      body.bounce.y = 0;
     }
+
     // Reseta o estado vertical ao sair do dano
     this.trocaVerticalAtiva = false;
   }

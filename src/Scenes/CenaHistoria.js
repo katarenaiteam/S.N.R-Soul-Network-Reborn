@@ -6,6 +6,8 @@ import Dio from "../Personagensjs/Dio.js";
 import SpiderMan from "../Personagensjs/SpiderMan.js";
 import Miku from "../Personagensjs/Miku.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
+import BotController from "../Objetos/BotController.js";
+import Spider_IA from "../Objetos/Spider_IA.js";
 
 export default class CenaHistoria extends Phaser.Scene {
   constructor() {
@@ -80,19 +82,28 @@ export default class CenaHistoria extends Phaser.Scene {
     }
 
     // Boss
-    const teclasBoss = {};
+// // 1. Instancia o Controlador de Hardware da IA
+    this.botIA = new BotController(this);
+
+    // 2. Cria a IA do Homem-Aranha passando o controller
+    this.spiderIA = new Spider_IA(this.botIA);
+
+    // 3. Conecta a IA (cérebro) ao Controlador
+    this.botIA.setCerebro(this.spiderIA);
+
+    // 4. Instancia o Boss passando as teclas virtuais do BotController
     this.boss = this.criarPersonagem(
       this.inimigoNome,
       this.mapaAtual.spawnsIniciais.p2.x,
       this.mapaAtual.spawnsIniciais.p2.y,
-      teclasBoss,
+      this.botIA.teclas,
       0,
       0,
       null
     );
 
-    // O parceiro participa da luta, mas o boss nao pode causar dano nele.
-    if (this.jogador2) this.jogador2.invulneravel = true;
+    // 5. Vincula a entidade do Boss no Controlador de Bot e na IA
+    this.botIA.bot = this.boss;
 
     // --- CRIAÇÃO DA HUD ---
     this.hudP1_Nome = this.add.text(80, 950, this.jogador1.nomePersonagem || this.escolhaP1, { fontSize: "45px", fill: "#27F5F5", fontStyle: "bold" }).setScrollFactor(0);
@@ -169,23 +180,37 @@ export default class CenaHistoria extends Phaser.Scene {
   }
 
   // Método auxiliar para processar dano garantindo que aliados não se acertem
+  // Método auxiliar para processar dano apenas em caso de contato real
   aplicarGolpe(atacante, vitima) {
-    if (!atacante || !vitima) return;
+    if (!atacante || !vitima || !atacante.sprite?.active || !vitima.sprite?.active) return;
 
-    // Se o atacante estiver em estado de ataque/hitbox ativa
+    // Se a vítima JÁ ESTÁ no estado apanhando, ignora novos acertos para não reiniciar o hitstun
+    const estadoVitima = vitima.maquinaEstados?.estadoAtual?.nome;
+    if (estadoVitima === "hurt") return;
+
     const estadoAtaque = atacante.maquinaEstados?.estados["atack"];
-    if (estadoAtaque && estadoAtaque.hitboxAtual?.active) {
-      const golpe = estadoAtaque.golpeAtual;
-      const dano = golpe?.dano || 10;
-      const props = golpe?.propriedades || {};
+    const hitbox = estadoAtaque?.hitboxAtual;
 
-      vitima.receberDano(dano, props);
+    if (estadoAtaque && hitbox && hitbox.active) {
+      const idAtaqueAtual = estadoAtaque.idAtaqueUnico || estadoAtaque.tempoInicio;
 
-      // Desativa a hitbox para não aplicar o mesmo golpe múltiplos frames seguidos
-      estadoAtaque.hitboxAtual.active = false;
+      if (vitima.ultimoAtaqueRecebidoId === idAtaqueAtual) return;
+
+      const sobreposicao = Phaser.Geom.Intersects.RectangleToRectangle(
+        hitbox.getBounds(),
+        vitima.sprite.getBounds()
+      );
+
+      if (sobreposicao) {
+        const golpe = estadoAtaque.golpeAtual;
+        const dano = golpe?.dano || 10;
+        const props = golpe?.propriedades || {};
+
+        vitima.ultimoAtaqueRecebidoId = idAtaqueAtual;
+        vitima.receberDano(dano, props, atacante.sprite.x);
+      }
     }
   }
-
   criarPersonagem(nome, x, y, teclas, minDano, maxDano, controle) {
     switch (nome) {
       case "Frederick": return new Frederick(this, x, y, teclas, minDano, maxDano, controle);
@@ -198,10 +223,23 @@ export default class CenaHistoria extends Phaser.Scene {
     }
   }
 
-  update() {
+ update(time, delta) {
+    if (this.botIA) this.botIA.update(time, delta);
+
     if (this.jogador1) this.jogador1.update();
     if (this.jogador2) this.jogador2.update();
     if (this.boss) this.boss.update();
+
+    // --- PROCESSAMENTO DE COLISÃO DE ATAQUES ---
+    if (this.boss) {
+      // P1 e P2 atacam o Boss de forma independente
+      if (this.jogador1) this.aplicarGolpe(this.jogador1, this.boss);
+      if (this.jogador2) this.aplicarGolpe(this.jogador2, this.boss);
+
+      // Boss ataca P1 e P2 sem misturar as instâncias
+      if (this.jogador1) this.aplicarGolpe(this.boss, this.jogador1);
+      if (this.jogador2) this.aplicarGolpe(this.boss, this.jogador2);
+    }
 
     this.atualizarCamera();
 
@@ -254,6 +292,9 @@ export default class CenaHistoria extends Phaser.Scene {
   respawnar(jogador, pontoRespawn) {
     jogador.sprite.body.setVelocity(0, 0);
     jogador.sprite.setPosition(pontoRespawn.x, pontoRespawn.y);
+
+    // Limpa a memória de acertos para o jogador poder voltar a ser atingido/atacar normalmente
+    jogador.ultimoAtaqueRecebidoId = null;
 
     if (jogador.porcentagemDano !== undefined) {
       jogador.porcentagemDano = 0;
