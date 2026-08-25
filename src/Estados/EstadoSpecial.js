@@ -190,6 +190,10 @@ export default class EstadoSpecial extends EstadoBase {
   }
 
   exit() {
+    if (this.logicaSpecial && typeof this.logicaSpecial.cancelar === "function") {
+      this.logicaSpecial.cancelar();
+    }
+
     // Restaura a gravidade se ela tiver sido anulada
     if (this.anulouGravidade) {
       this.personagem.sprite.body.setAllowGravity(true);

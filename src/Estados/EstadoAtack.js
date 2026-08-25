@@ -289,7 +289,7 @@ export default class EstadoAtack extends EstadoBase {
           const tipoImpacto = this.golpeAtual.tipoSomImpacto || "light";
           const somImpacto = this.golpeAtual.somImpacto || this.personagem.sons?.[tipoImpacto];
           if (somImpacto) {
-            this.personagem.tocarSomSorteado(somImpacto, { volume: 0.4 });
+            this.personagem.tocarSomSorteado(somImpacto, { volume: 0.15 });
           }
 
           const valorDano = this.golpeAtual.propriedades?.dano || 0;

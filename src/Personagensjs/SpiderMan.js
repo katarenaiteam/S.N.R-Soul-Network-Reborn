@@ -3,6 +3,7 @@ import WebShot from "./Specials/Spiderman/WebShot.js";
 import AirWebShot from "./Specials/Spiderman/AirWebshot.js"; 
 import SpiderCounter from "./Specials/Spiderman/SpiderCounter.js";
 import SpiderThrow from "./Specials/Spiderman/SpiderThrow.js";
+import SpiderSwing from "./Specials/Spiderman/SpiderSwing.js";
 
 export default class SpiderMan extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -563,6 +564,25 @@ export default class SpiderMan extends Personagem {
           
         },
       },
+
+       air_lado: {
+        animacao: "spy_AsiSpecial",
+        duracao: 9999,
+        cooldown: 2000,
+        logica: SpiderSwing,
+        // finalizarAoTocarChao: true,       
+        // atrasoFinalizacaoChao: 50,
+        // finalizarAoAcertarOponente: false,
+        propriedades: {
+          dano: 10,
+          knockbackX: 500,
+          knockbackY: 400,
+          anularGravidade: true,
+          //impulsoX: 0,                    
+          //impulsoY: 0,
+          
+        },
+      },
     };
   }
 
@@ -816,7 +836,7 @@ scene.anims.create({
       key: "spy_AneSpecial",
       frames: scene.anims.generateFrameNumbers("SpiderMan_AneSpecial", {
         start: 0,
-        end: 9,
+        end: 8,
       }),
       frameRate: 28,
       repeat: 0,
@@ -897,5 +917,25 @@ scene.anims.create({
      frameRate: 16,
      repeat: 0,
    });
+
+   scene.anims.create({
+  key: "spy_AsiSpecial",
+  frames: scene.anims.generateFrameNumbers("SpiderMan_AsiSpecial", {
+    start: 0,
+    end: 34,
+  }),
+  frameRate: 38,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "spy_spiderflip",
+  frames: scene.anims.generateFrameNumbers("Spiderflip", {
+    start: 0,
+    end: 8,
+  }),
+  frameRate: 18,
+  repeat: 0,
+});
   }
 }

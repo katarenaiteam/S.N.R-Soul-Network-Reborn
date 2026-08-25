@@ -130,7 +130,35 @@ this.load.spritesheet("SpiderMan_guard", "assets/personagens/SpiderMan/Sprites/S
 this.load.spritesheet("SpiderMan_siSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_siSpecial.png", { frameWidth: 154, frameHeight: 94 });
 this.load.spritesheet("Side_teia", "assets/personagens/SpiderMan/Sprites/Side_teia.png", { frameWidth: 320, frameHeight: 79 });
 this.load.spritesheet("Spider_throw", "assets/personagens/SpiderMan/Sprites/Spider_throw.png", { frameWidth: 640, frameHeight: 140 });
+this.load.spritesheet("SpiderMan_AsiSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AsiSpecial.png", { frameWidth: 245, frameHeight: 202 });
+this.load.spritesheet("Spiderflip", "assets/personagens/SpiderMan/Sprites/Spiderflip.png", { frameWidth: 105, frameHeight: 117 });
     
+
+if (!this.textures.exists('textura_teia')) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 16;
+  canvas.height = 32;
+  const ctx = canvas.getContext('2d');
+
+  // Corpo principal da teia
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(6, 0, 4, 32);
+
+  // Bordas e textura dos nós
+  ctx.fillStyle = '#80deea';
+  ctx.fillRect(4, 0, 2, 32);
+  ctx.fillRect(10, 0, 2, 32);
+
+  // Nós trançados
+  ctx.fillStyle = '#e0f7fa';
+  ctx.fillRect(2, 6, 12, 4);
+  ctx.fillRect(2, 22, 12, 4);
+
+  this.textures.addCanvas('textura_teia', canvas);
+}
+
+
+
     // spy_effects
     this.load.spritesheet("webshot", "assets/personagens/SpiderMan/Sprites/webshot.png", { frameWidth: 200, frameHeight: 200 });
     // --- Miku ---

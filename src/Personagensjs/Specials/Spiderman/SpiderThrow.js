@@ -5,6 +5,8 @@ export default class SpiderThrow {
     this.special = special;
     this.estado = estado;
 
+    this.deslocamentoAcumuladoX = 0;
+
     this.hitboxTeia = null;
     this.acertou = false;
     this.overlap = null;
@@ -54,7 +56,9 @@ export default class SpiderThrow {
         if (this.acertou) return;
 
         const direcao = sprite.flipX ? -1 : 1;
-        sprite.setX(sprite.x + 70 * direcao);
+        const deslocamento = 70 * direcao;
+        sprite.setX(sprite.x + deslocamento);
+        this.deslocamentoAcumuladoX += deslocamento;
 
         sprite.anims.play("spy_teia_side", true);
         this.criarHitboxTeia();
@@ -65,13 +69,18 @@ export default class SpiderThrow {
             this.limparHitbox();
 
             if (!this.acertou) {
-              sprite.setX(sprite.x - 80 * direcao);
+              const recuoMiss = 80 * direcao;
+              sprite.setX(sprite.x - recuoMiss);
+              this.deslocamentoAcumuladoX -= recuoMiss;
+
               sprite.anims.play("spy_siSpecial_miss", true);
 
               this.fnMiss = (animMiss) => {
                 if (animMiss.key === "spy_siSpecial_miss") {
                   sprite.off("animationcomplete", this.fnMiss);
-                  sprite.setX(sprite.x - 10 * direcao);
+                  const ajusteFinal = 10 * direcao;
+                  sprite.setX(sprite.x - ajusteFinal);
+                  this.deslocamentoAcumuladoX -= ajusteFinal;
                   this.finalizar();
                 }
               };
@@ -122,9 +131,23 @@ export default class SpiderThrow {
     this.alvoAtual = alvo;
     this.limparHitbox();
 
-    this.alvoAtual.podeAtacar = false;
+    // 1. GUARDA AS FUNÇÕES ORIGINAIS DE CHECAGEM DO INIMIGO
+    this.podeUsarAtaqueOriginal = alvo.podeUsarAtaque;
+    this.podeUsarSpecialOriginal = alvo.podeUsarSpecial;
 
-    // 1. DESATIVA A COLISÃO DE ATAQUE E CORPO DO INIMIGO
+    // 2. BLOQUEIA QUALQUER TENTATIVA DE ATAQUE/SPECIAL DO INIMIGO
+    alvo.podeUsarAtaque = () => false;
+    alvo.podeUsarSpecial = () => false;
+    alvo.podeAtacar = false;
+
+    // 3. SE O INIMIGO JÁ ESTIVER EM ESTADO DE ATAQUE, FORÇA A FINALIZAÇÃO
+    if (alvo.maquinaEstados?.estadoAtual?.finalizarAtaque) {
+      alvo.maquinaEstados.estadoAtual.finalizarAtaque();
+    } else if (alvo.maquinaEstados?.estadoAtual?.finalizarSpecial) {
+      alvo.maquinaEstados.estadoAtual.finalizarSpecial();
+    }
+
+    // 4. DESATIVA HURTBOXES E HITBOXES DO INIMIGO
     if (this.alvoAtual.grupoHurtbox) {
       this.alvoAtual.grupoHurtbox.getChildren().forEach((child) => {
         if (child.body) child.body.enable = false;
@@ -140,6 +163,7 @@ export default class SpiderThrow {
 
     const recuoThrow = 110 * direcao;
     sprite.setX(sprite.x - recuoThrow);
+    this.deslocamentoAcumuladoX -= recuoThrow;
 
     sprite.anims.play("spy_spider_throw", true);
 
@@ -147,10 +171,6 @@ export default class SpiderThrow {
       alvo.sprite.body.setVelocity(0, 0);
       alvo.sprite.body.setAllowGravity(false);
       alvo.sprite.body.moves = false;
-
-      if (typeof alvo.forcarEstado === "function") {
-        alvo.forcarEstado("preso");
-      }
     }
 
     const trajetoriaManual = [
@@ -166,6 +186,7 @@ export default class SpiderThrow {
       { x: 140 * direcao, y: -10 },
       { x: 60 * direcao, y: -10 },
       { x: -75 * direcao, y: -10 },
+      { x: -105 * direcao, y: -10 },
       { x: -105 * direcao, y: -10 },
       { x: -90 * direcao, y: -10 },
       { x: 40 * direcao, y: -10 },
@@ -192,8 +213,6 @@ export default class SpiderThrow {
     this.fnUpdate = (anim, frame) => {
       if (anim.key !== "spy_spider_throw" || !alvo.sprite) return;
 
-      alvo.podeAtacar = false;
-
       const index = frame.index - 1;
 
       if (index < 29 && !jaLancouOponente) {
@@ -206,18 +225,21 @@ export default class SpiderThrow {
       } else if (index >= 29 && !jaLancouOponente) {
         jaLancouOponente = true;
 
+        // RESTAURA AS PERMISSÕES DO INIMIGO NO MOMENTO DO LANÇAMENTO
+        if (this.podeUsarAtaqueOriginal) alvo.podeUsarAtaque = this.podeUsarAtaqueOriginal;
+        if (this.podeUsarSpecialOriginal) alvo.podeUsarSpecial = this.podeUsarSpecialOriginal;
+        alvo.podeAtacar = true;
+
         if (alvo.sprite && alvo.sprite.body) {
           alvo.sprite.body.setAllowGravity(true);
           alvo.sprite.body.moves = true;
         }
 
-        // 2. REATIVA AS CAIXAS DE FÍSICA PARA O INIMIGO RECEBER DANO/KNOCKBACK
         if (alvo.grupoHurtbox) {
           alvo.grupoHurtbox.getChildren().forEach((child) => {
             if (child.body) child.body.enable = true;
           });
         }
-        alvo.podeAtacar = true;
 
         const props = this.special?.propriedades || {};
         alvo.receberDano(props.dano || 18, {
@@ -234,6 +256,7 @@ export default class SpiderThrow {
       if (anim.key === "spy_spider_throw") {
         const devolucaoIdeal = 40 * direcao;
         sprite.setX(sprite.x + devolucaoIdeal);
+        this.deslocamentoAcumuladoX += devolucaoIdeal;
 
         this.finalizar();
       }
@@ -246,55 +269,32 @@ export default class SpiderThrow {
     this.limparHitbox();
     this.removerListeners();
 
-    if (this.alvoAtual && this.alvoAtual.sprite) {
+    const sprite = this.personagem.sprite;
+    if (sprite) {
+      // Devolve o deslocamento acumulado antes da pancada
+      if (this.deslocamentoAcumuladoX !== 0) {
+        sprite.setX(sprite.x - this.deslocamentoAcumuladoX);
+        this.deslocamentoAcumuladoX = 0;
+      }
+
+      if (sprite.body) {
+        sprite.body.moves = true;
+        sprite.body.setAllowGravity(true);
+        // Zera o impulso instantaneamente para evitar o salto/recuo gigante
+        sprite.body.setVelocity(0, 0); 
+      }
+    }
+
+    // Restaura o oponente se ele ficou preso no agarre
+    if (this.alvoAtual) {
+      if (this.podeUsarAtaqueOriginal) this.alvoAtual.podeUsarAtaque = this.podeUsarAtaqueOriginal;
+      if (this.podeUsarSpecialOriginal) this.alvoAtual.podeUsarSpecial = this.podeUsarSpecialOriginal;
       this.alvoAtual.podeAtacar = true;
 
-      // Restaura a físicas do inimigo caso o Aranha tome hit no meio
-      if (this.alvoAtual.grupoHurtbox) {
-        this.alvoAtual.grupoHurtbox.getChildren().forEach((child) => {
-          if (child.body) child.body.enable = true;
-        });
-      }
-
-      if (this.alvoAtual.sprite.body) {
+      if (this.alvoAtual.sprite && this.alvoAtual.sprite.body) {
         this.alvoAtual.sprite.body.setAllowGravity(true);
         this.alvoAtual.sprite.body.moves = true;
       }
-      if (typeof this.alvoAtual.forcarEstado === "function") {
-        this.alvoAtual.forcarEstado("idle");
-      }
-    }
-
-    const sprite = this.personagem.sprite;
-    if (sprite && sprite.body) {
-      sprite.body.moves = true;
-      sprite.body.setAllowGravity(true);
-    }
-
-    this.alvoAtual = null;
-    this.acertou = false;
-  }
-
-  cancelarInterrupcao() {
-    this.limparHitbox();
-    this.removerListeners();
-
-    // Restaura o oponente se ele ficou preso no ar
-    if (this.alvoAtual && this.alvoAtual.sprite) {
-      if (this.alvoAtual.sprite.body) {
-        this.alvoAtual.sprite.body.setAllowGravity(true);
-        this.alvoAtual.sprite.body.moves = true;
-      }
-      if (typeof this.alvoAtual.forcarEstado === "function") {
-        this.alvoAtual.forcarEstado("idle");
-      }
-    }
-
-    // Restaura a física do Aranha
-    const sprite = this.personagem.sprite;
-    if (sprite && sprite.body) {
-      sprite.body.moves = true;
-      sprite.body.setAllowGravity(true);
     }
 
     this.alvoAtual = null;
@@ -314,6 +314,7 @@ export default class SpiderThrow {
   }
 
   finalizar() {
+    this.deslocamentoAcumuladoX = 0;
     this.limparHitbox();
     this.removerListeners();
 

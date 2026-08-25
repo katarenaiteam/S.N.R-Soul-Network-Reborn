@@ -420,7 +420,7 @@ export default class Personagem {
     this.pulos++;
 
     // Toca o som em TODOS os pulos (primeiro, duplo, triplo, etc.)
-    this.tocarSomSorteado(this.sons.pulo, { volume: 0.6 });
+    this.tocarSomSorteado(this.sons.pulo, { volume: 0.4 });
 
     // Força o reinício da animação/estado de pulo para dar feedback visual e sonoro
     this.maquinaEstados.mudarEstado("jump");
