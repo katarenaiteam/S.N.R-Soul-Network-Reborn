@@ -25,10 +25,11 @@ export default class EstadoJump extends EstadoBase {
       this.personagem.inputJustDown("cima") &&
       this.personagem.pulos < this.personagem.maxPulos
     ) {
-      this.personagem.sprite.setVelocityY(this.personagem.forcaPulo);
-      this.personagem.pulos++;
+      // Chama a função central da classe Personagem, que aplica a velocidade,
+      // incrementa o contador e dispara o som do pulo!
+      this.personagem.pular();
 
-      // --- Chama o tocarAnimacao autorizando o RESTART! ---
+      // Força a animação de pulo a reiniciar visualmente no ar
       this.personagem.tocarAnimacao("jump", true); 
     }
 

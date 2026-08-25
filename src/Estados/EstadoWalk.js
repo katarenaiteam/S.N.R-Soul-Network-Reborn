@@ -4,6 +4,7 @@ import EstadoBase from "./EstadoBase.js";
 export default class EstadoWalk extends EstadoBase {
   enter() {
     this.personagem.tocarAnimacao("walk");
+    this.tempoUltimoPasso = 0;
   }
 
   execute() {
@@ -63,6 +64,20 @@ export default class EstadoWalk extends EstadoBase {
       this.personagem.maquinaEstados.mudarEstado("idle");
       return;
     }
+
+    // sons andando
+    const andando = this.personagem.inputDown("esquerda") || this.personagem.inputDown("direita");
+  
+    if (andando && this.personagem.sprite.body.blocked.down) {
+     const agora = this.personagem.scene.time.now;
+     if (agora - this.tempoUltimoPasso > 500) {
+       this.personagem.tocarSomSorteado(this.personagem.sons.passos, { volume: 0.3 });
+       this.tempoUltimoPasso = agora;
+     }
+    }
+   
+
+    
 
     if (this.personagem.inputDown("guard")) {
     this.personagem.maquinaEstados.mudarEstado("guard");

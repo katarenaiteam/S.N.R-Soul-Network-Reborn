@@ -51,6 +51,36 @@ export default class Personagem {
     this.tempoCooldownGuard = 3000;  
     this.tempoLiberacaoGuard = 0;
 
+    // sons
+    this.sons = {
+      pulo: ['jump1'],
+      pouso: ['generic-landing1', 'generic-landing2'],
+      dash: ['dash1', 'dash2'],
+      
+      // Adicionando os 9 passos para variá-los no jogo:
+      passos: [
+        'genericstep1', 'genericstep2', 'genericstep3',
+        'genericstep4', 'genericstep5', 'genericstep6',
+        'genericstep7', 'genericstep8', 'genericstep9'
+      ],
+
+      // Soco no ar / Wind:
+      wind: ['punch12'],
+
+      // Ataques Leves (Sorteia entre os socos leves declarados no Preload):
+      light: [
+        'punch1', 'punch2', 'punch3', 'punch4', 'punch5',
+        'punch6', 'punch7', 'punch8', 'punch9', 'punch17',
+        'punch18', 'punch19', 'punch22', 'punch23'
+      ],
+
+      // Ataques Pesados:
+      heavy: [
+        'punch10', 'punch11', 'punch13', 'punch14', 'punch15',
+        'punch16', 'punch20', 'punch21', 'punch24'
+      ]
+    };
+
     // Sprite e física
     this.sprite = scene.physics.add.sprite(x, y, keyAtlas, frameInicial);
     this.sprite.setOrigin(0.5, 1);
@@ -83,7 +113,27 @@ export default class Personagem {
     this.maquinaEstados.mudarEstado("idle");
   }
 
-  // --- RECEBIMENTO DE DANO ---
+ 
+   tocarSomSorteado(chavesAudio, config = {}) {
+    if (!this.scene.sound || !chavesAudio) return;
+    const lista = Array.isArray(chavesAudio) ? chavesAudio : [chavesAudio];
+    if (lista.length === 0) return;
+
+    const somSorteado = Phaser.Utils.Array.GetRandom(lista);
+
+    // Proteção: Só toca se a chave realmente existir no cache do Phaser
+    if (this.scene.cache.audio.exists(somSorteado)) {
+        this.scene.sound.play(somSorteado, {
+            volume: config.volume ?? 0.5,
+            detune: Phaser.Math.Between(-50, 50),
+            ...config
+        });
+    } else {
+        console.warn(`Aviso: O som com a chave "${somSorteado}" não existe no cache do Preload.`);
+    }
+}
+
+
   // --- RECEBIMENTO DE DANO ---
   receberDano(quantidade, propriedades = {}, origem = null) {
     if (this.invulneravel) return true;
@@ -162,6 +212,7 @@ export default class Personagem {
     if (noChao && !this.estavaNoChao) {
       this.pulos = 0;
       this.dashs = 0;
+      this.tocarSomSorteado(this.sons.pouso, { volume: 0.4 });
     }
     this.estavaNoChao = noChao;
 
@@ -362,10 +413,16 @@ export default class Personagem {
 
   // --- AÇÕES E CONTROLES ---
   pular() {
+    // Permite pular enquanto o contador for menor que o máximo permitido
     if (this.pulos >= this.maxPulos) return;
 
     this.sprite.setVelocityY(this.forcaPulo);
     this.pulos++;
+
+    // Toca o som em TODOS os pulos (primeiro, duplo, triplo, etc.)
+    this.tocarSomSorteado(this.sons.pulo, { volume: 0.6 });
+
+    // Força o reinício da animação/estado de pulo para dar feedback visual e sonoro
     this.maquinaEstados.mudarEstado("jump");
   }
 

@@ -56,7 +56,7 @@ export default class EstadoAtack extends EstadoBase {
      ) {
       this.finalizarAtaque();
       return;
-      }
+     }
 
      // verifica se já foi acertado o inimigo
      this.jaAcertou = false;
@@ -240,6 +240,12 @@ export default class EstadoAtack extends EstadoBase {
 
     this.hitboxCriada = true;
 
+    // 🔊 SOM DE VENTO (No ar, quando o ataque é gerado)
+    const somVento = this.golpeAtual.somVento || this.personagem.sons?.wind;
+    if (somVento) {
+      this.personagem.tocarSomSorteado(somVento, { volume: 0.4 });
+    }
+
     this.hitboxAtual = this.personagem.criarHitboxAtaque(
       this.golpeAtual.offsetX,
       this.golpeAtual.offsetY,
@@ -278,6 +284,14 @@ export default class EstadoAtack extends EstadoBase {
           if (this.jaAcertou) return;
 
           this.jaAcertou = true;
+
+          // 🔊 SOM DE IMPACTO (Apenas se atingir um alvo)
+          const tipoImpacto = this.golpeAtual.tipoSomImpacto || "light";
+          const somImpacto = this.golpeAtual.somImpacto || this.personagem.sons?.[tipoImpacto];
+          if (somImpacto) {
+            this.personagem.tocarSomSorteado(somImpacto, { volume: 0.4 });
+          }
+
           const valorDano = this.golpeAtual.propriedades?.dano || 0;
           const origem = {
             direcao: this.personagem.sprite.flipX ? -1 : 1,

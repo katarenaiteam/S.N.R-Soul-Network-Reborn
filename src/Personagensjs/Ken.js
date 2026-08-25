@@ -33,7 +33,7 @@ export default class Ken extends Personagem {
         largura: 85,
         altura: 120,
         offsetX: 0,
-        offsetY: -20,
+        offsetY: -10,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 60, offsetX: 25, offsetY: -70 },
@@ -45,7 +45,7 @@ export default class Ken extends Personagem {
         largura: 85,
         altura: 120,
         offsetX: 0,
-        offsetY: -19,
+        offsetY: -9,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 60, offsetX: 0, offsetY: -70 },
@@ -57,7 +57,7 @@ export default class Ken extends Personagem {
         largura: 85,
         altura: 120,
         offsetX: 0,
-        offsetY: 0,
+        offsetY: 10,
         escala: 1,
         hurtboxes: [
           { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
@@ -70,7 +70,7 @@ export default class Ken extends Personagem {
         largura: 85,
         altura: 60,
         offsetX: 0,
-        offsetY: 40,
+        offsetY: 50,
         escala: 1,
         hurtboxes: [
           { largura: 80, altura: 50, offsetX: 0, offsetY: -25 },
@@ -81,7 +81,7 @@ export default class Ken extends Personagem {
         largura: 85,
         altura: 60,
         offsetX: 0,
-        offsetY: 0,
+        offsetY: 10,
         escala: 1,
         hurtboxes: [
            ],
@@ -91,7 +91,7 @@ export default class Ken extends Personagem {
         largura: 85,
         altura: 120,
         offsetX: 0,
-        offsetY: -16,
+        offsetY: -6,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 60, offsetX: 25, offsetY: -70 },
@@ -103,7 +103,7 @@ export default class Ken extends Personagem {
   largura: 80,
   altura: 100,
   offsetX: 0,
-  offsetY: -15,
+  offsetY: -5,
   escala: 1,
   hurtboxes: [
     { largura: 60, altura: 65, offsetX: -10, offsetY: -60 }, // Tronco inclinado
@@ -117,7 +117,7 @@ export default class Ken extends Personagem {
         largura: 80,
         altura: 100,
         offsetX: 0,
-        offsetY: -5,
+        offsetY: 5,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 70, offsetX: 0, offsetY: -80 },
@@ -130,7 +130,7 @@ export default class Ken extends Personagem {
         largura: 80,
         altura: 100,
         offsetX: 0,
-        offsetY: -15,
+        offsetY: -5,
         escala: 1,
         hurtboxes: [
           { largura: 95, altura: 45, offsetX: 0, offsetY: -20 },
@@ -142,7 +142,7 @@ export default class Ken extends Personagem {
         largura: 80,
         altura: 100,
         offsetX: 0,
-        offsetY: 25,
+        offsetY: 35,
         escala: 1,
         hurtboxes: [
           { largura: 85, altura: 35, offsetX: 0, offsetY: -15 },
@@ -154,7 +154,7 @@ export default class Ken extends Personagem {
         largura: 144,
         altura: 33,
         offsetX: 10,
-        offsetY: 30,
+        offsetY: 40,
         escala: 1,
         hurtboxes: [
           { largura: 60, altura: 35, offsetX: -10, offsetY: -18 },
@@ -166,44 +166,44 @@ export default class Ken extends Personagem {
         largura: 80,
         altura: 100,
         offsetX: 0,
-        offsetY: -8,
+        offsetY: 2,
         escala: 1,
         hurtboxes: [],
       },
 
       atack1: {
         largura: 85,
-        altura: 120,
-        offsetX: 25,
-        offsetY: -20,
+        altura: 110,
+        offsetX: 18,
+        offsetY: -1,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 80, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 60, altura: 70, offsetX: 0, offsetY: -85 },
+          { largura: 70, altura: 40, offsetX: 0, offsetY: -20 },
         ],
       },
 
       atack2: {
         largura: 85,
-        altura: 96,
-        offsetX: 50,
-        offsetY: 0,
+        altura: 110,
+        offsetX: 21,
+        offsetY: -1,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 80, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 60, altura: 70, offsetX: 0, offsetY: -85 },
+          { largura: 70, altura: 40, offsetX: 0, offsetY: -20 },
         ],
       },
 
       atack3: {
         largura: 85,
-        altura: 96,
-        offsetX: 50,
-        offsetY: 0,
+        altura: 110,
+        offsetX: 48,
+        offsetY: 7, // Compensa a altura maior (121px) do Ken_combo3 para não entrar no chão
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 80, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 70, altura: 70, offsetX: 10, offsetY: -85 },
+          { largura: 80, altura: 40, offsetX: 10, offsetY: -20 },
         ],
       },
 
@@ -292,7 +292,7 @@ export default class Ken extends Personagem {
         largura: 60,
         altura: 20,
         cooldown: 700,
-        duracao: 300,
+        duracao: 350,
         propriedades: {
           dano: 4,
           knockbackX: 40,
@@ -313,7 +313,7 @@ export default class Ken extends Personagem {
         offsetY: -60,
         largura: 55,
         altura: 30,
-        duracao: 300,
+        duracao: 400,
         propriedades: {
           dano: 4,
           knockbackX: -10,
@@ -334,7 +334,7 @@ export default class Ken extends Personagem {
         offsetY: -75,
         largura: 35,
         altura: 70,
-        duracao: 500,
+        duracao: 700,
         bufferInputs: true,
         bufferJanelaInicio: 50,
         bufferJanelaFim: 350,
@@ -505,7 +505,7 @@ scene.anims.create({
         start: 0,
         end: 4,
       }),
-      frameRate: 18,
+      frameRate: 16,
       repeat: 0,
     });
 
@@ -515,7 +515,7 @@ scene.anims.create({
         start: 0,
         end: 5,
       }),
-      frameRate: 18,
+      frameRate: 16,
       repeat: 0,
     });
 
@@ -525,7 +525,7 @@ scene.anims.create({
         start: 0,
         end: 13,
       }),
-      frameRate: 20,
+      frameRate: 18,
       repeat: 0,
     });
    

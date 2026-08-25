@@ -295,9 +295,18 @@ export default class SpiderMan extends Personagem {
           { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
-     
-   
    };
+
+   //   this.sons = {
+   //  ...this.sons,
+   //  pulo: ['spy_pulo_1', 'spy_pulo_2'],
+   //  dash: ['spy_web_dash'],
+   //  wind: ['spy_whoosh_leve'],
+   // light: ['spy_hit_light_1'],
+   //  heavy: ['spy_hit_heavy_1']
+   // };
+
+
   
     // ============================ tabela de golpes =====================================
     this.golpes = {
@@ -311,6 +320,7 @@ export default class SpiderMan extends Personagem {
         cooldown: 700,
         duracao: 300,
         propriedades: {
+          tipoSomImpacto: "light",
           dano: 4,
           knockbackX: 40,
           knockbackY: 0,
@@ -332,6 +342,7 @@ export default class SpiderMan extends Personagem {
         altura: 30,
         duracao: 300,
         propriedades: {
+          tipoSomImpacto: "light",
           dano: 4,
           knockbackX: -10,
           knockbackY: 0,
@@ -356,6 +367,7 @@ export default class SpiderMan extends Personagem {
         bufferJanelaInicio: 50,
         bufferJanelaFim: 350,
         propriedades: {
+          tipoSomImpacto: "heavy",
           dano: 8,
           knockbackX: 50,
           knockbackY: -350,
@@ -372,6 +384,7 @@ export default class SpiderMan extends Personagem {
         cooldown: 700,
         duracao: 560,
         propriedades: {
+          tipoSomImpacto: "heavy",
           dano: 8,
           knockbackX: 50,
           knockbackY: -100,
@@ -388,6 +401,7 @@ export default class SpiderMan extends Personagem {
         cooldown: 900,
         duracao: 400,
         propriedades: {
+          tipoSomImpacto: "heavy",
           dano: 20,
           knockbackX: 400,
           knockbackY: -300,
@@ -406,6 +420,7 @@ export default class SpiderMan extends Personagem {
         cooldown: 500,
         duracao: 300,
         propriedades: {
+          tipoSomImpacto: "light",
           dano: 12,
           knockbackX: 200,
           knockbackY: -300,
@@ -428,6 +443,7 @@ export default class SpiderMan extends Personagem {
         finalizarAoAcertarOponente: true,
         atrasoFinalizacaoAcerto: 150,
         propriedades: {
+          tipoSomImpacto: "heavy",
           dano: 12,
           knockbackX: 50,
           knockbackY: 400,
@@ -450,6 +466,7 @@ export default class SpiderMan extends Personagem {
         atrasoFinalizacaoChao: 100,
         finalizarAoAcertarOponente: false,
         propriedades: {
+          tipoSomImpacto: "heavy",
           dano: 12,
           knockbackX: 300,
           knockbackY: -50,
@@ -472,6 +489,7 @@ export default class SpiderMan extends Personagem {
         atrasoFinalizacaoChao: 100,
         finalizarAoAcertarOponente: false,
         propriedades: {
+          tipoSomImpacto: "heavy",
           dano: 12,
           knockbackX: 50,
           knockbackY: -400,

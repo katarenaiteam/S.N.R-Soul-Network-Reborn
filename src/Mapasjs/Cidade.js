@@ -3,7 +3,7 @@ export default class Cidade {
         this.scene = scene;
 
         if (scene.sound) {
-            this.musica = scene.sound.add('ClockTower', { loop: true, volume: 0.1 });
+            this.musica = scene.sound.add('ClockTower', { loop: true, volume: 0.05 });
             this.musica.play();
         }
 
@@ -18,7 +18,7 @@ export default class Cidade {
                 largura: larguraMundo,
                 altura: alturaMundo
             },
-            maxZoom: 2.0,
+            maxZoom: 2.2,
             minZoom: 0.9,
             distMinima: 100,
             distMaxima: 1200

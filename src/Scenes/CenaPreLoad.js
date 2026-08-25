@@ -52,10 +52,13 @@ export default class CenaPreload extends Phaser.Scene {
     });
 
     // --- CARREGAMENTO DE ASSETS ---
+    
+    // --- preload ---
+    this.load.audio("Aria8bit", "assets/Menus/Preload/Aria8bit.mp3");
+    this.load.image("KatarenaiLogo", "assets/Menus/Preload/KatarenaiLogo.png");
 
     // --- MENUS ---
     // --- start ---
-    this.load.image("KatarenaiLogo", "assets/Menus/Preload/KatarenaiLogo.png");
     this.load.image("Start_menu", "./assets/Menus/Start_menu/Start_menu.png");
     this.load.image("Start_VSbuton", "./assets/Menus/Start_menu/Start_VSbuton.png");
     this.load.image("Start_Storybuton", "./assets/Menus/Start_menu/Start_Storybuton.png");
@@ -149,9 +152,63 @@ this.load.spritesheet("Spider_throw", "assets/personagens/SpiderMan/Sprites/Spid
     this.load.spritesheet("Ken_dead", "assets/personagens/Ken/Sprites/Ken_dead.png", { frameWidth: 177, frameHeight: 76 });
     this.load.spritesheet("Ken_getup", "assets/personagens/Ken/Sprites/Ken_getup.png", { frameWidth: 137, frameHeight: 105 });
     //golpes
-    this.load.spritesheet("Ken_combo1", "assets/personagens/Ken/Sprites/Ken_combo1.png", { frameWidth: 121, frameHeight: 107 });
-    this.load.spritesheet("Ken_combo2", "assets/personagens/Ken/Sprites/Ken_combo2.png", { frameWidth: 127, frameHeight: 107 });
+    this.load.spritesheet("Ken_combo1", "assets/personagens/Ken/Sprites/Ken_combo1.png", { frameWidth: 160, frameHeight: 111 });
+    this.load.spritesheet("Ken_combo2", "assets/personagens/Ken/Sprites/Ken_combo2.png", { frameWidth: 200, frameHeight: 111 });
     this.load.spritesheet("Ken_combo3", "assets/personagens/Ken/Sprites/Ken_combo3.png", { frameWidth: 182, frameHeight: 121 });
+
+    //--Sound effects
+    //-pulos
+    this.load.audio("jump1", "assets/personagens/SoundEffects_geral/dash-jump/jump/jump1.wav");
+
+    //-pouso
+    this.load.audio("generic-landing1", "assets/personagens/SoundEffects_geral/step/generic-landing1.wav");
+    this.load.audio("generic-landing2", "assets/personagens/SoundEffects_geral/step/generic-landing2.wav");
+
+    //-passo
+    this.load.audio("genericstep1", "assets/personagens/SoundEffects_geral/step/genericstep1.wav");
+    this.load.audio("genericstep2", "assets/personagens/SoundEffects_geral/step/genericstep2.wav");
+    this.load.audio("genericstep3", "assets/personagens/SoundEffects_geral/step/genericstep3.wav");
+    this.load.audio("genericstep4", "assets/personagens/SoundEffects_geral/step/genericstep4.wav");
+    this.load.audio("genericstep5", "assets/personagens/SoundEffects_geral/step/genericstep5.wav");
+    this.load.audio("genericstep6", "assets/personagens/SoundEffects_geral/step/genericstep6.wav");
+    this.load.audio("genericstep7", "assets/personagens/SoundEffects_geral/step/genericstep7.wav");
+    this.load.audio("genericstep8", "assets/personagens/SoundEffects_geral/step/genericstep8.wav");
+    this.load.audio("genericstep9", "assets/personagens/SoundEffects_geral/step/genericstep9.wav");
+
+    //-dash
+    this.load.audio("dash1", "assets/personagens/SoundEffects_geral/dash-jump/dash/dash1.wav");
+    this.load.audio("dash2", "assets/personagens/SoundEffects_geral/dash-jump/dash/dash2.wav");
+
+    //-wind
+    this.load.audio("punch12", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch12.wav");
+
+    //-light
+    this.load.audio("punch1", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch1.wav");
+    this.load.audio("punch2", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch2.wav");
+    this.load.audio("punch3", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch3.wav");
+    this.load.audio("punch4", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch4.wav");
+    this.load.audio("punch5", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch5.wav");
+    this.load.audio("punch6", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch6.wav");
+    this.load.audio("punch7", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch7.wav");
+    this.load.audio("punch8", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch8.wav");
+    this.load.audio("punch9", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch9.wav");
+    this.load.audio("punch17", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch17.wav");
+    this.load.audio("punch18", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch18.wav");
+    this.load.audio("punch19", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch19.wav");
+    this.load.audio("punch22", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch22.wav");
+    this.load.audio("punch23", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch23.wav");
+
+    //-heavy
+    this.load.audio("punch10", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch10.wav");
+    this.load.audio("punch11", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch11.wav");
+    this.load.audio("punch13", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch13.wav");
+    this.load.audio("punch14", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch14.wav");
+    this.load.audio("punch15", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch15.wav");
+    this.load.audio("punch16", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch16.wav");
+    this.load.audio("punch20", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch20.wav");
+    this.load.audio("punch21", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch21.wav");
+    this.load.audio("punch24", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch24.wav");
+
 
     // --- MAPAS ---
     
@@ -164,11 +221,15 @@ this.load.spritesheet("Spider_throw", "assets/personagens/SpiderMan/Sprites/Spid
     this.load.spritesheet("cidade", "assets/cenarios/MapaCidade/Sprites/cidade.png", { frameWidth: 960, frameHeight: 320 });
     this.load.audio("ClockTower", "assets/cenarios/MapaCidade/Ost/ClockTower.mp3");
     this.load.image("thumb_cidade", "assets/cenarios/MapaCidade/Sprites/thumb_cidade.png");
+
+
     // --- AUDIOS ---
-   
-    this.load.audio("Aria8bit", "assets/Menus/Preload/Aria8bit.mp3");
+    //--OST
     this.load.audio("DiosAmendment", "assets/cenarios/DiosAmendment.mp3");
 
+
+    
+    
     // --- EFEITOS ---
      this.load.spritesheet("TVefect", "assets/efeitos/TVefect.png", { frameWidth: 800, frameHeight: 400 });
   }

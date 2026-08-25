@@ -3,6 +3,7 @@ import EstadoBase from "./EstadoBase.js";
 
 export default class EstadoDash extends EstadoBase {
   enter() {
+    this.personagem.tocarSomSorteado(this.personagem.sons.dash, { volume: 0.5 });
     // Registra o tempo do dash atual
     this.personagem.tempoUltimoDash = this.personagem.scene.time.now;
     this.personagem.podeDash = false;
