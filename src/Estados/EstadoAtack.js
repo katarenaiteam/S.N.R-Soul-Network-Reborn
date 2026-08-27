@@ -5,6 +5,8 @@ export default class EstadoAtack extends EstadoBase {
    const noChao = this.personagem.sprite.body.blocked.down;
    const direcaoOlhar = this.personagem.sprite.flipX ? -1 : 1;
 
+   this.intentCancel = false;
+
    // reseta o combro pra 1, se o ataque vier sem dados(cima,baxo) ou se tiver combo false ! -> se nao for
    if (!dados?.combo) {
       this.comboIndex = 1;
@@ -126,6 +128,51 @@ export default class EstadoAtack extends EstadoBase {
     const agora = this.personagem.scene.time.now;
     const tempoDecorrido = agora - this.tempoInicio;
 
+
+   // CANCELAMENTO INSTANTÂNEO PÓS-HIT
+    // ==========================================
+    if (this.golpeAtual?.cancelavel) {
+      // Regra: Se pressionar qualquer botão de cancelamento, salva a intenção
+      if (
+        (this.personagem.inputJustDown("dash") && this.personagem.podeDash && this.personagem.dashs < this.personagem.maxDash) ||
+        (this.personagem.inputJustDown("cima") && this.personagem.pulos < this.personagem.maxPulos) ||
+        this.personagem.inputJustDown("special")
+      ) {
+        this.intentCancel = true;
+      }
+
+      // Assim que o acerto acontecer (jaAcertou == true), executa o cancelamento na hora
+      if (this.jaAcertou) {
+        if (
+          this.personagem.inputJustDown("dash") ||
+          (this.intentCancel && this.personagem.inputDown("dash"))
+        ) {
+          if (this.personagem.podeDash && this.personagem.dashs < this.personagem.maxDash) {
+            this.personagem.maquinaEstados.mudarEstado("dash");
+            return;
+          }
+        }
+        
+        if (
+          this.personagem.inputJustDown("cima") ||
+          (this.intentCancel && this.personagem.inputDown("cima"))
+        ) {
+          if (this.personagem.pulos < this.personagem.maxPulos) {
+            this.personagem.pular();
+            return;
+          }
+        }
+
+        if (
+          this.personagem.inputJustDown("special") ||
+          (this.intentCancel && this.personagem.inputDown("special"))
+        ) {
+          this.personagem.maquinaEstados.mudarEstado("special");
+          return;
+        }
+      }
+    }
+    // ==========================================
     // =========================
     // INPUT DO COMBO DE ATAQUE
     // =========================
@@ -243,7 +290,7 @@ export default class EstadoAtack extends EstadoBase {
     // 🔊 SOM DE VENTO (No ar, quando o ataque é gerado)
     const somVento = this.golpeAtual.somVento || this.personagem.sons?.wind;
     if (somVento) {
-      this.personagem.tocarSomSorteado(somVento, { volume: 0.4 });
+      this.personagem.tocarSomSorteado(somVento, { volume: 0.1 });
     }
 
     this.hitboxAtual = this.personagem.criarHitboxAtaque(

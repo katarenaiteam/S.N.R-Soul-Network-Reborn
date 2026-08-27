@@ -99,10 +99,10 @@ export default class SpiderThrow {
     const sprite = this.personagem.sprite;
     const direcao = sprite.flipX ? -1 : 1;
 
-    const posX = sprite.x + 120 * direcao;
+    const posX = sprite.x + 80 * direcao;
     const posY = sprite.y - 35;
 
-    this.hitboxTeia = this.scene.add.zone(posX, posY, 160, 40);
+    this.hitboxTeia = this.scene.add.zone(posX, posY, 140, 40);
     this.scene.physics.add.existing(this.hitboxTeia);
     this.hitboxTeia.body.setAllowGravity(false);
 

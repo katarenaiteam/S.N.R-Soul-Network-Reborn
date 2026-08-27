@@ -108,11 +108,13 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("SpiderMan_jump", "assets/personagens/SpiderMan/Sprites/SpiderMan_jump.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_down", "assets/personagens/SpiderMan/Sprites/SpiderMan_down.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_dash2", "assets/personagens/SpiderMan/Sprites/SpiderMan_dash2.png", { frameWidth: 200, frameHeight: 200 });
-this.load.spritesheet("SpiderMan_hurt", "assets/personagens/SpiderMan/Sprites/SpiderMan_hurt.png", { frameWidth: 200, frameHeight: 200 });
-this.load.spritesheet("SpiderMan_hurts", "assets/personagens/SpiderMan/Sprites/SpiderMan_hurts.png", { frameWidth: 200, frameHeight: 200 });
-this.load.spritesheet("SpiderMan_dead", "assets/personagens/SpiderMan/Sprites/SpiderMan_dead.png", { frameWidth: 155, frameHeight: 52 });
-this.load.spritesheet("SpiderMan_getup", "assets/personagens/SpiderMan/Sprites/SpiderMan_getup.png", { frameWidth: 145, frameHeight: 96 });
-this.load.spritesheet("SpiderMan_guard", "assets/personagens/SpiderMan/Sprites/SpiderMan_guard.png", { frameWidth: 200, frameHeight: 200 });
+    this.load.spritesheet("SpiderMan_hurt", "assets/personagens/SpiderMan/Sprites/SpiderMan_hurt.png", { frameWidth: 200, frameHeight: 200 });
+    this.load.spritesheet("SpiderMan_hurts", "assets/personagens/SpiderMan/Sprites/SpiderMan_hurts.png", { frameWidth: 200, frameHeight: 200 });
+    this.load.spritesheet("SpiderMan_dead", "assets/personagens/SpiderMan/Sprites/SpiderMan_dead.png", { frameWidth: 155, frameHeight: 52 });
+    this.load.spritesheet("SpiderMan_getup", "assets/personagens/SpiderMan/Sprites/SpiderMan_getup.png", { frameWidth: 145, frameHeight: 96 });
+    this.load.spritesheet("SpiderMan_guard", "assets/personagens/SpiderMan/Sprites/SpiderMan_guard.png", { frameWidth: 200, frameHeight: 200 });
+    this.load.spritesheet("SpiderMan_taunt1", "assets/personagens/SpiderMan/Sprites/SpiderMan_taunt1.png", { frameWidth: 200, frameHeight: 200 });
+
     //ataques
     this.load.spritesheet("SpiderMan_atack1", "assets/personagens/SpiderMan/Sprites/SpiderMan_atack1.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_atack2", "assets/personagens/SpiderMan/Sprites/SpiderMan_atack2.png", { frameWidth: 200, frameHeight: 200 });
@@ -127,43 +129,57 @@ this.load.spritesheet("SpiderMan_guard", "assets/personagens/SpiderMan/Sprites/S
     this.load.spritesheet("SpiderMan_AneSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AneSpecial.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_doSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_doSpecial.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("Counter", "assets/personagens/SpiderMan/Sprites/Counter.png", { frameWidth: 500, frameHeight: 200 });
-this.load.spritesheet("SpiderMan_siSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_siSpecial.png", { frameWidth: 154, frameHeight: 94 });
-this.load.spritesheet("Side_teia", "assets/personagens/SpiderMan/Sprites/Side_teia.png", { frameWidth: 320, frameHeight: 79 });
-this.load.spritesheet("Spider_throw", "assets/personagens/SpiderMan/Sprites/Spider_throw.png", { frameWidth: 640, frameHeight: 140 });
-this.load.spritesheet("SpiderMan_AsiSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AsiSpecial.png", { frameWidth: 245, frameHeight: 202 });
-this.load.spritesheet("Spiderflip", "assets/personagens/SpiderMan/Sprites/Spiderflip.png", { frameWidth: 105, frameHeight: 117 });
-    
+    this.load.spritesheet("SpiderMan_siSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_siSpecial.png", { frameWidth: 154, frameHeight: 94 });
+    this.load.spritesheet("Side_teia", "assets/personagens/SpiderMan/Sprites/Side_teia.png", { frameWidth: 320, frameHeight: 79 });
+    this.load.spritesheet("Spider_throw", "assets/personagens/SpiderMan/Sprites/Spider_throw.png", { frameWidth: 640, frameHeight: 140 });
+    this.load.spritesheet("SpiderMan_AsiSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AsiSpecial.png", { frameWidth: 245, frameHeight: 202 });
+    this.load.spritesheet("Spiderflip", "assets/personagens/SpiderMan/Sprites/Spiderflip.png", { frameWidth: 105, frameHeight: 117 });  
+//ult
+this.load.spritesheet("SpiderMan_ult0", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult0.png", { frameWidth: 200, frameHeight: 200 }); 
+this.load.spritesheet("SpiderMan_ult1", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult1.png", { frameWidth: 500, frameHeight: 200 }); 
+this.load.spritesheet("SpiderMan_ult2", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult2.png", { frameWidth: 500, frameHeight: 200 }); 
+this.load.spritesheet("SpiderMan_ult3", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult3.png", { frameWidth: 500, frameHeight: 200 }); 
+this.load.spritesheet("SpiderMan_ult4", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult4.png", { frameWidth: 500, frameHeight: 200 });
+this.load.spritesheet("SpiderMan_ult5", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult5.png", { frameWidth: 131, frameHeight: 121 });
+this.load.spritesheet("SpiderMan_ult6", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult6.png", { frameWidth: 315, frameHeight: 245 });
+this.load.spritesheet("SpiderMan_ult7", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult7.png", { frameWidth: 360, frameHeight: 256 });
+this.load.spritesheet("SpiderMan_ult8", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult8.png", { frameWidth: 122, frameHeight: 119 });  
 
-if (!this.textures.exists('textura_teia')) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 16;
-  canvas.height = 32;
-  const ctx = canvas.getContext('2d');
+    if (!this.textures.exists('textura_teia')) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 16;
+    canvas.height = 32;
+    const ctx = canvas.getContext('2d');
 
-  // Corpo principal da teia
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(6, 0, 4, 32);
+    // Corpo principal da teia
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(6, 0, 4, 32);
 
-  // Bordas e textura dos nós
-  ctx.fillStyle = '#80deea';
-  ctx.fillRect(4, 0, 2, 32);
-  ctx.fillRect(10, 0, 2, 32);
+    // Bordas e textura dos nós
+    ctx.fillStyle = '#80deea';
+    ctx.fillRect(4, 0, 2, 32);
+    ctx.fillRect(10, 0, 2, 32);
 
-  // Nós trançados
-  ctx.fillStyle = '#e0f7fa';
-  ctx.fillRect(2, 6, 12, 4);
-  ctx.fillRect(2, 22, 12, 4);
+    // Nós trançados
+    ctx.fillStyle = '#e0f7fa';
+    ctx.fillRect(2, 6, 12, 4);
+    ctx.fillRect(2, 22, 12, 4);
 
-  this.textures.addCanvas('textura_teia', canvas);
-}
-
-
+    this.textures.addCanvas('textura_teia', canvas);
+  }
 
     // spy_effects
     this.load.spritesheet("webshot", "assets/personagens/SpiderMan/Sprites/webshot.png", { frameWidth: 200, frameHeight: 200 });
     // --- Miku ---
-    this.load.spritesheet("Miku_idle", "assets/personagens/Miku/Sprites/Miku_idle.png", { frameWidth: 500, frameHeight: 500 });
-    this.load.spritesheet("Miku_walk", "assets/personagens/Miku/Sprites/Miku_walk.png", { frameWidth: 500, frameHeight: 500 });
+    //base
+    this.load.spritesheet("Miku_idle", "assets/personagens/Miku/Sprites/Miku_idle.png", { frameWidth: 334, frameHeight: 360 });
+    this.load.spritesheet("Miku_walk", "assets/personagens/Miku/Sprites/Miku_walk.png", { frameWidth: 467, frameHeight: 357 });
+    this.load.spritesheet("Miku_jump", "assets/personagens/Miku/Sprites/Miku_jump.png", { frameWidth: 490, frameHeight: 342 });
+    this.load.spritesheet("Miku_dash", "assets/personagens/Miku/Sprites/Miku_dash.png", { frameWidth: 188, frameHeight: 358 });
+    this.load.spritesheet("Miku_crouch1", "assets/personagens/Miku/Sprites/Miku_crouch1.png", { frameWidth: 188, frameHeight: 354 });
+    this.load.spritesheet("Miku_crouch2", "assets/personagens/Miku/Sprites/Miku_crouch2.png", { frameWidth: 180, frameHeight: 200 });
+    this.load.spritesheet("Miku_crouch3", "assets/personagens/Miku/Sprites/Miku_crouch3.png", { frameWidth: 188, frameHeight: 354 });
+    this.load.spritesheet("Miku_taunt1", "assets/personagens/Miku/Sprites/Miku_taunt1.png", { frameWidth: 304, frameHeight: 374 });
 
     // --- Ken ---
     //base

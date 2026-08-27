@@ -1,23 +1,13 @@
-//import * as Phaser from "phaser";
 import EstadoBase from "./EstadoBase.js";
 
 export default class EstadoIdle extends EstadoBase {
-  /**
-   * Executado quando o personagem entra no estado Parado
-   */
   enter() {
-    // 1. Zera o movimento horizontal para o personagem parar na hora
     this.personagem.sprite.setVelocityX(0);
-
-    // 2. Toca a animação de "idle" (parado)
     this.personagem.tocarAnimacao("idle");
   }
 
-  /**
-   * Loop executado a cada frame
-   */
   execute() {
-    // 1. Transição para AGACHADO (Subiu para o topo para ter prioridade!)
+    // 1. Transição para AGACHADO
     if (this.personagem.inputDown("baixo")) {
       this.personagem.maquinaEstados.mudarEstado("crouch");
       return;
@@ -25,58 +15,72 @@ export default class EstadoIdle extends EstadoBase {
 
     // 2. Transição para DASH
     if (this.personagem.inputJustDown("dash") && this.personagem.podeDash) {
-  this.personagem.maquinaEstados.mudarEstado("dash");
-  return;
-  }
+      this.personagem.maquinaEstados.mudarEstado("dash");
+      return;
+    }
+
     // 3. Transição para PULO
     if (this.personagem.inputJustDown("cima")) {
       this.personagem.pular();
       return;
     }
 
+    // ⚡ 4. ULTIMATE
+    const apertouAtack = this.personagem.inputJustDown("atack") || this.personagem.inputDown("atack");
+    const apertouSpecial = this.personagem.inputJustDown("special") || this.personagem.inputDown("special");
+    const intencaoUlt = (this.personagem.inputJustDown("atack") || this.personagem.inputJustDown("special")) && apertouAtack && apertouSpecial;
+
+    const podeUsar = typeof this.personagem.podeUsarUlt === "function" 
+      ? this.personagem.podeUsarUlt() 
+      : true;
+
+    // Só entra aqui se realmente TIVER a intenção E PUDER usar a Ult!
+    if (intencaoUlt && podeUsar) {
+      this.personagem.maquinaEstados.mudarEstado("ult");
+      return;
+    }
+
+    // 5. SPECIAL (Se a Ult não executou, tenta o Especial)
     if (this.personagem.inputJustDown("special")) {
-    // 🛑 Pega o tipo do special primeiro
-    const tipoSpecial = this.personagem.obterTipoSpecial ? this.personagem.obterTipoSpecial() : "neutro";
+      const tipoSpecial = this.personagem.obterTipoSpecial ? this.personagem.obterTipoSpecial() : "neutro";
 
-    // SÓ entra no estado de special se NÃO estiver em cooldown!
-    if (this.personagem.podeUsarSpecial(tipoSpecial)) {
-        this.personagem.maquinaEstados.mudarEstado("special");
+      if (this.personagem.podeUsarSpecial(tipoSpecial)) {
+        this.personagem.maquinaEstados.mudarEstado("special", { tipo: tipoSpecial });
         return;
-    }
+      }
     }
 
+    // 6. ATAQUE NORMAL (Se a Ult não executou, tenta o Ataque)
     if (this.personagem.inputJustDown("atack")) {
-    // Pega o tipo de ataque se a função existir, senão usa "neutro"
-    const tipoAtaque = this.personagem.obterTipoAtaque ? this.personagem.obterTipoAtaque() : "neutro1";
+      const tipoAtaque = this.personagem.obterTipoAtaque ? this.personagem.obterTipoAtaque() : "neutro1";
 
-    // SÓ entra no estado de atack se NÃO estiver em cooldown!
-    if (this.personagem.podeUsarAtaque(tipoAtaque)) {
+      if (this.personagem.podeUsarAtaque(tipoAtaque)) {
         this.personagem.maquinaEstados.mudarEstado("atack", { tipo: tipoAtaque });
         return;
+      }
     }
-   }
 
-    // 4. Transição para ANDAR
-    if (
-      this.personagem.inputDown("esquerda") ||
-      this.personagem.inputDown("direita")
-    ) {
+    // 7. ANDAR
+    if (this.personagem.inputDown("esquerda") || this.personagem.inputDown("direita")) {
       this.personagem.maquinaEstados.mudarEstado("walk");
       return;
     }
 
-    // 5. Segurança: se o personagem caiu de uma plataforma sem pular
-    if (
-      !this.personagem.sprite.body.blocked.down &&
-      !this.personagem.sprite.body.touching.down
-    ) {
+    // 8. QUEDA DA PLATAFORMA
+    if (!this.personagem.sprite.body.blocked.down && !this.personagem.sprite.body.touching.down) {
       this.personagem.maquinaEstados.mudarEstado("jump");
       return;
     }
 
+    // 9. TAUNT E GUARD
+    if (this.personagem.inputJustDown("taunt")) {
+      this.personagem.maquinaEstados.mudarEstado("taunt");
+      return;
+    }
+
     if (this.personagem.inputDown("guard")) {
-    this.personagem.maquinaEstados.mudarEstado("guard");
-    return;
+      this.personagem.maquinaEstados.mudarEstado("guard");
+      return;
     }
   }
 }

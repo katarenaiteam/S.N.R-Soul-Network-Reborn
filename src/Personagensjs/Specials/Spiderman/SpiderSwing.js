@@ -67,7 +67,7 @@ export default class SpiderSwing {
     const duracaoMs = animacao.duration || (animacao.frames.length / animacao.frameRate) * 1000;
 
     // Teia e Hitbox inicial
-    this.ancoraX = sprite.x + 145 * direcao;
+    this.ancoraX = sprite.x + 200 * direcao;
     this.ancoraY = sprite.y - 300;
     this.teia = this.scene.add.graphics();
     this.teia.setDepth(sprite.depth - 1);
@@ -186,7 +186,8 @@ export default class SpiderSwing {
     const topoCam = mainCam ? mainCam.worldView.y - 100 : sprite.y - 300;
     const meoAncoraY = Math.min(this.ancoraY, topoCam);
 
-    const maoX = sprite.x + 10 * direcao;
+    // Ajustado de (+ 10 * direcao) para (- 15 * direcao) para mover o início mais para trás
+    const maoX = sprite.x - 15 * direcao;
     const maoY = sprite.y - 60;
     const controleX = (this.ancoraX + maoX) / 2 + 45 * direcao;
     const controleY = (meoAncoraY + maoY) / 2 + 20;

@@ -55,6 +55,7 @@ export default class cenaPrincipal extends Phaser.Scene {
       atack: Phaser.Input.Keyboard.KeyCodes.F,
       special: Phaser.Input.Keyboard.KeyCodes.G,
       guard: Phaser.Input.Keyboard.KeyCodes.E,
+      taunt: Phaser.Input.Keyboard.KeyCodes.Q,
     });
 
     const teclasP2 = this.input.keyboard.addKeys({
@@ -66,6 +67,7 @@ export default class cenaPrincipal extends Phaser.Scene {
       atack: Phaser.Input.Keyboard.KeyCodes.H,
       special: Phaser.Input.Keyboard.KeyCodes.P,
       guard: Phaser.Input.Keyboard.KeyCodes.O,
+      taunt: Phaser.Input.Keyboard.KeyCodes.U,
     });
 
     const controleP1 = new ControleEntrada(this, teclasP1, 0);

@@ -16,6 +16,18 @@ export default class EstadoCrouch extends EstadoBase {
       // Veio de pé: toca a animação de abaixar normal
       this.personagem.tocarAnimacao("crouch");
     }
+
+    const chaveCrouch2 = `${this.personagem.prefixoAnim}crouch2`;
+    if (this.personagem.scene.anims.exists(chaveCrouch2)) {
+      this.personagem.sprite.once("animationcomplete", () => {
+        if (
+          this.personagem.maquinaEstados.estadoAtual === this &&
+          this.personagem.inputDown("baixo")
+        ) {
+          this.personagem.tocarAnimacao("crouch2");
+        }
+      });
+    }
   }
 
   execute() {
@@ -69,6 +81,12 @@ export default class EstadoCrouch extends EstadoBase {
     ) {
       this.personagem.maquinaEstados.mudarEstado("jump");
       return;
+    }
+
+    //taunt <3
+    if (this.personagem.inputJustDown("taunt")) {
+    this.personagem.maquinaEstados.mudarEstado("taunt");
+    return;
     }
 
     // LÓGICA DE LEVANTAR (APENAS QUANDO SOLTA BAIXO E NÃO APERTA MAIS NADA)

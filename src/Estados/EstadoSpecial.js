@@ -7,6 +7,8 @@ export default class EstadoSpecial extends EstadoBase {
 
     let tipoSpecial = dados?.tipo;
 
+    this.intentCancel = false;
+
     // Se não veio tipo nos dados, descobre pelas direções
     if (!tipoSpecial) {
       const apertandoCima = this.personagem.inputDown("cima");
@@ -95,6 +97,48 @@ export default class EstadoSpecial extends EstadoBase {
     const agora = this.personagem.scene.time.now;
     const tempoDecorrido = agora - this.tempoInicio;
 
+    // CANCELAMENTO INSTANTÂNEO PÓS-HIT
+    // ==========================================
+    if (this.specialAtual?.cancelavel) {
+      if (
+        (this.personagem.inputJustDown("dash") && this.personagem.podeDash && this.personagem.dashs < this.personagem.maxDash) ||
+        (this.personagem.inputJustDown("cima") && this.personagem.pulos < this.personagem.maxPulos) ||
+        this.personagem.inputJustDown("atack")
+      ) {
+        this.intentCancel = true;
+      }
+
+      if (this.finalizandoPorAcerto) {
+        if (
+          this.personagem.inputJustDown("dash") ||
+          (this.intentCancel && this.personagem.inputDown("dash"))
+        ) {
+          if (this.personagem.podeDash && this.personagem.dashs < this.personagem.maxDash) {
+            this.personagem.maquinaEstados.mudarEstado("dash");
+            return;
+          }
+        }
+
+        if (
+          this.personagem.inputJustDown("cima") ||
+          (this.intentCancel && this.personagem.inputDown("cima"))
+        ) {
+          if (this.personagem.pulos < this.personagem.maxPulos) {
+            this.personagem.pular();
+            return;
+          }
+        }
+
+        if (
+          this.personagem.inputJustDown("atack") ||
+          (this.intentCancel && this.personagem.inputDown("atack"))
+        ) {
+          this.personagem.maquinaEstados.mudarEstado("atack");
+          return;
+        }
+      }
+    }
+     // ==========================================
     // ===================================
     // INSTANCIA A LÓGICA DO ESPECIAL
     // ===================================

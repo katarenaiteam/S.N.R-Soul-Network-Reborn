@@ -4,6 +4,7 @@ import AirWebShot from "./Specials/Spiderman/AirWebshot.js";
 import SpiderCounter from "./Specials/Spiderman/SpiderCounter.js";
 import SpiderThrow from "./Specials/Spiderman/SpiderThrow.js";
 import SpiderSwing from "./Specials/Spiderman/SpiderSwing.js";
+import SpiderUlt from "./Ult/SpiderUlt.js";
 
 export default class SpiderMan extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -92,6 +93,18 @@ export default class SpiderMan extends Personagem {
      ]
       },
 
+       taunt: {
+      largura: 85,
+      altura: 95,
+      offsetX: 50,
+      offsetY: 96,
+      escala: 1,
+      hurtboxes: [
+          { largura: 55, altura: 60, offsetX: 25, offsetY: -70 }, // Tronco/cabeça
+          { largura: 110, altura: 35, offsetX: 5, offsetY: -18 }, // Agachado / pernas abertas
+     ]
+      },
+
       dano: {
         largura: 85,
         altura: 95,
@@ -160,7 +173,7 @@ export default class SpiderMan extends Personagem {
         largura: 85,
         altura: 95,
         offsetX: 50,
-        offsetY: 94,
+        offsetY: 96,
         escala: 1,
         hurtboxes: [
           { largura: 60, altura: 70, offsetX: 0, offsetY: -90 }, // Tronco/cabeça
@@ -313,23 +326,24 @@ export default class SpiderMan extends Personagem {
     this.golpes = {
       neutro1: {
         animacao: "spy_atack1",
-        frameHitbox: 2,
-        offsetX: 70,
+        frameHitbox: 3,
+        offsetX: 60,
         offsetY: -60,
         largura: 60,
         altura: 20,
         cooldown: 700,
-        duracao: 300,
+        duracao: 270,
+        cancelavel: true,
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
-          knockbackX: 40,
-          knockbackY: 0,
+          knockbackX: 10,
+          knockbackY: -5,
         },
 
         comboProximo: "neutro2",
-        comboJanelaInicio: 200,
-        comboJanelaFim: 300,
+        comboJanelaInicio: 150,
+        comboJanelaFim: 350,
       },
 
       neutro2: {
@@ -337,11 +351,12 @@ export default class SpiderMan extends Personagem {
 
         frameHitbox: 2,
 
-        offsetX: 60,
+        offsetX: 50,
         offsetY: -60,
-        largura: 55,
-        altura: 30,
-        duracao: 300,
+        largura: 50,
+        altura: 40,
+        duracao: 350,
+       // cancelavel: true,
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
@@ -357,21 +372,22 @@ export default class SpiderMan extends Personagem {
       neutro3: {
         animacao: "spy_atack3",
 
-        frameHitbox: 3,
+        frameHitbox: 4,
 
-        offsetX: 55,
+        offsetX: 45,
         offsetY: -75,
         largura: 35,
         altura: 70,
         duracao: 250,
-        bufferInputs: true,
-        bufferJanelaInicio: 50,
-        bufferJanelaFim: 350,
+        cancelavel: true,
+       // bufferInputs: true,
+       // bufferJanelaInicio: 50,
+       // bufferJanelaFim: 350,
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 8,
           knockbackX: 50,
-          knockbackY: -350,
+          knockbackY: -400,
           tumbling: true
         },
       },
@@ -384,6 +400,7 @@ export default class SpiderMan extends Personagem {
         altura: 30,
         cooldown: 700,
         duracao: 560,
+        cancelavel: true,
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 8,
@@ -394,18 +411,19 @@ export default class SpiderMan extends Personagem {
       },
       side: {
         animacao: "spy_sideAtack",
-        frameHitbox: 2,
+        frameHitbox: 3,
         offsetX: 52,
         offsetY: -60,
         largura: 55,
         altura: 25,
         cooldown: 900,
-        duracao: 400,
+        duracao: 300,
+        cancelavel: true,
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 20,
-          knockbackX: 400,
-          knockbackY: -300,
+          knockbackX: 370,
+          knockbackY: -290,
           tumbling: true,
           impulsoX: 0,
         },
@@ -423,7 +441,7 @@ export default class SpiderMan extends Personagem {
         propriedades: {
           tipoSomImpacto: "light",
           dano: 12,
-          knockbackX: 200,
+          knockbackX: 100,
           knockbackY: -300,
           tumbling: true
         },
@@ -440,9 +458,9 @@ export default class SpiderMan extends Personagem {
         // Finalização do ataque
         duracao: 1000,
         finalizarAoTocarChao: true,
-        atrasoFinalizacaoChao: 100,
+        atrasoFinalizacaoChao: 90,
         finalizarAoAcertarOponente: true,
-        atrasoFinalizacaoAcerto: 150,
+        atrasoFinalizacaoAcerto: 30,
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
@@ -455,14 +473,13 @@ export default class SpiderMan extends Personagem {
 
       air_side: {
         animacao: "spy_sideAir",
-        frameHitbox: 2,
+        frameHitbox: 3,
         offsetX: 34,
-        offsetY: -70,
-        largura: 60,
-        altura: 70,
+        offsetY: -30,
+        largura: 65,
+        altura: 55,
         cooldown: 500,
-        // Finalização do ataque
-        duracao: 300,
+        duracao: 350,
         finalizarAoTocarChao: false,
         atrasoFinalizacaoChao: 100,
         finalizarAoAcertarOponente: false,
@@ -479,10 +496,10 @@ export default class SpiderMan extends Personagem {
       air_cima: {
         animacao: "spy_upAir",
         frameHitbox: 2,
-        offsetX: 24,
+        offsetX: 15,
         offsetY: -120,
-        largura: 25,
-        altura: 40,
+        largura: 50,
+        altura: 50,
         cooldown: 900,
         // Finalização do ataque
         duracao: 300,
@@ -505,6 +522,7 @@ export default class SpiderMan extends Personagem {
       neutro: {
         animacao: "spy_neSpecial",
         duracao: 700,
+       // cancelavel: true,
         cooldown: 2000,
         logica: WebShot,
 
@@ -584,6 +602,15 @@ export default class SpiderMan extends Personagem {
         },
       },
     };
+    //-------------------------- ult ------------------------------------
+  
+    this.ult = {
+  animacao: "spy_ult1", // Animação inicial
+  logica: SpiderUlt,     // Passa a classe da classe criada
+  propriedades: {
+    anularGravidade: true // Trava no ar durante a cena
+  }
+};
   }
 
   //animaçoes====================================================
@@ -673,6 +700,16 @@ export default class SpiderMan extends Personagem {
       repeat: 0,
     });
 
+     scene.anims.create({
+      key: "spy_taunt",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_taunt1", {
+        start: 0,
+        end: 3,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
     scene.anims.create({
       key: "spy_dano",
       frames: scene.anims.generateFrameNumbers("SpiderMan_hurt", {
@@ -726,7 +763,7 @@ export default class SpiderMan extends Personagem {
         start: 0,
         end: 4,
       }),
-      frameRate: 20,
+      frameRate: 24,
       repeat: 0,
     });
 
@@ -756,7 +793,7 @@ export default class SpiderMan extends Personagem {
         start: 0,
         end: 2,
       }),
-      frameRate: 10,
+      frameRate: 14,
       repeat: 0,
     });
 
@@ -798,7 +835,7 @@ export default class SpiderMan extends Personagem {
         start: 0,
         end: 5,
       }),
-      frameRate: 16,
+      frameRate: 14,
       repeat: 0,
     });
 
@@ -808,7 +845,7 @@ export default class SpiderMan extends Personagem {
         start: 0,
         end: 4,
       }),
-      frameRate: 16,
+      frameRate: 13,
       repeat: 0,
     });
 //specials
@@ -885,7 +922,7 @@ scene.anims.create({
           start: 0,
           end: 6,
         }),
-        frameRate: 12,
+        frameRate: 9,
         repeat: 0,
       });
     }
@@ -937,5 +974,126 @@ scene.anims.create({
   frameRate: 18,
   repeat: 0,
 });
+
+scene.anims.create({
+  key: "spy_ult0",
+  frames: scene.anims.generateFrameNumbers("SpiderMan_ult0", {
+    start: 0,
+    end: 2,
+  }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "spy_ult00",
+  frames: scene.anims.generateFrameNumbers("SpiderMan_ult0", {
+    start: 1,
+    end: 2,
+  }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "spy_ult1",
+  frames: scene.anims.generateFrameNumbers("SpiderMan_ult1", {
+    start: 0,
+    end: 6,
+  }),
+  frameRate: 10,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "spy_ult2",
+  frames: scene.anims.generateFrameNumbers("SpiderMan_ult2", {
+    start: 0,
+    end: 3,
+  }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "spy_ult3",
+  frames: scene.anims.generateFrameNumbers("SpiderMan_ult3", {
+    start: 0,
+    end: 5,
+  }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "spy_ult35",
+  frames: scene.anims.generateFrameNumbers("SpiderMan_ult3", {
+    start: 6,
+    end: 12,
+  }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "spy_ult4",
+  frames: scene.anims.generateFrameNumbers("SpiderMan_ult4", {
+    start: 0,
+    end: 5,
+  }),
+  frameRate: 16,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "spy_ult5",
+  frames: scene.anims.generateFrameNumbers("SpiderMan_ult5", {
+    start: 0,
+    end: 9,
+  }),
+  frameRate: 10,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "spy_ult55",
+  frames: scene.anims.generateFrameNumbers("SpiderMan_ult5", {
+    start: 9,
+    end: 9,
+  }),
+  frameRate: 10,
+  repeat: -1,
+});
+
+scene.anims.create({
+  key: "spy_ult6",
+  frames: scene.anims.generateFrameNumbers("SpiderMan_ult6", {
+    start: 0,
+    end: 38,  //43
+  }),
+  frameRate: 36,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "spy_ult7",
+  frames: scene.anims.generateFrameNumbers("SpiderMan_ult7", {
+    start: 0,
+    end: 14,
+  }),
+  frameRate: 22,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "spy_ult8",
+  frames: scene.anims.generateFrameNumbers("SpiderMan_ult8", {
+    start: 0,
+    end: 3,
+  }),
+  frameRate: 16,
+  repeat: 0,
+});
+
   }
 }

@@ -9,7 +9,9 @@ import EstadoDano from "../Estados/EstadoDano.js";
 import EstadoSpecial from "../Estados/EstadoSpecial.js";
 import EstadoTeia from "../Estados/EstadoTeia.js";
 import EstadoGuard from "../Estados/EstadoGuard.js";    
-import EstadoDead from "../Estados/EstadoDead.js";
+import EstadoDead from "../Estados/EstadoDead.js";   
+import EstadoTaunt from "../Estados/EstadoTaunt.js";
+import EstadoUlt from "../Estados/EstadoUlt.js";
 
 export default class Personagem {
   constructor(
@@ -109,6 +111,8 @@ export default class Personagem {
     this.maquinaEstados.adicionarEstado("teia", new EstadoTeia(this));
     this.maquinaEstados.adicionarEstado("guard", new EstadoGuard(this));
     this.maquinaEstados.adicionarEstado("dead", new EstadoDead(this));
+    this.maquinaEstados.adicionarEstado("taunt", new EstadoTaunt(this));
+    this.maquinaEstados.adicionarEstado("ult", new EstadoUlt(this));
 
     this.maquinaEstados.mudarEstado("idle");
   }

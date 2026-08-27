@@ -76,7 +76,11 @@ export default class EstadoWalk extends EstadoBase {
      }
     }
    
-
+     //taunt <3
+    if (this.personagem.inputJustDown("taunt")) {
+    this.personagem.maquinaEstados.mudarEstado("taunt");
+    return;
+    }
     
 
     if (this.personagem.inputDown("guard")) {
