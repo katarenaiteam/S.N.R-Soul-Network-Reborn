@@ -99,10 +99,18 @@ export default class SpiderThrow {
     const sprite = this.personagem.sprite;
     const direcao = sprite.flipX ? -1 : 1;
 
-    const posX = sprite.x + 80 * direcao;
     const posY = sprite.y - 35;
+    const larguraMaxima = 140; // Largura final desejada
+    const altura = 40;
+    const offsetOrigemX = 10 * direcao; // Ponto inicial da teia (próximo à mão)
 
-    this.hitboxTeia = this.scene.add.zone(posX, posY, 140, 40);
+    // Cria a zona inicialmente com largura 1 (evita bugs de escala 0 no Phaser Physics)
+    this.hitboxTeia = this.scene.add.zone(
+      sprite.x + offsetOrigemX,
+      posY,
+      1,
+      altura
+    );
     this.scene.physics.add.existing(this.hitboxTeia);
     this.hitboxTeia.body.setAllowGravity(false);
 
@@ -122,6 +130,30 @@ export default class SpiderThrow {
         oponente.grupoHurtbox,
         () => this.processarAgarre(oponente)
       );
+    });
+
+    // Tween para fazer a hitbox esticar horizontalmente acompanhando o disparo
+    this.tweenTeia = this.scene.tweens.addCounter({
+      from: 1,
+      to: larguraMaxima,
+      duration: 180, // Tempo do disparo em ms (ajuste se quiser mais rápido ou devagar)
+      onUpdate: (tween) => {
+        if (!this.hitboxTeia || !this.hitboxTeia.active || !sprite) return;
+
+        const larguraAtual = tween.getValue();
+
+        // Recalcula o centro da hitbox conforme ela se estica para frente
+        const centroX = sprite.x + offsetOrigemX + (larguraAtual / 2) * direcao;
+
+        this.hitboxTeia.setPosition(centroX, posY);
+        this.hitboxTeia.setSize(larguraAtual, altura);
+
+        if (this.hitboxTeia.body) {
+          this.hitboxTeia.body.setSize(larguraAtual, altura);
+          this.hitboxTeia.body.x = centroX - larguraAtual / 2;
+          this.hitboxTeia.body.y = posY - altura / 2;
+        }
+      },
     });
   }
 
@@ -331,6 +363,10 @@ export default class SpiderThrow {
   }
 
   limparHitbox() {
+    if (this.tweenTeia) {
+      this.tweenTeia.stop();
+      this.tweenTeia = null;
+    }
     if (this.overlap && this.overlap.active) {
       this.overlap.destroy();
       this.overlap = null;
