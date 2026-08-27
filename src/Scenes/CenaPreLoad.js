@@ -276,6 +276,11 @@ this.load.spritesheet("SpiderMan_ult8", "assets/personagens/SpiderMan/Sprites/ul
     
     // --- EFEITOS ---
      this.load.spritesheet("TVefect", "assets/efeitos/TVefect.png", { frameWidth: 800, frameHeight: 400 });
+     this.load.spritesheet("punch_effect", "assets/efeitos/atack_effects/punch_effect.png", { frameWidth: 109, frameHeight: 107, });
+     this.load.spritesheet("punch_effect2", "assets/efeitos/atack_effects/punch_effect2.png", { frameWidth: 200, frameHeight: 250, });
+     this.load.spritesheet("punch_effect3", "assets/efeitos/atack_effects/punch_effect3.png", { frameWidth: 200, frameHeight: 250, });
+
+
   }
 
   iniciarSequenciaLogo() {

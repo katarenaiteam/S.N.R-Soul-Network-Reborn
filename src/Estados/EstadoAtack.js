@@ -327,7 +327,7 @@ export default class EstadoAtack extends EstadoBase {
       const colisor = cena.physics.add.overlap(
         this.hitboxAtual,
         alvo.grupoHurtbox,
-        () => {
+        (hitbox, hurtboxAtingida) => {
           if (this.jaAcertou) return;
 
           this.jaAcertou = true;
@@ -343,6 +343,13 @@ export default class EstadoAtack extends EstadoBase {
           const origem = {
             direcao: this.personagem.sprite.flipX ? -1 : 1,
           };
+
+          // VFX acionar
+           this.personagem.vfx?.tocarListaImpacto(
+           this.golpeAtual.vfxAcerto,
+           alvo,
+           hitbox
+           );
 
           alvo.receberDano(valorDano, this.golpeAtual.propriedades, origem);
 

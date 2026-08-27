@@ -31,6 +31,29 @@ export default class SpiderMan extends Personagem {
       "spy_",
       controle,
     );
+
+     this.configVFX = {
+  ...this.configVFX,
+
+   punch1: {
+    textura: "punch_effect",
+    animacao: "punch_effect",
+    escala: 1,
+  },
+
+  punch2: {
+    textura: "punch_effect2",
+    animacao: "punch_effect2",
+    escala: 1,
+  },
+
+  punch3: {
+    textura: "punch_effect3",
+    animacao: "punch_effect3",
+    escala: 1,
+  },
+};
+
     //============================= hitboxes ========================================
     this.nomePersonagem = "Homem Aranha";
     this.configAnimacoes = {
@@ -334,6 +357,17 @@ export default class SpiderMan extends Personagem {
         cooldown: 700,
         duracao: 270,
         cancelavel: true,
+
+         vfxAcerto: [
+        {
+        escolherUm: [
+        "punch1",
+        "punch2",
+        "punch3",
+          ],
+          },
+        ],
+
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
@@ -357,6 +391,17 @@ export default class SpiderMan extends Personagem {
         altura: 40,
         duracao: 350,
        // cancelavel: true,
+
+        vfxAcerto: [
+        {
+        escolherUm: [
+        "punch1",
+        "punch2",
+        "punch3",
+          ],
+          },
+        ],
+
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
@@ -380,6 +425,17 @@ export default class SpiderMan extends Personagem {
         altura: 70,
         duracao: 250,
         cancelavel: true,
+
+        vfxAcerto: [
+        {
+        escolherUm: [
+        "punch1",
+        "punch2",
+        "punch3",
+          ],
+          },
+        ],
+
        // bufferInputs: true,
        // bufferJanelaInicio: 50,
        // bufferJanelaFim: 350,
@@ -615,6 +671,36 @@ export default class SpiderMan extends Personagem {
 
   //animaçoes====================================================
   static criarAnimacoes(scene) {
+
+   // efeitos anim
+  if (!scene.anims.exists("punch_effect")) {
+  scene.anims.create({
+    key: "punch_effect",
+    frames: scene.anims.generateFrameNumbers("punch_effect"),
+    frameRate: 18,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("punch_effect2")) {
+  scene.anims.create({
+    key: "punch_effect2",
+    frames: scene.anims.generateFrameNumbers("punch_effect2"),
+    frameRate: 18,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("punch_effect3")) {
+  scene.anims.create({
+    key: "punch_effect3",
+    frames: scene.anims.generateFrameNumbers("punch_effect3"),
+    frameRate: 18,
+    repeat: 0,
+  });
+}
+
+
     // Se a animação "idle" já existe na cena, não recria
     if (scene.anims.exists("spy_idle")) return;
 

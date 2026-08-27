@@ -12,6 +12,8 @@ import EstadoGuard from "../Estados/EstadoGuard.js";
 import EstadoDead from "../Estados/EstadoDead.js";   
 import EstadoTaunt from "../Estados/EstadoTaunt.js";
 import EstadoUlt from "../Estados/EstadoUlt.js";
+import GerenciadorVFX from "../Objetos/GerenciadorVFX.js";
+
 
 export default class Personagem {
   constructor(
@@ -86,6 +88,10 @@ export default class Personagem {
     // Sprite e física
     this.sprite = scene.physics.add.sprite(x, y, keyAtlas, frameInicial);
     this.sprite.setOrigin(0.5, 1);
+
+    //efeitos visuais
+    this.configVFX = {};
+    this.vfx = new GerenciadorVFX(this);
 
     // Hurtbox (Área de recepção de dano)
     this.grupoHurtbox = scene.physics.add.group({
@@ -251,7 +257,7 @@ export default class Personagem {
     this.processarMovimentacaoAtaque(noChao);
     this.atualizarOffsetFisica();
     this.atualizarLogicasEspeciais();
-
+    this.vfx?.atualizar();
     this.maquinaEstados.update();
     this.controle?.salvarAnterior();
   }
