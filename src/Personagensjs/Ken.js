@@ -25,8 +25,32 @@ export default class Ken extends Personagem {
       "ken_",
       controle,
     );
+
+       this.configVFX = {
+  ...this.configVFX,
+
+   punch1: {
+    textura: "punch_effect",
+    animacao: "punch_effect",
+    escala: 1,
+  },
+
+  punch2: {
+    textura: "punch_effect2",
+    animacao: "punch_effect2",
+    escala: 1,
+  },
+
+  punch3: {
+    textura: "punch_effect3",
+    animacao: "punch_effect3",
+    escala: 1,
+  },
+};
+
+this.nomePersonagem = "Ken";
     //============================= hitboxes ========================================
-    this.nomePersonagem = "Ken";
+   
     this.configAnimacoes = {
       
        idle: {
@@ -91,7 +115,7 @@ export default class Ken extends Personagem {
         largura: 85,
         altura: 120,
         offsetX: 0,
-        offsetY: -6,
+        offsetY: -16,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 60, offsetX: 25, offsetY: -70 },
@@ -222,8 +246,8 @@ export default class Ken extends Personagem {
       sideAtack: {
         largura: 85,
         altura: 120,
-        offsetX: 0,
-        offsetY: -10,
+        offsetX: 30,
+        offsetY: 0,
         escala: 1,
         hurtboxes: [{ largura: 60, altura: 80, offsetX: -20, offsetY: -40 }],
       },
@@ -232,7 +256,7 @@ export default class Ken extends Personagem {
         largura: 85,
         altura: 60,
         offsetX: 0,
-        offsetY: 50,
+        offsetY: 10,
         escala: 1,
         hurtboxes: [{ largura: 80, altura: 60, offsetX: 0, offsetY: -40 }],
       },
@@ -287,16 +311,24 @@ export default class Ken extends Personagem {
       neutro1: {
         animacao: "ken_atack1",
         frameHitbox: 2,
-        offsetX: 70,
-        offsetY: -60,
-        largura: 60,
+        offsetX: 50,
+        offsetY: -80,
+        largura: 55,
         altura: 20,
         cooldown: 700,
         duracao: 350,
+        cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
         propriedades: {
           dano: 4,
-          knockbackX: 40,
+          knockbackX: 30,
           knockbackY: 0,
+          knockbackFixo: true,
         },
 
         comboProximo: "neutro2",
@@ -309,15 +341,16 @@ export default class Ken extends Personagem {
 
         frameHitbox: 2,
 
-        offsetX: 60,
-        offsetY: -60,
+        offsetX: 55,
+        offsetY: -80,
         largura: 55,
-        altura: 30,
+        altura: 25,
         duracao: 400,
         propriedades: {
           dano: 4,
-          knockbackX: -10,
+          knockbackX: 40,
           knockbackY: 0,
+          knockbackFixo: true,
         },
 
         comboProximo: "neutro3",
@@ -332,30 +365,85 @@ export default class Ken extends Personagem {
 
         offsetX: 55,
         offsetY: -75,
-        largura: 35,
-        altura: 70,
-        duracao: 700,
+        largura: 60,
+        altura: 40,
+        duracao: 750,
+        cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
         bufferInputs: true,
         bufferJanelaInicio: 50,
         bufferJanelaFim: 350,
         propriedades: {
           dano: 8,
-          knockbackX: 50,
-          knockbackY: -350,
+          knockbackX: 350,
+          knockbackY: -250,
           tumbling: true
         },
       },
+
+      side: {
+        animacao: "ken_sideAtack",
+        frameHitbox: 3,
+        offsetX: 52,
+        offsetY: -60,
+        largura: 55,
+        altura: 25,
+        cooldown: 900,
+        duracao: 600,
+        cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
+        propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 12,
+          knockbackX: 550,
+          knockbackY: -400,
+          tumbling: true,
+        },
+      },
+     agachado: {
+        animacao: "ken_downAtack",
+        frameHitbox: 3,
+        offsetX: 52,
+        offsetY: -60,
+        largura: 55,
+        altura: 25,
+        cooldown: 900,
+        duracao: 400,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+        propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 12,
+          knockbackX: 550,
+          knockbackY: -400,
+          tumbling: true,
+        },
+        movimento: {
+        inicio: 80,
+         fim: 260,
+         x: {
+         de: 350,
+         para: 80,
+         },
+         curva: "easeOut"
+         }
+      },
+
+
     }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -370,7 +458,42 @@ export default class Ken extends Personagem {
   }
 
   //animaçoes====================================================
+
+
+
+  
   static criarAnimacoes(scene) {
+
+   // efeitos anim
+  if (!scene.anims.exists("punch_effect")) {
+  scene.anims.create({
+    key: "punch_effect",
+    frames: scene.anims.generateFrameNumbers("punch_effect"),
+    frameRate: 18,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("punch_effect2")) {
+  scene.anims.create({
+    key: "punch_effect2",
+    frames: scene.anims.generateFrameNumbers("punch_effect2"),
+    frameRate: 18,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("punch_effect3")) {
+  scene.anims.create({
+    key: "punch_effect3",
+    frames: scene.anims.generateFrameNumbers("punch_effect3"),
+    frameRate: 18,
+    repeat: 0,
+  });
+}
+
+// personagem
+
     if (scene.anims.exists("ken_idle")) return;
 
     // Idle (Parada)
@@ -529,6 +652,25 @@ scene.anims.create({
       repeat: 0,
     });
    
+    scene.anims.create({
+      key: "ken_sideAtack",
+      frames: scene.anims.generateFrameNumbers("Ken_sideAtack", {
+        start: 0,
+        end: 13,
+      }),
+      frameRate: 18,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_downAtack",
+      frames: scene.anims.generateFrameNumbers("Ken_downAtack", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
 
   }
 }

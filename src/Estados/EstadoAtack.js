@@ -19,32 +19,13 @@ export default class EstadoAtack extends EstadoBase {
       tipoAtaque = `neutro${this.comboIndex}`;
      }
  
-     // dita as constantes de imput direcionais
-     if (!tipoAtaque) {
-      const apertandoLado =
-        this.personagem.inputDown("esquerda") ||
-        this.personagem.inputDown("direita");
-
-      const apertandoCima = this.personagem.inputDown("cima");
-      const apertandoBaixo = this.personagem.inputDown("baixo");
-     // cria as variaçoes de ataque que uso na tabela de golpes
-      if (noChao) {
-        if (apertandoCima) tipoAtaque = "cima";
-        else if (apertandoBaixo) tipoAtaque = "agachado";
-        else if (apertandoLado) tipoAtaque = "side";
-        else tipoAtaque = "neutro1";
-      } else {
-        if (apertandoCima) tipoAtaque = "air_cima";
-        else if (apertandoBaixo) tipoAtaque = "air_agachado";
-        else if (apertandoLado) tipoAtaque = "air_side";
-        else tipoAtaque = "air_neutro";
-      }
+     //diz qual ataque usar a depender da direçao
+    if (!tipoAtaque) {
+     tipoAtaque = this.personagem.obterTipoAtaque();
      }
 
      //checagem de ataque na tabela de golpes do personagem, ?>verdadeiro mantem tipoAtaque / :>falso manda executar neutro1
-     const tipoAtaqueEfetivo = this.personagem.golpes?.[tipoAtaque]
-      ? tipoAtaque
-      : "neutro1";
+     const tipoAtaqueEfetivo = tipoAtaque;
    
      // Pega o objeto com todos os dados do golpe de dentro da tabela do personagem e guarda dentro da classe do Estado de Ataque, 
      // depois guarda o ataqueAtual como ataque efetivo, que vai ser usado
@@ -108,25 +89,24 @@ export default class EstadoAtack extends EstadoBase {
     this.personagem.sprite.on("animationupdate", this.atualizarHitbox, this);
 
     // IMPULSO
-    if (this.golpeAtual?.propriedades?.impulsoX) {
-      this.personagem.sprite.setVelocityX(
-        direcaoOlhar * this.golpeAtual.propriedades.impulsoX,
-      );
-    } else if (noChao) {
-      this.personagem.sprite.setVelocityX(0);
-    }
+     this.direcaoMovimento = direcaoOlhar;
 
-    if (this.golpeAtual?.propriedades?.impulsoY) {
-      this.personagem.sprite.setVelocityY(
-        this.golpeAtual.propriedades.impulsoY,
-      );
-    }
-  }
+      this.movimentoAtaqueXAtivo = false;
+      this.movimentoAtaqueYAtivo = false;
+
+       if (
+        noChao &&
+         !this.golpeAtual?.movimento?.x
+         ) { this.personagem.sprite.setVelocityX(0);
+          }
+         }
 
   execute() {
     const noChao = this.personagem.sprite.body.blocked.down;
     const agora = this.personagem.scene.time.now;
     const tempoDecorrido = agora - this.tempoInicio;
+
+    this.atualizarMovimentoAtaque(tempoDecorrido);
 
 
    // CANCELAMENTO INSTANTÂNEO PÓS-HIT
@@ -259,23 +239,153 @@ export default class EstadoAtack extends EstadoBase {
       );
     }
 
-    // =========================
-    // MOVIMENTO NO AR
-    // =========================
-    if (
-      !noChao &&
-      this.tipoAtaqueAtual !== "air_side" &&
-      !this.golpeAtual?.propriedades?.impulsoX
-    ) {
-      const vel = this.personagem.velocidade;
-
-      if (this.personagem.inputDown("esquerda")) {
-        this.personagem.sprite.setVelocityX(-vel);
-      } else if (this.personagem.inputDown("direita")) {
-        this.personagem.sprite.setVelocityX(vel);
-      }
-    }
   }
+
+
+   atualizarMovimentoAtaque(tempoDecorrido) {
+  const movimento =
+    this.golpeAtual?.movimento;
+
+  const body =
+    this.personagem.sprite.body;
+
+  // Por padrão nenhum eixo está sendo
+  // controlado pelo movimento do golpe.
+  this.movimentoAtaqueXAtivo = false;
+  this.movimentoAtaqueYAtivo = false;
+
+  if (!movimento || !body) {
+    return;
+  }
+
+  const inicio =
+    movimento.inicio ?? 0;
+
+  const fim =
+    movimento.fim ??
+    this.golpeAtual.duracao ??
+    inicio;
+
+  // Ainda não começou ou já terminou.
+  if (
+    tempoDecorrido < inicio ||
+    tempoDecorrido > fim
+  ) {
+    return;
+  }
+
+  const duracao =
+    Math.max(1, fim - inicio);
+
+  let t =
+    (tempoDecorrido - inicio) /
+    duracao;
+
+  t = Phaser.Math.Clamp(
+    t,
+    0,
+    1
+  );
+
+  // -------------------------
+  // X
+  // -------------------------
+
+  if (movimento.x) {
+    const curvaX =
+      movimento.x.curva ??
+      movimento.curva ??
+      "linear";
+
+    const progressoX =
+      this.calcularCurvaMovimento(
+        t,
+        curvaX
+      );
+
+    const velocidadeInicialX =
+      movimento.x.de ?? 0;
+
+    const velocidadeFinalX =
+      movimento.x.para ??
+      velocidadeInicialX;
+
+    const velocidadeX =
+      Phaser.Math.Linear(
+        velocidadeInicialX,
+        velocidadeFinalX,
+        progressoX
+      );
+
+    body.setVelocityX(
+      this.direcaoMovimento *
+      velocidadeX
+    );
+
+    this.movimentoAtaqueXAtivo = true;
+  }
+
+  // -------------------------
+  // Y
+  // -------------------------
+
+  if (movimento.y) {
+    const curvaY =
+      movimento.y.curva ??
+      movimento.curva ??
+      "linear";
+
+    const progressoY =
+      this.calcularCurvaMovimento(
+        t,
+        curvaY
+      );
+
+    const velocidadeInicialY =
+      movimento.y.de ?? 0;
+
+    const velocidadeFinalY =
+      movimento.y.para ??
+      velocidadeInicialY;
+
+    const velocidadeY =
+      Phaser.Math.Linear(
+        velocidadeInicialY,
+        velocidadeFinalY,
+        progressoY
+      );
+
+    body.setVelocityY(
+      velocidadeY
+    );
+
+    this.movimentoAtaqueYAtivo = true;
+  }
+}
+
+ calcularCurvaMovimento(t, curva) {
+  switch (curva) {
+
+    // Começa devagar e acelera
+    case "easeIn":
+      return t * t;
+
+    // Muda bastante no começo
+    // e suaviza perto do final
+    case "easeOut":
+      return 1 - Math.pow(1 - t, 2);
+
+    // Suave no começo e no final
+    case "easeInOut":
+      return t * t * (3 - 2 * t);
+
+    // Mudança constante
+    case "linear":
+    default:
+      return t;
+  }
+}
+
 
   // =========================
   // HITBOX

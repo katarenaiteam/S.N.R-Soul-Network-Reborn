@@ -10,31 +10,12 @@ export default class EstadoSpecial extends EstadoBase {
     this.intentCancel = false;
 
     // Se não veio tipo nos dados, descobre pelas direções
-    if (!tipoSpecial) {
-      const apertandoCima = this.personagem.inputDown("cima");
-      const apertandoBaixo = this.personagem.inputDown("baixo");
-      const apertandoLado =
-        this.personagem.inputDown("esquerda") ||
-        this.personagem.inputDown("direita");
-
-      if (noChao) {
-        if (apertandoBaixo) tipoSpecial = "agachado";
-        else if (apertandoCima) tipoSpecial = "cima";
-        else if (apertandoLado) tipoSpecial = "lado";
-        else tipoSpecial = "neutro";
-      } else {
-        if (apertandoBaixo) tipoSpecial = "air_agachado";
-        else if (apertandoCima) tipoSpecial = "air_cima";
-        else if (apertandoLado) tipoSpecial = "air_lado";
-        else tipoSpecial = "air_neutro";
-      }
-    }
+   if (!tipoSpecial) {
+   tipoSpecial = this.personagem.obterTipoSpecial();
+   }
 
     // NUNCA faz fallback para "neutro" se a chave for agachado e existir no objeto
-    let tipoSpecialEfetivo = tipoSpecial;
-    if (!this.personagem.specials?.[tipoSpecialEfetivo]) {
-      tipoSpecialEfetivo = "neutro";
-    }
+    const tipoSpecialEfetivo = tipoSpecial;
 
     this.specialAtual = this.personagem.specials?.[tipoSpecialEfetivo];
     this.tipoSpecialAtual = tipoSpecialEfetivo;

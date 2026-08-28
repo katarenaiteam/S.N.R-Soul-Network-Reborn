@@ -163,6 +163,8 @@ export default class Personagem {
         this.sprite.body.setVelocity(0, 0);
 
         // Mudar para o estado de Dano
+        this.ultimoImpacto = propriedades;
+
         this.maquinaEstados.mudarEstado("dano");
         
         // Sobrescreve a duração do Stun especificamente para a Quebra de Guarda (1 segundo)
@@ -203,11 +205,38 @@ export default class Personagem {
     //  Salva se o golpe exige recuperação manual por comandos
     this.isTumbling = propriedades.tumbling ?? false;
 
-    // APLICA A VELOCIDADE PRIMEIRO NO CORPO FÍSICO
+
+    // =====================================================
+    // KNOCKBACK FIXO OU VARIÁVEL
+    // =====================================================
+    const knockbackFixo = propriedades.knockbackFixo ?? false;
+
+    let multiplicadorX = 1;
+    let multiplicadorY = 1;
+
+    if (!knockbackFixo) {
+      // Até 180% o dano cresce normalmente.
+      // Depois de 180% ele ainda cresce, mas muito mais devagar,
+      // evitando o estouro absurdo que existia nas porcentagens altas.
+      const danoEscalado = this.porcentagemDano <= 180
+        ? this.porcentagemDano
+        : 180 + (this.porcentagemDano - 180) * 0.20;
+
+      // Mantém a lógica original do jogo:
+      // - em porcentagem baixa o lançamento começa mais controlado;
+      // - X cresce muito mais com o dano que Y;
+      // - perto de 180% o lançamento já é muito forte.
+      multiplicadorX = 0.65 + danoEscalado / 34;
+      multiplicadorY = 0.65 + danoEscalado / 135;
+    }
+
     this.sprite.body.setVelocity(
-      direcaoX * Math.abs(kbX) * (1 + this.porcentagemDano / 30),
-      kbY * (1 + this.porcentagemDano / 150)
+      direcaoX * Math.abs(kbX) * multiplicadorX,
+      kbY * multiplicadorY
     );
+
+    // O EstadoDano usa a velocidade já aplicada para calcular o hitstun.
+    this.ultimoImpacto = propriedades;
 
     // DEPOIS MUDA PARA O ESTADO DE DANO
     this.maquinaEstados.mudarEstado("dano");
@@ -324,7 +353,6 @@ export default class Personagem {
     const estadoAtack = this.maquinaEstados.estados["atack"];
     if (this.maquinaEstados.estadoAtual !== estadoAtack) return;
 
-    const impulsoX = estadoAtack.golpeAtual?.propriedades?.impulsoX || 0;
 
     if (noChao) {
       if (impulsoX === 0) this.sprite.setVelocityX(0);
@@ -361,6 +389,58 @@ export default class Personagem {
     this.sprite.body.setOffset(offsetX, cfg.offsetY);
   }
 
+
+  processarMovimentacaoAtaque(noChao) {
+  const estadoAtack =
+    this.maquinaEstados.estados["atack"];
+
+  if (
+    this.maquinaEstados.estadoAtual !==
+    estadoAtack
+  ) {
+    return;
+  }
+
+  const movimentoXAtivo =
+    estadoAtack.movimentoAtaqueXAtivo;
+
+  // O movimento programado do ataque
+  // possui prioridade enquanto sua
+  // janela estiver ativa.
+  if (movimentoXAtivo) {
+    return;
+  }
+
+  // Quando a janela termina,
+  // o controle normal volta.
+  if (noChao) {
+    this.sprite.setVelocityX(0);
+    return;
+  }
+
+  const esq =
+    this.inputDown("esquerda");
+
+  const dir =
+    this.inputDown("direita");
+
+  if (esq) {
+    this.sprite.setVelocityX(
+      -this.velocidade
+    );
+  }
+
+  else if (dir) {
+    this.sprite.setVelocityX(
+      this.velocidade
+    );
+  }
+
+  else {
+    this.sprite.setVelocityX(0);
+  }
+}
+
  inputDown(nome) {
     if (this.controle) return this.controle.estaApertado(nome);
     const tecla = this.teclas?.[nome];
@@ -395,25 +475,102 @@ export default class Personagem {
     return Phaser.Input.Keyboard.JustUp(tecla);
   }
 
-  obterTipoSpecial() {
-    const noChao = this.sprite.body.blocked.down;
-    const apertandoBaixo = this.inputDown("baixo");
-    const apertandoCima = this.inputDown("cima");
-    const apertandoLado =
-      this.inputDown("esquerda") || this.inputDown("direita");
 
-    if (noChao) {
-      if (apertandoBaixo) return "agachado";
-      if (apertandoCima) return "cima";
-      if (apertandoLado) return "lado";
-      return "neutro";
+  obterTipoAtaque() {
+  const noChao = this.sprite.body.blocked.down;
+
+  const cima = this.inputDown("cima");
+  const baixo = this.inputDown("baixo");
+  const lado =
+    this.inputDown("esquerda") ||
+    this.inputDown("direita");
+
+  if (noChao) {
+    // PRIORIDADE: CIMA > BAIXO > LADO > NEUTRO
+
+    if (cima && this.golpes?.cima) {
+      return "cima";
     }
 
-    if (apertandoBaixo) return "air_agachado";
-    if (apertandoCima) return "air_cima";
-    if (apertandoLado) return "air_lado";
-    return "air_neutro";
+    if (baixo && this.golpes?.agachado) {
+      return "agachado";
+    }
+
+    if (lado && this.golpes?.side) {
+      return "side";
+    }
+
+    return "neutro1";
   }
+
+  // NO AR
+  if (cima && this.golpes?.air_cima) {
+    return "air_cima";
+  }
+
+  if (baixo && this.golpes?.air_agachado) {
+    return "air_agachado";
+  }
+
+  if (lado && this.golpes?.air_side) {
+    return "air_side";
+  }
+
+  return "air_neutro";
+}
+
+
+  obterTipoSpecial() {
+  const noChao = this.sprite.body.blocked.down;
+
+  const cima = this.inputDown("cima");
+  const baixo = this.inputDown("baixo");
+  const lado =
+    this.inputDown("esquerda") ||
+    this.inputDown("direita");
+
+  const existe = (tipo) => {
+    const special = this.specials?.[tipo];
+
+    return (
+      special &&
+      special.animacao
+    );
+  };
+
+  if (noChao) {
+    // PRIORIDADE: CIMA > BAIXO > LADO > NEUTRO
+
+    if (cima && existe("cima")) {
+      return "cima";
+    }
+
+    if (baixo && existe("agachado")) {
+      return "agachado";
+    }
+
+    if (lado && existe("lado")) {
+      return "lado";
+    }
+
+    return "neutro";
+  }
+
+  // NO AR
+  if (cima && existe("air_cima")) {
+    return "air_cima";
+  }
+
+  if (baixo && existe("air_agachado")) {
+    return "air_agachado";
+  }
+
+  if (lado && existe("air_lado")) {
+    return "air_lado";
+  }
+
+  return "air_neutro";
+}
 
   atualizarLogicasEspeciais() {
     this.logicasEspeciaisAtivas.forEach((logica) => {

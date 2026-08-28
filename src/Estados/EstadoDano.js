@@ -7,28 +7,41 @@ export default class EstadoDano extends EstadoBase {
     const body = this.personagem.sprite.body;
     const acumulado = this.personagem.porcentagemDano || 0;
 
-    // 1. CALCULA A FORÇA REAL DO IMPACTO DO GOLPE
-    let velImpacto = 0;
+    // =====================================================
+    // HITSTUN GLOBAL
+    // =====================================================
+    // A velocidade do impacto ainda influencia o stun, mas com limite.
+    // Assim golpes fortes seguram um pouco mais sem prender o jogador
+    // durante toda a viagem até a blast zone.
+    let velocidadeImpacto = 0;
     if (body) {
-      velImpacto = Math.sqrt(body.velocity.x ** 2 + body.velocity.y ** 2);
+      velocidadeImpacto = Math.sqrt(
+        body.velocity.x ** 2 + body.velocity.y ** 2
+      );
     }
 
-    // 2. DURAÇÃO DINÂMICA:
-    // - Golpes fracos (pouca velocidade): Duração base curta (ex: 120ms + escala leve).
-    // - Golpes fortes (muita velocidade): Duram proporcionalmente à força enviada na física.
-    const stunPorVelocidade = velImpacto * 0.45; 
-    const stunPorPorcentagem = 120 + (acumulado * 1.5);
+    // Até 180% o hitstun cresce normalmente. Depois continua crescendo
+    // só um pouco para não ficar infinito.
+    const danoEscalado = acumulado <= 180
+      ? acumulado
+      : 180 + (acumulado - 180) * 0.15;
 
-    // Usa o maior valor entre a força do golpe e o dano acumulado, limitando o teto
-    let stunCalculado = Math.max(stunPorVelocidade, stunPorPorcentagem);
+    // Tempo mínimo obrigatório: bom para combo já em porcentagem baixa
+    // e realmente perigoso perto de 180%.
+    const stunMinimo = 360 + danoEscalado * 2.0;
 
-    // TETO MÁXIMO (CAP):
-    // Se a velocidade for baixa (golpe fraco em local fechado/sem projeção), limita o stun a no máximo 280ms
-    if (velImpacto < 400) {
-      stunCalculado = Math.min(stunCalculado, 280);
-    }
+    // Golpes de lançamento muito forte recebem no máximo +120ms.
+    const bonusImpacto = Phaser.Math.Clamp(
+      (velocidadeImpacto - 400) * 0.12,
+      0,
+      120
+    );
 
-    this.duracaoStun = stunCalculado;
+    this.duracaoStun = Phaser.Math.Clamp(
+      stunMinimo + bonusImpacto,
+      360,
+      840
+    );
 
     // 🔒 Trava de controle para transição vertical sem passar pelo neutro
     this.trocaVerticalAtiva = false;
@@ -112,24 +125,23 @@ export default class EstadoDano extends EstadoBase {
   }
 
  execute() {
-    const body = this.personagem.sprite.body;
-    const agora = this.personagem.scene.time.now;
-    const tempoPassado = agora - this.tempoInicial;
+  const body = this.personagem.sprite.body;
+  const agora = this.personagem.scene.time.now;
+  const tempoPassado = agora - this.tempoInicial;
 
-    if (body) {
-      body.setVelocityX(body.velocity.x * 0.96);
-    }
+  // DESACELERAÇÃO DO KNOCKBACK
+  // Preserva a sensação original: o lançamento começa forte e
+  // perde velocidade horizontal progressivamente, sem zerar do nada.
+  if (body) {
+    body.setVelocityX(body.velocity.x * 0.965);
+  }
 
-    // Atualiza a animação dinamicamente
-    this.atualizarAnimacaoDano();
+  this.atualizarAnimacaoDano();
 
-    // CHECAGEM DE SEGURANÇA: Se encostou no chão e a velocidade zera, cancela o stun restante
-    const velTotal = body ? Math.sqrt(body.velocity.x ** 2 + body.velocity.y ** 2) : 0;
-    const parouNoChao = body && body.blocked.down && velTotal < 30 && tempoPassado > 100;
-
-    // Se o tempo de Stun ainda não acabou e não parou no chão, continua travado
-    if (tempoPassado < this.duracaoStun && !parouNoChao) {
-      return;
+    // Enquanto o tempo mínimo não terminou,
+    // o jogador NÃO possui controle.
+    if (tempoPassado < this.duracaoStun) {
+    return;
     }
 
     // -------------------------------------------------------------
@@ -181,17 +193,14 @@ export default class EstadoDano extends EstadoBase {
   }
 
   exit() {
-    const body = this.personagem.sprite.body;
-    if (body) {
-      // 1. Zera o quique nos dois eixos (X e Y) imediatamente
-      body.setBounce(0, 0);
+  const body = this.personagem.sprite.body;
 
-      // 2. Reseta o coeficiente de restituição (garante no motor físico do Phaser)
-      body.bounce.x = 0;
-      body.bounce.y = 0;
-    }
-
-    // Reseta o estado vertical ao sair do dano
-    this.trocaVerticalAtiva = false;
+  if (body) {
+    body.setBounce(0, 0);
+    body.bounce.x = 0;
+    body.bounce.y = 0;
   }
+
+  this.trocaVerticalAtiva = false;
+}
 }

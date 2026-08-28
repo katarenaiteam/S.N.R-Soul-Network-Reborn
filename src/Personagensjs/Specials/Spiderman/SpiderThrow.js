@@ -43,8 +43,10 @@ export default class SpiderThrow {
         "spy_spider_throw",
       ];
       if (!animsDoGolpe.includes(anim.key)) {
-        this.cancelarInterrupcao();
-      }
+  queueMicrotask(() => {
+    this.cancelarInterrupcao();
+  });
+}
     };
     sprite.on("animationstart", this.fnMonitorHit);
 
@@ -159,6 +161,15 @@ export default class SpiderThrow {
 
   processarAgarre(alvo) {
     if (this.acertou || !alvo) return;
+
+    // Se estiver defendendo, a teia é bloqueada
+    const estadoAlvo = alvo.maquinaEstados?.estadoAtual?.nome;
+
+     if (estadoAlvo === "guard") {
+     this.limparHitbox();
+     return;
+   }
+
     this.acertou = true;
     this.alvoAtual = alvo;
     this.limparHitbox();
@@ -198,6 +209,11 @@ export default class SpiderThrow {
     this.deslocamentoAcumuladoX -= recuoThrow;
 
     sprite.anims.play("spy_spider_throw", true);
+
+    // Se estava caído, troca apenas a animação visual durante o agarrão
+    if (alvo.maquinaEstados?.estadoAtual?.nome === "dead") {
+    alvo.tocarAnimacao?.("dano", true);
+    } 
 
     if (alvo.sprite && alvo.sprite.body) {
       alvo.sprite.body.setVelocity(0, 0);
@@ -298,40 +314,72 @@ export default class SpiderThrow {
   }
 
   cancelarInterrupcao() {
-    this.limparHitbox();
-    this.removerListeners();
+  this.limparHitbox();
+  this.removerListeners();
 
-    const sprite = this.personagem.sprite;
-    if (sprite) {
-      // Devolve o deslocamento acumulado antes da pancada
-      if (this.deslocamentoAcumuladoX !== 0) {
-        sprite.setX(sprite.x - this.deslocamentoAcumuladoX);
-        this.deslocamentoAcumuladoX = 0;
-      }
+  // =====================================================
+  // HOMEM-ARANHA
+  // =====================================================
 
-      if (sprite.body) {
-        sprite.body.moves = true;
-        sprite.body.setAllowGravity(true);
-        // Zera o impulso instantaneamente para evitar o salto/recuo gigante
-        sprite.body.setVelocity(0, 0); 
-      }
+  const sprite = this.personagem.sprite;
+
+if (sprite?.body) {
+  // Guarda o knockback que o golpe acabou de aplicar
+  const velX = sprite.body.velocity.x;
+  const velY = sprite.body.velocity.y;
+
+  sprite.body.moves = true;
+  sprite.body.setAllowGravity(true);
+
+  // Agora é seguro sincronizar, porque a configuração
+  // da animação de dano já foi aplicada.
+  sprite.body.updateFromGameObject();
+
+  // Garante que a sincronização não mate o knockback
+  sprite.body.setVelocity(velX, velY);
+}
+
+this.deslocamentoAcumuladoX = 0;
+
+
+  // =====================================================
+  // OPONENTE, CASO JÁ TENHA SIDO AGARRADO
+  // =====================================================
+
+  if (this.alvoAtual) {
+    const alvo = this.alvoAtual;
+
+    if (this.podeUsarAtaqueOriginal) {
+      alvo.podeUsarAtaque = this.podeUsarAtaqueOriginal;
     }
 
-    // Restaura o oponente se ele ficou preso no agarre
-    if (this.alvoAtual) {
-      if (this.podeUsarAtaqueOriginal) this.alvoAtual.podeUsarAtaque = this.podeUsarAtaqueOriginal;
-      if (this.podeUsarSpecialOriginal) this.alvoAtual.podeUsarSpecial = this.podeUsarSpecialOriginal;
-      this.alvoAtual.podeAtacar = true;
-
-      if (this.alvoAtual.sprite && this.alvoAtual.sprite.body) {
-        this.alvoAtual.sprite.body.setAllowGravity(true);
-        this.alvoAtual.sprite.body.moves = true;
-      }
+    if (this.podeUsarSpecialOriginal) {
+      alvo.podeUsarSpecial = this.podeUsarSpecialOriginal;
     }
 
-    this.alvoAtual = null;
-    this.acertou = false;
+    alvo.podeAtacar = true;
+
+    if (alvo.sprite?.body) {
+      alvo.sprite.body.setAllowGravity(true);
+      alvo.sprite.body.moves = true;
+
+      // Evita snap/teleporte ao devolver a física.
+      alvo.sprite.body.updateFromGameObject?.();
+    }
+
+    // Reativa as hurtboxes
+    if (alvo.grupoHurtbox) {
+      alvo.grupoHurtbox.getChildren().forEach((child) => {
+        if (child.body) {
+          child.body.enable = true;
+        }
+      });
+    }
   }
+
+  this.alvoAtual = null;
+  this.acertou = false;
+}
 
   removerListeners() {
     const sprite = this.personagem.sprite;
