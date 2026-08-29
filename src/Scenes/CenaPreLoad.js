@@ -69,10 +69,10 @@ export default class CenaPreload extends Phaser.Scene {
     // --- icons ---
     this.load.image("FJmenu", "assets/Menus/Char_menu/Sprites/FJmenu.png");
     this.load.image("Madomenu", "assets/Menus/Char_menu/Sprites/Madomenu.png");
-    this.load.image("Morrmenu", "assets/Menus/Char_menu/Sprites/Morrmenu.png");
-    this.load.image("Diomenu", "assets/Menus/Char_menu/Sprites/Diomenu.png");
     this.load.image("Spidermenu", "assets/Menus/Char_menu/Sprites/Spidermenu.png");
     this.load.image("Kenmenu", "assets/Menus/Char_menu/Sprites/Kenmenu.png");
+    this.load.image("Kenmenu", "assets/Menus/Char_menu/Sprites/Kenmenu.png");
+    this.load.image("Mikumenu", "assets/Menus/Char_menu/Sprites/Mikumenu.png");
 
     // --- PERSONAGENS ---
     // --- Madotsuki ---

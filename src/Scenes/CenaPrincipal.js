@@ -1,9 +1,7 @@
 //import * as Phaser from "phaser";
-import Morrigan from "../Personagensjs/Morr.js";
 import Madotsuki from "../Personagensjs/Madotsuki.js";
 import MapaCidade from "../Mapasjs/Cidade.js";
 import Frederick from "../Personagensjs/Frederick.js";
-import Dio from "../Personagensjs/Dio.js";
 import SpiderMan from "../Personagensjs/SpiderMan.js";
 import Miku from "../Personagensjs/Miku.js";
 import Ken from "../Personagensjs/Ken.js";
@@ -213,10 +211,6 @@ this.jogador2 = this.criarPersonagem(
         return new Frederick(this, x, y, teclas, minDano, maxDano, controle);
       case "Madotsuki":
         return new Madotsuki(this, x, y, teclas, minDano, maxDano, controle);
-      case "Morrigan":
-        return new Morrigan(this, x, y, teclas, minDano, maxDano, controle);
-      case "Dio":
-        return new Dio(this, x, y, teclas, minDano, maxDano, controle);
       case "SpiderMan":
         return new SpiderMan(this, x, y, teclas, minDano, maxDano, controle);
       case "Miku":

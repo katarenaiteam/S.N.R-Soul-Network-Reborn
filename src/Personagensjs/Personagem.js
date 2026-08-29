@@ -251,6 +251,7 @@ export default class Personagem {
     if (noChao && !this.estavaNoChao) {
       this.pulos = 0;
       this.dashs = 0;
+      this.resetarCooldownsAereos();
       this.tocarSomSorteado(this.sons.pouso, { volume: 0.4 });
     }
     this.estavaNoChao = noChao;
@@ -588,6 +589,20 @@ export default class Personagem {
       this.dashs < this.maxDash &&
       agora - this.tempoUltimoDash >= this.cooldownDash
     );
+  }
+
+  resetarCooldownsAereos() {
+    Object.keys(this.cooldownsAtaque).forEach((tipoAtaque) => {
+      if (tipoAtaque.startsWith("air_")) {
+        delete this.cooldownsAtaque[tipoAtaque];
+      }
+    });
+
+    Object.keys(this.cooldownsSpecial).forEach((tipoSpecial) => {
+      if (tipoSpecial.startsWith("air_")) {
+        delete this.cooldownsSpecial[tipoSpecial];
+      }
+    });
   }
 
   podeUsarAtaque(tipoAtaque) {

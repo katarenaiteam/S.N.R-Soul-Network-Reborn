@@ -5,6 +5,7 @@ export default class EstadoDano extends EstadoBase {
     this.tempoInicial = this.personagem.scene.time.now;
     this.janelaBufferPulo = 300;
     this.puloBufferAte = 0;
+    this.quiqueChaoAplicado = false;
 
     const body = this.personagem.sprite.body;
     const FRAME_MS = 1000 / 60;
@@ -220,6 +221,16 @@ this.duracaoStun =
     this.puloBufferAte = agora + this.janelaBufferPulo;
   }
 
+  const forcaQuiqueChao = this.personagem.ultimoImpacto?.quiqueChaoY;
+  if (
+    body?.blocked.down &&
+    forcaQuiqueChao > 0 &&
+    !this.quiqueChaoAplicado
+  ) {
+    this.quiqueChaoAplicado = true;
+    body.setVelocityY(-forcaQuiqueChao);
+  }
+
   // DESACELERAÇÃO DO KNOCKBACK
   // Preserva a sensação original: o lançamento começa forte e
   // perde velocidade horizontal progressivamente, sem zerar do nada.
@@ -311,5 +322,6 @@ this.duracaoStun =
   this.trocaVerticalAtiva = false;
   this.modoHorizontalAtivo = false;
   this.puloBufferAte = 0;
+  this.quiqueChaoAplicado = false;
 }
 }

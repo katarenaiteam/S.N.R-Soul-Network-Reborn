@@ -19,10 +19,9 @@ export default class Charmenu extends Phaser.Scene {
         this.opcoesPersonagens = [
     
             { id: "Madotsuki", thumbKey: "Madomenu", x: 300, y: 750 },
-            { id: "Dio",        thumbKey: "Diomenu",  x: 620, y: 750 },
             { id: "SpiderMan",  thumbKey: "Spidermenu",  x: 940, y: 750 },
             { id: "Ken",  thumbKey: "Kenmenu",  x: 1260, y: 750 },
-            { id: "Miku",       thumbKey: "Miku_idle",  x: 1580, y: 750 }
+            { id: "Miku", thumbKey: "Mikumenu",  x: 1580, y: 750 }
         ];
 
         this.opcoesPersonagens.forEach((char) => {

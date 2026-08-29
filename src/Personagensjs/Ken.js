@@ -443,7 +443,7 @@ this.nomePersonagem = "Ken";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 150,
+          knockbackX: 100,
           knockbackY: -350,
           tumbling: true,
         },
@@ -567,6 +567,7 @@ this.nomePersonagem = "Ken";
           dano: 12,
           knockbackX: 80,
           knockbackY: 400,
+          quiqueChaoY: 350,
         },
       },
 

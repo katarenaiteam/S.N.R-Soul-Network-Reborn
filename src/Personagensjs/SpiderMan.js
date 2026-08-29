@@ -546,6 +546,7 @@ export default class SpiderMan extends Personagem {
     dano: 12,
     knockbackX: 50,
     knockbackY: 400,
+    quiqueChaoY: 350,
   },
 },
 
