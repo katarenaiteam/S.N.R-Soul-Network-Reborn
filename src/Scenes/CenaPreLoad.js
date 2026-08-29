@@ -201,6 +201,10 @@ this.load.spritesheet("SpiderMan_ult8", "assets/personagens/SpiderMan/Sprites/ul
     this.load.spritesheet("Ken_combo3", "assets/personagens/Ken/Sprites/Ken_combo3.png", { frameWidth: 218, frameHeight: 121 });
     this.load.spritesheet("Ken_sideAtack", "assets/personagens/Ken/Sprites/Ken_sideAtack.png", { frameWidth: 183, frameHeight: 121 });
     this.load.spritesheet("Ken_downAtack", "assets/personagens/Ken/Sprites/Ken_downAtack.png", { frameWidth: 153, frameHeight: 73 });
+    this.load.spritesheet("Ken_neutralAir", "assets/personagens/Ken/Sprites/Ken_neutralAir.png", { frameWidth: 131, frameHeight: 116 });
+    this.load.spritesheet("Ken_upAir", "assets/personagens/Ken/Sprites/Ken_upAir.png", { frameWidth: 126, frameHeight: 116 });
+    this.load.spritesheet("Ken_downAir", "assets/personagens/Ken/Sprites/Ken_downAir.png", { frameWidth: 107, frameHeight: 135 });
+    this.load.spritesheet("Ken_sideAir", "assets/personagens/Ken/Sprites/Ken_sideAir.png", { frameWidth: 134, frameHeight: 110 });
 
 
     //--Sound effects

@@ -350,47 +350,6 @@ export default class Personagem {
   }
 
   processarMovimentacaoAtaque(noChao) {
-    const estadoAtack = this.maquinaEstados.estados["atack"];
-    if (this.maquinaEstados.estadoAtual !== estadoAtack) return;
-
-
-    if (noChao) {
-      if (impulsoX === 0) this.sprite.setVelocityX(0);
-    } else if (estadoAtack.tipoAtaqueAtual !== "air_side" && impulsoX === 0) {
-      const esq = this.inputDown("esquerda");
-      const dir = this.inputDown("direita");
-
-      if (esq) this.sprite.setVelocityX(-this.velocidade);
-      else if (dir) this.sprite.setVelocityX(this.velocidade);
-      else this.sprite.setVelocityX(0);
-    }
-
-    // Sincroniza Hitbox Ofensiva do ataque
-    if (estadoAtack.hitboxAtual?.active && estadoAtack.golpeAtual) {
-      const direcaoOlhar = this.sprite.flipX ? -1 : 1;
-      const golpe = estadoAtack.golpeAtual;
-      estadoAtack.hitboxAtual.setPosition(
-        this.sprite.x + golpe.offsetX * direcaoOlhar,
-        this.sprite.y + golpe.offsetY,
-      );
-    }
-  }
-
-  atualizarOffsetFisica() {
-    const cfg = this.obterConfigAtual();
-    if (!cfg.largura || !this.sprite.body) return;
-
-    this.sprite.body.setSize(cfg.largura, cfg.altura, false);
-
-    const offsetX = this.sprite.flipX
-      ? this.sprite.frame.realWidth - cfg.offsetX - cfg.largura
-      : cfg.offsetX;
-
-    this.sprite.body.setOffset(offsetX, cfg.offsetY);
-  }
-
-
-  processarMovimentacaoAtaque(noChao) {
   const estadoAtack =
     this.maquinaEstados.estados["atack"];
 
@@ -404,42 +363,71 @@ export default class Personagem {
   const movimentoXAtivo =
     estadoAtack.movimentoAtaqueXAtivo;
 
-  // O movimento programado do ataque
-  // possui prioridade enquanto sua
-  // janela estiver ativa.
-  if (movimentoXAtivo) {
-    return;
+  // =====================================================
+  // MOVIMENTO DO PERSONAGEM
+  // =====================================================
+
+  if (!movimentoXAtivo) {
+    if (noChao) {
+      this.sprite.setVelocityX(0);
+    } else {
+      const esq =
+        this.inputDown("esquerda");
+
+      const dir =
+        this.inputDown("direita");
+
+      if (esq) {
+        this.sprite.setVelocityX(
+          -this.velocidade
+        );
+      } else if (dir) {
+        this.sprite.setVelocityX(
+          this.velocidade
+        );
+      } else {
+        this.sprite.setVelocityX(0);
+      }
+    }
   }
 
-  // Quando a janela termina,
-  // o controle normal volta.
-  if (noChao) {
-    this.sprite.setVelocityX(0);
-    return;
-  }
+  // =====================================================
+  // HITBOX SEGUE O PERSONAGEM
+  // =====================================================
 
-  const esq =
-    this.inputDown("esquerda");
+  if (
+    estadoAtack.hitboxAtual?.active &&
+    estadoAtack.golpeAtual
+  ) {
+    const direcaoOlhar =
+      this.sprite.flipX ? -1 : 1;
 
-  const dir =
-    this.inputDown("direita");
+    const golpe =
+      estadoAtack.golpeAtual;
 
-  if (esq) {
-    this.sprite.setVelocityX(
-      -this.velocidade
+    estadoAtack.hitboxAtual.setPosition(
+      this.sprite.x +
+        golpe.offsetX *
+        direcaoOlhar,
+
+      this.sprite.y +
+        golpe.offsetY
     );
-  }
-
-  else if (dir) {
-    this.sprite.setVelocityX(
-      this.velocidade
-    );
-  }
-
-  else {
-    this.sprite.setVelocityX(0);
   }
 }
+
+  atualizarOffsetFisica() {
+    const cfg = this.obterConfigAtual();
+    if (!cfg.largura || !this.sprite.body) return;
+
+    this.sprite.body.setSize(cfg.largura, cfg.altura, false);
+
+    const offsetX = this.sprite.flipX
+      ? this.sprite.frame.realWidth - cfg.offsetX - cfg.largura
+      : cfg.offsetX;
+
+    this.sprite.body.setOffset(offsetX, cfg.offsetY);
+  }
 
  inputDown(nome) {
     if (this.controle) return this.controle.estaApertado(nome);

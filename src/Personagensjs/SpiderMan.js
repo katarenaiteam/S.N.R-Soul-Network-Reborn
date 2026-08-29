@@ -508,28 +508,46 @@ export default class SpiderMan extends Personagem {
       },
 
       air_agachado: {
-        animacao: "spy_downAir",
-        frameHitbox: 2,
-        offsetX: 34,
-        offsetY: -30,
-        largura: 60,
-        altura: 70,
-        cooldown: 500,
-        // Finalização do ataque
-        duracao: 1000,
-        finalizarAoTocarChao: true,
-        atrasoFinalizacaoChao: 90,
-        finalizarAoAcertarOponente: true,
-        atrasoFinalizacaoAcerto: 30,
-        propriedades: {
-          tipoSomImpacto: "heavy",
-          dano: 12,
-          knockbackX: 50,
-          knockbackY: 400,
-          impulsoX: 50,
-          impulsoY: 550,
-        },
-      },
+  animacao: "spy_downAir",
+  frameHitbox: 2,
+  offsetX: 34,
+  offsetY: -30,
+  largura: 60,
+  altura: 70,
+  cooldown: 500,
+
+  duracao: 1000,
+
+  finalizarAoTocarChao: true,
+  atrasoFinalizacaoChao: 90,
+
+  finalizarAoAcertarOponente: true,
+  atrasoFinalizacaoAcerto: 30,
+
+  movimento: {
+    inicio: 80,
+    fim: 900,
+
+    x: {
+      de: 80,
+      para: 80,
+    },
+
+    y: {
+      de: 800,
+      para: 1200,
+    },
+
+    curva: "easeOut",
+  },
+
+  propriedades: {
+    tipoSomImpacto: "heavy",
+    dano: 12,
+    knockbackX: 50,
+    knockbackY: 400,
+  },
+},
 
       air_side: {
         animacao: "spy_sideAir",
@@ -853,7 +871,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 4,
       }),
-      frameRate: 24,
+      frameRate: 22,
       repeat: 0,
     });
 
@@ -863,7 +881,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 8,
       }),
-      frameRate: 20,
+      frameRate: 18,
       repeat: 0,
     });
 
@@ -873,7 +891,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 6,
       }),
-      frameRate: 20,
+      frameRate: 18,
       repeat: 0,
     });
 

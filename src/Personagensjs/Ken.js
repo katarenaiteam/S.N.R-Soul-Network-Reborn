@@ -54,55 +54,55 @@ this.nomePersonagem = "Ken";
     this.configAnimacoes = {
       
        idle: {
-        largura: 85,
+        largura: 80,
         altura: 120,
         offsetX: 0,
         offsetY: -10,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 25, offsetY: -70 },
-          { largura: 110, altura: 35, offsetX: 5, offsetY: -18 },
+          { largura: 50, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 67, altura: 35, offsetX: 0, offsetY: -18 },
         ],
       },
 
       walk: {
-        largura: 85,
+        largura: 80,
         altura: 120,
-        offsetX: 0,
+        offsetX: 17,
         offsetY: -9,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 },
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 },
+          { largura: 50, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 60, altura: 35, offsetX: 0, offsetY: -18 },
         ],
       },
 
       jump: {
         largura: 85,
         altura: 120,
-        offsetX: 0,
+        offsetX: -5,
         offsetY: 10,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 60, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 55, altura: 70, offsetX: 0, offsetY: -90 },
+          { largura: 45, altura: 50, offsetX: -5, offsetY: -25 },
         ],
       },
 
       // DEMAIS ESTADOS CORRIGIDOS (Corpo base alinhado com o idle):
       crouch: {
-        largura: 85,
+        largura: 80,
         altura: 60,
-        offsetX: 0,
+        offsetX: 5,
         offsetY: 50,
         escala: 1,
         hurtboxes: [
-          { largura: 80, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 65, altura: 60, offsetX: 0, offsetY: -35 },
         ],
       },
 
       dash: {
-        largura: 85,
+        largura: 70,
         altura: 60,
         offsetX: 0,
         offsetY: 10,
@@ -112,14 +112,14 @@ this.nomePersonagem = "Ken";
       },
 
       guard: {
-        largura: 85,
+        largura: 80,
         altura: 120,
         offsetX: 0,
         offsetY: -16,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 25, offsetY: -70 },
-          { largura: 110, altura: 35, offsetX: 5, offsetY: -18 },
+          { largura: 50, altura: 50, offsetX: -5, offsetY: -75 },
+          { largura: 60, altura: 50, offsetX: 0, offsetY: -25 },
         ],
       },
 
@@ -136,7 +136,7 @@ this.nomePersonagem = "Ken";
 },
 
 
-      // Dano Up (Ken_hurts1 - 111px de altura)
+     
       danoUp: {
         largura: 80,
         altura: 100,
@@ -144,12 +144,11 @@ this.nomePersonagem = "Ken";
         offsetY: 5,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 70, offsetX: 0, offsetY: -80 },
+          { largura: 55, altura: 70, offsetX: 20, offsetY: -80 },
           { largura: 45, altura: 40, offsetX: 0, offsetY: -15 },
         ],
       },
 
-      // Dano Side (Ken_hurts2 - 138px de altura)
       danoSide: {
         largura: 80,
         altura: 100,
@@ -157,11 +156,11 @@ this.nomePersonagem = "Ken";
         offsetY: -5,
         escala: 1,
         hurtboxes: [
-          { largura: 95, altura: 45, offsetX: 0, offsetY: -20 },
+          { largura: 65, altura: 55, offsetX: -15, offsetY: -90 }, // Tronco inclinado
+          { largura: 50, altura: 45, offsetX: 30, offsetY: -70 },   // Pernas
         ],
       },
-
-      // Dano Down (Ken_hurts2 - 138px de altura, idêntico ao Side)
+     
       danoDown: {
         largura: 80,
         altura: 100,
@@ -169,7 +168,8 @@ this.nomePersonagem = "Ken";
         offsetY: 35,
         escala: 1,
         hurtboxes: [
-          { largura: 85, altura: 35, offsetX: 0, offsetY: -15 },
+          { largura: 60, altura: 65, offsetX: -10, offsetY: -60 }, 
+          { largura: 50, altura: 45, offsetX: 0, offsetY: -10 },
         ],
       },
 
@@ -181,7 +181,7 @@ this.nomePersonagem = "Ken";
         offsetY: 40,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 },
+          { largura: 100, altura: 35, offsetX: -10, offsetY: -18 },
         ],
       },
 
@@ -198,7 +198,7 @@ this.nomePersonagem = "Ken";
       atack1: {
         largura: 85,
         altura: 110,
-        offsetX: 18,
+        offsetX: 36,
         offsetY: -1,
         escala: 1,
         hurtboxes: [
@@ -210,7 +210,7 @@ this.nomePersonagem = "Ken";
       atack2: {
         largura: 85,
         altura: 110,
-        offsetX: 21,
+        offsetX: 55,
         offsetY: -1,
         escala: 1,
         hurtboxes: [
@@ -222,8 +222,8 @@ this.nomePersonagem = "Ken";
       atack3: {
         largura: 85,
         altura: 110,
-        offsetX: 48,
-        offsetY: 7, // Compensa a altura maior (121px) do Ken_combo3 para não entrar no chão
+        offsetX: 64,
+        offsetY: 7, 
         escala: 1,
         hurtboxes: [
           { largura: 70, altura: 70, offsetX: 10, offsetY: -85 },
@@ -325,6 +325,7 @@ this.nomePersonagem = "Ken";
         ],
 
         propriedades: {
+           tipoSomImpacto: "light",
           dano: 4,
           knockbackX: 30,
           knockbackY: 0,
@@ -347,6 +348,7 @@ this.nomePersonagem = "Ken";
         altura: 25,
         duracao: 400,
         propriedades: {
+           tipoSomImpacto: "heavy",
           dano: 4,
           knockbackX: 40,
           knockbackY: 0,
@@ -379,6 +381,7 @@ this.nomePersonagem = "Ken";
         bufferJanelaInicio: 50,
         bufferJanelaFim: 350,
         propriedades: {
+           tipoSomImpacto: "heavy",
           dano: 8,
           knockbackX: 350,
           knockbackY: -250,
@@ -427,20 +430,127 @@ this.nomePersonagem = "Ken";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
+          tumbling: true,
+        },
+      },
+
+        air_neutro: {
+        animacao: "ken_neutralAir",
+        frameHitbox: 3,
+        offsetX: 52,
+        offsetY: -60,
+        largura: 55,
+        altura: 25,
+        cooldown: 900,
+        duracao: 600,
+        cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
+        propriedades: {
+          tipoSomImpacto: "light",
+          dano: 12,
+          knockbackX: 550,
+          knockbackY: -400,
+          tumbling: false,
+        },
+      },
+
+
+      air_side: {
+        animacao: "ken_sideAir",
+        frameHitbox: 3,
+        offsetX: 52,
+        offsetY: -60,
+        largura: 55,
+        altura: 25,
+        cooldown: 900,
+        duracao: 600,
+        cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+        propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 12,
           knockbackX: 550,
           knockbackY: -400,
           tumbling: true,
         },
-        movimento: {
-        inicio: 80,
-         fim: 260,
-         x: {
-         de: 350,
-         para: 80,
-         },
-         curva: "easeOut"
-         }
       },
+      air_cima: {
+        animacao: "ken_upAir",
+        frameHitbox: 3,
+        offsetX: 52,
+        offsetY: -60,
+        largura: 55,
+        altura: 25,
+        cooldown: 900,
+        duracao: 600,
+        cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
+        propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 12,
+          knockbackX: 550,
+          knockbackY: -400,
+          tumbling: true,
+        },
+      },
+      air_agachado: {
+        animacao: "ken_downAir",
+        frameHitbox: 3,
+        offsetX: 52,
+        offsetY: -60,
+        largura: 55,
+        altura: 25,
+        cooldown: 900,
+        duracao: 900,
+        finalizarAoTocarChao: true,
+        atrasoFinalizacaoChao: 30,
+        finalizarAoAcertarOponente: true,
+        atrasoFinalizacaoAcerto: 30,
+        cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
+         movimento: {
+    inicio: 80,
+    fim: 900,
+    x: {
+      de: 400,
+      para: 500,
+    },
+    y: {
+      de: 600,
+      para: 800,
+    },
+
+    curva: "easeOut",
+  },
+        propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 12,
+          knockbackX: 100,
+          knockbackY: -400,
+          tumbling: true,
+        },
+      },
+
+
 
 
     }
@@ -631,7 +741,6 @@ scene.anims.create({
       frameRate: 16,
       repeat: 0,
     });
-
     scene.anims.create({
       key: "ken_atack2",
       frames: scene.anims.generateFrameNumbers("Ken_combo2", {
@@ -641,7 +750,6 @@ scene.anims.create({
       frameRate: 16,
       repeat: 0,
     });
-
     scene.anims.create({
       key: "ken_atack3",
       frames: scene.anims.generateFrameNumbers("Ken_combo3", {
@@ -651,7 +759,6 @@ scene.anims.create({
       frameRate: 18,
       repeat: 0,
     });
-   
     scene.anims.create({
       key: "ken_sideAtack",
       frames: scene.anims.generateFrameNumbers("Ken_sideAtack", {
@@ -661,12 +768,47 @@ scene.anims.create({
       frameRate: 18,
       repeat: 0,
     });
-
     scene.anims.create({
       key: "ken_downAtack",
       frames: scene.anims.generateFrameNumbers("Ken_downAtack", {
         start: 0,
         end: 5,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "ken_neutralAir",
+      frames: scene.anims.generateFrameNumbers("Ken_neutralAir", {
+        start: 0,
+        end: 8,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+     scene.anims.create({
+      key: "ken_upAir",
+      frames: scene.anims.generateFrameNumbers("Ken_upAir", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+     scene.anims.create({
+      key: "ken_sideAir",
+      frames: scene.anims.generateFrameNumbers("Ken_sideAir", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+     scene.anims.create({
+      key: "ken_downAir",
+      frames: scene.anims.generateFrameNumbers("Ken_downAir", {
+        start: 0,
+        end: 4,
       }),
       frameRate: 12,
       repeat: 0,

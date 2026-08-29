@@ -43,8 +43,9 @@ export default class EstadoDano extends EstadoBase {
       840
     );
 
-    // 🔒 Trava de controle para transição vertical sem passar pelo neutro
+    //controle para transição vertical sem passar pelo neutro
     this.trocaVerticalAtiva = false;
+    this.modoHorizontalAtivo = false;
 
     // Virar o personagem para o oponente
     const oponente =
@@ -68,62 +69,130 @@ export default class EstadoDano extends EstadoBase {
   }
 
   atualizarAnimacaoDano() {
-    const body = this.personagem.sprite.body;
-    let sulfixoDano = "dano";
+  const body = this.personagem.sprite.body;
+  let sulfixoDano = "dano";
 
-    if (body) {
-      const absX = Math.abs(body.velocity.x);
-      const absY = Math.abs(body.velocity.y);
-      const velY = body.velocity.y;
-      const noChao = body.blocked.down;
+  if (body) {
+    const absX = Math.abs(body.velocity.x);
+    const absY = Math.abs(body.velocity.y);
+    const velY = body.velocity.y;
+    const noChao = body.blocked.down;
 
-      const limiarMinimoVertical = 300;
-      const limiarMinimoHorizontal = 500;
-      const animacaoAtual = this.personagem.sprite.anims.currentAnim?.key;
-      const estaEmDanoSide =
-        animacaoAtual === `${this.personagem.prefixoAnim}danoSide`;
+    const limiarMinimoVertical = 300;
+    const limiarMinimoHorizontal = 500;
 
-      // 1. ATIVA O MODO VERTICAL: Se o golpe inicial te jogou forte para cima
-      if (velY < -limiarMinimoVertical && absY > absX) {
-        this.trocaVerticalAtiva = true;
-      }
+    // Velocidade de queda necessária para considerar
+    // que o personagem realmente começou a despencar.
+    const limiarQueda = 120;
 
-      // 2. Ataques laterais tambem passam para danoDown ao iniciar a queda
-      if (estaEmDanoSide && velY > 80 && !noChao) {
-        this.trocaVerticalAtiva = true;
-      }
 
-      // 🔴 MODO VERTICAL ATIVO (Garante a troca UP ➡️ DOWN sem passar pelo Neutro)
-      if (this.trocaVerticalAtiva && !noChao) {
-        if (velY < 0) {
-          sulfixoDano = "danoUp";   // Subindo
-        } else {
-          sulfixoDano = "danoDown"; // Descendo (Troca direto, ZERO neutro)
-        }
-      } 
-      // 🟢 MODO PADRÃO (Golpes normais/horizontais continuam usando neutro normalmente)
-      else {
-        if (absX >= absY && absX > limiarMinimoHorizontal) {
-          sulfixoDano = "danoSide";
-        } else {
-          sulfixoDano = "dano"; // Neutro reservado para golpes fracos
-        }
+    // =====================================================
+    // 1. LANÇAMENTO VERTICAL PARA CIMA
+    // =====================================================
+
+    if (
+      !this.trocaVerticalAtiva &&
+      velY < -limiarMinimoVertical &&
+      absY > absX
+    ) {
+      this.trocaVerticalAtiva = true;
+      this.modoHorizontalAtivo = false;
+    }
+
+
+    // =====================================================
+    // 2. LANÇAMENTO HORIZONTAL
+    // =====================================================
+
+    // IMPORTANTE:
+    // depois que entra no modo horizontal,
+    // ele NÃO sai dele só porque perdeu velocidade.
+    if (
+      !this.trocaVerticalAtiva &&
+      !this.modoHorizontalAtivo &&
+      absX >= absY &&
+      absX > limiarMinimoHorizontal
+    ) {
+      this.modoHorizontalAtivo = true;
+    }
+
+
+    // =====================================================
+    // 3. COMEÇOU A CAIR
+    // =====================================================
+
+    const estaCaindo =
+      !noChao &&
+      velY > limiarQueda;
+
+    if (
+      estaCaindo &&
+      (
+        this.modoHorizontalAtivo ||
+        this.personagem.isTumbling
+      )
+    ) {
+      this.trocaVerticalAtiva = true;
+      this.modoHorizontalAtivo = false;
+    }
+
+
+    // =====================================================
+    // 4. ESCOLHE A ANIMAÇÃO
+    // =====================================================
+
+    if (
+      this.trocaVerticalAtiva &&
+      !noChao
+    ) {
+      if (velY < 0) {
+        sulfixoDano = "danoUp";
+      } else {
+        sulfixoDano = "danoDown";
       }
     }
 
-    // Toca a animação apenas se for diferente da atual
-    const chaveTotal = `${this.personagem.prefixoAnim}${sulfixoDano}`;
-    const animAtual = this.personagem.sprite.anims.currentAnim?.key;
+    else if (
+      this.modoHorizontalAtivo &&
+      !noChao
+    ) {
+      sulfixoDano = "danoSide";
+    }
 
-    if (animAtual !== chaveTotal) {
-      if (this.personagem.scene.anims.exists(chaveTotal)) {
-        this.personagem.tocarAnimacao(sulfixoDano, true);
-      } else {
-        this.personagem.tocarAnimacao("dano", true);
-      }
+    else {
+      sulfixoDano = "dano";
     }
   }
 
+
+  // =====================================================
+  // TROCA DE ANIMAÇÃO
+  // =====================================================
+
+  const chaveTotal =
+    `${this.personagem.prefixoAnim}${sulfixoDano}`;
+
+  const animAtual =
+    this.personagem.sprite.anims.currentAnim?.key;
+
+  if (animAtual !== chaveTotal) {
+    if (
+      this.personagem.scene.anims.exists(
+        chaveTotal
+      )
+    ) {
+      this.personagem.tocarAnimacao(
+        sulfixoDano,
+        true
+      );
+    } else {
+      this.personagem.tocarAnimacao(
+        "dano",
+        true
+      );
+    }
+  }
+}
  execute() {
   const body = this.personagem.sprite.body;
   const agora = this.personagem.scene.time.now;
@@ -202,5 +271,6 @@ export default class EstadoDano extends EstadoBase {
   }
 
   this.trocaVerticalAtiva = false;
+  this.modoHorizontalAtivo = false;
 }
 }
