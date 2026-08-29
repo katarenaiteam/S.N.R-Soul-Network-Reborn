@@ -292,8 +292,8 @@ this.nomePersonagem = "Ken";
       neSpecial: {
         largura: 85,
         altura: 120,
-        offsetX: 0,
-        offsetY: -10,
+        offsetX: 20,
+        offsetY: -13,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 60, offsetX: 25, offsetY: -70 },
@@ -426,8 +426,8 @@ this.nomePersonagem = "Ken";
      agachado: {
         animacao: "ken_downAtack",
         frameHitbox: 3,
-        offsetX: 52,
-        offsetY: -60,
+        offsetX: 25,
+        offsetY: -20,
         largura: 55,
         altura: 25,
         cooldown: 900,
@@ -560,8 +560,8 @@ this.nomePersonagem = "Ken";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 100,
-          knockbackY: -400,
+          knockbackX: 80,
+          knockbackY: 400,
         },
       },
 
@@ -591,7 +591,7 @@ this.nomePersonagem = "Ken";
          volumeSom: 0.6,
         atrasoProjetil: 300,
         tempoProjetil: 5000,
-        velocidadeProjetil: 450,
+        velocidadeProjetil: 500,
         escalaProjetil: 1.5,
         profundidadeImpacto: 50,
         offsetProjetilX: 65,

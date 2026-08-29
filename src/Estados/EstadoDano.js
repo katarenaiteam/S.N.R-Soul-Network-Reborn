@@ -3,6 +3,8 @@ import EstadoBase from "./EstadoBase.js";
 export default class EstadoDano extends EstadoBase {
   enter() {
     this.tempoInicial = this.personagem.scene.time.now;
+    this.janelaBufferPulo = 300;
+    this.puloBufferAte = 0;
 
     const body = this.personagem.sprite.body;
     const FRAME_MS = 1000 / 60;
@@ -213,6 +215,11 @@ this.duracaoStun =
   const agora = this.personagem.scene.time.now;
   const tempoPassado = agora - this.tempoInicial;
 
+  // Guarda o pulo apertado durante o hitstun por uma pequena janela.
+  if (this.personagem.inputJustDown("cima")) {
+    this.puloBufferAte = agora + this.janelaBufferPulo;
+  }
+
   // DESACELERAÇÃO DO KNOCKBACK
   // Preserva a sensação original: o lançamento começa forte e
   // perde velocidade horizontal progressivamente, sem zerar do nada.
@@ -232,6 +239,23 @@ this.duracaoStun =
     // A PARTIR DAQUI, O STUN JÁ ACABOU (tempoPassado >= duracaoStun)
     // -------------------------------------------------------------
 
+    // Executa o pulo guardado assim que o controle volta no ar.
+    const p = this.personagem;
+    const puloSolicitado =
+      agora <= this.puloBufferAte ||
+      p.inputDown("cima");
+
+    if (
+      puloSolicitado &&
+      body &&
+      !body.blocked.down &&
+      p.pulos < p.maxPulos
+    ) {
+      this.puloBufferAte = 0;
+      p.isTumbling = false;
+      p.pular();
+      return;
+    }
     // 1. GOLPES COMUNS (sem tumbling) -> Volta pro IDLE se tiver no chão
     if (!this.personagem.isTumbling) {
       if (body && body.blocked.down) {
@@ -260,7 +284,6 @@ this.duracaoStun =
     }
 
     // Recuperação aérea por input após o término do Stun (apenas para golpes fortes no ar)
-    const p = this.personagem;
     const apertouComando =
       p.inputJustDown("cima") ||
       p.inputJustDown("baixo") ||
@@ -287,5 +310,6 @@ this.duracaoStun =
 
   this.trocaVerticalAtiva = false;
   this.modoHorizontalAtivo = false;
+  this.puloBufferAte = 0;
 }
 }

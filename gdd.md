@@ -157,10 +157,12 @@ SNR é um jogo de temática Cyberpunk, do gênero platform fighter.
       * Voluntário
     * João Campos Neto
 
-      * Programação / Trilha e efeitos sonoros
+      * Programação
       * Voluntário
-* Licenses / Hardware / Other Costs
-* Total Costs with breakdown
+    * Marcos Davi Correia
+
+      * Trilha e efeitos sonoros/auxiliar na produção de arte
+      * Voluntário
 
 ## Influences (Brief)
 

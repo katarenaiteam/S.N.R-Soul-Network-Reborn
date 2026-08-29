@@ -4,6 +4,7 @@ import SkyTowers from "../Mapasjs/SkyTowers.js";
 import Frederick from "../Personagensjs/Frederick.js";
 import Dio from "../Personagensjs/Dio.js";
 import SpiderMan from "../Personagensjs/SpiderMan.js";
+import Ken from "../Personagensjs/Ken.js";
 import Miku from "../Personagensjs/Miku.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import BotController from "../Objetos/BotController.js";
@@ -219,6 +220,7 @@ export default class CenaHistoria extends Phaser.Scene {
       case "Dio": return new Dio(this, x, y, teclas, minDano, maxDano, controle);
       case "SpiderMan": return new SpiderMan(this, x, y, teclas, minDano, maxDano, controle);
       case "Miku": return new Miku(this, x, y, teclas, minDano, maxDano, controle);
+      case "Ken": return new Ken(this, x, y, teclas, minDano, maxDano, controle);
       default: return new Frederick(this, x, y, teclas, minDano, maxDano, controle);
     }
   }
