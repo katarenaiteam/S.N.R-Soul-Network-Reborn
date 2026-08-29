@@ -125,6 +125,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("SpiderMan_sideAir", "assets/personagens/SpiderMan/Sprites/SpiderMan_sideAir.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_downAtack", "assets/personagens/SpiderMan/Sprites/SpiderMan_downAtack.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_sideAtack", "assets/personagens/SpiderMan/Sprites/SpiderMan_sideAtack.png", { frameWidth: 200, frameHeight: 200 });
+    //specials
     this.load.spritesheet("SpiderMan_neSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_neSpecial.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_AneSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AneSpecial.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_doSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_doSpecial.png", { frameWidth: 200, frameHeight: 200 });
@@ -205,12 +206,16 @@ this.load.spritesheet("SpiderMan_ult8", "assets/personagens/SpiderMan/Sprites/ul
     this.load.spritesheet("Ken_upAir", "assets/personagens/Ken/Sprites/Ken_upAir.png", { frameWidth: 126, frameHeight: 116 });
     this.load.spritesheet("Ken_downAir", "assets/personagens/Ken/Sprites/Ken_downAir.png", { frameWidth: 107, frameHeight: 135 });
     this.load.spritesheet("Ken_sideAir", "assets/personagens/Ken/Sprites/Ken_sideAir.png", { frameWidth: 134, frameHeight: 110 });
-
+    //specials
+    this.load.spritesheet("Ken_neSpecial", "assets/personagens/Ken/Sprites/Ken_neSpecial.png", { frameWidth: 135, frameHeight: 108 });
+    this.load.spritesheet("hadouken1", "assets/personagens/Ken/Sprites/hadouken1.png", { frameWidth: 88, frameHeight: 54 });
+    this.load.spritesheet("hadouken2", "assets/personagens/Ken/Sprites/hadouken2.png", { frameWidth: 60, frameHeight: 63 });
+    this.load.audio("hadouken", "assets/personagens/Ken/Audio/hadouken.wav");
+    
 
     //--Sound effects
     //-pulos
     this.load.audio("jump1", "assets/personagens/SoundEffects_geral/dash-jump/jump/jump1.wav");
-
     //-pouso
     this.load.audio("generic-landing1", "assets/personagens/SoundEffects_geral/step/generic-landing1.wav");
     this.load.audio("generic-landing2", "assets/personagens/SoundEffects_geral/step/generic-landing2.wav");

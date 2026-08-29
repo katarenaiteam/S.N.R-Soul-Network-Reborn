@@ -5,43 +5,58 @@ export default class EstadoDano extends EstadoBase {
     this.tempoInicial = this.personagem.scene.time.now;
 
     const body = this.personagem.sprite.body;
-    const acumulado = this.personagem.porcentagemDano || 0;
+    const FRAME_MS = 1000 / 60;
 
-    // =====================================================
-    // HITSTUN GLOBAL
-    // =====================================================
-    // A velocidade do impacto ainda influencia o stun, mas com limite.
-    // Assim golpes fortes seguram um pouco mais sem prender o jogador
-    // durante toda a viagem até a blast zone.
-    let velocidadeImpacto = 0;
-    if (body) {
-      velocidadeImpacto = Math.sqrt(
-        body.velocity.x ** 2 + body.velocity.y ** 2
-      );
-    }
+let forcaImpacto = 0;
 
-    // Até 180% o hitstun cresce normalmente. Depois continua crescendo
-    // só um pouco para não ficar infinito.
-    const danoEscalado = acumulado <= 180
-      ? acumulado
-      : 180 + (acumulado - 180) * 0.15;
+if (body) {
+  forcaImpacto = Math.max(
+    Math.abs(body.velocity.x),
+    Math.abs(body.velocity.y)
+  );
+}
 
-    // Tempo mínimo obrigatório: bom para combo já em porcentagem baixa
-    // e realmente perigoso perto de 180%.
-    const stunMinimo = 360 + danoEscalado * 2.0;
+let framesStun;
 
-    // Golpes de lançamento muito forte recebem no máximo +120ms.
-    const bonusImpacto = Phaser.Math.Clamp(
-      (velocidadeImpacto - 400) * 0.12,
-      0,
-      120
-    );
 
-    this.duracaoStun = Phaser.Math.Clamp(
-      stunMinimo + bonusImpacto,
-      360,
-      840
-    );
+// =====================================================
+// GOLPE COMUM
+// Pouco lançamento = recuperação rápida
+// =====================================================
+
+if (!this.personagem.isTumbling) {
+
+  framesStun =
+    5 + forcaImpacto / 100;
+
+  framesStun = Phaser.Math.Clamp(
+    framesStun,
+    6,   // 100ms
+    12   // 200ms
+  );
+}
+
+
+// =====================================================
+// GOLPE DE LANÇAMENTO / TUMBLING
+// O personagem realmente fica incapacitado durante o voo
+// =====================================================
+
+else {
+
+  framesStun =
+    16 + forcaImpacto / 45;
+
+  framesStun = Phaser.Math.Clamp(
+    framesStun,
+    20,  // 333ms mínimo
+    45   // 750ms máximo
+  );
+}
+
+
+this.duracaoStun =
+  framesStun * FRAME_MS;
 
     //controle para transição vertical sem passar pelo neutro
     this.trocaVerticalAtiva = false;

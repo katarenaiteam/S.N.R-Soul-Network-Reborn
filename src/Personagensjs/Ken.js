@@ -1,4 +1,5 @@
 import Personagem from "./Personagem.js";
+import Hadouken from "./Specials/Ken/hadouken.js";
 
 export default class Ken extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -78,9 +79,9 @@ this.nomePersonagem = "Ken";
       },
 
       jump: {
-        largura: 85,
+        largura: 80,
         altura: 120,
-        offsetX: -5,
+        offsetX: -1,
         offsetY: 10,
         escala: 1,
         hurtboxes: [
@@ -89,7 +90,7 @@ this.nomePersonagem = "Ken";
         ],
       },
 
-      // DEMAIS ESTADOS CORRIGIDOS (Corpo base alinhado com o idle):
+      
       crouch: {
         largura: 80,
         altura: 60,
@@ -103,8 +104,8 @@ this.nomePersonagem = "Ken";
 
       dash: {
         largura: 70,
-        altura: 60,
-        offsetX: 0,
+        altura: 80,
+        offsetX: 4,
         offsetY: 10,
         escala: 1,
         hurtboxes: [
@@ -197,9 +198,9 @@ this.nomePersonagem = "Ken";
 
       atack1: {
         largura: 85,
-        altura: 110,
+        altura: 120,
         offsetX: 36,
-        offsetY: -1,
+        offsetY: -10,
         escala: 1,
         hurtboxes: [
           { largura: 60, altura: 70, offsetX: 0, offsetY: -85 },
@@ -209,9 +210,9 @@ this.nomePersonagem = "Ken";
 
       atack2: {
         largura: 85,
-        altura: 110,
+        altura: 120,
         offsetX: 55,
-        offsetY: -1,
+        offsetY: -10,
         escala: 1,
         hurtboxes: [
           { largura: 60, altura: 70, offsetX: 0, offsetY: -85 },
@@ -221,21 +222,21 @@ this.nomePersonagem = "Ken";
 
       atack3: {
         largura: 85,
-        altura: 110,
-        offsetX: 64,
-        offsetY: 7, 
+        altura: 120,
+        offsetX: 67,
+        offsetY: -3, 
         escala: 1,
         hurtboxes: [
           { largura: 70, altura: 70, offsetX: 10, offsetY: -85 },
-          { largura: 80, altura: 40, offsetX: 10, offsetY: -20 },
+          { largura: 40, altura: 40, offsetX: 10, offsetY: -25 },
         ],
       },
 
       neutralAir: {
         largura: 85,
         altura: 120,
-        offsetX: 0,
-        offsetY: -10,
+        offsetX: 22,
+        offsetY: -5,
         escala: 1,
         hurtboxes: [
           { largura: 60, altura: 70, offsetX: -20, offsetY: -90 },
@@ -247,7 +248,7 @@ this.nomePersonagem = "Ken";
         largura: 85,
         altura: 120,
         offsetX: 30,
-        offsetY: 0,
+        offsetY: 1,
         escala: 1,
         hurtboxes: [{ largura: 60, altura: 80, offsetX: -20, offsetY: -40 }],
       },
@@ -255,7 +256,7 @@ this.nomePersonagem = "Ken";
       downAtack: {
         largura: 85,
         altura: 60,
-        offsetX: 0,
+        offsetX: 36,
         offsetY: 10,
         escala: 1,
         hurtboxes: [{ largura: 80, altura: 60, offsetX: 0, offsetY: -40 }],
@@ -264,8 +265,8 @@ this.nomePersonagem = "Ken";
       sideAir: {
         largura: 85,
         altura: 120,
-        offsetX: 0,
-        offsetY: -10,
+        offsetX: 25,
+        offsetY: -11,
         escala: 1,
         hurtboxes: [{ largura: 80, altura: 60, offsetX: 0, offsetY: -40 }],
       },
@@ -273,10 +274,19 @@ this.nomePersonagem = "Ken";
       upAir: {  
         largura: 85,
         altura: 120,
-        offsetX: 0,
-        offsetY: -10,
+        offsetX: 19,
+        offsetY: -5,
         escala: 1,
         hurtboxes: [{ largura: 70, altura: 80, offsetX: 0, offsetY: -50 }],
+      },
+
+      downAir: {
+        largura: 85,
+        altura: 120,
+        offsetX: 12,
+        offsetY: 12,
+        escala: 1,
+        hurtboxes: [{ largura: 80, altura: 60, offsetX: 0, offsetY: -40 }],
       },
 
       neSpecial: {
@@ -384,14 +394,14 @@ this.nomePersonagem = "Ken";
            tipoSomImpacto: "heavy",
           dano: 8,
           knockbackX: 350,
-          knockbackY: -250,
+          knockbackY: -300,
           tumbling: true
         },
       },
 
       side: {
         animacao: "ken_sideAtack",
-        frameHitbox: 3,
+        frameHitbox: 4,
         offsetX: 52,
         offsetY: -60,
         largura: 55,
@@ -437,12 +447,14 @@ this.nomePersonagem = "Ken";
         air_neutro: {
         animacao: "ken_neutralAir",
         frameHitbox: 3,
-        offsetX: 52,
-        offsetY: -60,
-        largura: 55,
+        offsetX: 30,
+        offsetY: -85,
+        largura: 60,
         altura: 25,
         cooldown: 900,
-        duracao: 600,
+        duracao: 350,
+         finalizarAoTocarChao: true,
+        atrasoFinalizacaoChao: 30,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -463,12 +475,14 @@ this.nomePersonagem = "Ken";
       air_side: {
         animacao: "ken_sideAir",
         frameHitbox: 3,
-        offsetX: 52,
-        offsetY: -60,
-        largura: 55,
-        altura: 25,
+        offsetX: 35,
+        offsetY: -50,
+        largura: 60,
+        altura: 30,
         cooldown: 900,
         duracao: 600,
+         finalizarAoTocarChao: true,
+        atrasoFinalizacaoChao: 30,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -486,12 +500,14 @@ this.nomePersonagem = "Ken";
       air_cima: {
         animacao: "ken_upAir",
         frameHitbox: 3,
-        offsetX: 52,
-        offsetY: -60,
-        largura: 55,
-        altura: 25,
+        offsetX: 25,
+        offsetY: -80,
+        largura: 60,
+        altura: 30,
         cooldown: 900,
         duracao: 600,
+         finalizarAoTocarChao: true,
+        atrasoFinalizacaoChao: 30,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -510,10 +526,10 @@ this.nomePersonagem = "Ken";
       air_agachado: {
         animacao: "ken_downAir",
         frameHitbox: 3,
-        offsetX: 52,
-        offsetY: -60,
-        largura: 55,
-        altura: 25,
+        offsetX: 30,
+        offsetY: -20,
+        largura: 60,
+        altura: 60,
         cooldown: 900,
         duracao: 900,
         finalizarAoTocarChao: true,
@@ -535,8 +551,8 @@ this.nomePersonagem = "Ken";
       para: 500,
     },
     y: {
-      de: 600,
-      para: 800,
+      de: 500,
+      para: 900,
     },
 
     curva: "easeOut",
@@ -546,7 +562,6 @@ this.nomePersonagem = "Ken";
           dano: 12,
           knockbackX: 100,
           knockbackY: -400,
-          tumbling: true,
         },
       },
 
@@ -563,7 +578,35 @@ this.nomePersonagem = "Ken";
 
 
 
-    //specials
+
+
+    // specials
+    this.specials = {
+      neutro: {
+        animacao: "ken_neSpecial",
+        duracao: 1000,
+        cooldown: 2000,
+        logica: Hadouken,
+         som: "hadouken",
+         volumeSom: 0.6,
+        atrasoProjetil: 300,
+        tempoProjetil: 5000,
+        velocidadeProjetil: 450,
+        escalaProjetil: 1.5,
+        profundidadeImpacto: 50,
+        offsetProjetilX: 65,
+        offsetProjetilY: -70,
+        larguraProjetil: 52,
+        alturaProjetil: 38,
+        propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 8,
+          knockbackX: 320,
+          knockbackY: -230,
+          tumbling: false,
+        },
+      },
+    };
 
   }
 
@@ -783,7 +826,7 @@ scene.anims.create({
         start: 0,
         end: 8,
       }),
-      frameRate: 12,
+      frameRate: 16,
       repeat: 0,
     });
      scene.anims.create({
@@ -813,6 +856,46 @@ scene.anims.create({
       frameRate: 12,
       repeat: 0,
     });
+    scene.anims.create({
+      key: "ken_neSpecial",
+      frames: scene.anims.generateFrameNumbers("Ken_neSpecial", {
+        start: 0,
+        end: 15,
+      }),
+      frameRate: 16,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_hadouken_inicio",
+      frames: scene.anims.generateFrameNumbers("hadouken1", {
+        start: 0,
+        end: 9,
+      }),
+      frameRate: 20,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_hadouken_loop",
+      frames: scene.anims.generateFrameNumbers("hadouken1", {
+        start: 1,
+        end: 9,
+      }),
+      frameRate: 16,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "ken_hadouken_impacto",
+      frames: scene.anims.generateFrameNumbers("hadouken2", {
+        start: 0,
+        end: 9,
+      }),
+      frameRate: 24,
+      repeat: 0,
+    });
+
 
   }
 }
