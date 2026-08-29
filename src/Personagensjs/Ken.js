@@ -1,5 +1,6 @@
 import Personagem from "./Personagem.js";
 import Hadouken from "./Specials/Ken/hadouken.js";
+import Tatsumaki from "./Specials/Ken/tatsumaki.js";
 
 export default class Ken extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -606,6 +607,21 @@ this.nomePersonagem = "Ken";
           tumbling: false,
         },
       },
+      lado: {
+        animacao: "ken_siSpecial",
+        cooldown: 1800,
+        logica: Tatsumaki,
+         som: "tatsumaki",
+         volumeSom: 0.6,
+        propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 15,
+          knockbackX: 570,
+          knockbackY: -300,
+          tumbling: true,
+        },
+      },
+
     };
 
   }
@@ -896,6 +912,24 @@ scene.anims.create({
       repeat: 0,
     });
 
-
+    scene.anims.create({
+      key: "ken_siSpecial",
+      frames: [
+        ...scene.anims.generateFrameNumbers("Ken_siSpecial", {
+          start: 0,
+          end: 4,
+        }).map((frame) => ({ ...frame, duration: 25 })),
+        ...scene.anims.generateFrameNumbers("Ken_siSpecial", {
+          start: 5,
+          end: 19,
+        }),
+        ...scene.anims.generateFrameNumbers("Ken_siSpecial", {
+          start: 30,
+          end: 35,
+        }).map((frame) => ({ ...frame, duration: 70 })),
+      ],
+      frameRate: 24,
+      repeat: 0,
+    });
   }
 }
