@@ -612,7 +612,7 @@ this.nomePersonagem = "Ken";
         cooldown: 1800,
         logica: Tatsumaki,
          som: "tatsumaki",
-         volumeSom: 0.6,
+         volumeSom: 0.4,
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 15,
