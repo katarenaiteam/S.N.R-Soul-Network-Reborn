@@ -1,46 +1,46 @@
-const VELOCIDADE_AVANCO = 500;
-const MULTIPLICADOR_AVANCO_AEREO = 1.2;
-const MULTIPLICADOR_IMPULSO = 1.2;
-const VELOCIDADE_FINAL = 0.25;
+const IMPULSO_X = 190;
+const IMPULSO_Y = -580;
+const IMPULSO_AEREO_X = 250;
+const IMPULSO_AEREO_Y = -720;
+const FRAME_IMPULSO = 4;
+const FRAMES_DOS_HITS = [5, 9, 13];
+const FRAME_INICIO_HITBOX = 4;
+const FRAME_FIM_HITBOX = 13;
+const FRAME_INICIO_EFEITOS = 4;
+const DURACAO_HIT_STOP = 55;
 const INTERVALO_RASTRO = 45;
-const FRAME_INICIO_MOVIMENTO = 3;
-const FRAME_INICIO_IMPULSO = 6;
-const FRAME_FIM_MOVIMENTO = 20;
-const FRAME_INICIO_HITBOX = 6;
-const FRAME_FIM_HITBOX = 23;
-const FRAMES_DOS_HITS = [6, 11, 16, 22];
-
-const PROPRIEDADES_HITS_INICIAIS = {
-  tipoSomImpacto: "light",
-  dano: 2,
-  knockbackX: 45,
-  knockbackY: -110,
-  knockbackFixo: true,
-  tumbling: false,
-};
 
 const HITBOX = {
-  largura: 95,
-  altura: 65,
-  offsetX: 48,
+  largura: 82,
+  altura: 125,
+  offsetX: 25,
   offsetY: -45,
 };
 
 const CORPO_FISICO = {
-  largura: 80,
-  altura: 110,
-  offsetX: 36,
-  offsetY: 9,
+  largura: 70,
+  altura: 120,
+  offsetX: 15,
+  offsetY: 35,
 };
 
-export default class Tatsumaki {
+const PROPRIEDADES_HITS_INICIAIS = {
+  tipoSomImpacto: "light",
+  dano: 3,
+  knockbackX: 40,
+  knockbackY: -90,
+  knockbackFixo: true,
+  tumbling: false,
+};
+
+export default class Shoryuken {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
     this.scene = personagem.scene;
     this.special = special;
     this.estado = estado;
-    this.chaveAnimacao = special?.animacao || "ken_siSpecial";
-    this.ehAereo = this.chaveAnimacao === "ken_AsiSpecial";
+    this.chaveAnimacao = special?.animacao || "ken_doSpecial";
+    this.ehAereo = this.chaveAnimacao === "ken_AupSpecial";
 
     this.direcao = 1;
     this.hitbox = null;
@@ -48,10 +48,14 @@ export default class Tatsumaki {
     this.ultimoHitPorAlvo = new Map();
     this.alvosCarregados = new Set();
     this.indiceHitAtivo = -1;
+    this.impulsoAplicado = false;
+    this.chamas = null;
+    this.chamasCriadas = false;
     this.ultimoRastroEm = 0;
-    this.movimentoAtivo = false;
-    this.velocidadeMovimento = 0;
-    this.gravidadeAnulada = false;
+    this.emHitStop = false;
+    this.timerHitStop = null;
+    this.velocidadeAntesHitStop = null;
+    this.oponenteHitStop = null;
     this.finalizado = false;
     this.corpoOriginal = null;
 
@@ -64,10 +68,6 @@ export default class Tatsumaki {
     const body = sprite?.body;
     if (!sprite?.active || !body) return;
 
-    this.personagem.tocarSomSorteado(this.special?.som, {
-      volume: this.special?.volumeSom ?? 0.8,
-    });
-
     this.direcao = sprite.flipX ? -1 : 1;
     this.corpoOriginal = {
       largura: body.width,
@@ -76,10 +76,13 @@ export default class Tatsumaki {
       offsetY: body.offset.y,
     };
 
+    this.personagem.tocarSomSorteado(this.special?.som, {
+      volume: this.special?.volumeSom ?? 0.7,
+    });
+
     this.aplicarCorpoFisico();
-    this.movimentoAtivo = false;
-    this.velocidadeMovimento = 0;
-    body.setVelocityX(0);
+    body.setVelocity(0, 0);
+
     sprite.on("animationupdate", this.aoAtualizarAnimacao);
     sprite.once(
       `animationcomplete-${this.chaveAnimacao}`,
@@ -91,58 +94,21 @@ export default class Tatsumaki {
     if (animacao.key !== this.chaveAnimacao || this.finalizado) return;
 
     const frameAtual = frame.index;
+    const frameReal = Number(frame.textureFrame);
+
+    if (!this.impulsoAplicado && frameReal === FRAME_IMPULSO) {
+      this.impulsoAplicado = true;
+      this.personagem.sprite.body.setVelocity(
+        (this.ehAereo ? IMPULSO_AEREO_X : IMPULSO_X) * this.direcao,
+        this.ehAereo ? IMPULSO_AEREO_Y : IMPULSO_Y
+      );
+    }
 
     this.indiceHitAtivo = FRAMES_DOS_HITS.reduce(
       (indiceAtual, frameHit, indice) =>
         frameAtual >= frameHit ? indice : indiceAtual,
       -1
     );
-
-    const frameInicioMovimento = this.ehAereo ? 0 : FRAME_INICIO_MOVIMENTO;
-    this.movimentoAtivo =
-      frameAtual >= frameInicioMovimento &&
-      frameAtual <= FRAME_FIM_MOVIMENTO;
-
-    if (this.ehAereo && this.movimentoAtivo && !this.gravidadeAnulada) {
-      this.gravidadeAnulada = true;
-      this.personagem.sprite.body.setAllowGravity(false);
-      this.personagem.sprite.body.setVelocityY(0);
-    } else if (
-      this.ehAereo &&
-      !this.movimentoAtivo &&
-      this.gravidadeAnulada
-    ) {
-      this.restaurarGravidade();
-    }
-
-    if (this.movimentoAtivo) {
-      if (frameAtual < FRAME_INICIO_IMPULSO) {
-        // Pequena antecipação; ainda não existe hitbox.
-        this.velocidadeMovimento = this.ehAereo
-          ? VELOCIDADE_AVANCO * MULTIPLICADOR_IMPULSO
-          : VELOCIDADE_AVANCO * 0.3;
-      } else {
-        const progresso = Phaser.Math.Clamp(
-          (frameAtual - FRAME_INICIO_IMPULSO) /
-            (FRAME_FIM_MOVIMENTO - FRAME_INICIO_IMPULSO),
-          0,
-          1
-        );
-
-        if (progresso < 0.2) {
-          const saidaImpulso = progresso / 0.2;
-          this.velocidadeMovimento = VELOCIDADE_AVANCO * (
-            MULTIPLICADOR_IMPULSO - 0.2 * saidaImpulso
-          );
-        } else {
-          const frenagem = (progresso - 0.2) / 0.8;
-          this.velocidadeMovimento = VELOCIDADE_AVANCO * (
-            1 - (1 - VELOCIDADE_FINAL) * frenagem
-          );
-        }
-      }
-    }
-
 
     if (
       frameAtual >= FRAME_INICIO_HITBOX &&
@@ -151,6 +117,10 @@ export default class Tatsumaki {
       this.criarHitbox();
     } else {
       this.destruirHitbox();
+    }
+
+    if (frameAtual >= FRAME_INICIO_EFEITOS) {
+      this.criarChamas();
     }
   }
 
@@ -236,29 +206,91 @@ export default class Tatsumaki {
       { direcao: this.direcao, x: this.personagem.sprite.x }
     );
 
-    if (!ehUltimoHit && oponente.sprite?.body) {
-      // Mantém o alvo dentro do Tatsumaki para receber os próximos hits.
-      const velocidadeKen = Math.abs(
-        this.personagem.sprite.body?.velocity.x ?? VELOCIDADE_AVANCO
-      );
-
-      oponente.sprite.body.setVelocityX(
-        Math.max(velocidadeKen, VELOCIDADE_AVANCO * 0.75) * this.direcao
-      );
-    }
-
     const somImpacto =
       this.personagem.sons?.[propriedades.tipoSomImpacto || "heavy"];
 
     if (somImpacto) {
       this.personagem.tocarSomSorteado(somImpacto, { volume: 0.15 });
     }
+
+    this.aplicarHitStop(oponente);
   }
+
+  aplicarHitStop(oponente) {
+    if (this.emHitStop || this.finalizado) return;
+
+    const sprite = this.personagem.sprite;
+    const body = sprite.body;
+
+    this.emHitStop = true;
+    this.velocidadeAntesHitStop = {
+      x: body.velocity.x,
+      y: body.velocity.y,
+    };
+
+    sprite.anims.pause();
+    body.setVelocity(0, 0);
+    this.oponenteHitStop = oponente;
+    oponente.sprite?.anims?.pause();
+
+    this.timerHitStop = this.scene.time.delayedCall(
+      DURACAO_HIT_STOP,
+      () => {
+        this.timerHitStop = null;
+        if (this.finalizado || !sprite?.active) return;
+
+        sprite.anims.resume();
+        oponente.sprite?.anims?.resume();
+        this.oponenteHitStop = null;
+
+        if (this.velocidadeAntesHitStop) {
+          body.setVelocity(
+            this.velocidadeAntesHitStop.x,
+            this.velocidadeAntesHitStop.y
+          );
+        }
+
+        this.velocidadeAntesHitStop = null;
+        this.emHitStop = false;
+      }
+    );
+  }
+
+  criarChamas() {
+    if (this.chamasCriadas || this.chamas?.active) return;
+
+    this.chamasCriadas = true;
+
+    const sprite = this.personagem.sprite;
+    this.chamas = this.scene.add.sprite(
+      sprite.x,
+      sprite.y - 65,
+      "flames",
+      0
+    );
+
+    this.chamas.setFlipX(this.direcao < 0);
+    this.chamas.setDepth(sprite.depth + 1);
+    this.scene.camHUD?.ignore(this.chamas);
+    this.chamas.anims.play("ken_shoryuken_chamas");
+
+    this.chamas.once("animationcomplete-ken_shoryuken_chamas", () => {
+      if (this.chamas?.active) this.chamas.destroy();
+      this.chamas = null;
+    });
+  }
+
   criarRastro() {
     const sprite = this.personagem.sprite;
     const agora = this.scene.time.now;
 
-    if (agora - this.ultimoRastroEm < INTERVALO_RASTRO) return;
+    if (
+      this.emHitStop ||
+      agora - this.ultimoRastroEm < INTERVALO_RASTRO
+    ) {
+      return;
+    }
+
     this.ultimoRastroEm = agora;
 
     const rastro = this.scene.add.sprite(
@@ -287,10 +319,10 @@ export default class Tatsumaki {
       onComplete: () => rastro.destroy(),
     });
   }
+
   atualizarAlvosCarregados() {
     const spriteKen = this.personagem?.sprite;
-    const velocidadeKen = spriteKen?.body?.velocity.x ?? 0;
-    if (!spriteKen) return;
+    if (!spriteKen || this.emHitStop) return;
 
     this.alvosCarregados.forEach((oponente) => {
       const spriteAlvo = oponente?.sprite;
@@ -301,49 +333,55 @@ export default class Tatsumaki {
         return;
       }
 
-      const xDesejado = spriteKen.x + 38 * this.direcao;
-      const distancia = xDesejado - spriteAlvo.x;
-      const correcao = Phaser.Math.Clamp(distancia * 10, -280, 280);
+      const xDesejado = spriteKen.x + 28 * this.direcao;
+      const yDesejado = spriteKen.y - 18;
+      const distanciaX = xDesejado - spriteAlvo.x;
+      const distanciaY = yDesejado - spriteAlvo.y;
 
-      bodyAlvo.setVelocityX(velocidadeKen + correcao);
-
-      // Impede que uma queda de frames deixe o alvo escapar da área do golpe.
-      if (Math.abs(distancia) > 75) {
-        spriteAlvo.setX(xDesejado - 75 * Math.sign(distancia));
-      }
+      bodyAlvo.setVelocity(
+        (spriteKen.body?.velocity.x ?? 0) +
+          Phaser.Math.Clamp(distanciaX * 10, -220, 220),
+        (spriteKen.body?.velocity.y ?? 0) +
+          Phaser.Math.Clamp(distanciaY * 8, -180, 180)
+      );
     });
   }
+
   atualizar() {
     const sprite = this.personagem?.sprite;
     const body = sprite?.body;
-
     if (this.finalizado || !sprite?.active || !body) return;
 
     this.aplicarCorpoFisico();
-
-    if (this.movimentoAtivo) {
-      const multiplicadorAvanco = this.ehAereo
-        ? MULTIPLICADOR_AVANCO_AEREO
-        : 1;
-      body.setVelocityX(
-        this.velocidadeMovimento * multiplicadorAvanco * this.direcao
-      );
-    } else {
-      // Conserva parte do impulso e freia suavemente durante o pouso.
-      body.setVelocityX(body.velocity.x * 0.9);
-    }
-
     this.atualizarPosicaoHitbox();
+    this.atualizarPosicaoChamas();
     this.atualizarAlvosCarregados();
-    if (this.movimentoAtivo) this.criarRastro();
 
-    const bateuNaParede =
-      (this.direcao > 0 && body.blocked.right) ||
-      (this.direcao < 0 && body.blocked.left);
-
-    if (bateuNaParede) {
-      this.finalizar();
+    if (!this.emHitStop && this.indiceHitAtivo >= 0) {
+      this.criarRastro();
     }
+
+    if (this.emHitStop) {
+      body.setVelocity(0, 0);
+    }
+  }
+
+  atualizarPosicaoHitbox() {
+    if (!this.hitbox?.active) return;
+
+    this.hitbox.setPosition(
+      this.personagem.sprite.x + HITBOX.offsetX * this.direcao,
+      this.personagem.sprite.y + HITBOX.offsetY
+    );
+  }
+
+  atualizarPosicaoChamas() {
+    if (!this.chamas?.active) return;
+
+    this.chamas.setPosition(
+      this.personagem.sprite.x + 8 * this.direcao,
+      this.personagem.sprite.y - 65
+    );
   }
 
   aplicarCorpoFisico() {
@@ -366,15 +404,6 @@ export default class Tatsumaki {
     body.setOffset(offsetX, CORPO_FISICO.offsetY);
   }
 
-  atualizarPosicaoHitbox() {
-    if (!this.hitbox?.active) return;
-
-    this.hitbox.setPosition(
-      this.personagem.sprite.x + HITBOX.offsetX * this.direcao,
-      this.personagem.sprite.y + HITBOX.offsetY
-    );
-  }
-
   aoCompletarAnimacao() {
     this.finalizar();
   }
@@ -383,9 +412,7 @@ export default class Tatsumaki {
     if (this.finalizado) return;
     this.finalizado = true;
 
-    if (
-      this.personagem.maquinaEstados.estadoAtual === this.estado
-    ) {
+    if (this.personagem.maquinaEstados.estadoAtual === this.estado) {
       this.estado.finalizarSpecial();
     } else {
       this.cancelar();
@@ -402,11 +429,6 @@ export default class Tatsumaki {
     this.hitbox = null;
   }
 
-  restaurarGravidade() {
-    const body = this.personagem?.sprite?.body;
-    if (body && this.gravidadeAnulada) body.setAllowGravity(true);
-    this.gravidadeAnulada = false;
-  }
   restaurarCorpoFisico() {
     const body = this.personagem?.sprite?.body;
     if (!body || !this.corpoOriginal) return;
@@ -439,13 +461,36 @@ export default class Tatsumaki {
       this.aoCompletarAnimacao
     );
 
+    if (this.timerHitStop) {
+      this.timerHitStop.remove(false);
+      this.timerHitStop = null;
+    }
+
+    if (this.emHitStop) {
+      sprite?.anims?.resume();
+      this.oponenteHitStop?.sprite?.anims?.resume();
+      this.oponenteHitStop = null;
+
+      if (sprite?.body && this.velocidadeAntesHitStop) {
+        sprite.body.setVelocity(
+          this.velocidadeAntesHitStop.x,
+          this.velocidadeAntesHitStop.y
+        );
+      }
+    }
+
     this.destruirHitbox();
+    this.alvosCarregados.forEach((oponente) => {
+      oponente.sprite?.anims?.resume();
+    });
     this.alvosCarregados.clear();
 
-    if (sprite?.body) sprite.body.setVelocityX(0);
-    this.restaurarGravidade();
+    if (this.chamas?.active) this.chamas.destroy();
+    this.chamas = null;
+
     this.restaurarCorpoFisico();
     this.removerDaListaAtiva();
     this.finalizado = true;
+    this.emHitStop = false;
   }
 }

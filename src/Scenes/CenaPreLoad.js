@@ -213,6 +213,14 @@ this.load.spritesheet("SpiderMan_ult8", "assets/personagens/SpiderMan/Sprites/ul
     this.load.audio("hadouken", "assets/personagens/Ken/Audio/hadouken.wav");
     this.load.spritesheet("Ken_siSpecial", "assets/personagens/Ken/Sprites/Ken_siSpecial.png", { frameWidth: 159, frameHeight: 119 });
     this.load.audio("tatsumaki", "assets/personagens/Ken/Audio/tatsumaki.wav");
+    this.load.spritesheet("Ken_doSpecial", "assets/personagens/Ken/Sprites/Ken_doSpecial.png", { frameWidth: 100, frameHeight: 164 });
+    this.load.spritesheet("flames", "assets/personagens/Ken/Sprites/flames.png", { frameWidth: 154, frameHeight: 172 });
+    this.load.audio("shoryuken", "assets/personagens/Ken/Audio/shoryuken.wav");
+    this.load.spritesheet("Ken_AneSpecial", "assets/personagens/Ken/Sprites/Ken_AneSpecial.png", { frameWidth: 146, frameHeight: 113 });
+    this.load.spritesheet("Ken_AsiSpecial", "assets/personagens/Ken/Sprites/Ken_AsiSpecial.png", { frameWidth: 159, frameHeight: 124 });
+  
+
+
     
     //--Sound effects
     //-pulos

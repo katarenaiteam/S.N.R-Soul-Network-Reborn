@@ -1,8 +1,10 @@
 export default class Hadouken {
-  constructor(personagem, special) {
+  constructor(personagem, special, estado) {
     this.personagem = personagem;
     this.scene = personagem.scene;
     this.special = special;
+    this.estado = estado;
+    this.ehAereo = special?.animacao === "ken_AneSpecial";
     this.projetil = null;
     this.timerCriacao = null;
     this.timerVida = null;
@@ -13,6 +15,14 @@ export default class Hadouken {
 
   executar() {
   if (this.projetil || this.timerCriacao) return;
+
+  if (
+    this.special?.animacao === "ken_AneSpecial" &&
+    !this.personagem.sprite.body.blocked.down
+  ) {
+    this.personagem.sprite.setVelocityX(0);
+    this.personagem.sprite.setVelocityY(40);
+  }
 
   this.personagem.tocarSomSorteado(this.special?.som, {
     volume: this.special?.volumeSom ?? 0.8,
@@ -191,6 +201,15 @@ export default class Hadouken {
   }
 
   atualizar() {
+    if (
+      this.ehAereo &&
+      this.personagem.maquinaEstados.estadoAtual === this.estado &&
+      !this.personagem.sprite.body.blocked.down
+    ) {
+      this.personagem.sprite.setVelocityX(0);
+      this.personagem.sprite.setVelocityY(40);
+    }
+
     if (
       this.projetil?.active
       && Math.abs(this.projetil.x - this.personagem.sprite.x) > 1400

@@ -1,6 +1,7 @@
 import Personagem from "./Personagem.js";
 import Hadouken from "./Specials/Ken/hadouken.js";
 import Tatsumaki from "./Specials/Ken/tatsumaki.js";
+import Shoryuken from "./Specials/Ken/shoryuken.js";
 
 export default class Ken extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -310,7 +311,7 @@ this.nomePersonagem = "Ken";
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 60, offsetX: 0, offsetY: -70 },
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 },
+          { largura: 60, altura: 35, offsetX: -3, offsetY: -18 },
         ],
       },
    
@@ -433,6 +434,7 @@ this.nomePersonagem = "Ken";
         altura: 25,
         cooldown: 900,
         duracao: 400,
+        cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
@@ -441,6 +443,8 @@ this.nomePersonagem = "Ken";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
+          knockbackX: 150,
+          knockbackY: -350,
           tumbling: true,
         },
       },
@@ -571,16 +575,6 @@ this.nomePersonagem = "Ken";
 
     }
 
-
-
-
-
-
-
-
-
-
-
     // specials
     this.specials = {
       neutro: {
@@ -614,6 +608,70 @@ this.nomePersonagem = "Ken";
          som: "tatsumaki",
          volumeSom: 0.4,
         propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 15,
+          knockbackX: 570,
+          knockbackY: -300,
+          tumbling: true,
+        },
+      },
+
+      agachado: {
+        animacao: "ken_doSpecial",
+        cooldown: 1800,
+        logica: Shoryuken,
+        som: "shoryuken",
+        volumeSom: 0.7,
+        propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 14,
+          knockbackX: 250,
+          knockbackY: -650,
+          tumbling: true,
+        },
+      },
+
+      air_neutro: {
+        animacao: "ken_AneSpecial",
+        duracao: 800,
+        cooldown: 2000,
+        logica: Hadouken,
+        som: "hadouken",
+        volumeSom: 0.6,
+        propriedades: {
+          travarMovimentoAir: true,
+          tipoSomImpacto: "heavy",
+          dano: 8,
+          knockbackX: 320,
+          knockbackY: -230,
+          tumbling: false,
+        },
+      },
+
+      air_cima: {
+        animacao: "ken_AupSpecial",
+        cooldown: 2200,
+        logica: Shoryuken,
+        som: "shoryuken",
+        volumeSom: 0.7,
+        propriedades: {
+          travarMovimentoAir: true,
+          tipoSomImpacto: "heavy",
+          dano: 14,
+          knockbackX: 250,
+          knockbackY: -650,
+          tumbling: true,
+        },
+      },
+
+      air_lado: {
+        animacao: "ken_AsiSpecial",
+        cooldown: 1800,
+        logica: Tatsumaki,
+        som: "tatsumaki",
+        volumeSom: 0.4,
+        propriedades: {
+          travarMovimentoAir: true,
           tipoSomImpacto: "heavy",
           dano: 15,
           knockbackX: 570,
@@ -928,6 +986,56 @@ scene.anims.create({
           end: 35,
         }).map((frame) => ({ ...frame, duration: 70 })),
       ],
+      frameRate: 24,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_doSpecial",
+      frames: scene.anims.generateFrameNumbers("Ken_doSpecial", {
+        start: 0,
+        end: 13,
+      }),
+      frameRate: 18,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_shoryuken_chamas",
+      frames: scene.anims.generateFrameNumbers("flames", {
+        start: 0,
+        end: 8,
+      }),
+      frameRate: 18,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_AneSpecial",
+      frames: scene.anims.generateFrameNumbers("Ken_AneSpecial", {
+        start: 0,
+        end: 12,
+      }),
+      frameRate: 18,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_AupSpecial",
+      frames: scene.anims.generateFrameNumbers("Ken_doSpecial", {
+        start: 2,
+        end: 14,
+      }),
+      frameRate: 20,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_AsiSpecial",
+      frames: scene.anims.generateFrameNumbers("Ken_AsiSpecial", {
+        start: 0,
+        end: 23,
+      }),
       frameRate: 24,
       repeat: 0,
     });
