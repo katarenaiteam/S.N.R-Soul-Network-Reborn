@@ -64,8 +64,9 @@ export default class SpiderMan extends Personagem {
         offsetY: 95,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 25, offsetY: -70 }, // Tronco/cabeça
-          { largura: 110, altura: 35, offsetX: 5, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 30, altura: 30, offsetX: 20, offsetY: -75 },
+          { largura: 50, altura: 20, offsetX: 22, offsetY: -48 }, // Tronco/cabeça
+          { largura: 80, altura: 35, offsetX: 0, offsetY: -18 }, // Agachado / pernas abertas
         ],
       },
 
@@ -76,7 +77,7 @@ export default class SpiderMan extends Personagem {
         offsetY: 96,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
+          { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
           { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
@@ -89,7 +90,7 @@ export default class SpiderMan extends Personagem {
         escala: 1,
         hurtboxes: [
           { largura: 60, altura: 70, offsetX: 0, offsetY: -90 }, // Tronco/cabeça
-          { largura: 60, altura: 50, offsetX: 0, offsetY: -25 }, // parte de baixo parecida
+          { largura: 30, altura: 50, offsetX: -20, offsetY: -25 }, // parte de baixo parecida
         ],
       },
 
@@ -100,7 +101,8 @@ export default class SpiderMan extends Personagem {
         offsetY: 96,
         escala: 1,
         hurtboxes: [
-          { largura: 80, altura: 50, offsetX: 0, offsetY: -25 }, // fechadinho
+          { largura: 60, altura: 25, offsetX: 0, offsetY: -35 }, // fechadinho
+          { largura: 75, altura: 25, offsetX: 0, offsetY: -20 },
         ],
       },
 
@@ -111,8 +113,9 @@ export default class SpiderMan extends Personagem {
       offsetY: 96,
       escala: 1,
       hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 25, offsetY: -70 }, // Tronco/cabeça
-          { largura: 110, altura: 35, offsetX: 5, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 55, altura: 55, offsetX: -15, offsetY: -65 }, // Tronco/cabeça
+          { largura: 60, altura: 10, offsetX: -15, offsetY: -32 },
+          { largura: 85, altura: 15, offsetX: -5, offsetY: -18 }, // Agachado / pernas abertas
      ]
       },
 
@@ -123,8 +126,8 @@ export default class SpiderMan extends Personagem {
       offsetY: 96,
       escala: 1,
       hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 25, offsetY: -70 }, // Tronco/cabeça
-          { largura: 110, altura: 35, offsetX: 5, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 55, altura: 60, offsetX: -5, offsetY: -70 }, // Tronco/cabeça
+          { largura: 55, altura: 35, offsetX: -5, offsetY: -18 }, // Agachado / pernas abertas
      ]
       },
 
@@ -147,8 +150,8 @@ export default class SpiderMan extends Personagem {
         offsetY: 96,
         escala: 1,
         hurtboxes: [
-           { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+           { largura: 55, altura: 60, offsetX: 0, offsetY: -95 }, // Tronco/cabeça
+          { largura: 55, altura: 35, offsetX: 0, offsetY: -45 },
         ],
       },
       danoDown: {
@@ -158,8 +161,8 @@ export default class SpiderMan extends Personagem {
         offsetY: 96,
         escala: 1,
         hurtboxes: [
-           { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+           { largura: 55, altura: 60, offsetX: 0, offsetY: -90 }, 
+          { largura: 55, altura: 35, offsetX: 0, offsetY: -45 }, 
         ], 
       },
       danoSide: {
@@ -169,8 +172,7 @@ export default class SpiderMan extends Personagem {
         offsetY: 96,
         escala: 1,
         hurtboxes: [
-           { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+           { largura: 60, altura: 55, offsetX: 0, offsetY: -75 },  
         ],
       },
       dead: {
@@ -180,7 +182,8 @@ export default class SpiderMan extends Personagem {
         offsetY: 3, // Ajustado para compensar a folha de 52px de altura
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 },
+          { largura: 50, altura: 15, offsetX: -10, offsetY: -35 },
+          { largura: 90, altura: 20, offsetX: 0, offsetY: -15 },
         ],
       },
       getup: {
@@ -189,7 +192,10 @@ export default class SpiderMan extends Personagem {
         offsetX: 30,
         offsetY: -6,  // Compensação para os 96px do spritesheet do getup alinhar o pé com o chão
         escala: 1,
-        hurtboxes: [],
+        hurtboxes: [
+          { largura: 60, altura: 25, offsetX: 0, offsetY: -35 }, // fechadinho
+          { largura: 75, altura: 25, offsetX: 0, offsetY: -20 },
+        ],
       },
 
       atack: {
@@ -199,8 +205,9 @@ export default class SpiderMan extends Personagem {
         offsetY: 96,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 }, // Tronco/cabeça
-          { largura: 80, altura: 50, offsetX: 0, offsetY: -25 }, // fechadinho
+          { largura: 30, altura: 30, offsetX: 20, offsetY: -75 },
+          { largura: 50, altura: 20, offsetX: 22, offsetY: -48 }, // Tronco/cabeça
+          { largura: 80, altura: 35, offsetX: 0, offsetY: -18 }, // Agachado / pernas abertas
         ],
       },
 
@@ -211,8 +218,8 @@ export default class SpiderMan extends Personagem {
         offsetY: 96,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: -20, offsetY: -90 }, // Tronco/cabeça
-          { largura: 80, altura: 50, offsetX: 0, offsetY: -25 }, // perna dano
+          { largura: 60, altura: 45, offsetX: -20, offsetY: -60 }, // Tronco/cabeça
+          { largura: 70, altura: 45, offsetX: 0, offsetY: -35 }, // perna dano
         ],
       },
 
@@ -231,7 +238,7 @@ export default class SpiderMan extends Personagem {
         offsetX: 50,
         offsetY: 96,
         escala: 1,
-        hurtboxes: [{ largura: 80, altura: 60, offsetX: 0, offsetY: -40 }],
+        hurtboxes: [{ largura: 80, altura: 45, offsetX: 0, offsetY: -30 }],
       },
 
       sideAir: {
@@ -240,7 +247,7 @@ export default class SpiderMan extends Personagem {
         offsetX: 50,
         offsetY: 96,
         escala: 1,
-        hurtboxes: [{ largura: 80, altura: 60, offsetX: 0, offsetY: -40 }],
+        hurtboxes: [{ largura: 65, altura: 60, offsetX: -15, offsetY: -40 }],
       },
 
       upAir: {  
@@ -249,7 +256,7 @@ export default class SpiderMan extends Personagem {
         offsetX: 50,
         offsetY: 96,
         escala: 1,
-        hurtboxes: [{ largura: 70, altura: 80, offsetX: 0, offsetY: -50 }],
+        hurtboxes: [{ largura: 60, altura: 70, offsetX: -5, offsetY: -50 }],
       },
 
       neSpecial: {
@@ -259,8 +266,9 @@ export default class SpiderMan extends Personagem {
         offsetY: 95,
         escala: 1,
     hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 25, offsetY: -70 }, // Tronco/cabeça
-          { largura: 110, altura: 35, offsetX: 5, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 30, altura: 20, offsetX: -5, offsetY: -70 },
+          { largura: 70, altura: 20, offsetX: 12, offsetY: -48 }, // Tronco/cabeça
+          { largura: 75, altura: 35, offsetX: 0, offsetY: -18 }, // Agachado / pernas abertas
     ], 
     },
 
@@ -271,8 +279,6 @@ export default class SpiderMan extends Personagem {
         offsetY: 96,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
       counter: {
@@ -281,43 +287,66 @@ export default class SpiderMan extends Personagem {
      offsetX: 200,
      offsetY: 96,
       escala: 1,
-     hurtboxes: [
-    { largura: 60, altura: 80, offsetX: 0, offsetY: -40 }
-       ]
+     hurtboxes: []
       },
     siSpecial: {
         largura: 85,
         altura: 95,
-        offsetX: 40,
+        offsetX: 32,
         offsetY: -10,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
+          { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
           { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
+
+      AsiSpecial: {
+        largura: 85,
+        altura: 95,
+        offsetX: 64,
+        offsetY: 90,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
+          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+        ],
+      },
+
+      AneSpecial: {
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: 96,
+        escala: 1,
+        hurtboxes: [
+          { largura: 70, altura: 55, offsetX: -30, offsetY: -65 }, // Tronco/cabeça
+          
+        ],
+      },
+
      
       teia_side: {
         largura: 85,
         altura: 95,
-        offsetX: 50,
+        offsetX: 47,
         offsetY: -25,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 55, altura: 45, offsetX: -70, offsetY: -60 }, // Tronco/cabeça
+          { largura: 60, altura: 35, offsetX: -70, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
 
       spider_throw: {
         largura: 85,
         altura: 95,
-        offsetX: 250,
+        offsetX: 350,
         offsetY: 30,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 55, altura: 45, offsetX: 67, offsetY: -60 }, // Tronco/cabeça
+          { largura: 60, altura: 35, offsetX: 67, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
 
@@ -371,8 +400,8 @@ export default class SpiderMan extends Personagem {
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
-          knockbackX: 20,
-          knockbackY: -5,
+          knockbackX: 40,
+          knockbackY: -10,
           knockbackFixo: true,
         },
 
@@ -387,9 +416,9 @@ export default class SpiderMan extends Personagem {
         frameHitbox: 2,
 
         offsetX: 50,
-        offsetY: -60,
+        offsetY: -68,
         largura: 50,
-        altura: 40,
+        altura: 35,
         duracao: 350,
        // cancelavel: true,
 
@@ -407,7 +436,7 @@ export default class SpiderMan extends Personagem {
           tipoSomImpacto: "light",
           dano: 4,
           knockbackX: 30,
-          knockbackY: 0,
+          knockbackY: -10,
           knockbackFixo: true,
         },
 
@@ -422,9 +451,9 @@ export default class SpiderMan extends Personagem {
         frameHitbox: 4,
 
         offsetX: 45,
-        offsetY: -75,
+        offsetY: -80,
         largura: 35,
-        altura: 70,
+        altura: 60,
         duracao: 250,
         cancelavel: true,
 
@@ -473,7 +502,7 @@ export default class SpiderMan extends Personagem {
         frameHitbox: 3,
         offsetX: 52,
         offsetY: -60,
-        largura: 55,
+        largura: 60,
         altura: 25,
         cooldown: 900,
         duracao: 300,
@@ -525,7 +554,7 @@ export default class SpiderMan extends Personagem {
   atrasoFinalizacaoAcerto: 30,
 
   movimento: {
-    inicio: 80,
+    inicio: 30,
     fim: 900,
 
     x: {
@@ -585,6 +614,19 @@ export default class SpiderMan extends Personagem {
         finalizarAoTocarChao: false,
         atrasoFinalizacaoChao: 100,
         finalizarAoAcertarOponente: false,
+
+        movimento: {
+    inicio: 0,
+    fim: 300,
+
+    y: {
+      de: -200,
+      para: -350,
+    },
+
+    curva: "easeOut",
+  },
+
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
@@ -671,9 +713,10 @@ export default class SpiderMan extends Personagem {
         // atrasoFinalizacaoChao: 50,
         // finalizarAoAcertarOponente: false,
         propriedades: {
+          travarMovimentoAir: true,
           dano: 10,
           knockbackX: 500,
-          knockbackY: 400,
+          knockbackY: -180,
           anularGravidade: true,
           //impulsoX: 0,                    
           //impulsoY: 0,
@@ -1027,10 +1070,7 @@ scene.anims.create({
       if (!scene.anims.exists("spy_counter")) {
       scene.anims.create({
         key: "spy_counter",
-        frames: scene.anims.generateFrameNumbers("Counter", {
-          start: 0,
-          end: 6,
-        }),
+        frames: scene.anims.generateFrameNumbers("Counter", { start: 0, end: 6,}),
         frameRate: 9,
         repeat: 0,
       });
@@ -1046,7 +1086,7 @@ scene.anims.create({
    scene.anims.create({
      key: "spy_teia_side",
      frames: scene.anims.generateFrameNumbers("Side_teia", { start: 0, end: 3 }),
-     frameRate: 12,
+     frameRate: 14,
      repeat: 0,
    });
 

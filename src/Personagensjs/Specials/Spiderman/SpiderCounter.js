@@ -34,7 +34,7 @@ export default class SpiderCounter {
     }
 
     // Cria a Zone do Counter
-    this.hitboxCounter = this.scene.add.zone(sprite.x, sprite.y - 45, 90, 130);
+    this.hitboxCounter = this.scene.add.zone(sprite.x -5, sprite.y -80, 55, 110);
     this.scene.physics.add.existing(this.hitboxCounter);
     if (this.hitboxCounter.body) {
       this.hitboxCounter.body.allowGravity = false;
@@ -53,7 +53,7 @@ export default class SpiderCounter {
     }
 
     const sprite = this.personagem.sprite;
-    this.hitboxCounter.setPosition(sprite.x, sprite.y - 45);
+    this.hitboxCounter.setPosition(sprite.x -5, sprite.y - 60);
 
     // =========================================================
     // CHECAGEM GEOMÉTRICA MANUAL (Sem travas de overlap do Phaser)

@@ -307,7 +307,7 @@ this.nomePersonagem = "Ken";
         largura: 85,
         altura: 120,
         offsetX: 0,
-        offsetY: -10,
+        offsetY: 0,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 60, offsetX: 0, offsetY: -70 },
@@ -470,7 +470,7 @@ this.nomePersonagem = "Ken";
         propriedades: {
           tipoSomImpacto: "light",
           dano: 12,
-          knockbackX: 550,
+          knockbackX: 300,
           knockbackY: -400,
           tumbling: false,
         },

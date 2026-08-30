@@ -19,6 +19,8 @@ export default class SpiderSwing {
     this.ancoraX = null;
     this.ancoraY = null;
     this.fase = "idle";
+    this.velocidadeSaidaX = 0;
+    this.velocidadeSaidaY = 0;
 
     // --- CONFIGURAÇÃO DA HITBOX E DELAY ---
     this.hitboxOffsetX = 22;   // Posição X (frente/trás)
@@ -63,8 +65,11 @@ export default class SpiderSwing {
 
     const inicioX = sprite.x;
     const inicioY = sprite.y;
-    const distanciaX = 300 * direcao;
-    const duracaoMs = animacao.duration || (animacao.frames.length / animacao.frameRate) * 1000;
+    const distanciaX = 340 * direcao;
+    const amplitudeY = 65;
+    const duracaoAnimacao = animacao.duration ||
+      (animacao.frames.length / animacao.frameRate) * 1000;
+    const duracaoMs = duracaoAnimacao * 0.7;
 
     // Teia e Hitbox inicial
     this.ancoraX = sprite.x + 200 * direcao;
@@ -88,30 +93,68 @@ export default class SpiderSwing {
       from: 0,
       to: 1,
       duration: duracaoMs,
-      ease: "Sine.easeInOut",
+      ease: (progresso) => progresso * (0.65 + 0.35 * progresso),
       onUpdate: (tween) => {
         if (this.fase !== "swing") return;
 
         const progresso = tween.getValue();
         const proximoX = inicioX + distanciaX * progresso;
-        const proximoY = inicioY + Math.sin(progresso * Math.PI) * 55;
+        const proximoY = inicioY + Math.sin(progresso * Math.PI) * amplitudeY;
+        const estruturas = [
+          this.scene.mapaAtual?.plataformas,
+          this.scene.plataformas,
+          this.scene.chao,
+        ].filter((estrutura, indice, lista) =>
+          estrutura && lista.indexOf(estrutura) === indice
+        );
 
-        // 1. Move o sprite e atualiza o corpo físico para a nova posição
-        sprite.setPosition(proximoX, proximoY);
-        sprite.body.updateFromGameObject();
+        const inicioPassoX = sprite.x;
+        const inicioPassoY = sprite.y;
+        const deltaX = proximoX - inicioPassoX;
+        const deltaY = proximoY - inicioPassoY;
+        const totalPassos = Math.max(
+          1,
+          Math.ceil(Math.max(Math.abs(deltaX), Math.abs(deltaY)) / 4)
+        );
+        let ultimoXSeguro = inicioPassoX;
+        let ultimoYSeguro = inicioPassoY;
 
-        // 2. Pega o grupo REAL de plataformas do mapa instanciado
-        const plataformas = 
-          (this.scene.mapaAtual && this.scene.mapaAtual.plataformas) || 
-          this.scene.plataformas;
+        for (let passo = 1; passo <= totalPassos; passo += 1) {
+          const fracao = passo / totalPassos;
+          sprite.setPosition(
+            inicioPassoX + deltaX * fracao,
+            inicioPassoY + deltaY * fracao
+          );
+          sprite.body.updateFromGameObject();
 
-        // 3. Testa se encostou em qualquer bloco do mapa
-        if (plataformas && this.scene.physics.overlap(sprite, plataformas)) {
-          this.tweenMovimento.stop();
-          this.finalizar();
-          return;
+          if (this.estaColidindoComCenario(estruturas)) {
+            const comprimentoPasso = Math.hypot(deltaX, deltaY) || 1;
+            sprite.setPosition(
+              ultimoXSeguro - (deltaX / comprimentoPasso) * 8,
+              ultimoYSeguro - (deltaY / comprimentoPasso) * 8
+            );
+            sprite.body.updateFromGameObject();
+            sprite.body.setVelocity(0, 0);
+            this.tweenMovimento?.stop();
+            this.finalizar();
+            return;
+          }
+
+          ultimoXSeguro = sprite.x;
+          ultimoYSeguro = sprite.y;
         }
 
+        const deltaSegundos = Math.max(this.scene.game.loop.delta, 1) / 1000;
+        this.velocidadeSaidaX = Phaser.Math.Clamp(
+          (sprite.x - inicioPassoX) / deltaSegundos,
+          -850,
+          850
+        );
+        this.velocidadeSaidaY = Phaser.Math.Clamp(
+          (sprite.y - inicioPassoY) / deltaSegundos,
+          -600,
+          600
+        );
         this.atualizarTeia(direcao);
 
         // Atualiza a hitbox de ataque
@@ -128,8 +171,38 @@ export default class SpiderSwing {
       },
       onComplete: () => {
         if (this.fase !== "swing") return;
-        this.acertou ? this.executarFlipAtras() : this.finalizar();
+
+        sprite.body.setAllowGravity(true);
+        sprite.body.setVelocity(
+          this.velocidadeSaidaX,
+          this.velocidadeSaidaY
+        );
+        this.finalizar();
       },
+    });
+  }
+
+  estaColidindoComCenario(estruturas) {
+    const body = this.personagem?.sprite?.body;
+    if (!body) return false;
+
+    const objetos = estruturas.flatMap((estrutura) => {
+      if (typeof estrutura.getChildren === "function") {
+        return estrutura.getChildren();
+      }
+      return Array.isArray(estrutura) ? estrutura : [estrutura];
+    });
+
+    return objetos.some((objeto) => {
+      const corpoCenario = objeto?.body;
+      if (!corpoCenario || corpoCenario.enable === false) return false;
+
+      return (
+        body.right > corpoCenario.left + 0.5 &&
+        body.left < corpoCenario.right - 0.5 &&
+        body.bottom > corpoCenario.top + 0.5 &&
+        body.top < corpoCenario.bottom - 0.5
+      );
     });
   }
 
@@ -233,12 +306,17 @@ export default class SpiderSwing {
     const direcao = sprite && sprite.flipX ? -1 : 1;
 
     if (typeof alvo.receberDano === "function") {
-      alvo.receberDano(props.dano || 18, {
-        knockbackX: (props.knockbackX || 550) * direcao,
-        knockbackY: props.knockbackY || -240,
-        tumbling: true,
-      });
+      alvo.receberDano(
+        props.dano || 18,
+        {
+          knockbackX: props.knockbackX || 500,
+          knockbackY: props.knockbackY ?? -180,
+          tumbling: true,
+        },
+        { x: sprite.x, direcao }
+      );
     }
+    this.executarFlipAtras();
   }
 
   executarFlipAtras() {
@@ -343,15 +421,6 @@ export default class SpiderSwing {
     if (sprite?.body) {
       sprite.body.setAllowGravity(true);
       sprite.setVisible(true);
-
-      // --- RESTAURA A HITBOX PADRÃO AO CANCELAR ---
-      if (typeof this.personagem.configurarHitboxPadrao === "function") {
-        this.personagem.configurarHitboxPadrao();
-      } else {
-        sprite.body.setSize(sprite.width, sprite.height);
-        sprite.body.setOffset(0, 0);
-      }
-      sprite.body.updateFromGameObject();
     }
 
     if (this.listenerAnimacao) {
@@ -384,16 +453,6 @@ export default class SpiderSwing {
     if (sprite && sprite.body) {
       sprite.body.setAllowGravity(true);
       sprite.setVisible(true);
-
-      // --- RESTAURA A HITBOX PADRÃO AO FINALIZAR ---
-      if (typeof this.personagem.configurarHitboxPadrao === "function") {
-        this.personagem.configurarHitboxPadrao();
-      } else {
-        // Redefine a hitbox para o tamanho padrão do sprite do Homem-Aranha
-        sprite.body.setSize(sprite.width, sprite.height);
-        sprite.body.setOffset(0, 0);
-      }
-      sprite.body.updateFromGameObject();
     }
 
     if (this.listenerAnimacao) {
@@ -403,7 +462,17 @@ export default class SpiderSwing {
     }
 
     if (this.estado && typeof this.estado.finalizarSpecial === "function") {
+      const body = this.personagem.sprite.body;
+      const centroXAnterior = body.center.x;
+      const baseYAnterior = body.bottom;
+
       this.estado.finalizarSpecial();
+      this.personagem.atualizarOffsetFisica();
+      body.updateFromGameObject();
+
+      this.personagem.sprite.x += centroXAnterior - body.center.x;
+      this.personagem.sprite.y += baseYAnterior - body.bottom;
+      body.updateFromGameObject();
     }
   }
 

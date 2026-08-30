@@ -101,10 +101,10 @@ export default class SpiderThrow {
     const sprite = this.personagem.sprite;
     const direcao = sprite.flipX ? -1 : 1;
 
-    const posY = sprite.y - 35;
-    const larguraMaxima = 140; // Largura final desejada
-    const altura = 40;
-    const offsetOrigemX = 10 * direcao; // Ponto inicial da teia (próximo à mão)
+    const posY = sprite.y - 55;
+    const larguraMaxima = 160; // Largura final desejada
+    const altura = 25;
+    const offsetOrigemX = -10 * direcao; // Ponto inicial da teia (próximo à mão)
 
     // Cria a zona inicialmente com largura 1 (evita bugs de escala 0 no Phaser Physics)
     this.hitboxTeia = this.scene.add.zone(
