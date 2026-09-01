@@ -93,9 +93,9 @@ this.vfxAtaqueNormal = {
     ],
   },
   porAtaque: {
-    neutro1: { efeito: "notaAtaque1", quantidade: 2 },
-    neutro2: { efeito: "notaAtaque2", quantidade: 3 },
-    neutro3: { efeito: "notaAtaque1", quantidade: 3 },
+    neutro1: { efeito: "notaAtaque1", quantidade: 2, offsetX: -20, movimentoX: 11 },
+    neutro2: { efeito: "notaAtaque2", quantidade: 3, offsetX: -20, movimentoX: 11 },
+    neutro3: { efeito: "notaAtaque1", quantidade: 3, offsetX: -20, movimentoX: 11 },
     neutro4: { efeito: "notaAtaque2", quantidade: 4, movimentoX: 70 },
     side: {
       efeito: "notaAtaque2", quantidade: 5, movimentoX: 16,
@@ -620,7 +620,7 @@ this.vfxAtaqueNormal = {
       escalaNota: 0.8,
       larguraNota: 70,
       alturaNota: 70,
-      velocidadeNota: 700,
+      velocidadeNota: 900,
       quedaNota: 0,
       tempoNota: 4000,
       tempoPoseLancamento: 560,
@@ -929,6 +929,8 @@ scene.anims.create({
     });
   }
 }
+
+
 
 
 
