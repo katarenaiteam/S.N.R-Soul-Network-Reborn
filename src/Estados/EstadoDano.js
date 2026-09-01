@@ -10,6 +10,7 @@ export default class EstadoDano extends EstadoBase {
     const body = this.personagem.sprite.body;
     const FRAME_MS = 1000 / 60;
 
+if (false) {
 let forcaImpacto = 0;
 
 if (body) {
@@ -60,23 +61,47 @@ else {
 
 this.duracaoStun =
   framesStun * FRAME_MS;
+}
+
+// O impacto já traz o hitstun calculado. O fallback cobre chamadas antigas
+// que entrem diretamente neste estado sem passar por receberDano.
+this.duracaoStun = this.personagem.ultimoImpacto?.hitstunCalculadoMs
+  ?? (this.personagem.isTumbling ? 22 : 14) * FRAME_MS;
 
     //controle para transição vertical sem passar pelo neutro
     this.trocaVerticalAtiva = false;
     this.modoHorizontalAtivo = false;
 
-    // Virar o personagem para o oponente
+    // Perto de uma parede, mantém a direção atual para o sprite não invadi-la
+    // ao ser espelhado. Fora dela, continua olhando para o atacante.
     const oponente =
       this.personagem.scene.jogador1 === this.personagem
         ? this.personagem.scene.jogador2
         : this.personagem.scene.jogador1;
+    const plataformas = this.personagem.scene.mapaAtual?.plataformas?.getChildren?.() ?? [];
+    const margemParede = 24;
+    const paredeProxima = body && plataformas.some((plataforma) => {
+      const parede = plataforma.body;
+      if (!parede?.enable) return false;
 
-    if (oponente && oponente.sprite) {
+      const sobrepoeVerticalmente =
+        body.bottom > parede.top && body.top < parede.bottom;
+      const pertoDaEsquerda = Math.abs(body.left - parede.right) <= margemParede;
+      const pertoDaDireita = Math.abs(body.right - parede.left) <= margemParede;
+
+      return sobrepoeVerticalmente && (pertoDaEsquerda || pertoDaDireita);
+    });
+    const encostadoNaParede = body && (
+      body.blocked.left || body.blocked.right ||
+      body.touching.left || body.touching.right ||
+      paredeProxima
+    );
+
+    if (oponente?.sprite && !encostadoNaParede) {
       this.personagem.sprite.setFlipX(
         this.personagem.sprite.x > oponente.sprite.x
       );
     }
-
     // Aplica o quique
     if (body) {
       body.setBounce(0.5, 0.4);
@@ -84,6 +109,7 @@ this.duracaoStun =
 
     // Inicializa a animação
     this.atualizarAnimacaoDano();
+
   }
 
   atualizarAnimacaoDano() {

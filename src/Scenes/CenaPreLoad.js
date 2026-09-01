@@ -180,8 +180,30 @@ this.load.spritesheet("SpiderMan_ult8", "assets/personagens/SpiderMan/Sprites/ul
     this.load.spritesheet("Miku_crouch1", "assets/personagens/Miku/Sprites/Miku_crouch1.png", { frameWidth: 188, frameHeight: 354 });
     this.load.spritesheet("Miku_crouch2", "assets/personagens/Miku/Sprites/Miku_crouch2.png", { frameWidth: 180, frameHeight: 200 });
     this.load.spritesheet("Miku_crouch3", "assets/personagens/Miku/Sprites/Miku_crouch3.png", { frameWidth: 188, frameHeight: 354 });
+    this.load.spritesheet("Miku_guard", "assets/personagens/Miku/Sprites/Miku_guard.png", { frameWidth: 166, frameHeight: 335 });
     this.load.spritesheet("Miku_taunt1", "assets/personagens/Miku/Sprites/Miku_taunt1.png", { frameWidth: 304, frameHeight: 374 });
-
+    this.load.spritesheet("Miku_hurt1", "assets/personagens/Miku/Sprites/Miku_hurt1.png", { frameWidth: 270, frameHeight: 351 });
+    this.load.spritesheet("Miku_hurtUp", "assets/personagens/Miku/Sprites/Miku_hurtUp.png", { frameWidth: 270, frameHeight: 348 });
+    this.load.spritesheet("Miku_hurtSide", "assets/personagens/Miku/Sprites/Miku_hurtSide.png", { frameWidth: 334, frameHeight: 351 });
+    this.load.spritesheet("Miku_hurtDown", "assets/personagens/Miku/Sprites/Miku_hurtDown.png", { frameWidth: 274, frameHeight: 336 });
+    this.load.spritesheet("Miku_dead", "assets/personagens/Miku/Sprites/Miku_dead.png", { frameWidth: 360, frameHeight: 130 });
+    //ataque
+    this.load.spritesheet("Miku_neutro1", "assets/personagens/Miku/Sprites/Miku_neutro1.png", { frameWidth: 203, frameHeight: 348 });
+    this.load.spritesheet("Miku_neutro2", "assets/personagens/Miku/Sprites/Miku_neutro2.png", { frameWidth: 244, frameHeight: 356 });
+    this.load.spritesheet("Miku_neutro3", "assets/personagens/Miku/Sprites/Miku_neutro3.png", { frameWidth: 360, frameHeight: 356 });
+    this.load.spritesheet("Miku_spin", "assets/personagens/Miku/Sprites/Miku_spin.png", { frameWidth: 512, frameHeight: 370 });
+    this.load.spritesheet("Miku_upAtack", "assets/personagens/Miku/Sprites/Miku_upAtack.png", { frameWidth: 393, frameHeight: 424 });
+    this.load.spritesheet("Miku_airplosion", "assets/personagens/Miku/Sprites/Miku_airplosion.png", { frameWidth: 490, frameHeight: 342 });
+    this.load.spritesheet("Miku_downAtack", "assets/personagens/Miku/Sprites/Miku_downAtack.png", { frameWidth: 390, frameHeight: 381 });
+    this.load.spritesheet("Miku_megasing", "assets/personagens/Miku/Sprites/Miku_megasing.png", { frameWidth: 423, frameHeight: 364 });
+    this.load.spritesheet("Miku_sing1", "assets/personagens/Miku/Sprites/Miku_sing1.png", { frameWidth: 274, frameHeight: 376 });
+    this.load.spritesheet("Miku_sing2", "assets/personagens/Miku/Sprites/Miku_sing2.png", { frameWidth: 308, frameHeight: 382 });
+    this.load.spritesheet("Miku_effects", "assets/personagens/Miku/Sprites/Miku_effects.png", { frameWidth: 400, frameHeight: 400 });
+    this.load.spritesheet("Miku_spine", "assets/personagens/Miku/Sprites/Miku_spine.png", { frameWidth: 192, frameHeight: 94 });
+    this.load.audio("sek", "assets/personagens/Miku/Audio/sek.wav");
+    this.load.audio("e", "assets/personagens/Miku/Audio/e.wav");
+    this.load.audio("kai", "assets/personagens/Miku/Audio/kai.wav");
+    
     // --- Ken ---
     //base
     this.load.spritesheet("Ken_idle", "assets/personagens/Ken/Sprites/Ken_idle.png", { frameWidth: 78, frameHeight: 111 });
@@ -218,6 +240,7 @@ this.load.spritesheet("SpiderMan_ult8", "assets/personagens/SpiderMan/Sprites/ul
     this.load.audio("shoryuken", "assets/personagens/Ken/Audio/shoryuken.wav");
     this.load.spritesheet("Ken_AneSpecial", "assets/personagens/Ken/Sprites/Ken_AneSpecial.png", { frameWidth: 146, frameHeight: 113 });
     this.load.spritesheet("Ken_AsiSpecial", "assets/personagens/Ken/Sprites/Ken_AsiSpecial.png", { frameWidth: 159, frameHeight: 124 });
+    this.load.spritesheet("Ken_AdoSpecial", "assets/personagens/Ken/Sprites/Ken_AdoSpecial.png", { frameWidth: 166, frameHeight: 132 });
   
 
 
@@ -286,6 +309,11 @@ this.load.spritesheet("SpiderMan_ult8", "assets/personagens/SpiderMan/Sprites/ul
     this.load.spritesheet("cidade", "assets/cenarios/MapaCidade/Sprites/cidade.png", { frameWidth: 960, frameHeight: 320 });
     this.load.audio("ClockTower", "assets/cenarios/MapaCidade/Ost/ClockTower.mp3");
     this.load.image("thumb_cidade", "assets/cenarios/MapaCidade/Sprites/thumb_cidade.png");
+    // test
+    this.load.spritesheet("backtest", "assets/cenarios/MapaTest/backtest.png", { frameWidth: 1200, frameHeight: 600 });
+    this.load.audio("No_More", "assets/cenarios/MapaTest/No_More.mp3");
+    this.load.image("thumb_teste", "assets/cenarios/MapaTest/thumb_teste.png");
+
 
 
     // --- AUDIOS ---

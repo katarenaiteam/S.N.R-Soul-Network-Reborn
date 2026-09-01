@@ -115,6 +115,7 @@ export default class SpiderThrow {
     );
     this.scene.physics.add.existing(this.hitboxTeia);
     this.hitboxTeia.body.setAllowGravity(false);
+    this.hitboxTeia.body.debugBodyColor = 0xff0000;
 
     const oponentes =
       this.scene.scene.key === "CenaHistoria"

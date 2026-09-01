@@ -297,6 +297,8 @@ export default class CenaHistoria extends Phaser.Scene {
 
     // Limpa a memória de acertos para o jogador poder voltar a ser atingido/atacar normalmente
     jogador.ultimoAtaqueRecebidoId = null;
+    jogador.comboHitsRecebidos = 0;
+    jogador.tempoUltimoHit = -Infinity;
 
     if (jogador.porcentagemDano !== undefined) {
       jogador.porcentagemDano = 0;

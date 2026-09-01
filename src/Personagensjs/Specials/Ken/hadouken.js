@@ -49,6 +49,7 @@ export default class Hadouken {
     this.projetil.setDepth(lutador.depth + 1);
     this.scene.camHUD?.ignore(this.projetil);
     this.projetil.body.setAllowGravity(false);
+    this.projetil.body.debugBodyColor = 0xff0000;
     this.projetil.body.setSize(
       this.special?.larguraProjetil ?? 52,
       this.special?.alturaProjetil ?? 38

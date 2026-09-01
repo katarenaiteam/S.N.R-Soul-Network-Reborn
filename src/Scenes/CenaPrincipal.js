@@ -280,6 +280,8 @@ this.jogador2 = this.criarPersonagem(
     jogador.sprite.body.setVelocity(0, 0);
     jogador.sprite.setPosition(pontoRespawn.x, pontoRespawn.y);
     jogador.isTumbling = false;
+    jogador.comboHitsRecebidos = 0;
+    jogador.tempoUltimoHit = -Infinity;
     jogador.maquinaEstados.mudarEstado("idle");
 
     if (jogador.porcentagemDano !== undefined) {

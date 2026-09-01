@@ -39,6 +39,7 @@ export default class WebShot {
     this.projetil.anims.play("spy_webShot");
 
     this.projetil.body.setAllowGravity(false);
+    this.projetil.body.debugBodyColor = 0xff0000;
     this.projetil.body.setSize(30, 30);
     this.projetil.body.setVelocityX(600 * direcao);
 

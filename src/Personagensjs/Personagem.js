@@ -42,6 +42,10 @@ export default class Personagem {
     this.specials = {};
     this.logicasEspeciaisAtivas = [];
     this.invulneravel = false;
+    this.hiperArmaduraHits = 0;
+    this.hiperArmaduraFonte = null;
+    this.comboHitsRecebidos = 0;
+    this.tempoUltimoHit = -Infinity;
 
     // Atributos
     this.velocidade = config.velocidade;
@@ -192,6 +196,14 @@ export default class Personagem {
     this.porcentagemDano += quantidade;
     if (this.textoDano) this.textoDano.setText(`${Math.floor(this.porcentagemDano)}%`);
 
+    // Hiper armadura recebe o dano normalmente, mas um número limitado de
+    // golpes não aplica knockback nem interrompe o estado atual.
+    if (this.hiperArmaduraHits > 0) {
+      this.hiperArmaduraHits--;
+      if (this.hiperArmaduraHits === 0) this.hiperArmaduraFonte = null;
+      return false;
+    }
+
     const oponente = this.scene.jogador1 === this ? this.scene.jogador2 : this.scene.jogador1;
     const direcaoX = origem?.direcao !== undefined
       ? origem.direcao * Math.sign(propriedades.knockbackX ?? 250)
@@ -236,7 +248,43 @@ export default class Personagem {
     );
 
     // O EstadoDano usa a velocidade já aplicada para calcular o hitstun.
-    this.ultimoImpacto = propriedades;
+    const agora = this.scene.time.now;
+    const janelaCombo = propriedades.janelaCombo ?? 1100;
+    this.comboHitsRecebidos = agora - this.tempoUltimoHit <= janelaCombo
+      ? this.comboHitsRecebidos + 1
+      : 1;
+    this.tempoUltimoHit = agora;
+
+    // Hitstun e knockback usam curvas diferentes. A raiz quadrada impede que
+    // velocidades altas transformem um lançamento em incapacidade excessiva.
+    const velocidadeImpacto = Math.hypot(
+      Math.abs(kbX) * multiplicadorX,
+      Math.abs(kbY) * multiplicadorY
+    );
+    const tumbling = propriedades.tumbling ?? false;
+    const baseFrames = propriedades.hitstunBaseFrames ?? (tumbling ? 19 : 13);
+    const porDano = Math.min(6, quantidade * (tumbling ? 0.3 : 0.45));
+    const porImpacto = Math.sqrt(velocidadeImpacto) * (tumbling ? 0.48 : 0.18);
+    let hitstunFrames = propriedades.hitstunFrames
+      ?? baseFrames + porDano + porImpacto;
+
+    const minimo = propriedades.hitstunMinFrames ?? (tumbling ? 22 : 14);
+    const maximo = propriedades.hitstunMaxFrames ?? (tumbling ? 42 : 24);
+    hitstunFrames = Phaser.Math.Clamp(hitstunFrames, minimo, maximo);
+
+    // Preserva combos curtos e reduz progressivamente prisões de muitos hits.
+    const hitsSemDecay = propriedades.hitsSemDecay ?? 3;
+    const passosDecay = Math.max(0, this.comboHitsRecebidos - hitsSemDecay);
+    const multiplicadorDecay = propriedades.ignorarHitstunDecay
+      ? 1
+      : Math.max(0.6, 1 - passosDecay * 0.1);
+    hitstunFrames = Math.max(10, hitstunFrames * multiplicadorDecay);
+
+    this.ultimoImpacto = {
+      ...propriedades,
+      hitstunCalculadoMs: hitstunFrames * (1000 / 60),
+      comboHits: this.comboHitsRecebidos,
+    };
 
     // DEPOIS MUDA PARA O ESTADO DE DANO
     this.maquinaEstados.mudarEstado("dano");
@@ -421,13 +469,15 @@ export default class Personagem {
     const cfg = this.obterConfigAtual();
     if (!cfg.largura || !this.sprite.body) return;
 
-    this.sprite.body.setSize(cfg.largura, cfg.altura, false);
+    const body = this.sprite.body;
+
+    body.setSize(cfg.largura, cfg.altura, false);
 
     const offsetX = this.sprite.flipX
       ? this.sprite.frame.realWidth - cfg.offsetX - cfg.largura
       : cfg.offsetX;
 
-    this.sprite.body.setOffset(offsetX, cfg.offsetY);
+    body.setOffset(offsetX, cfg.offsetY);
   }
 
  inputDown(nome) {
@@ -642,6 +692,7 @@ export default class Personagem {
 
     if (cfg.escala) this.sprite.setScale(cfg.escala);
     this.atualizarOffsetFisica();
+
 
     if (this.hurtbox?.body) {
       const hL = cfg.hurtboxLargura || cfg.largura;

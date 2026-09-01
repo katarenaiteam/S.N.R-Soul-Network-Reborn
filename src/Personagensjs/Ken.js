@@ -2,6 +2,7 @@ import Personagem from "./Personagem.js";
 import Hadouken from "./Specials/Ken/hadouken.js";
 import Tatsumaki from "./Specials/Ken/tatsumaki.js";
 import Shoryuken from "./Specials/Ken/shoryuken.js";
+import AxeKick from "./Specials/Ken/axeKick.js";
 
 export default class Ken extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -63,7 +64,7 @@ this.nomePersonagem = "Ken";
         offsetY: -10,
         escala: 1,
         hurtboxes: [
-          { largura: 50, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
           { largura: 67, altura: 35, offsetX: 0, offsetY: -18 },
         ],
       },
@@ -75,7 +76,7 @@ this.nomePersonagem = "Ken";
         offsetY: -9,
         escala: 1,
         hurtboxes: [
-          { largura: 50, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
           { largura: 60, altura: 35, offsetX: 0, offsetY: -18 },
         ],
       },
@@ -87,8 +88,8 @@ this.nomePersonagem = "Ken";
         offsetY: 10,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 45, altura: 50, offsetX: -5, offsetY: -25 },
+          { largura: 45, altura: 70, offsetX: 0, offsetY: -90 },
+          { largura: 30, altura: 50, offsetX: -5, offsetY: -25 },
         ],
       },
 
@@ -121,8 +122,8 @@ this.nomePersonagem = "Ken";
         offsetY: -16,
         escala: 1,
         hurtboxes: [
-          { largura: 50, altura: 50, offsetX: -5, offsetY: -75 },
-          { largura: 60, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 45, altura: 50, offsetX: -5, offsetY: -75 },
+          { largura: 50, altura: 50, offsetX: -5, offsetY: -25 },
         ],
       },
 
@@ -133,8 +134,8 @@ this.nomePersonagem = "Ken";
   offsetY: -5,
   escala: 1,
   hurtboxes: [
-    { largura: 60, altura: 65, offsetX: -10, offsetY: -60 }, // Tronco inclinado
-    { largura: 50, altura: 45, offsetX: 0, offsetY: -10 },   // Pernas
+    { largura: 50, altura: 65, offsetX: -10, offsetY: -60 }, // Tronco inclinado
+    { largura: 50, altura: 30, offsetX: 0, offsetY: -15 },   // Pernas
   ],
 },
 
@@ -178,9 +179,9 @@ this.nomePersonagem = "Ken";
 
       // Dead (Ken_dead - 76px de altura)
       dead: {
-        largura: 144,
+        largura: 80,
         altura: 33,
-        offsetX: 10,
+        offsetX: 49,
         offsetY: 40,
         escala: 1,
         hurtboxes: [
@@ -199,38 +200,38 @@ this.nomePersonagem = "Ken";
       },
 
       atack1: {
-        largura: 85,
+        largura: 80,
         altura: 120,
-        offsetX: 36,
+        offsetX: 41,
         offsetY: -10,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -85 },
-          { largura: 70, altura: 40, offsetX: 0, offsetY: -20 },
+          { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 67, altura: 35, offsetX: 0, offsetY: -18 },
         ],
       },
 
       atack2: {
-        largura: 85,
+        largura: 80,
         altura: 120,
-        offsetX: 55,
+        offsetX: 61,
         offsetY: -10,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -85 },
-          { largura: 70, altura: 40, offsetX: 0, offsetY: -20 },
+          { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 67, altura: 35, offsetX: 0, offsetY: -18 },
         ],
       },
 
       atack3: {
-        largura: 85,
+        largura: 80,
         altura: 120,
-        offsetX: 67,
-        offsetY: -3, 
+        offsetX: 70,
+        offsetY: 0,
         escala: 1,
         hurtboxes: [
-          { largura: 70, altura: 70, offsetX: 10, offsetY: -85 },
-          { largura: 40, altura: 40, offsetX: 10, offsetY: -25 },
+          { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 35, altura: 35, offsetX: 17, offsetY: -18 },
         ],
       },
 
@@ -241,8 +242,8 @@ this.nomePersonagem = "Ken";
         offsetY: -5,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: -20, offsetY: -90 },
-          { largura: 80, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 50, altura: 55, offsetX: -20, offsetY: -85 },
+          { largura: 60, altura: 25, offsetX: -25, offsetY: -40 },
         ],
       },
 
@@ -250,18 +251,18 @@ this.nomePersonagem = "Ken";
         largura: 85,
         altura: 120,
         offsetX: 30,
-        offsetY: 1,
+        offsetY: 0,
         escala: 1,
-        hurtboxes: [{ largura: 60, altura: 80, offsetX: -20, offsetY: -40 }],
+        hurtboxes: [{ largura: 60, altura: 100, offsetX: -20, offsetY: -50 }],
       },
 
       downAtack: {
         largura: 85,
         altura: 60,
         offsetX: 36,
-        offsetY: 10,
+        offsetY: 12,
         escala: 1,
-        hurtboxes: [{ largura: 80, altura: 60, offsetX: 0, offsetY: -40 }],
+        hurtboxes: [{ largura: 50, altura: 60, offsetX: -10, offsetY: -30 }],
       },
 
       sideAir: {
@@ -270,7 +271,7 @@ this.nomePersonagem = "Ken";
         offsetX: 25,
         offsetY: -11,
         escala: 1,
-        hurtboxes: [{ largura: 80, altura: 60, offsetX: 0, offsetY: -40 }],
+        hurtboxes: [{ largura: 55, altura: 80, offsetX: -20, offsetY: -65 }],
       },
 
       upAir: {  
@@ -279,7 +280,7 @@ this.nomePersonagem = "Ken";
         offsetX: 19,
         offsetY: -5,
         escala: 1,
-        hurtboxes: [{ largura: 70, altura: 80, offsetX: 0, offsetY: -50 }],
+        hurtboxes: [{ largura: 45, altura: 80, offsetX: -20, offsetY: -70 }],
       },
 
       downAir: {
@@ -288,30 +289,78 @@ this.nomePersonagem = "Ken";
         offsetX: 12,
         offsetY: 12,
         escala: 1,
-        hurtboxes: [{ largura: 80, altura: 60, offsetX: 0, offsetY: -40 }],
+        hurtboxes: [{ largura: 60, altura: 80, offsetX: -10, offsetY: -70 }],
       },
 
       neSpecial: {
         largura: 85,
         altura: 120,
-        offsetX: 20,
+        offsetX: 25,
         offsetY: -13,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 25, offsetY: -70 },
-          { largura: 110, altura: 35, offsetX: 5, offsetY: -18 },
+          { largura: 55, altura: 55, offsetX: 0, offsetY: -70 },
+          { largura: 90, altura: 35, offsetX: -10, offsetY: -18 },
         ], 
       },
 
       doSpecial: {
         largura: 85,
         altura: 120,
-        offsetX: 0,
-        offsetY: 0,
+        offsetX: 5,
+        offsetY: 44,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 60, offsetX: 0, offsetY: -70 },
           { largura: 60, altura: 35, offsetX: -3, offsetY: -18 },
+        ],
+      },
+
+      AupSpecial: {
+        largura: 85,
+        altura: 120,
+        offsetX: 5,
+        offsetY: 44,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 60, altura: 35, offsetX: -3, offsetY: -18 },
+        ],
+      },
+
+      siSpecial: {
+        largura: 80,
+        altura: 110,
+        offsetX: 36,
+        offsetY: 9,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 75, offsetX: 0, offsetY: -65 },
+          { largura: 35, altura: 35, offsetX: 0, offsetY: -18 },
+        ],
+      },
+
+      AsiSpecial: {
+        largura: 80,
+        altura: 110,
+        offsetX: 36,
+        offsetY: 14,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 75, offsetX: 0, offsetY: -65 },
+          { largura: 35, altura: 35, offsetX: 0, offsetY: -18 },
+        ],
+      },
+
+      AdoSpecial: {
+        largura: 90,
+        altura: 115,
+        offsetX: 38,
+        offsetY: 17,
+        escala: 1,
+        hurtboxes: [
+          { largura: 65, altura: 75, offsetX: 0, offsetY: -68 },
+          { largura: 70, altura: 40, offsetX: 5, offsetY: -22 },
         ],
       },
    
@@ -342,6 +391,7 @@ this.nomePersonagem = "Ken";
           knockbackX: 30,
           knockbackY: 0,
           knockbackFixo: true,
+          hitstunFrames: 17,
         },
 
         comboProximo: "neutro2",
@@ -359,12 +409,14 @@ this.nomePersonagem = "Ken";
         largura: 55,
         altura: 25,
         duracao: 400,
+        cancelavel: true,
         propriedades: {
            tipoSomImpacto: "heavy",
           dano: 4,
           knockbackX: 40,
           knockbackY: 0,
           knockbackFixo: true,
+          hitstunFrames: 18,
         },
 
         comboProximo: "neutro3",
@@ -460,7 +512,7 @@ this.nomePersonagem = "Ken";
         duracao: 350,
          finalizarAoTocarChao: true,
         atrasoFinalizacaoChao: 30,
-        cancelavel: true,
+        //cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
@@ -470,8 +522,8 @@ this.nomePersonagem = "Ken";
         propriedades: {
           tipoSomImpacto: "light",
           dano: 12,
-          knockbackX: 300,
-          knockbackY: -400,
+          knockbackX: 200,
+          knockbackY: -450,
           tumbling: false,
         },
       },
@@ -523,8 +575,8 @@ this.nomePersonagem = "Ken";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 550,
-          knockbackY: -400,
+          knockbackX: 300,
+          knockbackY: -500,
           tumbling: true,
         },
       },
@@ -538,10 +590,10 @@ this.nomePersonagem = "Ken";
         cooldown: 900,
         duracao: 900,
         finalizarAoTocarChao: true,
-        atrasoFinalizacaoChao: 30,
+        atrasoFinalizacaoChao: 0,
         finalizarAoAcertarOponente: true,
-        atrasoFinalizacaoAcerto: 30,
-        cancelavel: true,
+        atrasoFinalizacaoAcerto: 50,
+        cancelavel: false,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
@@ -570,10 +622,6 @@ this.nomePersonagem = "Ken";
           quiqueChaoY: 350,
         },
       },
-
-
-
-
     }
 
     // specials
@@ -595,6 +643,7 @@ this.nomePersonagem = "Ken";
         larguraProjetil: 52,
         alturaProjetil: 38,
         propriedades: {
+          travarMovimentoAir: true,
           tipoSomImpacto: "heavy",
           dano: 8,
           knockbackX: 320,
@@ -609,6 +658,7 @@ this.nomePersonagem = "Ken";
          som: "tatsumaki",
          volumeSom: 0.4,
         propriedades: {
+          travarMovimentoAir: true,
           tipoSomImpacto: "heavy",
           dano: 15,
           knockbackX: 570,
@@ -624,6 +674,7 @@ this.nomePersonagem = "Ken";
         som: "shoryuken",
         volumeSom: 0.7,
         propriedades: {
+          travarMovimentoAir: true,
           tipoSomImpacto: "heavy",
           dano: 14,
           knockbackX: 250,
@@ -677,6 +728,20 @@ this.nomePersonagem = "Ken";
           dano: 15,
           knockbackX: 570,
           knockbackY: -300,
+          tumbling: true,
+        },
+      },
+
+      air_agachado: {
+        animacao: "ken_AdoSpecial",
+        cooldown: 1800,
+        logica: AxeKick,
+        propriedades: {
+          travarMovimentoAir: true,
+          tipoSomImpacto: "heavy",
+          dano: 16,
+          knockbackX: 180,
+          knockbackY: 520,
           tumbling: true,
         },
       },
@@ -1036,6 +1101,16 @@ scene.anims.create({
       frames: scene.anims.generateFrameNumbers("Ken_AsiSpecial", {
         start: 0,
         end: 23,
+      }),
+      frameRate: 24,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_AdoSpecial",
+      frames: scene.anims.generateFrameNumbers("Ken_AdoSpecial", {
+        start: 4,
+        end: 14,
       }),
       frameRate: 24,
       repeat: 0,

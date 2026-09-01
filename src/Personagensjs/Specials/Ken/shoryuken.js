@@ -17,13 +17,6 @@ const HITBOX = {
   offsetY: -45,
 };
 
-const CORPO_FISICO = {
-  largura: 70,
-  altura: 120,
-  offsetX: 15,
-  offsetY: 35,
-};
-
 const PROPRIEDADES_HITS_INICIAIS = {
   tipoSomImpacto: "light",
   dano: 3,
@@ -57,8 +50,6 @@ export default class Shoryuken {
     this.velocidadeAntesHitStop = null;
     this.oponenteHitStop = null;
     this.finalizado = false;
-    this.corpoOriginal = null;
-
     this.aoAtualizarAnimacao = this.aoAtualizarAnimacao.bind(this);
     this.aoCompletarAnimacao = this.aoCompletarAnimacao.bind(this);
   }
@@ -69,18 +60,10 @@ export default class Shoryuken {
     if (!sprite?.active || !body) return;
 
     this.direcao = sprite.flipX ? -1 : 1;
-    this.corpoOriginal = {
-      largura: body.width,
-      altura: body.height,
-      offsetX: body.offset.x,
-      offsetY: body.offset.y,
-    };
-
     this.personagem.tocarSomSorteado(this.special?.som, {
       volume: this.special?.volumeSom ?? 0.7,
     });
 
-    this.aplicarCorpoFisico();
     body.setVelocity(0, 0);
 
     sprite.on("animationupdate", this.aoAtualizarAnimacao);
@@ -135,6 +118,7 @@ export default class Shoryuken {
     );
     this.scene.physics.add.existing(this.hitbox);
     this.hitbox.body.setAllowGravity(false);
+    this.hitbox.body.debugBodyColor = 0xff0000;
     this.hitbox.body.setImmovable(true);
     this.scene.camHUD?.ignore(this.hitbox);
 
@@ -352,7 +336,6 @@ export default class Shoryuken {
     const body = sprite?.body;
     if (this.finalizado || !sprite?.active || !body) return;
 
-    this.aplicarCorpoFisico();
     this.atualizarPosicaoHitbox();
     this.atualizarPosicaoChamas();
     this.atualizarAlvosCarregados();
@@ -384,26 +367,6 @@ export default class Shoryuken {
     );
   }
 
-  aplicarCorpoFisico() {
-    const sprite = this.personagem.sprite;
-    const body = sprite.body;
-    if (!body) return;
-
-    body.setSize(
-      CORPO_FISICO.largura,
-      CORPO_FISICO.altura,
-      false
-    );
-
-    const offsetX = sprite.flipX
-      ? sprite.frame.realWidth
-        - CORPO_FISICO.offsetX
-        - CORPO_FISICO.largura
-      : CORPO_FISICO.offsetX;
-
-    body.setOffset(offsetX, CORPO_FISICO.offsetY);
-  }
-
   aoCompletarAnimacao() {
     this.finalizar();
   }
@@ -427,21 +390,6 @@ export default class Shoryuken {
 
     if (this.hitbox?.active) this.hitbox.destroy();
     this.hitbox = null;
-  }
-
-  restaurarCorpoFisico() {
-    const body = this.personagem?.sprite?.body;
-    if (!body || !this.corpoOriginal) return;
-
-    body.setSize(
-      this.corpoOriginal.largura,
-      this.corpoOriginal.altura,
-      false
-    );
-    body.setOffset(
-      this.corpoOriginal.offsetX,
-      this.corpoOriginal.offsetY
-    );
   }
 
   removerDaListaAtiva() {
@@ -488,7 +436,6 @@ export default class Shoryuken {
     if (this.chamas?.active) this.chamas.destroy();
     this.chamas = null;
 
-    this.restaurarCorpoFisico();
     this.removerDaListaAtiva();
     this.finalizado = true;
     this.emHitStop = false;

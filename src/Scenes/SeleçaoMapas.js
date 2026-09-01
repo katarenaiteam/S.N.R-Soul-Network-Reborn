@@ -1,6 +1,7 @@
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import Cidade from "../Mapasjs/Cidade.js";
 import SkyTowers from "../Mapasjs/SkyTowers.js";
+import MapaTeste from "../Mapasjs/MapaTeste.js";
 
 export default class CenaSelecaoMapa extends Phaser.Scene {
   constructor() {
@@ -37,6 +38,7 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
     this.mapas = [
       { id: "cidade", nome: "Cidade", classe: Cidade, chaveSprite: "thumb_cidade" },
       { id: "SkyTowers", nome: "SkyTowers", classe: SkyTowers, chaveSprite: "thumb_skytowers" },
+      { id: "mapaTeste", nome: "Mapa Teste", classe: MapaTeste, chaveSprite: "thumb_teste" },
     ];
 
     this.indiceOpcao = 0; // Começa no primeiro mapa

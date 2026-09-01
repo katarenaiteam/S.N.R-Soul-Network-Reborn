@@ -226,6 +226,7 @@ export default class SpiderSwing {
 
     if (this.hitboxAtaque.body) {
       this.hitboxAtaque.body.setAllowGravity(false);
+      this.hitboxAtaque.body.debugBodyColor = 0xff0000;
       this.hitboxAtaque.body.setSize(this.hitboxWidth, this.hitboxHeight);
       this.hitboxAtaque.body.x = posX - this.hitboxWidth / 2;
       this.hitboxAtaque.body.y = posY - this.hitboxHeight / 2;

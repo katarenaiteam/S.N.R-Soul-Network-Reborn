@@ -8,6 +8,7 @@ export default class EstadoSpecial extends EstadoBase {
     let tipoSpecial = dados?.tipo;
 
     this.intentCancel = false;
+    this.intentCancelAgachar = false;
 
     // Se não veio tipo nos dados, descobre pelas direções
    if (!tipoSpecial) {
@@ -81,6 +82,10 @@ export default class EstadoSpecial extends EstadoBase {
     // CANCELAMENTO INSTANTÂNEO PÓS-HIT
     // ==========================================
     if (this.specialAtual?.cancelavel) {
+      if (noChao && this.personagem.inputJustDown("baixo")) {
+        this.intentCancelAgachar = true;
+      }
+
       if (
         (this.personagem.inputJustDown("dash") && this.personagem.podeDash && this.personagem.dashs < this.personagem.maxDash) ||
         (this.personagem.inputJustDown("cima") && this.personagem.pulos < this.personagem.maxPulos) ||
@@ -90,6 +95,19 @@ export default class EstadoSpecial extends EstadoBase {
       }
 
       if (this.finalizandoPorAcerto) {
+        if (
+          noChao &&
+          (
+            this.personagem.inputJustDown("baixo") ||
+            (this.intentCancelAgachar && this.personagem.inputDown("baixo"))
+          )
+        ) {
+          this.personagem.maquinaEstados.mudarEstado("crouch", {
+            vindoDeAtaque: true,
+          });
+          return;
+        }
+
         if (
           this.personagem.inputJustDown("dash") ||
           (this.intentCancel && this.personagem.inputDown("dash"))

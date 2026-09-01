@@ -1,4 +1,4 @@
-import EstadoBase from "./EstadoBase.js";
+﻿import EstadoBase from "./EstadoBase.js";
 
 export default class EstadoAtack extends EstadoBase {
   enter(dados = {}) {
@@ -6,6 +6,7 @@ export default class EstadoAtack extends EstadoBase {
    const direcaoOlhar = this.personagem.sprite.flipX ? -1 : 1;
 
    this.intentCancel = false;
+   this.intentCancelAgachar = false;
 
    // reseta o combro pra 1, se o ataque vier sem dados(cima,baxo) ou se tiver combo false ! -> se nao for
    if (!dados?.combo) {
@@ -19,7 +20,7 @@ export default class EstadoAtack extends EstadoBase {
       tipoAtaque = `neutro${this.comboIndex}`;
      }
  
-     //diz qual ataque usar a depender da direçao
+     //diz qual ataque usar a depender da direÃ§ao
     if (!tipoAtaque) {
      tipoAtaque = this.personagem.obterTipoAtaque();
      }
@@ -41,13 +42,13 @@ export default class EstadoAtack extends EstadoBase {
       return;
      }
 
-     // verifica se já foi acertado o inimigo
+     // verifica se jÃ¡ foi acertado o inimigo
      this.jaAcertou = false;
-      // verifica se já foi criada a hitbox
+      // verifica se jÃ¡ foi criada a hitbox
      this.hitboxCriada = false;
      //define o tempo para imediato no relogio interno do phaser
      this.tempoInicio = this.personagem.scene.time.now;
-     //trava que verifica instancia a finalizaçao no chao
+     //trava que verifica instancia a finalizaÃ§ao no chao
      this.timerFinalizacaoChao = null;
      this.finalizandoPorChao = false;
      this.timerFinalizacaoAcerto = null;
@@ -69,14 +70,17 @@ export default class EstadoAtack extends EstadoBase {
       this.anulouGravidade = false;
      }
 
-    // ANIMAÇÃO
+    // ANIMAÃ‡ÃƒO
     const animChave = this.golpeAtual?.animacao || "mado_atack";
 
     if (this.personagem.scene.anims.exists(animChave)) {
       this.personagem.sprite.anims.play(animChave, true);
-      this.personagem.aplicarConfiguracao("atack");
+      const nomeConfigAnimacao = animChave.startsWith(this.personagem.prefixoAnim)
+        ? animChave.slice(this.personagem.prefixoAnim.length)
+        : animChave;
+      this.personagem.aplicarConfiguracao(nomeConfigAnimacao);
     } else {
-      console.warn(`Animação ${animChave} não existe!`);
+      console.warn(`AnimaÃ§Ã£o ${animChave} nÃ£o existe!`);
       const animacaoGenerica = `${this.personagem.prefixoAnim}atack`;
       if (this.personagem.scene.anims.exists(animacaoGenerica)) {
         this.personagem.tocarAnimacao("atack");
@@ -109,10 +113,14 @@ export default class EstadoAtack extends EstadoBase {
     this.atualizarMovimentoAtaque(tempoDecorrido);
 
 
-   // CANCELAMENTO INSTANTÂNEO PÓS-HIT
+   // CANCELAMENTO INSTANTÃ‚NEO PÃ“S-HIT
     // ==========================================
     if (this.golpeAtual?.cancelavel) {
-      // Regra: Se pressionar qualquer botão de cancelamento, salva a intenção
+      if (noChao && this.personagem.inputJustDown("baixo")) {
+        this.intentCancelAgachar = true;
+      }
+
+      // Regra: Se pressionar qualquer botÃ£o de cancelamento, salva a intenÃ§Ã£o
       if (
         (this.personagem.inputJustDown("dash") && this.personagem.podeDash && this.personagem.dashs < this.personagem.maxDash) ||
         (this.personagem.inputJustDown("cima") && this.personagem.pulos < this.personagem.maxPulos) ||
@@ -123,6 +131,19 @@ export default class EstadoAtack extends EstadoBase {
 
       // Assim que o acerto acontecer (jaAcertou == true), executa o cancelamento na hora
       if (this.jaAcertou) {
+        if (
+          noChao &&
+          (
+            this.personagem.inputJustDown("baixo") ||
+            (this.intentCancelAgachar && this.personagem.inputDown("baixo"))
+          )
+        ) {
+          this.personagem.maquinaEstados.mudarEstado("crouch", {
+            vindoDeAtaque: true,
+          });
+          return;
+        }
+
         if (
           this.personagem.inputJustDown("dash") ||
           (this.intentCancel && this.personagem.inputDown("dash"))
@@ -183,7 +204,7 @@ export default class EstadoAtack extends EstadoBase {
     }
 
     // =========================
-    // PROGRESSÃO DO COMBO
+    // PROGRESSÃƒO DO COMBO
     // =========================
     if (
       this.comboBuffer &&
@@ -208,7 +229,7 @@ export default class EstadoAtack extends EstadoBase {
     }
 
     // =========================
-    // FINALIZAÇÃO POR DURAÇÃO
+    // FINALIZAÃ‡ÃƒO POR DURAÃ‡ÃƒO
     // =========================
     if (
       this.golpeAtual?.duracao !== undefined &&
@@ -219,7 +240,7 @@ export default class EstadoAtack extends EstadoBase {
     }
 
     // =========================
-    // FINALIZAÇÃO AO TOCAR CHÃO
+    // FINALIZAÃ‡ÃƒO AO TOCAR CHÃƒO
     // =========================
     if (
       this.golpeAtual?.finalizarAoTocarChao &&
@@ -249,7 +270,7 @@ export default class EstadoAtack extends EstadoBase {
   const body =
     this.personagem.sprite.body;
 
-  // Por padrão nenhum eixo está sendo
+  // Por padrÃ£o nenhum eixo estÃ¡ sendo
   // controlado pelo movimento do golpe.
   this.movimentoAtaqueXAtivo = false;
   this.movimentoAtaqueYAtivo = false;
@@ -266,7 +287,7 @@ export default class EstadoAtack extends EstadoBase {
     this.golpeAtual.duracao ??
     inicio;
 
-  // Ainda não começou ou já terminou.
+  // Ainda nÃ£o comeÃ§ou ou jÃ¡ terminou.
   if (
     tempoDecorrido < inicio ||
     tempoDecorrido > fim
@@ -366,20 +387,20 @@ export default class EstadoAtack extends EstadoBase {
  calcularCurvaMovimento(t, curva) {
   switch (curva) {
 
-    // Começa devagar e acelera
+    // ComeÃ§a devagar e acelera
     case "easeIn":
       return t * t;
 
-    // Muda bastante no começo
+    // Muda bastante no comeÃ§o
     // e suaviza perto do final
     case "easeOut":
       return 1 - Math.pow(1 - t, 2);
 
-    // Suave no começo e no final
+    // Suave no comeÃ§o e no final
     case "easeInOut":
       return t * t * (3 - 2 * t);
 
-    // Mudança constante
+    // MudanÃ§a constante
     case "linear":
     default:
       return t;
@@ -397,7 +418,7 @@ export default class EstadoAtack extends EstadoBase {
 
     this.hitboxCriada = true;
 
-    // 🔊 SOM DE VENTO (No ar, quando o ataque é gerado)
+    // ðŸ”Š SOM DE VENTO (No ar, quando o ataque Ã© gerado)
     const somVento = this.golpeAtual.somVento || this.personagem.sons?.wind;
     if (somVento) {
       this.personagem.tocarSomSorteado(somVento, { volume: 0.1 });
@@ -409,7 +430,65 @@ export default class EstadoAtack extends EstadoBase {
       this.golpeAtual.largura,
       this.golpeAtual.altura
     );
+    // VFX opcional criado junto da hitbox de ataques normais.
+    // Specials usam EstadoSpecial e nÃ£o passam por este bloco.
+    const configVFXAtaque = this.personagem.vfxAtaqueNormal;
+    const configDesteAtaque = configVFXAtaque?.porAtaque?.[this.tipoAtaqueAtual];
+    if (configDesteAtaque) {
+      const direcao = this.personagem.sprite.flipX ? -1 : 1;
+      const quantidade = configDesteAtaque.quantidade ?? 1;
+      const formacao =
+        configDesteAtaque.formacao ??
+        configVFXAtaque.formacoes?.[quantidade] ??
+        [{ x: 0, y: 0, distancia: 0, escala: 1, angulo: 0 }];
+      const duracao = configDesteAtaque.duracao ?? configVFXAtaque.duracao ?? 300;
+      const movimentoX =
+        (configDesteAtaque.movimentoX ?? configVFXAtaque.distancia ?? 0) * direcao;
+      const movimentoY = configDesteAtaque.movimentoY ?? 0;
+      const tamanhoVetor = Math.hypot(movimentoX, movimentoY) || 1;
+      const fatorCompensacao =
+        configDesteAtaque.fatorCompensacaoMovimento ?? 1;
+      const compensacaoX = configDesteAtaque.compensarMovimento
+        ? this.personagem.sprite.body.velocity.x * (duracao / 1000) * fatorCompensacao
+        : 0;
+      const compensacaoY = configDesteAtaque.compensarMovimento
+        ? this.personagem.sprite.body.velocity.y * (duracao / 1000) * fatorCompensacao
+        : 0;
 
+      for (let indice = 0; indice < quantidade; indice += 1) {
+        const ponto = formacao[indice] ?? formacao[formacao.length - 1];
+        const efeito = this.personagem.vfx?.tocar(configDesteAtaque.efeito, {
+          offsetX:
+            this.golpeAtual.offsetX +
+            (configVFXAtaque.offsetX ?? 0) +
+            (configDesteAtaque.offsetX ?? 0) +
+            ponto.x,
+          offsetY:
+            this.golpeAtual.offsetY +
+            (configVFXAtaque.offsetY ?? 0) +
+            (configDesteAtaque.offsetY ?? 0) +
+            ponto.y,
+        });
+
+        if (efeito) {
+          efeito.setScale(efeito.scaleX * ponto.escala);
+          efeito.setAngle(ponto.angulo * direcao);
+          this.personagem.scene.tweens.add({
+            targets: efeito,
+            x:
+              efeito.x + movimentoX +
+              (movimentoX / tamanhoVetor) * ponto.distancia +
+              compensacaoX,
+            y:
+              efeito.y + movimentoY +
+              (movimentoY / tamanhoVetor) * ponto.distancia +
+              ponto.y * 0.25 + compensacaoY,
+            duration: duracao,
+            ease: "Quad.easeOut",
+          });
+        }
+      }
+    }
     if (this.personagem.scene.camHUD) {
       this.personagem.scene.camHUD.ignore(this.hitboxAtual);
     }
@@ -417,7 +496,7 @@ export default class EstadoAtack extends EstadoBase {
     const cena = this.personagem.scene;
     let alvos = [];
 
-    // MODO HISTÓRIA: P1 e P2 batem só no Boss. Boss bate nos dois.
+    // MODO HISTÃ“RIA: P1 e P2 batem sÃ³ no Boss. Boss bate nos dois.
     if (cena.scene.key === "CenaHistoria") {
       const souPlayer = (this.personagem === cena.jogador1 || this.personagem === cena.jogador2);
       alvos = souPlayer 
@@ -442,7 +521,7 @@ export default class EstadoAtack extends EstadoBase {
 
           this.jaAcertou = true;
 
-          // 🔊 SOM DE IMPACTO (Apenas se atingir um alvo)
+          // ðŸ”Š SOM DE IMPACTO (Apenas se atingir um alvo)
           const tipoImpacto = this.golpeAtual.tipoSomImpacto || "light";
           const somImpacto = this.golpeAtual.somImpacto || this.personagem.sons?.[tipoImpacto];
           if (somImpacto) {
@@ -506,7 +585,7 @@ export default class EstadoAtack extends EstadoBase {
   }
 
   exit() {
-    // Limpa o evento de colisão da física do Phaser
+    // Limpa o evento de colisÃ£o da fÃ­sica do Phaser
     if (this.colisorOverlap) {
       this.personagem.scene.physics.world.removeCollider(this.colisorOverlap);
       this.colisorOverlap = null;
@@ -541,3 +620,4 @@ export default class EstadoAtack extends EstadoBase {
     this.finalizandoPorAcerto = false;
   }
 }
+
