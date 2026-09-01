@@ -3,7 +3,7 @@ export default class MapaTeste {
         this.scene = scene;
 
         if (scene.sound) {
-            this.musica = scene.sound.add("No_More", { loop: true, volume: 0.1 });
+            this.musica = scene.sound.add("No_More", { loop: true, volume: 0.6 });
             this.musica.play();
         }
 
