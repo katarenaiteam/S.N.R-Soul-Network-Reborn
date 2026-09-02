@@ -1,4 +1,5 @@
 // AirWebshot.js
+import { obterAlvosCombate, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
 export default class AirWebShot {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
@@ -57,14 +58,13 @@ export default class AirWebShot {
     const velY = 400;
     this.projetil.body.setVelocity(velX, velY);
 
+    registrarAtaqueEspecial(this, this.projetil, {
+      categoria: "projetil",
+      aoColidir: () => this.destruirEmChoque(),
+    });
+
     // 2. Colisão/Overlap com Inimigos
-    const oponentes = this.scene.scene.key === "CenaHistoria"
-      ? (this.personagem === this.scene.boss
-        ? [this.scene.jogador1]
-        : [this.scene.boss])
-      : [this.scene.jogador1, this.scene.jogador2].filter(
-        (j) => j && j !== this.personagem
-      );
+    const oponentes = obterAlvosCombate(this.personagem);
 
     this.overlaps = [];
 
@@ -111,7 +111,7 @@ export default class AirWebShot {
 
     const defendeu = alvo.receberDano(props.dano || 8, props);
 
-    if (!defendeu && !alvo.estaPresoNaTeia && !alvo.imuneTeia) {
+    if (!defendeu && alvo.maquinaEstados && !alvo.estaPresoNaTeia && !alvo.imuneTeia) {
       this.prenderOponente(alvo);
     }
 
@@ -119,6 +119,15 @@ export default class AirWebShot {
       projetil.destroy();
       this.projetil = null;
     }
+  }
+
+  destruirEmChoque() {
+    if (this.acertou) return;
+    this.acertou = true;
+    this.overlaps.forEach((overlap) => overlap?.destroy());
+    this.overlaps = [];
+    this.projetil?.destroy();
+    this.projetil = null;
   }
 
   prenderOponente(alvo) {

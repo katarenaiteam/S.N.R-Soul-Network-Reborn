@@ -1,3 +1,5 @@
+import { obterAtaquesEspeciaisInimigos } from "../../../Objetos/SistemaCombateEspecial.js";
+
 export default class SpiderCounter {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
@@ -79,9 +81,28 @@ export default class SpiderCounter {
         this.dispararContraAtaque(oponente);
       }
     }
+
+    const boundsCounter = this.hitboxCounter.getBounds();
+    const ataqueEspecial = obterAtaquesEspeciaisInimigos(this.scene, this.personagem)
+      .find((ataque) => {
+        const boundsAtaque = ataque.objeto.getBounds?.() ?? ataque.objeto.body;
+        return boundsAtaque && Phaser.Geom.Intersects.RectangleToRectangle(
+          boundsCounter,
+          boundsAtaque
+        );
+      });
+
+    if (ataqueEspecial) {
+      ataqueEspecial.aoColidir?.();
+      ataqueEspecial.remover?.();
+      this.dispararContraAtaque(
+        oponente,
+        ataqueEspecial.categoria !== "projetil"
+      );
+    }
   }
 
-  dispararContraAtaque(oponente) {
+  dispararContraAtaque(oponente, causarDano = true) {
     if (!this.counterAtivo) return;
 
     this.desativarCounter();
@@ -102,7 +123,7 @@ export default class SpiderCounter {
       }
     }
 
-    if (typeof oponente.receberDano === 'function') {
+    if (causarDano && typeof oponente.receberDano === 'function') {
       oponente.receberDano(15, { 
         knockbackX: 650, 
         knockbackY: -350, 

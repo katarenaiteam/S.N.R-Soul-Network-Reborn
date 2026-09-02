@@ -1,3 +1,5 @@
+import { obterAlvosCombate, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
+
 export default class WebShot {
   constructor(personagem, special) {
     this.personagem = personagem;
@@ -43,14 +45,13 @@ export default class WebShot {
     this.projetil.body.setSize(30, 30);
     this.projetil.body.setVelocityX(600 * direcao);
 
+    registrarAtaqueEspecial(this, this.projetil, {
+      categoria: "projetil",
+      aoColidir: () => this.destruirEmChoque(),
+    });
+
     // Colisão com Inimigos
-    const oponentes = this.scene.scene.key === "CenaHistoria"
-      ? (this.personagem === this.scene.boss
-        ? [this.scene.jogador1]
-        : [this.scene.boss])
-      : [this.scene.jogador1, this.scene.jogador2].filter(
-        (j) => j && j !== this.personagem
-      );
+    const oponentes = obterAlvosCombate(this.personagem);
 
     this.overlaps = [];
 
@@ -87,7 +88,7 @@ export default class WebShot {
     const defendeu = alvo.receberDano(props.dano || 8, props);
 
     // 2. SÓ PRENDE SE NÃO TIVER DEFENDIDO NA GUARDA!
-    if (!defendeu && !alvo.estaPresoNaTeia && !alvo.imuneTeia) {
+    if (!defendeu && alvo.maquinaEstados && !alvo.estaPresoNaTeia && !alvo.imuneTeia) {
       this.prenderOponente(alvo);
     }
 
@@ -96,6 +97,15 @@ export default class WebShot {
       projetil.destroy();
       this.projetil = null;
     }
+  }
+
+  destruirEmChoque() {
+    if (this.acertou) return;
+    this.acertou = true;
+    this.overlaps.forEach((overlap) => overlap?.destroy());
+    this.overlaps = [];
+    this.projetil?.destroy();
+    this.projetil = null;
   }
 
   prenderOponente(alvo) {

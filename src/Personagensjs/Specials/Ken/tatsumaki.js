@@ -26,6 +26,8 @@ const HITBOX = {
   offsetY: -45,
 };
 
+import { obterAlvosCombate, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
+
 export default class Tatsumaki {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
@@ -151,6 +153,7 @@ export default class Tatsumaki {
     this.hitbox.body.debugBodyColor = 0xff0000;
     this.hitbox.body.setImmovable(true);
     this.scene.camHUD?.ignore(this.hitbox);
+    registrarAtaqueEspecial(this, this.hitbox, { categoria: "corpo" });
 
     this.atualizarPosicaoHitbox();
 
@@ -170,24 +173,7 @@ export default class Tatsumaki {
   }
 
   obterOponentes() {
-    if (this.scene.scene.key === "CenaHistoria") {
-      const souJogador =
-        this.personagem === this.scene.jogador1 ||
-        this.personagem === this.scene.jogador2;
-
-      return souJogador
-        ? [this.scene.boss].filter(Boolean)
-        : [this.scene.jogador1, this.scene.jogador2].filter(Boolean);
-    }
-
-    return [
-      this.scene.jogador1,
-      this.scene.jogador2,
-      this.scene.jogador3,
-      this.scene.jogador4,
-    ].filter(
-      (lutador) => lutador && lutador !== this.personagem
-    );
+    return obterAlvosCombate(this.personagem);
   }
 
   processarAcerto(oponente) {

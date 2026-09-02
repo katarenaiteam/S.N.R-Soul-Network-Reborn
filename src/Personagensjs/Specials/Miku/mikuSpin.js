@@ -96,7 +96,6 @@
 
   acertar(alvo) {
     if (this.finalizando || !alvo?.sprite?.active) return;
-    if (alvo.maquinaEstados?.estadoAtual?.nome === "guard") return;
 
     this.alvo = alvo;
     this.limparHitbox();

@@ -1,6 +1,8 @@
 ﻿const puppetsAtivos = new WeakMap();
 const cooldownsPuppet = new WeakMap();
 
+import { registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
+
 export default class MikuPuppet {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
@@ -112,6 +114,7 @@ export default class MikuPuppet {
     this.hitboxAtaque.body.setImmovable(true);
     this.hitboxAtaque.body.debugBodyColor = 0xff0000;
     this.scene.camHUD?.ignore(this.hitboxAtaque);
+    registrarAtaqueEspecial(this, this.hitboxAtaque, { categoria: "corpo" });
 
     this.obterOponentes().forEach((oponente) => {
       const overlap = this.scene.physics.add.overlap(

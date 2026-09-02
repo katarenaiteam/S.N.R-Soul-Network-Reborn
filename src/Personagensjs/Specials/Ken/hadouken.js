@@ -1,3 +1,5 @@
+import { obterAlvosCombate, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
+
 export default class Hadouken {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
@@ -65,6 +67,11 @@ export default class Hadouken {
       }
     });
 
+    registrarAtaqueEspecial(this, this.projetil, {
+      categoria: "projetil",
+      aoColidir: () => this.finalizarProjetil(true),
+    });
+
     this.criarColisoes();
     this.timerVida = this.scene.time.delayedCall(
       this.special?.tempoProjetil ?? 5000,
@@ -73,13 +80,7 @@ export default class Hadouken {
   }
 
   criarColisoes() {
-    const oponentes = this.scene.scene.key === "CenaHistoria"
-      ? (this.personagem === this.scene.boss
-        ? [this.scene.jogador1]
-        : [this.scene.boss])
-      : [this.scene.jogador1, this.scene.jogador2].filter(
-        (jogador) => jogador && jogador !== this.personagem
-      );
+    const oponentes = obterAlvosCombate(this.personagem);
 
     this.overlaps = oponentes.map((oponente) =>
       this.scene.physics.add.overlap(
@@ -90,8 +91,6 @@ export default class Hadouken {
         this
       )
     );
-
-    this.criarColisoesComHadoukens(oponentes);
 
     const plataformas = this.scene.mapaAtual?.plataformas
       || this.scene.plataformas
@@ -106,38 +105,6 @@ export default class Hadouken {
     }
   }
 
-  criarColisoesComHadoukens(oponentes) {
-    oponentes.forEach((oponente) => {
-      const logicasAtivas = oponente?.logicasEspeciaisAtivas || [];
-
-      logicasAtivas.forEach((outraLogica) => {
-        if (
-          !(outraLogica instanceof Hadouken)
-          || outraLogica === this
-          || !outraLogica.projetil?.active
-          || outraLogica.finalizando
-        ) {
-          return;
-        }
-
-        const overlap = this.scene.physics.add.overlap(
-          this.projetil,
-          outraLogica.projetil,
-          () => {
-            if (this.finalizando || outraLogica.finalizando) return;
-
-            // Os dois Hadoukens explodem no ponto em que se encontram.
-            this.finalizarProjetil(true);
-            outraLogica.finalizarProjetil(true);
-          },
-          null,
-          this
-        );
-
-        this.overlaps.push(overlap);
-      });
-    });
-  }
   processarAcerto(alvo) {
     if (this.finalizando) return;
     const propriedades = this.special?.propriedades || {};

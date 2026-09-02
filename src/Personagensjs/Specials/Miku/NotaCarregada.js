@@ -1,5 +1,7 @@
 ﻿const cargasCompletas = new WeakMap();
 
+import { obterAlvosCombate, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
+
 export default class NotaCarregada {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
@@ -275,13 +277,12 @@ export default class NotaCarregada {
       this.special.quedaNota ?? 0
     );
 
-    const oponentes = this.scene.scene.key === "CenaHistoria"
-      ? (this.personagem === this.scene.boss
-        ? [this.scene.jogador1]
-        : [this.scene.boss])
-      : [this.scene.jogador1, this.scene.jogador2].filter(
-        (jogador) => jogador && jogador !== this.personagem
-      );
+    registrarAtaqueEspecial(this, nota, {
+      categoria: "projetil",
+      aoColidir: () => this.destruirNota(entrada),
+    });
+
+    const oponentes = obterAlvosCombate(this.personagem);
 
     entrada.overlaps = oponentes.filter(Boolean).map((oponente) =>
       this.scene.physics.add.overlap(
