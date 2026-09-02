@@ -39,6 +39,8 @@ export default class Personagem {
     this.tempoUltimoDash = 0;
     this.cooldownsAtaque = {};
     this.cooldownsSpecial = {};
+    this.specialsAereosUsados = 0;
+    this.maxSpecialsAereos = 2;
     this.specials = {};
     this.logicasEspeciaisAtivas = [];
     this.invulneravel = false;
@@ -642,17 +644,14 @@ export default class Personagem {
   }
 
   resetarCooldownsAereos() {
+    this.specialsAereosUsados = 0;
+
     Object.keys(this.cooldownsAtaque).forEach((tipoAtaque) => {
       if (tipoAtaque.startsWith("air_")) {
         delete this.cooldownsAtaque[tipoAtaque];
       }
     });
 
-    Object.keys(this.cooldownsSpecial).forEach((tipoSpecial) => {
-      if (tipoSpecial.startsWith("air_")) {
-        delete this.cooldownsSpecial[tipoSpecial];
-      }
-    });
   }
 
   podeUsarAtaque(tipoAtaque) {
@@ -679,11 +678,25 @@ export default class Personagem {
 
   podeUsarSpecial(tipoSpecial) {
     const agora = this.scene.time.now;
+    const specialAereo = tipoSpecial?.startsWith("air_");
+
+    if (
+      specialAereo &&
+      this.specialsAereosUsados >= this.maxSpecialsAereos
+    ) {
+      return false;
+    }
 
     return (
       !this.cooldownsSpecial?.[tipoSpecial] ||
       agora >= this.cooldownsSpecial[tipoSpecial]
     );
+  }
+
+  registrarUsoSpecialAereo(tipoSpecial) {
+    if (tipoSpecial?.startsWith("air_")) {
+      this.specialsAereosUsados++;
+    }
   }
 
   aplicarConfiguracao(nomeAnim) {

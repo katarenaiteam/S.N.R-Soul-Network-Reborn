@@ -331,7 +331,7 @@ this.nomePersonagem = "Ken";
       siSpecial: {
         largura: 80,
         altura: 110,
-        offsetX: 36,
+        offsetX: 39.5,
         offsetY: 9,
         escala: 1,
         hurtboxes: [
@@ -343,7 +343,7 @@ this.nomePersonagem = "Ken";
       AsiSpecial: {
         largura: 80,
         altura: 110,
-        offsetX: 36,
+        offsetX: 39.5,
         offsetY: 14,
         escala: 1,
         hurtboxes: [
@@ -672,7 +672,7 @@ this.nomePersonagem = "Ken";
         cooldown: 1800,
         logica: Shoryuken,
         som: "shoryuken",
-        volumeSom: 0.7,
+        volumeSom: 0.4,
         propriedades: {
           travarMovimentoAir: true,
           tipoSomImpacto: "heavy",
@@ -689,7 +689,7 @@ this.nomePersonagem = "Ken";
         cooldown: 2000,
         logica: Hadouken,
         som: "hadouken",
-        volumeSom: 0.6,
+        volumeSom: 0.4,
         propriedades: {
           travarMovimentoAir: true,
           tipoSomImpacto: "heavy",
@@ -705,7 +705,7 @@ this.nomePersonagem = "Ken";
         cooldown: 2200,
         logica: Shoryuken,
         som: "shoryuken",
-        volumeSom: 0.7,
+        volumeSom: 0.4,
         propriedades: {
           travarMovimentoAir: true,
           tipoSomImpacto: "heavy",

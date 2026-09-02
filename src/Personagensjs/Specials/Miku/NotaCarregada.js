@@ -18,6 +18,9 @@ export default class NotaCarregada {
     this.timerProximaNota = null;
     this.aoRepetirCarregamento = null;
     this.inicioCarga = 0;
+    this.timerPausaAerea = null;
+    this.gravidadeSuspensa = false;
+    this.audioLancamentoGerenciado = false;
   }
 
   executar() {
@@ -33,7 +36,20 @@ export default class NotaCarregada {
       cargasCompletas.delete(this.personagem);
 
       this.carregando = true;
+      if (this.special.aereo) this.aplicarPausaAerea();
       this.soltar();
+      return;
+    }
+
+    if (this.special.aereo) {
+      this.carregando = true;
+      this.criarNotaCarregada();
+      this.criarNotaCarregada();
+      this.atualizarNotasCarregadas();
+      this.aplicarPausaAerea();
+      this.audioLancamentoGerenciado = true;
+      this.soltar();
+      this.tocarAudioAereoSemCarga();
       return;
     }
 
@@ -43,6 +59,34 @@ export default class NotaCarregada {
     this.criarNotaCarregada();
     this.agendarProximaNota();
     this.iniciarCancao();
+  }
+
+  aplicarPausaAerea() {
+    const corpo = this.personagem.sprite.body;
+    if (!corpo) return;
+
+    this.timerPausaAerea?.remove(false);
+    corpo.setVelocityY(0);
+    corpo.setAllowGravity(false);
+    this.gravidadeSuspensa = true;
+    this.timerPausaAerea = this.scene.time.delayedCall(
+      this.special.tempoPausaAerea ?? 180,
+      () => {
+        this.timerPausaAerea = null;
+        if (!this.gravidadeSuspensa || !this.personagem.sprite?.body) return;
+        this.personagem.sprite.body.setAllowGravity(true);
+        this.gravidadeSuspensa = false;
+      }
+    );
+  }
+
+  restaurarGravidadeAerea() {
+    this.timerPausaAerea?.remove(false);
+    this.timerPausaAerea = null;
+    if (this.gravidadeSuspensa && this.personagem.sprite?.body) {
+      this.personagem.sprite.body.setAllowGravity(true);
+    }
+    this.gravidadeSuspensa = false;
   }
 
   agendarProximaNota() {
@@ -73,6 +117,25 @@ export default class NotaCarregada {
     if (this.personagem.maquinaEstados.estadoAtual === this.estado) {
       this.estado.finalizarSpecial();
     }
+  }
+
+  tocarAudioAereoSemCarga() {
+    const volume = this.special.volumeSom ?? 0.7;
+    if (!this.scene.cache.audio.exists("sek")) {
+      if (this.scene.cache.audio.exists("kai")) {
+        this.scene.sound.play("kai", { volume });
+      }
+      return;
+    }
+
+    const sek = this.scene.sound.add("sek", { volume });
+    sek.once("complete", () => {
+      sek.destroy();
+      if (this.scene.cache.audio.exists("kai")) {
+        this.scene.sound.play("kai", { volume });
+      }
+    });
+    sek.play();
   }
 
   iniciarCancao() {
@@ -176,7 +239,7 @@ export default class NotaCarregada {
     this.pararEscutaCarregamento();
     this.pararCargaSonora();
 
-    if (this.scene.cache.audio.exists("kai")) {
+    if (!this.audioLancamentoGerenciado && this.scene.cache.audio.exists("kai")) {
       this.scene.sound.play("kai", { volume: this.special.volumeSom ?? 0.7 });
     }
 
@@ -323,6 +386,7 @@ export default class NotaCarregada {
   }
 
   cancelar() {
+    this.restaurarGravidadeAerea();
     this.pararEscutaCarregamento();
     this.pararCargaSonora();
     if (this.armazenada) return;
@@ -337,6 +401,12 @@ export default class NotaCarregada {
     this.removerDaListaAtiva();
   }
 }
+
+
+
+
+
+
 
 
 

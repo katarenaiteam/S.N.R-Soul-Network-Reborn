@@ -136,6 +136,8 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("SpiderMan_AsiSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AsiSpecial.png", { frameWidth: 245, frameHeight: 202 });
     this.load.spritesheet("Spiderflip", "assets/personagens/SpiderMan/Sprites/Spiderflip.png", { frameWidth: 105, frameHeight: 117 });  
 //ult
+this.load.spritesheet("ultimateback", "assets/personagens/SpiderMan/Sprites/ultimate/ultimatebackground.png", { frameWidth: 640, frameHeight: 480 });
+this.load.audio("sp_ShowTime", "assets/personagens/SpiderMan/Audio/sp_ShowTime.wav");
 this.load.spritesheet("SpiderMan_ult0", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult0.png", { frameWidth: 200, frameHeight: 200 }); 
 this.load.spritesheet("SpiderMan_ult1", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult1.png", { frameWidth: 500, frameHeight: 200 }); 
 this.load.spritesheet("SpiderMan_ult2", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult2.png", { frameWidth: 500, frameHeight: 200 }); 
@@ -144,7 +146,8 @@ this.load.spritesheet("SpiderMan_ult4", "assets/personagens/SpiderMan/Sprites/ul
 this.load.spritesheet("SpiderMan_ult5", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult5.png", { frameWidth: 131, frameHeight: 121 });
 this.load.spritesheet("SpiderMan_ult6", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult6.png", { frameWidth: 315, frameHeight: 245 });
 this.load.spritesheet("SpiderMan_ult7", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult7.png", { frameWidth: 360, frameHeight: 256 });
-this.load.spritesheet("SpiderMan_ult8", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult8.png", { frameWidth: 122, frameHeight: 119 });  
+this.load.spritesheet("SpiderMan_ult8", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult8.png", { frameWidth: 122, frameHeight: 119 });
+this.load.audio("finish", "assets/personagens/SpiderMan/Audio/finish.wav");  
 
     if (!this.textures.exists('textura_teia')) {
     const canvas = document.createElement('canvas');
@@ -200,9 +203,15 @@ this.load.spritesheet("SpiderMan_ult8", "assets/personagens/SpiderMan/Sprites/ul
     this.load.spritesheet("Miku_sing2", "assets/personagens/Miku/Sprites/Miku_sing2.png", { frameWidth: 308, frameHeight: 382 });
     this.load.spritesheet("Miku_effects", "assets/personagens/Miku/Sprites/Miku_effects.png", { frameWidth: 400, frameHeight: 400 });
     this.load.spritesheet("Miku_spine", "assets/personagens/Miku/Sprites/Miku_spine.png", { frameWidth: 192, frameHeight: 94 });
+    this.load.spritesheet("Miku_puppet", "assets/personagens/Miku/Sprites/Miku_puppet.png", { frameWidth: 166, frameHeight: 145 });
     this.load.audio("sek", "assets/personagens/Miku/Audio/sek.wav");
     this.load.audio("e", "assets/personagens/Miku/Audio/e.wav");
     this.load.audio("kai", "assets/personagens/Miku/Audio/kai.wav");
+    this.load.audio("RollingGirl", "assets/personagens/Miku/Audio/RollingGirl.wav");
+    this.load.audio("soree", "assets/personagens/Miku/Audio/soree.wav");
+    this.load.audio("yata", "assets/personagens/Miku/Audio/yata.wav");
+
+
     
     // --- Ken ---
     //base

@@ -44,6 +44,7 @@ export default class EstadoAtack extends EstadoBase {
 
      // verifica se jÃ¡ foi acertado o inimigo
      this.jaAcertou = false;
+     this.colisoresOverlap = [];
       // verifica se jÃ¡ foi criada a hitbox
      this.hitboxCriada = false;
      //define o tempo para imediato no relogio interno do phaser
@@ -510,6 +511,12 @@ export default class EstadoAtack extends EstadoBase {
         : [];
     }
 
+    // Entidades auxiliares podem se registrar como alvos sem regras de personagem aqui.
+    const alvosExtras = (cena.alvosAtaqueExtras ?? []).filter(
+      (alvo) => alvo?.ativo && alvo.dono !== this.personagem
+    );
+    alvos = [...new Set([...alvos, ...alvosExtras])];
+
     alvos.forEach((alvo) => {
       if (!alvo || !alvo.grupoHurtbox) return;
 
@@ -555,7 +562,8 @@ export default class EstadoAtack extends EstadoBase {
         }
       );
 
-      this.colisorOverlap = colisor;
+      this.colisoresOverlap.push(colisor);
+      alvo.registrarColisorRecebido?.(colisor);
     });
   }
 
@@ -586,10 +594,10 @@ export default class EstadoAtack extends EstadoBase {
 
   exit() {
     // Limpa o evento de colisÃ£o da fÃ­sica do Phaser
-    if (this.colisorOverlap) {
-      this.personagem.scene.physics.world.removeCollider(this.colisorOverlap);
-      this.colisorOverlap = null;
-    }
+    (this.colisoresOverlap ?? []).forEach((colisor) => {
+      this.personagem.scene.physics.world.removeCollider(colisor);
+    });
+    this.colisoresOverlap = [];
 
     if (this.hitboxAtual) {
       this.hitboxAtual.destroy();
@@ -620,4 +628,6 @@ export default class EstadoAtack extends EstadoBase {
     this.finalizandoPorAcerto = false;
   }
 }
+
+
 

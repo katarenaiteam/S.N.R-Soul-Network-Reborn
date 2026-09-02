@@ -11,6 +11,16 @@ export default class SpiderUlt {
     this.etapaAtual = 0;
     this.etapas = [];
     this.congelado = false; // Flag para cortar o movimento manual no update
+    this.multiplicadorRitmo = 1.2;
+    this.timeScaleAranhaOriginal = null;
+    this.timeScaleOponenteOriginal = null;
+    this.fundoUlt = null;
+    this.fundoFaseOriginal = null;
+    this.fundoFaseEraVisivel = true;
+    this.visibilidadePlataformas = [];
+    this.timerFalhaUlt = null;
+    this.intervaloTremorFinal = null;
+    this.posCameraAntesTremor = null;
   }
 
   executar() {
@@ -21,6 +31,12 @@ export default class SpiderUlt {
 
     const cam = this.scene.cameras.main;
     const dir = this.personagem.sprite.flipX ? -1 : 1;
+
+    this.ativarFundoUltimate();
+    this.personagem.tocarSomSorteado("sp_ShowTime", {
+      volume: 0.8,
+      detune: 0
+    });
 
     this.desativarCameraCena();
     this.scene.physics.pause();
@@ -73,10 +89,11 @@ export default class SpiderUlt {
   }
 
   iniciarAvançoTrigger(dir) {
+    this.aplicarRitmoAnimacoes();
     this.emAvanço = true;
     this.conectou = false;
     this.tempoAvançoInicio = this.scene.time.now;
-    this.duracaoAvanço = 300;
+    this.duracaoAvanço = 300 * this.multiplicadorRitmo;
 
     this.posInicialAvançoX = this.personagem.sprite.x;
     this.distanciaAvanço = 250 * dir;
@@ -90,6 +107,8 @@ export default class SpiderUlt {
   }
 
   atualizar() {
+    this.ajustarFundoNaCamera();
+
     // SE ESTIVER CONGELADO NO GOLPE FINAL, BLOQUEIA QUALQUER MOVIMENTO POR CÓDIGO
     if (this.congelado) return;
 
@@ -117,7 +136,10 @@ export default class SpiderUlt {
 
       if (progresso >= 1) {
         this.emAvanço = false;
-        this.finalizarCinematica();
+        this.timerFalhaUlt = this.scene.time.delayedCall(500, () => {
+          this.timerFalhaUlt = null;
+          this.finalizarCinematica();
+        });
         return;
       }
       return;
@@ -129,10 +151,19 @@ export default class SpiderUlt {
       const decorrido = this.scene.time.now - this.tempoEtapaInicio;
       
       const tempoAranha = etapa.tempoMovimentoAranha || etapa.duracao;
-      const tempoOponente = etapa.tempoMovimentoOponente || etapa.duracao;
+      const delayMovimentoOponente = etapa.delayMovimentoOponente ?? 0;
+      const tempoDisponivelOponente = Math.max(
+        1,
+        etapa.duracao - delayMovimentoOponente
+      );
+      const tempoOponente = etapa.tempoMovimentoOponente || tempoDisponivelOponente;
 
       const progressoAranha = Math.min(decorrido / tempoAranha, 1);
-      const progressoOponente = Math.min(decorrido / tempoOponente, 1);
+      const progressoOponente = Phaser.Math.Clamp(
+        (decorrido - delayMovimentoOponente) / tempoOponente,
+        0,
+        1
+      );
 
       // Movimento do Homem-Aranha
       if (etapa.targetAranha) {
@@ -198,6 +229,11 @@ export default class SpiderUlt {
       this.oponente.podeUsarSpecial = () => false;
       this.oponente.podeAtacar = false;
 
+      if (!this.updateEstadoOponenteOriginal && this.oponente.maquinaEstados) {
+        this.updateEstadoOponenteOriginal = this.oponente.maquinaEstados.update;
+        this.oponente.maquinaEstados.update = () => {};
+      }
+
       if (this.oponente.maquinaEstados?.estadoAtual?.finalizarAtaque) {
         this.oponente.maquinaEstados.estadoAtual.finalizarAtaque();
       } else if (this.oponente.maquinaEstados?.estadoAtual?.finalizarSpecial) {
@@ -226,24 +262,26 @@ export default class SpiderUlt {
         animAranha: "spy_ult00",
         animOponente: "danoSide",
         dano: 5,
-        targetAranha: { x: hitX + (180 * dir), y: hitY },
-        targetOponente: { x: hitX + (225 * dir), y: hitY - 15 },
+        targetAranha: { x: hitX + (175 * dir), y: hitY },
+        targetOponente: { x: hitX + (220 * dir), y: hitY  },
+        movimentoCurva: { aranha: 0, oponente: 50 },
         velocidadeAranha: 0.5,   
         velocidadeOponente: 0.5
       },
       {
-        duracao: 360,
+        duracao: 400,
         animAranha: "spy_ult1",
         animOponente: "danoUp",
         dano: 5,
-        targetAranha: { x: hitX + (180 * dir), y: hitY },
+        targetAranha: { x: hitX + (175 * dir), y: hitY },
         targetOponente: { x: hitX + (230 * dir), y: hitY - 25 },
-        movimentoCurva: { aranha: 0, oponente: 10 },
+        movimentoCurva: { aranha: 0, oponente: 40 },
         velocidadeAranha: 3.5,   
         velocidadeOponente: 2
       },
       {
         duracao: 380,
+         delayMovimentoOponente: 60,
         animAranha: "spy_ult2",
         delayAnimAranha: 50,
         animOponente: "danoUp",
@@ -255,13 +293,15 @@ export default class SpiderUlt {
         easeOponente: "Cubic.easeOut"
       },
       {
-        duracao: 120,
+        duracao: 300,
         animAranha: "spy_ult3",
         animOponente: "danoUp",
         dano: 8,
+        frameFeedbackImpacto: 4,
         targetAranha: { x: hitX + (220 * dir), y: hitY - 90 },
         targetOponente: { x: hitX + (240 * dir), y: hitY - 160 },
-        velocidadeAranha: 0.5,   
+        tempoMovimentoAranha: 300,
+        velocidadeAranha: 0.4,   
         velocidadeOponente: 0.5,
         easeAranha: "Cubic.easeOut",
       },
@@ -270,7 +310,7 @@ export default class SpiderUlt {
         animAranha: "spy_ult35",
         animOponente: "danoUp",
         dano: 8,
-        targetAranha: { x: hitX + (220 * dir), y: hitY - 90 },
+        targetAranha: { x: hitX + (190 * dir), y: hitY - 90 },
         targetOponente: { x: hitX + (250 * dir), y: hitY - 220 },
         movimentoCurva: { aranha: 80, oponente: 200 },
         velocidadeAranha: 3.5,   
@@ -283,27 +323,27 @@ export default class SpiderUlt {
         animOponente: "danoDown",
         dano: 8,
         targetAranha: { x: hitX + (220 * dir), y: hitY - 90 },
-        targetOponente: { x: hitX + (300 * dir), y: hitY - 20 },
-        velocidadeAranha: 3.5,   
-        velocidadeOponente: 0.5
+        targetOponente: { x: hitX + (300 * dir), y: hitY +10 },
+        velocidadeAranha: 3.50,   
+        velocidadeOponente: 0.8
       },
       {
-        duracao: 250,
+        duracao: 400,
         animAranha: "spy_ult5",
         animOponente: "dano",
         dano: 2,
-        targetAranha: { x: hitX + (180 * dir), y: hitY - 120 },
-        targetOponente: { x: hitX + (300 * dir), y: hitY - 20 },
+        targetAranha: { x: hitX + (190 * dir), y: hitY - 110 },
+        targetOponente: { x: hitX + (300 * dir), y: hitY - 55 },
         velocidadeAranha: 2.5,   
-        velocidadeOponente: 0.5
+        velocidadeOponente: 0.3
       },
       {
         duracao: 200,
         animAranha: "spy_ult55",
         animOponente: "dano",
         dano: 2,
-        targetAranha: { x: hitX + (180 * dir), y: hitY - 120 },
-        targetOponente: { x: hitX + (300 * dir), y: hitY - 20 },
+        targetAranha: { x: hitX + (190 * dir), y: hitY - 110 },
+        targetOponente: { x: hitX + (300 * dir), y: hitY - 55 },
         velocidadeAranha: 3.5,   
         velocidadeOponente: 0.5
       },
@@ -312,6 +352,7 @@ export default class SpiderUlt {
         animAranha: "spy_ult6",
         animOponente: "dano",
         dano: 12,
+        frameFeedbackImpacto: 2,
         trajetoriaPorFrame: [
           { x:   85, y: -125 }, { x:  104, y: -100 }, { x:  116, y:  -71 },
           { x:  120, y:  -40 }, { x:  116, y:   -9 }, { x:  104, y:   20 },
@@ -333,6 +374,9 @@ export default class SpiderUlt {
         animAranha: "spy_ult7",
         animOponente: "danoDown",
         dano: 10,
+        // A etapa dura 400 ms (cerca de 9 frames a 22 fps).
+        // Toca no último frame visível e após atualizar a posição do alvo.
+        frameFeedbackImpacto: 9,
         trajetoriaPorFrame: [
           { x:  -85, y:   45 }, { x: -101, y:   25 }, { x: -112, y:    3 },
           { x: -119, y:  -21 }, { x: -120, y:  -46 }, { x: -116, y:  -71 },
@@ -348,7 +392,7 @@ export default class SpiderUlt {
         animOponente: "dano",
         dano: 0,
         targetAranha: { x: hitX + (180 * dir), y: hitY - 120 },
-        targetOponente: { x: hitX + (300 * dir), y: hitY - 20 },
+        targetOponente: { x: hitX + (310 * dir), y: hitY  },
         velocidadeAranha: 3.5,
         velocidadeOponente: 0.5
       },
@@ -357,19 +401,38 @@ export default class SpiderUlt {
         animAranha: "spy_ult8",
         animOponente: "danoSide",
         dano: 20,
-        targetAranha: { x: hitX + (290 * dir), y: hitY - 30 },
-        targetOponente: { x: hitX + (300 * dir), y: hitY - 20 },
+        atrasoFeedbackImpacto: 200,
+        impactoPesado: true,
+        somImpacto: "finish",
+        targetAranha: { x: hitX + (290 * dir), y: hitY - 10 },
+        targetOponente: { x: hitX + (300 * dir), y: hitY - 5 },
         velocidadeAranha: 4.0,
         velocidadeOponente: 0.5,
         easeAranha: "Quad.easeIn",
         onStart: () => {
           // Ativa o freeze 200ms após o início da animação spy_ult8 para pegar o momento exato do chute
-          this.scene.time.delayedCall(200, () => {
+          this.scene.time.delayedCall(200 * this.multiplicadorRitmo, () => {
             this.executarImpactoFinal(dir);
           });
         }
       }
     ];
+
+    const camposTemporais = [
+      "duracao",
+      "tempoMovimentoAranha",
+      "tempoMovimentoOponente",
+      "delayMovimentoOponente",
+      "delayAnimAranha",
+      "atrasoFeedbackImpacto"
+    ];
+    this.etapas.forEach((etapa) => {
+      camposTemporais.forEach((campo) => {
+        if (typeof etapa[campo] === "number") {
+          etapa[campo] *= this.multiplicadorRitmo;
+        }
+      });
+    });
 
     this.etapaAtual = 0;
     this.proximaEtapa();
@@ -400,34 +463,39 @@ export default class SpiderUlt {
     if (etapa.animAranha && this.scene.anims.exists(etapa.animAranha)) {
       this.personagem.sprite.anims.play(etapa.animAranha, true);
 
-      if (etapa.trajetoriaPorFrame && Array.isArray(etapa.trajetoriaPorFrame)) {
+      if (
+        (etapa.trajetoriaPorFrame && Array.isArray(etapa.trajetoriaPorFrame)) ||
+        etapa.frameFeedbackImpacto
+      ) {
+        let feedbackTocado = false;
         this.fnUpdateFrame = (anim, frame) => {
           if (anim.key !== etapa.animAranha || !this.oponente || !this.oponente.sprite) return;
 
-          const dir = this.personagem.sprite.flipX ? -1 : 1;
-          const totalPontos = etapa.trajetoriaPorFrame.length;
-          const index = (frame.index - 1) % totalPontos;
-          const offset = etapa.trajetoriaPorFrame[index];
+          if (etapa.trajetoriaPorFrame) {
+            const dir = this.personagem.sprite.flipX ? -1 : 1;
+            const totalPontos = etapa.trajetoriaPorFrame.length;
+            const index = (frame.index - 1) % totalPontos;
+            const offset = etapa.trajetoriaPorFrame[index];
 
-          if (offset) {
-            this.oponente.sprite.setPosition(
-              this.personagem.sprite.x + (offset.x * dir),
-              this.personagem.sprite.y + offset.y
-            );
+            if (offset) {
+              this.oponente.sprite.setPosition(
+                this.personagem.sprite.x + (offset.x * dir),
+                this.personagem.sprite.y + offset.y
+              );
+            }
+          }
+
+          if (
+            !feedbackTocado &&
+            etapa.frameFeedbackImpacto &&
+            frame.index >= etapa.frameFeedbackImpacto
+          ) {
+            feedbackTocado = true;
+            this.tocarFeedbackImpacto(etapa);
           }
         };
 
         this.personagem.sprite.on('animationupdate', this.fnUpdateFrame);
-      }
-    }
-
-    if (etapa.animOponente) {
-      const prefixoOp = this.oponente.prefixo || "";
-      const animComPrefixo = prefixoOp + etapa.animOponente;
-      const animFinal = this.scene.anims.exists(animComPrefixo) ? animComPrefixo : etapa.animOponente;
-
-      if (this.scene.anims.exists(animFinal)) {
-        this.oponente.sprite.anims.play(animFinal, true);
       }
     }
 
@@ -438,6 +506,25 @@ export default class SpiderUlt {
         semEmpurrao: true,
         apenasDano: true
       });
+
+      if (!etapa.frameFeedbackImpacto) {
+        const tocarFeedback = () => this.tocarFeedbackImpacto(etapa);
+        if (etapa.atrasoFeedbackImpacto) {
+          this.scene.time.delayedCall(etapa.atrasoFeedbackImpacto, tocarFeedback);
+        } else {
+          tocarFeedback();
+        }
+      }
+    }
+
+    if (etapa.animOponente) {
+      const prefixoOp = this.oponente.prefixoAnim || "";
+      const animComPrefixo = prefixoOp + etapa.animOponente;
+      const animFinal = this.scene.anims.exists(animComPrefixo) ? animComPrefixo : etapa.animOponente;
+
+      if (this.scene.anims.exists(animFinal)) {
+        this.oponente.sprite.anims.play(animFinal, true);
+      }
     }
 
     if (typeof etapa.onStart === "function") {
@@ -450,12 +537,170 @@ export default class SpiderUlt {
     });
   }
 
+  tocarFeedbackImpacto(etapa) {
+    if (!this.oponente?.sprite) return;
+
+    const impactoPesado = etapa.impactoPesado || etapa.dano >= 8;
+    const efeitos = impactoPesado
+      ? ["punch2", "punch3"]
+      : ["punch1", "punch2", "punch3"];
+
+    this.personagem.vfx?.tocarListaImpacto(
+      [{ escolherUm: efeitos, escala: impactoPesado ? 1.15 : 0.85 }],
+      this.oponente
+    );
+
+    const tipoSom = impactoPesado ? "heavy" : "light";
+    const sonsImpacto = etapa.somImpacto || this.personagem.sons?.[tipoSom];
+    if (sonsImpacto) {
+      const configSom = {
+        volume: etapa.somImpacto ? 0.85 : (impactoPesado ? 0.22 : 0.15)
+      };
+      if (etapa.somImpacto) configSom.detune = 0;
+      this.personagem.tocarSomSorteado(sonsImpacto, configSom);
+    }
+  }
+
+  ativarFundoUltimate() {
+    if (this.fundoUlt?.active || !this.scene.textures.exists("ultimateback")) return;
+
+    const fundoFase = this.scene.mapaAtual?.imagemFundo;
+    this.fundoFaseOriginal = fundoFase || null;
+    this.fundoFaseEraVisivel = fundoFase?.visible ?? true;
+
+    if (!this.scene.anims.exists("spider_ultimateback")) {
+      this.scene.anims.create({
+        key: "spider_ultimateback",
+        frames: this.scene.anims.generateFrameNumbers("ultimateback", {
+          start: 0,
+          end: 115
+        }),
+        frameRate: 36,
+        repeat: -1
+      });
+    }
+
+    this.fundoUlt = this.scene.add.sprite(0, 0, "ultimateback", 0);
+    this.fundoUlt.setDepth((fundoFase?.depth ?? -100) + 1);
+    this.fundoUlt.setScrollFactor(1);
+    this.ajustarFundoNaCamera();
+    this.fundoUlt.play("spider_ultimateback");
+    fundoFase?.setVisible(false);
+
+    const plataformas = this.scene.mapaAtual?.plataformas?.getChildren?.() || [];
+    this.visibilidadePlataformas = plataformas.map((plataforma) => ({
+      plataforma,
+      visivel: plataforma.visible
+    }));
+    plataformas.forEach((plataforma) => plataforma.setVisible(false));
+
+    this.scene.camHUD?.ignore(this.fundoUlt);
+  }
+
+  ajustarFundoNaCamera() {
+    if (!this.fundoUlt?.active) return;
+
+    const cam = this.scene.cameras.main;
+    this.fundoUlt.setPosition(cam.midPoint.x, cam.midPoint.y);
+    this.fundoUlt.setDisplaySize(
+      cam.width / cam.zoom,
+      cam.height / cam.zoom
+    );
+  }
+
+  restaurarFundoFase() {
+    if (this.fundoFaseOriginal?.active) {
+      this.fundoFaseOriginal.setVisible(this.fundoFaseEraVisivel);
+    }
+    this.fundoUlt?.destroy();
+    this.fundoUlt = null;
+    this.fundoFaseOriginal = null;
+
+    this.visibilidadePlataformas.forEach(({ plataforma, visivel }) => {
+      if (plataforma?.active) plataforma.setVisible(visivel);
+    });
+    this.visibilidadePlataformas = [];
+  }
+
+  iniciarTremorFinal(cam) {
+    this.pararTremorFinal();
+
+    const duracao = 800;
+    const intervalo = 45;
+    const amplitudeInicial = 150 / cam.zoom;
+    const inicio = performance.now();
+    this.posCameraAntesTremor = { x: cam.scrollX, y: cam.scrollY };
+
+    this.intervaloTremorFinal = setInterval(() => {
+      const progresso = Math.min((performance.now() - inicio) / duracao, 1);
+      const quedaSuave = Math.pow(1 - progresso, 0.65);
+      const amplitude = amplitudeInicial * quedaSuave;
+      const base = this.posCameraAntesTremor;
+
+      cam.setScroll(
+        base.x + Phaser.Math.FloatBetween(-amplitude, amplitude),
+        base.y + Phaser.Math.FloatBetween(-amplitude, amplitude)
+      );
+      this.ajustarFundoNaCamera();
+
+      if (progresso >= 1) this.pararTremorFinal();
+    }, intervalo);
+  }
+
+  pararTremorFinal() {
+    if (this.intervaloTremorFinal) {
+      clearInterval(this.intervaloTremorFinal);
+      this.intervaloTremorFinal = null;
+    }
+
+    if (this.posCameraAntesTremor && this.scene?.cameras?.main) {
+      this.scene.cameras.main.setScroll(
+        this.posCameraAntesTremor.x,
+        this.posCameraAntesTremor.y
+      );
+      this.posCameraAntesTremor = null;
+      this.ajustarFundoNaCamera();
+    }
+  }
+
+  aplicarRitmoAnimacoes() {
+    const animsAranha = this.personagem?.sprite?.anims;
+    const animsOponente = this.oponente?.sprite?.anims;
+
+    if (animsAranha && this.timeScaleAranhaOriginal === null) {
+      this.timeScaleAranhaOriginal = animsAranha.timeScale;
+      animsAranha.timeScale = this.timeScaleAranhaOriginal / this.multiplicadorRitmo;
+    }
+
+    if (animsOponente && this.timeScaleOponenteOriginal === null) {
+      this.timeScaleOponenteOriginal = animsOponente.timeScale;
+      animsOponente.timeScale = this.timeScaleOponenteOriginal / this.multiplicadorRitmo;
+    }
+  }
+
+  restaurarRitmoAnimacoes() {
+    if (this.timeScaleAranhaOriginal !== null && this.personagem?.sprite?.anims) {
+      this.personagem.sprite.anims.timeScale = this.timeScaleAranhaOriginal;
+      this.timeScaleAranhaOriginal = null;
+    }
+
+    if (this.timeScaleOponenteOriginal !== null && this.oponente?.sprite?.anims) {
+      this.oponente.sprite.anims.timeScale = this.timeScaleOponenteOriginal;
+      this.timeScaleOponenteOriginal = null;
+    }
+  }
+
   restaurarOponente() {
     if (!this.oponente) return;
 
     if (this.podeUsarAtaqueOriginal) this.oponente.podeUsarAtaque = this.podeUsarAtaqueOriginal;
     if (this.podeUsarSpecialOriginal) this.oponente.podeUsarSpecial = this.podeUsarSpecialOriginal;
     this.oponente.podeAtacar = true;
+
+    if (this.updateEstadoOponenteOriginal && this.oponente.maquinaEstados) {
+      this.oponente.maquinaEstados.update = this.updateEstadoOponenteOriginal;
+      this.updateEstadoOponenteOriginal = null;
+    }
 
     if (this.oponente.sprite && this.oponente.sprite.body) {
       this.oponente.sprite.body.setAllowGravity(true);
@@ -485,10 +730,10 @@ export default class SpiderUlt {
     this.scene.physics.pause();
     this.scene.time.paused = true;
 
-    // 5. TREMOR EM MEIO-TERMO (0.005) DURANTE TODO O CONGELAMENTO (1500ms)
-    cam.shake(900, 0.01, true);
+    // Tremor controlado, com baixa frequência e queda gradual de intensidade.
+    this.iniciarTremorFinal(cam);
 
-    // 6. DESCONGELA APÓS 1,5 SEGUNDOS (1500ms)
+    // Mantém o close congelado depois do tremor para destacar a pose final.
     setTimeout(() => {
       if (!this.scene || !this.scene.time) return;
 
@@ -514,7 +759,7 @@ export default class SpiderUlt {
         const multPorcentagem = 1 + (pctDano / 100);
 
         const forcaX = 500 * dir * multPorcentagem;
-        const forcaY = 1600 * multPorcentagem;
+        const forcaY = 1200 * multPorcentagem;  //1600 original
 
         if (this.oponente.maquinaEstados && typeof this.oponente.maquinaEstados.mudarEstado === "function") {
           this.oponente.maquinaEstados.mudarEstado("hit", {
@@ -535,11 +780,20 @@ export default class SpiderUlt {
       }
 
       this.finalizarCinematica();
-    }, 900); // 1500ms (1.5 segundos)
+    }, 1300);
   }
 
   finalizarCinematica() {
     this.congelado = false;
+    this.pararTremorFinal();
+    if (this.timerFalhaUlt) {
+      this.timerFalhaUlt.remove();
+      this.timerFalhaUlt = null;
+    }
+    if (this.fnUpdateFrame) {
+      this.personagem.sprite.off("animationupdate", this.fnUpdateFrame);
+      this.fnUpdateFrame = null;
+    }
 
     // Garante que o clock do Phaser não fique pausado se a Ult acabar
     if (this.scene && this.scene.time) {
@@ -555,6 +809,8 @@ export default class SpiderUlt {
       this.personagem.sprite.body.setAllowGravity(true);
     }
 
+    this.restaurarFundoFase();
+    this.restaurarRitmoAnimacoes();
     this.restaurarOponente();
     this.restaurarCameraSeNecessario();
 
@@ -564,6 +820,15 @@ export default class SpiderUlt {
   }
   cancelar() {
     this.congelado = false;
+    this.pararTremorFinal();
+    if (this.timerFalhaUlt) {
+      this.timerFalhaUlt.remove();
+      this.timerFalhaUlt = null;
+    }
+    if (this.fnUpdateFrame) {
+      this.personagem.sprite.off("animationupdate", this.fnUpdateFrame);
+      this.fnUpdateFrame = null;
+    }
 
     if (this.timerEtapa) {
       this.timerEtapa.remove();
@@ -577,6 +842,9 @@ export default class SpiderUlt {
       this.oponente.sprite.body.setAllowGravity(true);
     }
 
+    this.restaurarFundoFase();
+    this.restaurarRitmoAnimacoes();
+    this.restaurarOponente();
     this.restaurarCameraSeNecessario();
   }
 }

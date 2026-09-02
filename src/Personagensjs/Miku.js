@@ -1,5 +1,7 @@
 ﻿import Personagem from "./Personagem.js";
 import NotaCarregada from "./Specials/Miku/NotaCarregada.js";
+import MikuSpin from "./Specials/Miku/mikuSpin.js";
+import MikuPuppet from "./Specials/Miku/mikuPuppet.js";
 
 export default class Miku extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -17,7 +19,7 @@ export default class Miku extends Personagem {
       {
         velocidade: 280,
         forcaPulo: -600,
-        maxPulos: 3,
+        maxPulos: 2,
         maxDash: 1,
         maxComboIndex: 3,
       },
@@ -148,69 +150,66 @@ this.vfxAtaqueNormal = {
       jump: {
         largura: 85, altura: 340, offsetX: 244, offsetY: -5, escala: 0.34,
         hurtboxes: [
-          { largura: 30, altura: 50, offsetX: 0, offsetY: -70 },
+          { largura: 30, altura: 50, offsetX: 1, offsetY: -70 },
           { largura: 30, altura: 25, offsetX: 10, offsetY: -40 },
         ],
       },
       crouch: {
         largura: 85, altura: 170, offsetX: 90, offsetY: 184, escala: 0.34,
-        hurtboxes: [{ largura: 35, altura: 50, offsetX: 20, offsetY: -25 }],
+        hurtboxes: [{ largura: 35, altura: 50, offsetX: 5, offsetY: -25 }],
       },
       crouch2: {
         largura: 85, altura: 170, offsetX: 90, offsetY: 30, escala: 0.34,
-        hurtboxes: [{ largura: 40, altura: 50, offsetX: 0, offsetY: -25 }],
+        hurtboxes: [{ largura: 40, altura: 50, offsetX: 10, offsetY: -25 }],
       },
       crouch3: {
         largura: 85, altura: 170, offsetX: 90, offsetY: 184, escala: 0.34,
-        hurtboxes: [{ largura: 80, altura: 50, offsetX: 0, offsetY: -25 }],
+        hurtboxes: [{ largura: 40, altura: 50, offsetX: 10, offsetY: -25 }],
       },
       dash: {
         largura: 85, altura: 340, offsetX: 97, offsetY: 18, escala: 0.34,
-        hurtboxes: [
-          { largura: 42, altura: 48, offsetX: 0, offsetY: -78 },
-          { largura: 55, altura: 42, offsetX: 4, offsetY: -34 },
-        ],
+        hurtboxes: [],
       },
       guard: {
         largura: 90, altura: 315, offsetX: 38, offsetY: 20, escala: 0.34,
         hurtboxes: [
-          { largura: 30, altura: 48, offsetX: 0, offsetY: -82 },
-          { largura: 52, altura: 55, offsetX: 0, offsetY: -38 },
+          { largura: 30, altura: 48, offsetX: 5, offsetY: -82 },
+          { largura: 35, altura: 55, offsetX: 5, offsetY: -38 },
         ],
       },
       taunt1: {
         largura: 95, altura: 340, offsetX: 105, offsetY: 34, escala: 0.34,
         hurtboxes: [
-          { largura: 38, altura: 48, offsetX: 0, offsetY: -92 },
-          { largura: 50, altura: 62, offsetX: 0, offsetY: -42 },
+          { largura: 35, altura: 48, offsetX: 0, offsetY: -92 },
+          { largura: 40, altura: 62, offsetX: 0, offsetY: -42 },
         ],
       },
       dano: {
         largura: 85, altura: 340, offsetX: 138, offsetY: 11, escala: 0.34,
         hurtboxes: [
-          { largura: 42, altura: 52, offsetX: 0, offsetY: -82 },
-          { largura: 54, altura: 50, offsetX: 0, offsetY: -34 },
+          { largura: 35, altura: 52, offsetX: 0, offsetY: -82 },
+          { largura: 35, altura: 50, offsetX: 0, offsetY: -34 },
         ],
       },
       danoUp: {
         largura: 85, altura: 340, offsetX: 138, offsetY: 8, escala: 0.34,
         hurtboxes: [
-          { largura: 42, altura: 52, offsetX: 0, offsetY: -88 },
-          { largura: 52, altura: 48, offsetX: 0, offsetY: -40 },
+          { largura: 35, altura: 52, offsetX: 0, offsetY: -88 },
+          { largura: 45, altura: 48, offsetX: 0, offsetY: -40 },
         ],
       },
       danoSide: {
         largura: 85, altura: 340, offsetX: 170, offsetY: 11, escala: 0.34,
         hurtboxes: [
-          { largura: 60, altura: 50, offsetX: 0, offsetY: -72 },
-          { largura: 62, altura: 42, offsetX: 0, offsetY: -30 },
+          { largura: 35, altura: 50, offsetX: 0, offsetY: -72 },
+          { largura: 35, altura: 42, offsetX: 0, offsetY: -30 },
         ],
       },
       danoDown: {
         largura: 85, altura: 340, offsetX: 140, offsetY: -4, escala: 0.34,
         hurtboxes: [
-          { largura: 58, altura: 48, offsetX: 0, offsetY: -66 },
-          { largura: 62, altura: 38, offsetX: 0, offsetY: -27 },
+          { largura: 40, altura: 48, offsetX: 0, offsetY: -66 },
+          { largura: 45, altura: 38, offsetX: 0, offsetY: -27 },
         ],
       },
       dead: {
@@ -220,85 +219,104 @@ this.vfxAtaqueNormal = {
       getup: {
         largura: 110, altura: 120, offsetX: 125, offsetY: 10, escala: 0.34,
         hurtboxes: [
-          { largura: 58, altura: 38, offsetX: 0, offsetY: -35 },
-          { largura: 72, altura: 25, offsetX: 0, offsetY: -14 },
+          { largura: 50, altura: 25, offsetX: 0, offsetY: -14 },
         ],
       },
       atack1: {
         largura: 85, altura: 340, offsetX: 183, offsetY: 16, escala: 0.34,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 60, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 20, altura: 45, offsetX: 15, offsetY: -95 },
+          { largura: 30, altura: 70, offsetX: 15, offsetY: -35 },
         ],
       },
       atack2: {
         largura: 85, altura: 340, offsetX: 183, offsetY: 16, escala: 0.34,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 60, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 20, altura: 45, offsetX: 15, offsetY: -95 },
+          { largura: 30, altura: 70, offsetX: 15, offsetY: -35 },
         ],
       },
       atack3: {
         largura: 85, altura: 340, offsetX: 183, offsetY: 16, escala: 0.34,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 60, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 20, altura: 45, offsetX: 15, offsetY: -95 },
+          { largura: 30, altura: 70, offsetX: 15, offsetY: -35 },
         ],
       },
       sideAtack: {
         largura: 85, altura: 340, offsetX: 157, offsetY: 42, escala: 0.34,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 60, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 25, altura: 45, offsetX: 0, offsetY: -95 },
+          { largura: 30, altura: 70, offsetX: 5, offsetY: -35 },
         ],
       },
       downAtack: {
         largura: 85, altura: 170, offsetX: 198, offsetY: 209, escala: 0.34,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 60, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 50, altura: 70, offsetX: 0, offsetY: -90 },
         ],
       },
       neutralAir: {
         largura: 85, altura: 340, offsetX: 248, offsetY: -5, escala: 0.34,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 60, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 35, altura: 50, offsetX: 0, offsetY: -80 },
+          { largura: 40, altura: 50, offsetX: 20, offsetY: -25 },
+          
         ],
       },
       sideAir: {
         largura: 85, altura: 340, offsetX: 248, offsetY: -5, escala: 0.34,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 60, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 35, altura: 50, offsetX: 0, offsetY: -80 },
+          { largura: 40, altura: 50, offsetX: 20, offsetY: -25 },
         ],
       },
       upAir: {
-        largura: 85, altura: 340, offsetX: 196, offsetY: 50, escala: 0.34,
+        largura: 85, altura: 340, offsetX: 196, offsetY: 70, escala: 0.34,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 60, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 20, altura: 45, offsetX: 0, offsetY: -95 },
+          { largura: 35, altura: 70, offsetX: -5, offsetY: -35 },
         ],
       },
       downAir: {
         largura: 85, altura: 340, offsetX: 248, offsetY: -5, escala: 0.34,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 60, altura: 50, offsetX: 0, offsetY: -25 },
+          { largura: 35, altura: 50, offsetX: 0, offsetY: -80 },
         ],
       },
       specialSing1: {
         largura: 85, altura: 340, offsetX: 140, offsetY: 36, escala: 0.34,
         hurtboxes: [
-          { largura: 45, altura: 55, offsetX: 0, offsetY: -82 },
-          { largura: 55, altura: 48, offsetX: 0, offsetY: -32 },
+          { largura: 25, altura: 55, offsetX: 5, offsetY: -82 },
+          { largura: 35, altura: 48, offsetX: 2, offsetY: -32 },
         ],
       },
       specialSing2: {
         largura: 85, altura: 340, offsetX: 157, offsetY: 42, escala: 0.34,
         hurtboxes: [
-          { largura: 45, altura: 55, offsetX: 0, offsetY: -82 },
-          { largura: 55, altura: 48, offsetX: 0, offsetY: -32 },
+          { largura: 25, altura: 55, offsetX: 5, offsetY: -82 },
+          { largura: 33, altura: 48, offsetX: 2, offsetY: -32 },
+        ],
+      },
+      spin: {
+        largura: 85, altura: 340, offsetX: 214, offsetY: 20, escala: 0.34,
+        hurtboxes: [
+          { largura: 35, altura: 55, offsetX: 0, offsetY: -82 },
+          { largura: 45, altura: 48, offsetX: 0, offsetY: -32 },
+        ],
+      },
+      spinLoop: {
+        largura: 85, altura: 340, offsetX: 214, offsetY: 20, escala: 0.34,
+        hurtboxes: [
+          { largura: 35, altura: 55, offsetX: 0, offsetY: -82 },
+          { largura: 45, altura: 48, offsetX: 0, offsetY: -32 },
+        ],
+      },
+      spinFinal: {
+        largura: 85, altura: 340, offsetX: 248, offsetY: -5, escala: 0.34,
+        hurtboxes: [
+          { largura: 35, altura: 50, offsetX: 0, offsetY: -80 },
+          { largura: 40, altura: 50, offsetX: 20, offsetY: -25 },
         ],
       },
     };
@@ -412,7 +430,7 @@ this.vfxAtaqueNormal = {
         offsetY: -75,
         largura: 60,
         altura: 40,
-        duracao: 750,
+        duracao: 500,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -451,7 +469,7 @@ this.vfxAtaqueNormal = {
         largura: 55,
         altura: 25,
         cooldown: 900,
-        duracao: 600,
+        duracao: 500,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -573,6 +591,17 @@ this.vfxAtaqueNormal = {
           },
         ],
 
+        movimento: {
+         inicio: 50,
+         fim: 300,
+       x: {
+         de: 500,
+         para: 150,
+        },
+
+        curva: "easeIn",
+       },
+
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
@@ -582,7 +611,9 @@ this.vfxAtaqueNormal = {
         },
       },
       air_agachado: {
-        animacao: "miku_sideAir",
+        // Usa os mesmos frames visuais dos outros aereos, mas uma chave propria
+        // impede que o estado de ataque associe este golpe a outra configuracao.
+        animacao: "miku_downAir",
         frameHitbox: 3,
         offsetX: 30,
         offsetY: -20,
@@ -625,13 +656,69 @@ this.vfxAtaqueNormal = {
       tempoNota: 4000,
       tempoPoseLancamento: 560,
       tempoMinimoCarga: 1100,
-      volumeSom: 0.4,
+      volumeSom: 0.8,
       propriedades: {
         tipoSomImpacto: "light",
         dano: 8,
         knockbackX: 250,
         knockbackY: -90,
         tumbling: false,
+      },
+    },
+    air_neutro: {
+      animacao: "miku_specialSing2",
+      cooldown: 1800,
+      logica: NotaCarregada,
+      aereo: true,
+      escalaNota: 0.8,
+      larguraNota: 70,
+      alturaNota: 70,
+      velocidadeNota: 900,
+      quedaNota: 0,
+      tempoNota: 4000,
+      tempoPoseLancamento: 560,
+      tempoPausaAerea: 560,
+      volumeSom: 0.8,
+      propriedades: {
+        tipoSomImpacto: "light",
+        dano: 8,
+        knockbackX: 250,
+        knockbackY: -90,
+        tumbling: false,
+        travarMovimentoAir: true,
+        anularGravidade: true,
+      },
+    },
+    agachado: {
+      animacao: "miku_dash",
+      cooldown: 450,
+      duracao: 340,
+      logica: MikuPuppet,
+    },
+    lado: {
+      animacao: "miku_spin",
+      cooldown: 2200,
+      logica: MikuSpin,
+      propriedades: {
+        tipoSomImpacto: "heavy",
+        dano: 18,
+        knockbackX: 430,
+        knockbackY: -360,
+        tumbling: true,
+        travarMovimentoAir: true,
+      },
+    },
+    air_lado: {
+      animacao: "miku_spin",
+      cooldown: 2200,
+      logica: MikuSpin,
+      propriedades: {
+        tipoSomImpacto: "heavy",
+        dano: 18,
+        knockbackX: 430,
+        knockbackY: -360,
+        tumbling: true,
+        travarMovimentoAir: true,
       },
     },
   };
@@ -891,7 +978,7 @@ scene.anims.create({
       repeat: 0,
     });
      scene.anims.create({
-      key: "mku_downAir",
+      key: "miku_downAir",
       frames: scene.anims.generateFrameNumbers("Miku_airplosion", {
         start: 0,
         end: 4,
@@ -927,8 +1014,47 @@ scene.anims.create({
       frameRate: 24,
       repeat: -1,
     });
+    scene.anims.create({
+      key: "miku_spin",
+      frames: scene.anims.generateFrameNumbers("Miku_spin", { start: 0, end: 20 }),
+      frameRate: 24,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "miku_spinLoop",
+      frames: scene.anims.generateFrameNumbers("Miku_spin", { start: 7, end: 20 }),
+      frameRate: 24,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "miku_spinFinal",
+      frames: scene.anims.generateFrameNumbers("Miku_airplosion", { start: 0, end: 5 }),
+      frameRate: 9,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "miku_spine",
+      frames: scene.anims.generateFrameNumbers("Miku_spine", { start: 0, end: 23 }),
+      frameRate: 24,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "miku_puppet_move",
+      frames: scene.anims.generateFrameNumbers("Miku_puppet", { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1,
+    });
   }
 }
+
+
+
+
+
+
+
 
 
 

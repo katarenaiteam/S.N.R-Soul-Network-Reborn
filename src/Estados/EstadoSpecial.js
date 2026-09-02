@@ -36,6 +36,9 @@ export default class EstadoSpecial extends EstadoBase {
     this.timerFinalizacaoAcerto = null;
     this.finalizandoPorAcerto = false;
 
+    // Só conta depois que o special foi validado e realmente iniciou.
+    this.personagem.registrarUsoSpecialAereo(tipoSpecialEfetivo);
+
     // Inicia Cooldown especificamente da chave resolvida
     this.personagem.iniciarCooldownSpecial(tipoSpecialEfetivo);
 

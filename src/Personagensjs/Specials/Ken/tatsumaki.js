@@ -291,10 +291,7 @@ export default class Tatsumaki {
 
       bodyAlvo.setVelocityX(velocidadeKen + correcao);
 
-      // Impede que uma queda de frames deixe o alvo escapar da área do golpe.
-      if (Math.abs(distancia) > 75) {
-        spriteAlvo.setX(xDesejado - 75 * Math.sign(distancia));
-      }
+
     });
   }
   atualizar() {
