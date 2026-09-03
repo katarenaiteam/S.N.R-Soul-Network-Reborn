@@ -1,4 +1,5 @@
 import {
+  destruirColisor,
   obterAlvosCombate,
   registrarAtaqueEspecial,
 } from "../../../Objetos/SistemaCombateEspecial.js";
@@ -21,7 +22,7 @@ export default class AupSpecial {
     });
 
     impulsosX.forEach((impulsoX, indice) => {
-      this.criarMini(indice, impulsoX * direcao);
+        this.criarMini(indice, impulsoX * direcao);
     });
   }
 
@@ -161,21 +162,18 @@ export default class AupSpecial {
 
     this.scene.time.delayedCall(0, () => {
       entrada.colisoresRecebidos.forEach((colisor) => {
-        this.scene.physics.world.removeCollider(colisor);
+        destruirColisor(colisor);
       });
       entrada.colisoresRecebidos.clear();
       entrada.overlaps.forEach((overlap) => {
-        if (overlap?.active) this.scene.physics.world.removeCollider(overlap);
+        destruirColisor(overlap);
       });
       entrada.overlaps = [];
-      if (entrada.colliderMapa?.active) {
-        this.scene.physics.world.removeCollider(entrada.colliderMapa);
-      }
+      destruirColisor(entrada.colliderMapa);
       entrada.colliderMapa = null;
       entrada.timerVida?.remove(false);
       entrada.timerVida = null;
       entrada.grupoHurtbox?.clear(true, true);
-      entrada.grupoHurtbox?.destroy(true);
       entrada.grupoHurtbox = null;
       entrada.hurtbox = null;
       entrada.sprite?.destroy();

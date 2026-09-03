@@ -1,4 +1,5 @@
 import ControleEntrada from "../Objetos/ControleEntrada.js";
+import { tocarMusicaSegura } from "../Objetos/AudioSeguro.js";
 
 export default class Charmenu extends Phaser.Scene {
     constructor() {
@@ -13,8 +14,7 @@ export default class Charmenu extends Phaser.Scene {
     create() {
         this.add.image(0, 0, "Charmenu").setOrigin(0, 0).setDisplaySize(this.scale.width, this.scale.height);
 
-        this.musica = this.sound.add('katarenai8bit', { loop: true, volume: 0.1 });
-        this.musica.play();
+        this.musica = tocarMusicaSegura(this, 'katarenai8bit', { loop: true, volume: 0.1 });
 
         this.opcoesPersonagens = [
     
@@ -51,14 +51,9 @@ export default class Charmenu extends Phaser.Scene {
         });
 
         this.teclasP2 = this.input.keyboard.addKeys({
-            esquerda: Phaser.Input.Keyboard.KeyCodes.J,
-            direita:  Phaser.Input.Keyboard.KeyCodes.L,
-            confirmar: Phaser.Input.Keyboard.KeyCodes.O
-        });
-
-        this.teclasSetas = this.input.keyboard.addKeys({
             esquerda: Phaser.Input.Keyboard.KeyCodes.LEFT,
-            direita: Phaser.Input.Keyboard.KeyCodes.RIGHT
+            direita: Phaser.Input.Keyboard.KeyCodes.RIGHT,
+            confirmar: Phaser.Input.Keyboard.KeyCodes.J
         });
 
         this.controleP1 = new ControleEntrada(this, this.teclasP1, 0);
@@ -72,8 +67,8 @@ export default class Charmenu extends Phaser.Scene {
         if (this.numPlayers === 2) this.controleP2.atualizar();
 
         if (!this.p1Confirmou) {
-            const esqP1 = Phaser.Input.Keyboard.JustDown(this.teclasP1.esquerda) || Phaser.Input.Keyboard.JustDown(this.teclasSetas.esquerda) || this.controleP1.acabouDeApertar("esquerda");
-            const dirP1 = Phaser.Input.Keyboard.JustDown(this.teclasP1.direita) || Phaser.Input.Keyboard.JustDown(this.teclasSetas.direita) || this.controleP1.acabouDeApertar("direita");
+            const esqP1 = Phaser.Input.Keyboard.JustDown(this.teclasP1.esquerda) || this.controleP1.acabouDeApertar("esquerda");
+            const dirP1 = Phaser.Input.Keyboard.JustDown(this.teclasP1.direita) || this.controleP1.acabouDeApertar("direita");
             const confP1 = Phaser.Input.Keyboard.JustDown(this.teclasP1.confirmar) || this.controleP1.acabouDeApertar("confirmar") || this.controleP1.acabouDeApertar("atack") || this.controleP1.acabouDeApertar("special");
 
             if (esqP1) {
@@ -94,7 +89,7 @@ export default class Charmenu extends Phaser.Scene {
         if (this.numPlayers === 2 && !this.p2Confirmou) {
             const esqP2 = Phaser.Input.Keyboard.JustDown(this.teclasP2.esquerda) || this.controleP2.acabouDeApertar("esquerda");
             const dirP2 = Phaser.Input.Keyboard.JustDown(this.teclasP2.direita) || this.controleP2.acabouDeApertar("direita");
-            const confP2 = Phaser.Input.Keyboard.JustDown(this.teclasP2.confirmar) || this.controleP2.acabouDeApertar("confirmar") || this.controleP2.acabouDeApertar("atack") || this.controleP2.acabouDeApertar("special");
+            const confP2 = Phaser.Input.Keyboard.JustDown(this.teclasP2.confirmar) || this.controleP2.acabouDeApertar("confirmar");
 
             if (esqP2) {
                 this.indiceP2 = (this.indiceP2 - 1 + this.opcoesPersonagens.length) % this.opcoesPersonagens.length;

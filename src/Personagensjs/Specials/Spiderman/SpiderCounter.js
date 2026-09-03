@@ -48,14 +48,16 @@ export default class SpiderCounter {
   }
 
   atualizar() {
-    if (!this.counterAtivo || !this.hitboxCounter?.active) return;
+    const hitboxCounter = this.hitboxCounter;
+    if (!this.counterAtivo || !hitboxCounter?.active) return;
 
     if (this.personagem) {
       this.personagem.destruirHurtboxes();
     }
 
     const sprite = this.personagem.sprite;
-    this.hitboxCounter.setPosition(sprite.x -5, sprite.y - 60);
+    if (!sprite?.active || !hitboxCounter.active) return;
+    hitboxCounter.setPosition(sprite.x -5, sprite.y - 60);
 
     // =========================================================
     // CHECAGEM GEOMÉTRICA MANUAL (Sem travas de overlap do Phaser)
@@ -73,16 +75,18 @@ export default class SpiderCounter {
 
     // Se houver uma hitbox de ataque ATIVA no oponente
     if (hitboxInimiga && hitboxInimiga.active) {
-      const boundsCounter = this.hitboxCounter.getBounds();
+      const boundsCounter = hitboxCounter.getBounds();
       const boundsAtaque = hitboxInimiga.getBounds ? hitboxInimiga.getBounds() : hitboxInimiga.body;
 
       // Teste de interseção entre os retângulos
       if (Phaser.Geom.Intersects.RectangleToRectangle(boundsCounter, boundsAtaque)) {
         this.dispararContraAtaque(oponente);
+        return;
       }
     }
 
-    const boundsCounter = this.hitboxCounter.getBounds();
+    if (!this.counterAtivo || !hitboxCounter.active) return;
+    const boundsCounter = hitboxCounter.getBounds();
     const ataqueEspecial = obterAtaquesEspeciaisInimigos(this.scene, this.personagem)
       .find((ataque) => {
         const boundsAtaque = ataque.objeto.getBounds?.() ?? ataque.objeto.body;

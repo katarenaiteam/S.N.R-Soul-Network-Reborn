@@ -595,7 +595,7 @@ export default class EstadoAtack extends EstadoBase {
   exit() {
     // Limpa o evento de colisÃ£o da fÃ­sica do Phaser
     (this.colisoresOverlap ?? []).forEach((colisor) => {
-      this.personagem.scene.physics.world.removeCollider(colisor);
+      if (colisor?.active && colisor.world) colisor.destroy();
     });
     this.colisoresOverlap = [];
 

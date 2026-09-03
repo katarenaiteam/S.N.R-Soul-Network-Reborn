@@ -13,6 +13,7 @@ import EstadoDead from "../Estados/EstadoDead.js";
 import EstadoTaunt from "../Estados/EstadoTaunt.js";
 import EstadoUlt from "../Estados/EstadoUlt.js";
 import GerenciadorVFX from "../Objetos/GerenciadorVFX.js";
+import { tocarSomSeguro } from "../Objetos/AudioSeguro.js";
 
 
 export default class Personagem {
@@ -140,7 +141,7 @@ export default class Personagem {
 
     // Proteção: Só toca se a chave realmente existir no cache do Phaser
     if (this.scene.cache.audio.exists(somSorteado)) {
-        this.scene.sound.play(somSorteado, {
+      tocarSomSeguro(this.scene, somSorteado, {
             volume: config.volume ?? 0.5,
             detune: Phaser.Math.Between(-50, 50),
             ...config

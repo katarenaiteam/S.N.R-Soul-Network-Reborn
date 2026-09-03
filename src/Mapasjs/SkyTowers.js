@@ -1,10 +1,11 @@
+import { tocarMusicaSegura } from "../Objetos/AudioSeguro.js";
+
 export default class SkyTowers {
     constructor(scene) {
         this.scene = scene;
 
         if (scene.sound) {
-            this.musica = scene.sound.add('Gathers_Under_Night', { loop: true, volume: 0.1 });
-            this.musica.play();
+            this.musica = tocarMusicaSegura(scene, 'Gathers_Under_Night', { loop: true, volume: 0.1 });
         }
 
         // 1. TAMANHO REDUZIDO DO MUNDO (Fica menor e mais proporcional)

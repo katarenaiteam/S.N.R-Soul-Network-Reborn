@@ -1,10 +1,11 @@
+import { tocarMusicaSegura } from "../Objetos/AudioSeguro.js";
+
 export default class Cidade {
     constructor(scene) {
         this.scene = scene;
 
         if (scene.sound) {
-            this.musica = scene.sound.add('ClockTower', { loop: true, volume: 0.05 });
-            this.musica.play();
+            this.musica = tocarMusicaSegura(scene, 'ClockTower', { loop: true, volume: 0.05 });
         }
 
         // 1. TAMANHO DO MUNDO (Seguindo o padrão do SkyTowers)

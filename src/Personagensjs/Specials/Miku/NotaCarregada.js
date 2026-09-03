@@ -2,6 +2,8 @@
 
 import { obterAlvosCombate, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
 
+import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
+
 export default class NotaCarregada {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
@@ -125,7 +127,7 @@ export default class NotaCarregada {
     const volume = this.special.volumeSom ?? 0.7;
     if (!this.scene.cache.audio.exists("sek")) {
       if (this.scene.cache.audio.exists("kai")) {
-        this.scene.sound.play("kai", { volume });
+        tocarSomSeguro(this.scene, "kai", { volume });
       }
       return;
     }
@@ -134,7 +136,7 @@ export default class NotaCarregada {
     sek.once("complete", () => {
       sek.destroy();
       if (this.scene.cache.audio.exists("kai")) {
-        this.scene.sound.play("kai", { volume });
+        tocarSomSeguro(this.scene, "kai", { volume });
       }
     });
     sek.play();
@@ -242,7 +244,7 @@ export default class NotaCarregada {
     this.pararCargaSonora();
 
     if (!this.audioLancamentoGerenciado && this.scene.cache.audio.exists("kai")) {
-      this.scene.sound.play("kai", { volume: this.special.volumeSom ?? 0.7 });
+      tocarSomSeguro(this.scene, "kai", { volume: this.special.volumeSom ?? 0.7 });
     }
 
     this.personagem.sprite.play("miku_specialSing2", true);

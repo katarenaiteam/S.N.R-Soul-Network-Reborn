@@ -5,6 +5,12 @@ function obterRegistro(scene) {
   return scene.registroCombateEspecial;
 }
 
+export function destruirColisor(colisor) {
+  if (colisor?.active && colisor.world) {
+    colisor.destroy();
+  }
+}
+
 export function obterAlvosCombate(personagem) {
   const scene = personagem.scene;
   const jogadores = scene.scene.key === "CenaHistoria"
@@ -42,7 +48,7 @@ export function registrarAtaqueEspecial(logica, objeto, opcoes = {}) {
     entrada.colisores.forEach((colisor) => {
       // O mesmo overlap pertence aos dois ataques. O primeiro lado pode já
       // tê-lo destruído enquanto o segundo está sendo removido.
-      if (colisor?.active) colisor.destroy();
+      destruirColisor(colisor);
     });
     entrada.colisores.clear();
     registro.delete(entrada);

@@ -1,3 +1,5 @@
+import { tocarMusicaSegura } from "../Objetos/AudioSeguro.js";
+
 export default class CenaPreload extends Phaser.Scene {
   constructor() {
     super({ key: "CenaPreload" });
@@ -486,7 +488,7 @@ this.load.audio("finish", "assets/personagens/SpiderMan/Audio/finish.wav");
   }
   create() {
     this.musicaFundo = this.sound.add('Aria8bit', { volume: 0.5, loop: true });
-    this.musicaFundo.play();
+    tocarMusicaSegura(this, "Aria8bit", { loop: true, volume: 0.1 });
 
     // --- ATALHO DE DEV (ESC para Pular Intro) ---
     this.input.keyboard.once('keydown-ESC', () => {

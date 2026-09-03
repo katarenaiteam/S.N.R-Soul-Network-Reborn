@@ -1,7 +1,11 @@
 ﻿const puppetsAtivos = new WeakMap();
 const cooldownsPuppet = new WeakMap();
 
-import { registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
+import {
+  destruirColisor,
+  registrarAtaqueEspecial,
+} from "../../../Objetos/SistemaCombateEspecial.js";
+import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
 
 export default class MikuPuppet {
   constructor(personagem, special, estado) {
@@ -144,7 +148,7 @@ export default class MikuPuppet {
   limparHitboxAtaque() {
     this.timerHitboxAtaque?.remove(false);
     this.timerHitboxAtaque = null;
-    this.overlapsAtaque.forEach((overlap) => overlap?.destroy());
+    this.overlapsAtaque.forEach((overlap) => destruirColisor(overlap));
     this.overlapsAtaque = [];
     this.hitboxAtaque?.destroy();
     this.hitboxAtaque = null;
@@ -156,7 +160,7 @@ export default class MikuPuppet {
 
   removerColisoresRecebidos() {
     this.colisoresRecebidos.forEach((colisor) => {
-      this.scene.physics.world.removeCollider(colisor);
+      destruirColisor(colisor);
     });
     this.colisoresRecebidos.clear();
   }
@@ -254,7 +258,7 @@ export default class MikuPuppet {
 
   tocarAudio(chave) {
     if (this.scene.cache.audio.exists(chave)) {
-      this.scene.sound.play(chave, { volume: 0.65 });
+      tocarSomSeguro(this.scene, chave, { volume: 0.65 });
     }
   }
 
@@ -499,10 +503,9 @@ export default class MikuPuppet {
     this.timerTempoDeVida = null;
     this.limparHitboxAtaque();
     this.removerColisoresRecebidos();
-    this.colliderMapa?.destroy();
+    destruirColisor(this.colliderMapa);
     this.colliderMapa = null;
     this.grupoHurtbox?.clear(true, true);
-    this.grupoHurtbox?.destroy(true);
     this.grupoHurtbox = null;
     this.hurtbox = null;
     this.sprite?.destroy();

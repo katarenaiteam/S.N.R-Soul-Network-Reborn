@@ -1,10 +1,11 @@
+import { tocarMusicaSegura } from "../Objetos/AudioSeguro.js";
+
 export default class MapaTeste {
     constructor(scene) {
         this.scene = scene;
 
         if (scene.sound) {
-            this.musica = scene.sound.add("No_More", { loop: true, volume: 0.1 });
-            this.musica.play();
+            this.musica = tocarMusicaSegura(scene, "No_More", { loop: true, volume: 0.1 });
         }
 
         const larguraMundo = 2600;
