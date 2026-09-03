@@ -729,7 +729,7 @@ export default class SpiderMan extends Personagem {
         animacao: "spy_AupSpecial",
         duracao: 1600,
         cooldown: 2200,
-        atrasoDisparo: 100,
+        atrasoDisparo: 50,
         logica: SpiderAupSpecial,
         propriedades: {
           anularGravidade: true,
@@ -1229,7 +1229,7 @@ scene.anims.create({
   key: "spy_ult35",
   frames: scene.anims.generateFrameNumbers("SpiderMan_ult3", {
     start: 6,
-    end: 12,
+    end: 11,
   }),
   frameRate: 12,
   repeat: 0,

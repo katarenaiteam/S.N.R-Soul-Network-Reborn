@@ -144,7 +144,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("Spiderflip", "assets/personagens/SpiderMan/Sprites/Spiderflip.png", { frameWidth: 105, frameHeight: 117 });  
     this.load.spritesheet("Sp_AupSpecial", "assets/personagens/SpiderMan/Sprites/Sp_AupSpecial.png", { frameWidth: 106, frameHeight: 116 });
     this.load.spritesheet("teiagrow", "assets/personagens/SpiderMan/Sprites/teiagrow.png", { frameWidth: 209, frameHeight: 10 });
-    this.load.spritesheet("growextra", "assets/personagens/SpiderMan/Sprites/growextra.png", { frameWidth: 209, frameHeight: 10 });   
+    this.load.spritesheet("extragrow", "assets/personagens/SpiderMan/Sprites/growextra.png", { frameWidth: 209, frameHeight: 10 });
     this.load.spritesheet("teiabroke", "assets/personagens/SpiderMan/Sprites/teiabroke.png", { frameWidth: 174, frameHeight: 34 });
 
 

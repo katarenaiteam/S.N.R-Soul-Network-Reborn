@@ -36,9 +36,14 @@ export default class SpiderAupSpecial {
     const sprite = this.personagem.sprite;
     this.direcao = sprite.flipX ? -1 : 1;
     const x = sprite.x + 28 * this.direcao;
-    const y = sprite.y - 72;
+    const y = sprite.y - 75;
 
     this.teia = this.criarVisual(x, y, "teiagrow", "spy_teia_grow");
+    if (!this.teia) {
+      this.finalizado = true;
+      this.estado?.finalizarSpecial?.();
+      return;
+    }
     this.ponta = this.scene.add.zone(x, y, 28, 28);
     this.scene.physics.add.existing(this.ponta);
     this.ponta.body.setAllowGravity(false);
@@ -67,12 +72,22 @@ export default class SpiderAupSpecial {
       "extragrow",
       "spy_extra_grow"
     );
+    if (!this.extra) {
+      this.falhar();
+      return;
+    }
     this.extra.once("animationcomplete-spy_extra_grow", () => {
       if (!this.finalizado && this.fase === "extra") this.falhar();
     });
   }
 
   criarVisual(x, y, textura, animacao) {
+    if (!this.scene.textures.exists(textura) || !this.scene.anims.exists(animacao)) {
+      console.error(
+        `[SpiderAupSpecial] Recurso ausente: textura=${textura}, animação=${animacao}`
+      );
+      return null;
+    }
     const visual = this.scene.add.sprite(x, y, textura, 0)
       .setOrigin(this.direcao > 0 ? 1 : 0, 0.5)
       .setFlipX(this.direcao < 0)
@@ -111,7 +126,7 @@ export default class SpiderAupSpecial {
       (props.impulsoAoAncorarX ?? 230) * this.direcao,
       props.impulsoAoAncorarY ?? -780
     );
-    sprite.anims.play("spy_jump", true);
+    if (this.scene.anims.exists("spy_jump")) sprite.anims.play("spy_jump", true);
     this.agendarFinalizacao();
   }
 
@@ -127,6 +142,10 @@ export default class SpiderAupSpecial {
   tocarQuebra() {
     [this.teia, this.extra].forEach((visual) => {
       if (!visual?.active) return;
+      if (!this.scene.textures.exists("teiabroke") || !this.scene.anims.exists("spy_teia_broke")) {
+        visual.destroy();
+        return;
+      }
       visual.setTexture("teiabroke", 0);
       visual.play("spy_teia_broke", true);
     });
