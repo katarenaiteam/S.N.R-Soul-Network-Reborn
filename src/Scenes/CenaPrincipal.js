@@ -162,12 +162,14 @@ this.jogador2 = this.criarPersonagem(
     this.camJogo.setBounds(limCam.x, limCam.y, limCam.largura, limCam.altura);
     }
 
-    this.anims.create({
-      key: "TVefect",
-      frames: this.anims.generateFrameNumbers("TVefect"),
-      frameRate: 8,
-      repeat: 0,
-    });
+    if (!this.anims.exists("TVefect")) {
+      this.anims.create({
+        key: "TVefect",
+        frames: this.anims.generateFrameNumbers("TVefect"),
+        frameRate: 8,
+        repeat: 0,
+      });
+    }
 
     // Criar o sprite alinhado no canto (0,0) em vez do centro
     this.overlayMorte = this.add.sprite(0, 0, "TVefect");

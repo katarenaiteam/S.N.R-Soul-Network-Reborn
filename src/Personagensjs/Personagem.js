@@ -48,6 +48,7 @@ export default class Personagem {
     this.hiperArmaduraFonte = null;
     this.comboHitsRecebidos = 0;
     this.tempoUltimoHit = -Infinity;
+    this.tweenSquashPouso = null;
 
     // Atributos
     this.velocidade = config.velocidade;
@@ -303,6 +304,7 @@ export default class Personagem {
       this.dashs = 0;
       this.resetarCooldownsAereos();
       this.tocarSomSorteado(this.sons.pouso, { volume: 0.4 });
+      this.scene.time.delayedCall(0, () => this.aplicarSquashPouso());
     }
     this.estavaNoChao = noChao;
 
@@ -344,6 +346,32 @@ export default class Personagem {
   // --- MÉTODOS DE SUPORTE AO UPDATE ---
 
   // Pega a config atual baseada na animação tocando
+  aplicarSquashPouso() {
+    const sprite = this.sprite;
+    if (!sprite?.active || this.maquinaEstados?.estadoAtual?.nome === "dead") return;
+
+    if (this.tweenSquashPouso) {
+      this.tweenSquashPouso.stop();
+      this.tweenSquashPouso = null;
+    }
+
+    const escalaXOriginal = sprite.scaleX;
+    const escalaYOriginal = sprite.scaleY;
+
+    this.tweenSquashPouso = this.scene.tweens.add({
+      targets: sprite,
+      scaleX: escalaXOriginal * 1.035,
+      scaleY: escalaYOriginal * 0.94,
+      duration: 65,
+      ease: "Quad.easeOut",
+      yoyo: true,
+      onComplete: () => {
+        if (sprite?.active) sprite.setScale(escalaXOriginal, escalaYOriginal);
+        this.tweenSquashPouso = null;
+      },
+    });
+  }
+
   obterConfigAtual() {
     const animAtual = this.sprite.anims.currentAnim?.key || "";
     const chaveAnim = animAtual.replace(this.prefixoAnim, "");
@@ -361,23 +389,25 @@ export default class Personagem {
     const listaConfigs = cfg.hurtboxes || [];
     const direcaoOlhar = this.sprite.flipX ? -1 : 1;
 
-    // Se o número de caixas mudou, reinicia a lista de caixas no Grupo
-    if (this.hurtboxesAtivas.length !== listaConfigs.length) {
-      this.destruirHurtboxes();
-
-      listaConfigs.forEach(() => {
-        const zone = this.scene.add.zone(0, 0, 1, 1).setOrigin(0.5, 1);
-        this.grupoHurtbox.add(zone);
-        zone.body.setAllowGravity(false);
-        zone.body.setImmovable(true);
-        zone.body.debugBodyColor = 0x00ff00;
-        this.hurtboxesAtivas.push(zone);
-      });
+    // Expande o pool quando necessário; caixas excedentes são desativadas.
+    while (this.hurtboxesAtivas.length < listaConfigs.length) {
+      const zone = this.scene.add.zone(0, 0, 1, 1).setOrigin(0.5, 1);
+      this.grupoHurtbox.add(zone);
+      zone.body.setAllowGravity(false);
+      zone.body.setImmovable(true);
+      zone.body.debugBodyColor = 0x00ff00;
+      this.hurtboxesAtivas.push(zone);
     }
 
     // Reposiciona cada hurtbox ativa
     this.hurtboxesAtivas.forEach((zone, index) => {
       const boxCfg = listaConfigs[index];
+      if (!boxCfg) {
+        if (zone?.body) zone.body.enable = false;
+        return;
+      }
+      if (!zone?.body) return;
+      zone.body.enable = true;
       const offX = boxCfg.offsetX ?? 0;
       const offY = boxCfg.offsetY ?? 0;
 
@@ -395,7 +425,6 @@ export default class Personagem {
   }
 
   destruirHurtboxes() {
-    this.hurtboxesAtivas.forEach((hb) => hb.destroy());
     this.hurtboxesAtivas = [];
     this.grupoHurtbox.clear(true, true);
   }
