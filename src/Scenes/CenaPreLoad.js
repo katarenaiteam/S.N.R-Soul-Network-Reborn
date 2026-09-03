@@ -63,6 +63,13 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("Start_VSbuton", "./assets/Menus/Start_menu/Start_VSbuton.png");
     this.load.image("Start_Storybuton", "./assets/Menus/Start_menu/Start_Storybuton.png");
     this.load.image("ReZero", "./assets/Menus/Game_Over/ReZero.png");
+    // --- new start ---
+    this.load.image("frontStart", "./assets/Menus/Start_menu/frontStart.png");
+    this.load.image("backStart", "./assets/Menus/Start_menu/backStart.png");
+    this.load.image("logo", "./assets/Menus/Start_menu/logo.png");
+    this.load.spritesheet("glitch", "./assets/Menus/Start_menu/glitch.png", { frameWidth: 683, frameHeight: 365 });
+
+
     // --- charmenu ---
     this.load.image("Charmenu", "assets/Menus/Char_menu/Sprites/Charmenu.png");
     this.load.audio("katarenai8bit", "assets/Menus/Char_menu/Audio/katarenai8bit.mp3");
@@ -135,6 +142,12 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("Spider_throw", "assets/personagens/SpiderMan/Sprites/Spider_throw.png", { frameWidth: 640, frameHeight: 140 });
     this.load.spritesheet("SpiderMan_AsiSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AsiSpecial.png", { frameWidth: 245, frameHeight: 202 });
     this.load.spritesheet("Spiderflip", "assets/personagens/SpiderMan/Sprites/Spiderflip.png", { frameWidth: 105, frameHeight: 117 });  
+    this.load.spritesheet("Sp_AupSpecial", "assets/personagens/SpiderMan/Sprites/Sp_AupSpecial.png", { frameWidth: 106, frameHeight: 116 });
+    this.load.spritesheet("teiagrow", "assets/personagens/SpiderMan/Sprites/teiagrow.png", { frameWidth: 209, frameHeight: 10 });
+    this.load.spritesheet("growextra", "assets/personagens/SpiderMan/Sprites/growextra.png", { frameWidth: 209, frameHeight: 10 });   
+    this.load.spritesheet("teiabroke", "assets/personagens/SpiderMan/Sprites/teiabroke.png", { frameWidth: 174, frameHeight: 34 });
+
+
 //ult
 this.load.spritesheet("ultimateback", "assets/personagens/SpiderMan/Sprites/ultimate/ultimatebackground.png", { frameWidth: 640, frameHeight: 480 });
 this.load.audio("sp_ShowTime", "assets/personagens/SpiderMan/Audio/sp_ShowTime.wav");
@@ -210,6 +223,7 @@ this.load.audio("finish", "assets/personagens/SpiderMan/Audio/finish.wav");
     this.load.audio("RollingGirl", "assets/personagens/Miku/Audio/RollingGirl.wav");
     this.load.audio("soree", "assets/personagens/Miku/Audio/soree.wav");
     this.load.audio("yata", "assets/personagens/Miku/Audio/yata.wav");
+    this.load.audio("SnowMix", "assets/personagens/Miku/Audio/SnowMix.wav");
 
 
     
@@ -460,7 +474,7 @@ this.load.audio("finish", "assets/personagens/SpiderMan/Audio/finish.wav");
               this.sound.stopAll();
             }
 
-            this.scene.start('CenaStart');
+            this.iniciarTransicaoStart();
           });
         }
       }
@@ -472,10 +486,87 @@ this.load.audio("finish", "assets/personagens/SpiderMan/Audio/finish.wav");
 
     // --- ATALHO DE DEV (ESC para Pular Intro) ---
     this.input.keyboard.once('keydown-ESC', () => {
-      if (this.musicaFundo) this.musicaFundo.stop();
-      this.sound.stopAll();
-      this.scene.start('CenaStart');
+      this.iniciarTransicaoStart();
     });
+  }
+
+  iniciarTransicaoStart() {
+    if (this.transicaoStartAtiva) return;
+    this.transicaoStartAtiva = true;
+    this.podeAssinar = false;
+    this.cursorTimer?.destroy();
+
+    if (this.musicaFundo) this.musicaFundo.stop();
+    else this.sound.stopAll();
+
+    const largura = this.scale.width;
+    const altura = this.scale.height;
+    const alfabeto = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコサシスセソタチツテト";
+    const objetosAntigos = this.children.list.slice();
+    objetosAntigos.forEach((objeto) => objeto.setDepth?.(0));
+    const painelPreto = this.add.rectangle(0, -altura, largura + 8, altura + 8, 0x000000)
+      .setOrigin(0, 0)
+      .setPosition(-4, -altura - 4)
+      .setScrollFactor(0)
+      .setDepth(10000);
+    const cortina = this.add.container(0, 0).setDepth(10001);
+    const faixasPretas = [];
+    const larguraColuna = 34;
+
+    for (let x = larguraColuna / 2; x < largura; x += larguraColuna) {
+      const quantidade = Phaser.Math.Between(10, 23);
+      let texto = "";
+      for (let i = 0; i < quantidade; i += 1) {
+        texto += alfabeto.charAt(Phaser.Math.Between(0, alfabeto.length - 1));
+        if (i < quantidade - 1) texto += "\n";
+      }
+      const coluna = this.add.text(x, Phaser.Math.Between(-altura * 1.35, -altura * 0.55), texto, {
+        fontFamily: "monospace",
+        fontSize: `${Phaser.Math.Between(20, 30)}px`,
+        color: Phaser.Math.Between(0, 4) === 0 ? "#caffdc" : "#35ff82",
+        lineSpacing: Phaser.Math.Between(1, 5),
+      }).setOrigin(0.5, 0).setAlpha(Phaser.Math.FloatBetween(0.58, 0.95));
+      cortina.add(coluna);
+      this.tweens.add({
+        targets: coluna,
+        y: altura * Phaser.Math.FloatBetween(1.05, 1.45),
+        duration: Phaser.Math.Between(2400, 3100),
+        ease: "Linear",
+      });
+      faixasPretas.push(
+        this.add.rectangle(x - larguraColuna / 2, -altura, larguraColuna + 2, altura, 0x000000)
+          .setOrigin(0, 0)
+          .setDepth(10000)
+      );
+    }
+
+    // A chuva atravessa a tela enquanto todo o preload é fisicamente empurrado.
+    this.time.delayedCall(1050, () => {
+      faixasPretas.forEach((faixa) => {
+        this.tweens.add({
+          targets: faixa,
+          y: 0,
+          delay: Phaser.Math.Between(0, 260),
+          duration: Phaser.Math.Between(1250, 1550),
+          ease: "Sine.easeInOut",
+        });
+      });
+
+      // O painel contínuo vem logo atrás das pontas irregulares da chuva.
+      this.tweens.add({
+        targets: painelPreto,
+        y: -4,
+        duration: 1500,
+        ease: "Sine.easeInOut",
+        onComplete: () => {
+          objetosAntigos.forEach((objeto) => objeto.setVisible?.(false));
+          this.time.delayedCall(700, () => {
+            this.scene.start("CenaStart", { entradaPreload: true });
+          });
+        },
+      });
+    });
+
   }
 
   update() {

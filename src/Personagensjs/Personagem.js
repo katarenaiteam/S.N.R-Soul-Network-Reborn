@@ -475,9 +475,11 @@ export default class Personagem {
 
     body.setSize(cfg.largura, cfg.altura, false);
 
-    const offsetX = this.sprite.flipX
-      ? this.sprite.frame.realWidth - cfg.offsetX - cfg.largura
-      : cfg.offsetX;
+    const offsetX = this.centralizarCorpoFisicoX
+      ? (this.sprite.frame.realWidth - cfg.largura) / 2
+      : this.sprite.flipX
+        ? this.sprite.frame.realWidth - cfg.offsetX - cfg.largura
+        : cfg.offsetX;
 
     body.setOffset(offsetX, cfg.offsetY);
   }

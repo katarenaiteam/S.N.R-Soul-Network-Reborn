@@ -39,7 +39,11 @@ export function registrarAtaqueEspecial(logica, objeto, opcoes = {}) {
   const remover = () => {
     if (entrada.encerrado) return;
     entrada.encerrado = true;
-    entrada.colisores.forEach((colisor) => colisor?.destroy());
+    entrada.colisores.forEach((colisor) => {
+      // O mesmo overlap pertence aos dois ataques. O primeiro lado pode já
+      // tê-lo destruído enquanto o segundo está sendo removido.
+      if (colisor?.active) colisor.destroy();
+    });
     entrada.colisores.clear();
     registro.delete(entrada);
   };

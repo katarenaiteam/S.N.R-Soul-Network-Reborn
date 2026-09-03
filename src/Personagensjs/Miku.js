@@ -2,6 +2,7 @@
 import NotaCarregada from "./Specials/Miku/NotaCarregada.js";
 import MikuSpin from "./Specials/Miku/mikuSpin.js";
 import MikuPuppet from "./Specials/Miku/mikuPuppet.js";
+import AupSpecial from "./Specials/Miku/AupSpecial.js";
 
 export default class Miku extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -14,8 +15,8 @@ export default class Miku extends Personagem {
       scene,
       x,
       y,
-      "miku_idle",
-      "0",
+      "Miku_idle",
+      0,
       {
         velocidade: 280,
         forcaPulo: -600,
@@ -104,25 +105,35 @@ this.vfxAtaqueNormal = {
       compensarMovimento: true,
       fatorCompensacaoMovimento: 0.35,
     },
-    agachado: { efeito: "notaAtaque1", quantidade: 2 },
+    agachado: {
+      efeito: "notaAtaque1",
+      quantidade: 2,
+      offsetX: -25,
+      movimentoX: 20,
+    },
     air_neutro: {
-      efeito: "notaAtaque1", quantidade: 3, movimentoX: 30,
+      efeito: "notaAtaque1", quantidade: 3,
+      offsetY: 30,
+      offsetX: -20,
+       movimentoX: 11,
       compensarMovimento: true,
     },
     air_side: {
-      efeito: "notaAtaque2", quantidade: 3, movimentoX: 40,
+      efeito: "notaAtaque2", quantidade: 3,
+      offsetY: 17,
+      movimentoX: 20,
       compensarMovimento: true,
       fatorCompensacaoMovimento: 0.55,
     },
     air_cima: {
       efeito: "notaAtaque1", quantidade: 3,
-      offsetX: -35, offsetY: -20, movimentoX: 0, movimentoY: -70,
+      offsetX: -12, offsetY: 30, movimentoX: 0, movimentoY: -72,
       compensarMovimento: true,
       fatorCompensacaoMovimento: 0.4,
     },
     air_agachado: {
       efeito: "notaAtaque2", quantidade: 3,
-      offsetX: -20, offsetY: 40, movimentoX: 0, movimentoY: 42,
+      offsetX: -14, offsetY: 5, movimentoX: 1, movimentoY: 30,
       compensarMovimento: true,
       fatorCompensacaoMovimento: 0.4,
     },
@@ -131,6 +142,9 @@ this.vfxAtaqueNormal = {
 
     //============================= hitboxes ========================================
     this.nomePersonagem = "Hatsune Miku";
+    // A colisao principal nao acompanha os grandes offsets laterais dos sprites.
+    // Assim, virar a Miku perto de uma parede nao teleporta o corpo para dentro dela.
+    this.centralizarCorpoFisicoX = true;
     this.qtdTaunts = 1;
     this.configAnimacoes = {
       idle: {
@@ -148,7 +162,7 @@ this.vfxAtaqueNormal = {
         ],
       },
       jump: {
-        largura: 85, altura: 340, offsetX: 244, offsetY: -5, escala: 0.34,
+        largura: 85, altura: 340, offsetX: 247, offsetY: -5, escala: 0.34,
         hurtboxes: [
           { largura: 30, altura: 50, offsetX: 1, offsetY: -70 },
           { largura: 30, altura: 25, offsetX: 10, offsetY: -40 },
@@ -342,8 +356,8 @@ this.vfxAtaqueNormal = {
         frameHitbox: 2,
         offsetX: 50,
         offsetY: -80,
-        largura: 55,
-        altura: 20,
+        largura: 45,
+        altura: 30,
         cooldown: 700,
         duracao: 400,
         cancelavel: true,
@@ -372,10 +386,10 @@ this.vfxAtaqueNormal = {
 
         frameHitbox: 2,
 
-        offsetX: 55,
+        offsetX: 50,
         offsetY: -80,
-        largura: 55,
-        altura: 25,
+        largura: 45,
+        altura: 30,
         duracao: 400,
         cancelavel: true,
         propriedades: {
@@ -394,10 +408,10 @@ this.vfxAtaqueNormal = {
       neutro3: {
         animacao: "miku_atack1",
         frameHitbox: 2,
-        offsetX: 50,
+       offsetX: 50,
         offsetY: -80,
-        largura: 55,
-        altura: 20,
+        largura: 45,
+        altura: 30,
         cooldown: 700,
         duracao: 350,
         cancelavel: true,
@@ -426,10 +440,10 @@ this.vfxAtaqueNormal = {
 
         frameHitbox: 2,
 
-        offsetX: 55,
-        offsetY: -75,
-        largura: 60,
-        altura: 40,
+        offsetX: 50,
+        offsetY: -80,
+        largura: 45,
+        altura: 30,
         duracao: 500,
         cancelavel: true,
 
@@ -467,7 +481,7 @@ this.vfxAtaqueNormal = {
         offsetX: 52,
         offsetY: -60,
         largura: 55,
-        altura: 25,
+        altura: 50,
         cooldown: 900,
         duracao: 500,
         cancelavel: true,
@@ -499,9 +513,9 @@ this.vfxAtaqueNormal = {
      agachado: {
         animacao: "miku_downAtack",
         frameHitbox: 3,
-        offsetX: 25,
+        offsetX: 40,
         offsetY: -20,
-        largura: 55,
+        largura: 45,
         altura: 25,
         cooldown: 900,
         duracao: 400,
@@ -522,11 +536,11 @@ this.vfxAtaqueNormal = {
 
         air_neutro: {
         animacao: "miku_neutralAir",
-        frameHitbox: 3,
-        offsetX: 30,
-        offsetY: -85,
-        largura: 60,
-        altura: 25,
+        frameHitbox: 2,
+        offsetX: 50,
+        offsetY: -70,
+        largura: 55,
+        altura: 35,
         cooldown: 900,
         duracao: 350,
          finalizarAoTocarChao: true,
@@ -552,9 +566,9 @@ this.vfxAtaqueNormal = {
         animacao: "miku_sideAir",
         frameHitbox: 3,
         offsetX: 35,
-        offsetY: -50,
+        offsetY: -70,
         largura: 60,
-        altura: 30,
+        altura: 40,
         cooldown: 900,
         duracao: 600,
          finalizarAoTocarChao: true,
@@ -576,10 +590,10 @@ this.vfxAtaqueNormal = {
       air_cima: {
         animacao: "miku_upAir",
         frameHitbox: 3,
-        offsetX: 25,
-        offsetY: -80,
-        largura: 60,
-        altura: 30,
+        offsetX: 8,
+        offsetY: -140,
+        largura: 32,
+        altura: 34,
         cooldown: 900,
         duracao: 600,
          finalizarAoTocarChao: true,
@@ -592,11 +606,11 @@ this.vfxAtaqueNormal = {
         ],
 
         movimento: {
-         inicio: 50,
-         fim: 300,
-       x: {
-         de: 500,
-         para: 150,
+         inicio: 10,
+         fim: 500,
+       y: {
+         de: -400,
+         para: -150,
         },
 
         curva: "easeIn",
@@ -605,7 +619,7 @@ this.vfxAtaqueNormal = {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 300,
+          knockbackX: 0,
           knockbackY: -500,
           tumbling: true,
         },
@@ -617,10 +631,10 @@ this.vfxAtaqueNormal = {
         frameHitbox: 3,
         offsetX: 30,
         offsetY: -20,
-        largura: 60,
-        altura: 60,
+        largura: 50,
+        altura: 50,
         cooldown: 900,
-        duracao: 900,
+        duracao: 400,
         finalizarAoTocarChao: true,
         atrasoFinalizacaoChao: 0,
         finalizarAoAcertarOponente: true,
@@ -631,6 +645,17 @@ this.vfxAtaqueNormal = {
            ],
           },
         ],
+
+        movimento: {
+         inicio: 10,
+         fim: 250,
+       y: {
+         de: 300,
+         para: 150,
+        },
+
+        curva: "easeIn",
+       },
 
         propriedades: {
           tipoSomImpacto: "heavy",
@@ -719,6 +744,24 @@ this.vfxAtaqueNormal = {
         knockbackY: -360,
         tumbling: true,
         travarMovimentoAir: true,
+      },
+    },
+    air_cima: {
+      animacao: "miku_spin",
+      cooldown: 5000,
+      duracao: 650,
+      logica: AupSpecial,
+      escalaMini: 0.25,
+      velocidadeMini: 210,
+      tempoVidaMini: 15000,
+      propriedades: {
+        impulsoY: -800,
+        travarMovimentoAir: true,
+        tipoSomImpacto: "light",
+        dano: 1,
+        knockbackX: 80,
+        knockbackY: -45,
+        knockbackFixo: true,
       },
     },
   };

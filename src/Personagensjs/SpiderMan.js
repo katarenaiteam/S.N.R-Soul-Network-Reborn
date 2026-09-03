@@ -4,6 +4,7 @@ import AirWebShot from "./Specials/Spiderman/AirWebshot.js";
 import SpiderCounter from "./Specials/Spiderman/SpiderCounter.js";
 import SpiderThrow from "./Specials/Spiderman/SpiderThrow.js";
 import SpiderSwing from "./Specials/Spiderman/SpiderSwing.js";
+import SpiderAupSpecial from "./Specials/Spiderman/AupSpecial.js";
 import SpiderUlt from "./Ult/SpiderUlt.js";
 
 export default class SpiderMan extends Personagem {
@@ -704,7 +705,7 @@ export default class SpiderMan extends Personagem {
         },
       },
 
-       air_lado: {
+      air_lado: {
         animacao: "spy_AsiSpecial",
         duracao: 9999,
         cooldown: 2000,
@@ -721,6 +722,20 @@ export default class SpiderMan extends Personagem {
           //impulsoX: 0,                    
           //impulsoY: 0,
           
+        },
+      },
+
+      air_cima: {
+        animacao: "spy_AupSpecial",
+        duracao: 1600,
+        cooldown: 2200,
+        atrasoDisparo: 100,
+        logica: SpiderAupSpecial,
+        propriedades: {
+          anularGravidade: true,
+          travarMovimentoAir: true,
+          impulsoAoAncorarX: 230,
+          impulsoAoAncorarY: -780,
         },
       },
     };
@@ -1123,6 +1138,42 @@ scene.anims.create({
   frameRate: 18,
   repeat: 0,
 });
+
+if (!scene.anims.exists("spy_AupSpecial")) {
+  scene.anims.create({
+    key: "spy_AupSpecial",
+    frames: scene.anims.generateFrameNumbers("Sp_AupSpecial", { start: 0, end: 0 }),
+    frameRate: 1,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("spy_teia_grow")) {
+  scene.anims.create({
+    key: "spy_teia_grow",
+    frames: scene.anims.generateFrameNumbers("teiagrow", { start: 0, end: 12 }),
+    frameRate: 56,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("spy_extra_grow")) {
+  scene.anims.create({
+    key: "spy_extra_grow",
+    frames: scene.anims.generateFrameNumbers("extragrow", { start: 0, end: 10 }),
+    frameRate: 52,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("spy_teia_broke")) {
+  scene.anims.create({
+    key: "spy_teia_broke",
+    frames: scene.anims.generateFrameNumbers("teiabroke", { start: 0, end: 3 }),
+    frameRate: 28,
+    repeat: 0,
+  });
+}
 
 scene.anims.create({
   key: "spy_ult0",

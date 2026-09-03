@@ -30,6 +30,7 @@ export default class MikuPuppet {
     this.dono = personagem;
     this.controladorTemporario = false;
     this.timerSaidaEstado = null;
+    this.timerTempoDeVida = null;
   }
 
   executar() {
@@ -86,6 +87,13 @@ export default class MikuPuppet {
     this.criarHurtbox();
     this.registrarComoAlvoExtra();
     this.ativo = true;
+    this.timerTempoDeVida = this.scene.time.delayedCall(
+      MikuPuppet.TEMPO_DE_VIDA,
+      () => {
+        this.timerTempoDeVida = null;
+        this.destruir();
+      }
+    );
   }
 
   criarHurtbox() {
@@ -487,6 +495,8 @@ export default class MikuPuppet {
 
     this.timerSaidaEstado?.remove(false);
     this.timerSaidaEstado = null;
+    this.timerTempoDeVida?.remove(false);
+    this.timerTempoDeVida = null;
     this.limparHitboxAtaque();
     this.removerColisoresRecebidos();
     this.colliderMapa?.destroy();
@@ -524,33 +534,23 @@ export default class MikuPuppet {
 }
 
 MikuPuppet.COOLDOWN_REINVOCACAO = 30000;
-MikuPuppet.VIDA_MAXIMA = 50;
+MikuPuppet.TEMPO_DE_VIDA = 60000;
+MikuPuppet.VIDA_MAXIMA = 25;
 MikuPuppet.VELOCIDADE_ATAQUE = 190;
 MikuPuppet.VELOCIDADE_DURANTE_ATAQUE = 150;
 MikuPuppet.VELOCIDADE_SUPORTE = 165;
 MikuPuppet.FORCA_PULO = -300;
 MikuPuppet.DANO_ATAQUE = 5;
 MikuPuppet.KNOCKBACK_X = 165;
-MikuPuppet.INTERVALO_ATAQUE = 850;
+MikuPuppet.INTERVALO_ATAQUE = 1000;
 MikuPuppet.DURACAO_HITBOX = 130;
 MikuPuppet.TEMPO_RECUO = 420;
 MikuPuppet.DISTANCIA_ATAQUE_X = 72;
 MikuPuppet.DISTANCIA_ATAQUE_Y = 85;
-MikuPuppet.HITSTUN = 220;
-MikuPuppet.CURA = 2;
+MikuPuppet.HITSTUN = 400;
+MikuPuppet.CURA = 4;
 MikuPuppet.INTERVALO_CURA = 5000;
 MikuPuppet.DISTANCIA_CURA = 145;
-
-
-
-
-
-
-
-
-
-
-
 
 MikuPuppet.MARGEM_AREA_SEGURA = 18;
 MikuPuppet.TOLERANCIA_ABAIXO_PLATAFORMA = 28;
@@ -558,4 +558,3 @@ MikuPuppet.ALTURA_MAXIMA_ALVO = 520;
 MikuPuppet.DISTANCIA_SONDA_BORDA = 12;
 MikuPuppet.TOLERANCIA_SONDA_CIMA = 14;
 MikuPuppet.TOLERANCIA_SONDA_BAIXO = 42;
-
