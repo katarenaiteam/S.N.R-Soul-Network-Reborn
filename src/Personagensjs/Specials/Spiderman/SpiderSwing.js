@@ -27,7 +27,7 @@ export default class SpiderSwing {
     this.hitboxOffsetY = -40;  // Posição Y (cima/baixo)
     this.hitboxWidth = 105;    // Largura
     this.hitboxHeight = 25;    // Altura
-    this.hitboxDelayMs = 300;  // DELAY EM MILISSEGUNDOS (ajuste para atrasar o surgimento da hitbox)
+    this.hitboxDelayMs = 140;  // Surge um pouco antes durante o balanço
   }
 
   ignorarNoHud(objeto) {
@@ -66,10 +66,10 @@ export default class SpiderSwing {
     const inicioX = sprite.x;
     const inicioY = sprite.y;
     const distanciaX = 340 * direcao;
-    const amplitudeY = 65;
+    const amplitudeY = 58.5; // 10% menos movimento vertical
     const duracaoAnimacao = animacao.duration ||
       (animacao.frames.length / animacao.frameRate) * 1000;
-    const duracaoMs = duracaoAnimacao * 0.7;
+    const duracaoMs = duracaoAnimacao * 0.775;
 
     // Teia e Hitbox inicial
     this.ancoraX = sprite.x + 200 * direcao;
@@ -93,7 +93,8 @@ export default class SpiderSwing {
       from: 0,
       to: 1,
       duration: duracaoMs,
-      ease: (progresso) => progresso * (0.65 + 0.35 * progresso),
+      // Começa a 70% da velocidade anterior e termina a 90%.
+      ease: (progresso) => 0.875 * progresso + 0.125 * progresso * progresso,
       onUpdate: (tween) => {
         if (this.fase !== "swing") return;
 

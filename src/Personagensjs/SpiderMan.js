@@ -199,12 +199,7 @@ export default class SpiderMan extends Personagem {
         ],
       },
 
-      atack: {
-        largura: 85,
-        altura: 95,
-        offsetX: 50,
-        offsetY: 96,
-        escala: 1,
+      atack: { largura: 85, altura: 95, offsetX: 50, offsetY: 96, escala: 1,
         hurtboxes: [
           { largura: 30, altura: 30, offsetX: 20, offsetY: -75 },
           { largura: 50, altura: 20, offsetX: 22, offsetY: -48 }, // Tronco/cabeça
@@ -303,6 +298,18 @@ export default class SpiderMan extends Personagem {
       },
 
       AsiSpecial: {
+        largura: 85,
+        altura: 95,
+        offsetX: 64,
+        offsetY: 90,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
+          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+        ],
+      },
+
+      AupSpecial: {
         largura: 85,
         altura: 95,
         offsetX: 64,
@@ -730,6 +737,8 @@ export default class SpiderMan extends Personagem {
         duracao: 1600,
         cooldown: 2200,
         atrasoDisparo: 50,
+        duracaoPuxao: 230,
+        duracaoStun: 650,
         logica: SpiderAupSpecial,
         propriedades: {
           anularGravidade: true,
@@ -1091,10 +1100,10 @@ scene.anims.create({
       });
     }
     
-    scene.anims.create({
+   scene.anims.create({
      key: "spy_siSpecial",
      frames: scene.anims.generateFrameNumbers("SpiderMan_siSpecial", { start: 0, end: 5 }),
-     frameRate: 12,
+     frameRate: 18,
      repeat: 0,
    });
 
@@ -1119,13 +1128,13 @@ scene.anims.create({
      repeat: 0,
    });
 
-   scene.anims.create({
+scene.anims.create({
   key: "spy_AsiSpecial",
   frames: scene.anims.generateFrameNumbers("SpiderMan_AsiSpecial", {
     start: 0,
     end: 34,
   }),
-  frameRate: 38,
+  frameRate: 50,
   repeat: 0,
 });
 

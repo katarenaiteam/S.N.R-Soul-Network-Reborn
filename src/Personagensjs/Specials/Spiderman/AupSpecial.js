@@ -1,3 +1,5 @@
+import { obterAlvosCombate } from "../../../Objetos/SistemaCombateEspecial.js";
+
 export default class SpiderAupSpecial {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
@@ -8,6 +10,10 @@ export default class SpiderAupSpecial {
     this.extra = null;
     this.ponta = null;
     this.colliders = [];
+    this.overlaps = [];
+    this.tweenPuxao = null;
+    this.alvoPuxado = null;
+    this.gravidadeOriginalAlvo = true;
     this.timerDisparo = null;
     this.timerFim = null;
     this.fase = "pose";
@@ -53,6 +59,19 @@ export default class SpiderAupSpecial {
     this.obterEstruturas().forEach((estrutura) => {
       this.colliders.push(
         this.scene.physics.add.collider(this.ponta, estrutura, () => this.ancorar())
+      );
+    });
+
+    obterAlvosCombate(this.personagem).forEach((alvo) => {
+      if (!alvo?.grupoHurtbox) return;
+      this.overlaps.push(
+        this.scene.physics.add.overlap(
+          this.ponta,
+          alvo.grupoHurtbox,
+          () => this.puxarInimigo(alvo),
+          null,
+          this
+        )
       );
     });
 
@@ -130,6 +149,52 @@ export default class SpiderAupSpecial {
     this.agendarFinalizacao();
   }
 
+  puxarInimigo(alvo) {
+    if (this.finalizado || !alvo?.sprite?.body || !this.ponta?.active) return;
+    this.finalizado = true;
+    this.fase = "puxando";
+    this.alvoPuxado = alvo;
+    this.ponta.body.setVelocity(0, 0);
+    this.removerColisoes();
+
+    const spriteAlvo = alvo.sprite;
+    const duracaoPuxao = this.special.duracaoPuxao ?? 230;
+    const duracaoStun = this.special.duracaoStun ?? 650;
+    this.gravidadeOriginalAlvo = spriteAlvo.body.allowGravity;
+
+    alvo.isTumbling = false;
+    alvo.ultimoImpacto = {
+      hitstunCalculadoMs: duracaoPuxao + duracaoStun,
+      knockbackX: 0,
+      knockbackY: 0,
+      puxadoPorTeia: true,
+    };
+    alvo.maquinaEstados?.mudarEstado("dano");
+    spriteAlvo.body.setVelocity(0, 0);
+    spriteAlvo.body.setAllowGravity(false);
+
+    const aranha = this.personagem.sprite;
+    this.tweenPuxao = this.scene.tweens.add({
+      targets: spriteAlvo,
+      x: aranha.x + 72 * this.direcao,
+      y: aranha.y - 8,
+      duration: duracaoPuxao,
+      ease: "Cubic.easeIn",
+      onUpdate: () => spriteAlvo.body?.updateFromGameObject(),
+      onComplete: () => {
+        this.tweenPuxao = null;
+        if (spriteAlvo.body) {
+          spriteAlvo.body.updateFromGameObject();
+          spriteAlvo.body.setAllowGravity(this.gravidadeOriginalAlvo);
+          spriteAlvo.body.setVelocity(0, 0);
+        }
+        this.alvoPuxado = null;
+        this.tocarQuebra();
+        this.agendarFinalizacao();
+      },
+    });
+  }
+
   falhar() {
     if (this.finalizado) return;
     this.finalizado = true;
@@ -152,7 +217,7 @@ export default class SpiderAupSpecial {
   }
 
   agendarFinalizacao() {
-    this.removerColliders();
+    this.removerColisoes();
     this.timerFim = this.scene.time.delayedCall(170, () => {
       this.timerFim = null;
       this.limpar();
@@ -176,13 +241,15 @@ export default class SpiderAupSpecial {
     hud?.ignore?.(objeto);
   }
 
-  removerColliders() {
+  removerColisoes() {
     this.colliders.forEach((collider) => collider?.destroy());
     this.colliders = [];
+    this.overlaps.forEach((overlap) => overlap?.destroy());
+    this.overlaps = [];
   }
 
   limpar() {
-    this.removerColliders();
+    this.removerColisoes();
     this.teia?.destroy();
     this.extra?.destroy();
     this.ponta?.destroy();
@@ -196,6 +263,16 @@ export default class SpiderAupSpecial {
     this.timerFim?.remove(false);
     this.timerDisparo = null;
     this.timerFim = null;
+    if (this.tweenPuxao) {
+      this.tweenPuxao.stop();
+      this.tweenPuxao = null;
+    }
+    if (this.alvoPuxado?.sprite?.body) {
+      this.alvoPuxado.sprite.body.updateFromGameObject();
+      this.alvoPuxado.sprite.body.setAllowGravity(this.gravidadeOriginalAlvo);
+      this.alvoPuxado.sprite.body.setVelocity(0, 0);
+    }
+    this.alvoPuxado = null;
     this.limpar();
   }
 }

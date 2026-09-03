@@ -134,14 +134,18 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("SpiderMan_sideAtack", "assets/personagens/SpiderMan/Sprites/SpiderMan_sideAtack.png", { frameWidth: 200, frameHeight: 200 });
     //specials
     this.load.spritesheet("SpiderMan_neSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_neSpecial.png", { frameWidth: 200, frameHeight: 200 });
+    
     this.load.spritesheet("SpiderMan_AneSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AneSpecial.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_doSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_doSpecial.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("Counter", "assets/personagens/SpiderMan/Sprites/Counter.png", { frameWidth: 500, frameHeight: 200 });
+
     this.load.spritesheet("SpiderMan_siSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_siSpecial.png", { frameWidth: 154, frameHeight: 94 });
     this.load.spritesheet("Side_teia", "assets/personagens/SpiderMan/Sprites/Side_teia.png", { frameWidth: 320, frameHeight: 79 });
     this.load.spritesheet("Spider_throw", "assets/personagens/SpiderMan/Sprites/Spider_throw.png", { frameWidth: 640, frameHeight: 140 });
+
     this.load.spritesheet("SpiderMan_AsiSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AsiSpecial.png", { frameWidth: 245, frameHeight: 202 });
-    this.load.spritesheet("Spiderflip", "assets/personagens/SpiderMan/Sprites/Spiderflip.png", { frameWidth: 105, frameHeight: 117 });  
+    this.load.spritesheet("Spiderflip", "assets/personagens/SpiderMan/Sprites/Spiderflip.png", { frameWidth: 105, frameHeight: 117 }); 
+     
     this.load.spritesheet("Sp_AupSpecial", "assets/personagens/SpiderMan/Sprites/Sp_AupSpecial.png", { frameWidth: 106, frameHeight: 116 });
     this.load.spritesheet("teiagrow", "assets/personagens/SpiderMan/Sprites/teiagrow.png", { frameWidth: 209, frameHeight: 10 });
     this.load.spritesheet("extragrow", "assets/personagens/SpiderMan/Sprites/growextra.png", { frameWidth: 209, frameHeight: 10 });
