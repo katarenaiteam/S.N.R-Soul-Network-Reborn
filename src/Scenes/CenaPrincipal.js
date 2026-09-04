@@ -228,8 +228,8 @@ this.jogador2 = this.criarPersonagem(
 
       const caracteres = [...String(porcentagem), "%"];
       const passo = 53;
-      const largura = (caracteres.length - 1) * passo + 72;
-      const inicioX = ladoDireito ? -75 - largura : 225;
+      // A borda esquerda fica fixa: novos algarismos entram somente à direita.
+      const inicioX = ladoDireito ? -210 : 225;
       const numero = this.add.container(0, 0);
 
       caracteres.forEach((caractere, indice) => {
