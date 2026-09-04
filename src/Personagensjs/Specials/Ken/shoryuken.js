@@ -11,10 +11,10 @@ const DURACAO_HIT_STOP = 55;
 const INTERVALO_RASTRO = 45;
 
 const HITBOX = {
-  largura: 82,
-  altura: 125,
-  offsetX: 25,
-  offsetY: -45,
+  largura: 60,
+  altura: 120,
+  offsetX: 30,
+  offsetY: -90,
 };
 
 const PROPRIEDADES_HITS_INICIAIS = {
@@ -123,7 +123,10 @@ export default class Shoryuken {
     this.hitbox.body.debugBodyColor = 0xff0000;
     this.hitbox.body.setImmovable(true);
     this.scene.camHUD?.ignore(this.hitbox);
-    registrarAtaqueEspecial(this, this.hitbox, { categoria: "corpo" });
+    registrarAtaqueEspecial(this, this.hitbox, {
+      categoria: "corpo",
+      contraAtacarDono: true,
+    });
 
     this.atualizarPosicaoHitbox();
 

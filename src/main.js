@@ -7,6 +7,7 @@ import CenaGameOver from "./Scenes/GameOver.js";
 import CenaSelecaoMapa from "./Scenes/SeleçaoMapas.js";
 import CenaHistoria from "./Scenes/CenaHistoria.js";
 import CenaCreditos from "./Scenes/CenaCreditos.js";
+import { instalarComandosDebug } from "./DebugConsole.js";
 
 const config = {
   type: Phaser.AUTO,
@@ -22,7 +23,7 @@ const config = {
     default: "arcade",
     arcade: {
       gravity: { y: 900 },
-      debug: false,
+      debug: true,
     },
   },
   scale: {
@@ -43,4 +44,5 @@ const config = {
   scene: [CenaPreload, CenaStart, Charmenu, CenaSelecaoMapa, CenaPrincipal, CenaHistoria, CenaGameOver, CenaCreditos],
 };
 
-new Phaser.Game(config);
+const game = new Phaser.Game(config);
+instalarComandosDebug(game);

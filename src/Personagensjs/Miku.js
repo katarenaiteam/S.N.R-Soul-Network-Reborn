@@ -142,9 +142,11 @@ this.vfxAtaqueNormal = {
 
     //============================= hitboxes ========================================
     this.nomePersonagem = "Hatsune Miku";
-    // A colisao principal nao acompanha os grandes offsets laterais dos sprites.
-    // Assim, virar a Miku perto de uma parede nao teleporta o corpo para dentro dela.
+    // Mantem o corpo estavel entre spritesheets de larguras diferentes.
+    // O ajuste de 45.5 preserva a posicao horizontal configurada no idle:
+    // 170 - (334 - 85) / 2 = 45.5.
     this.centralizarCorpoFisicoX = true;
+    this.ajusteCorpoFisicoX = 45.5;
     this.qtdTaunts = 1;
     this.configAnimacoes = {
       idle: {
@@ -662,7 +664,7 @@ this.vfxAtaqueNormal = {
           dano: 12,
           knockbackX: 80,
           knockbackY: 400,
-          quiqueChaoY: 350,
+          quiqueChaoY: 400,
         },
       },
     }
@@ -748,12 +750,13 @@ this.vfxAtaqueNormal = {
     },
     air_cima: {
       animacao: "miku_spin",
-      cooldown: 5000,
+      cooldown: 2500,
       duracao: 650,
       logica: AupSpecial,
       escalaMini: 0.25,
       velocidadeMini: 210,
       tempoVidaMini: 15000,
+      cooldownMiniPuppets: 10000,
       propriedades: {
         impulsoY: -800,
         travarMovimentoAir: true,

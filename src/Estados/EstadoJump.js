@@ -57,7 +57,7 @@ export default class EstadoJump extends EstadoBase {
 
     // SÓ entra no estado de special se NÃO estiver em cooldown!
     if (this.personagem.podeUsarSpecial(tipoSpecial)) {
-        this.personagem.maquinaEstados.mudarEstado("special");
+        this.personagem.maquinaEstados.mudarEstado("special", { tipo: tipoSpecial });
         return;
     }
     }

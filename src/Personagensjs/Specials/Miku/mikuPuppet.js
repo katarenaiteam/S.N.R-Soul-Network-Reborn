@@ -77,7 +77,10 @@ export default class MikuPuppet {
     this.sprite.body.setSize(58, 88);
     this.sprite.body.setOffset(51, 58);
     this.sprite.body.setVelocity(190 * direcao, -310);
-    this.sprite.body.debugBodyColor = 0xff0000;
+    // Este Body serve apenas para movimento e colisao com o mapa. A area que
+    // recebe golpes e exclusivamente a hurtbox verde criada abaixo.
+    this.sprite.body.debugShowBody = false;
+    this.sprite.body.debugShowVelocity = false;
     this.scene.camHUD?.ignore(this.sprite);
 
     const plataformas = this.scene.mapaAtual?.plataformas;
@@ -126,7 +129,11 @@ export default class MikuPuppet {
     this.hitboxAtaque.body.setImmovable(true);
     this.hitboxAtaque.body.debugBodyColor = 0xff0000;
     this.scene.camHUD?.ignore(this.hitboxAtaque);
-    registrarAtaqueEspecial(this, this.hitboxAtaque, { categoria: "corpo" });
+    registrarAtaqueEspecial(this, this.hitboxAtaque, {
+      categoria: "corpo",
+      contraAtacarDono: false,
+      aoColidir: () => this.limparHitboxAtaque(),
+    });
 
     this.obterOponentes().forEach((oponente) => {
       const overlap = this.scene.physics.add.overlap(
@@ -537,23 +544,23 @@ export default class MikuPuppet {
 }
 
 MikuPuppet.COOLDOWN_REINVOCACAO = 30000;
-MikuPuppet.TEMPO_DE_VIDA = 60000;
-MikuPuppet.VIDA_MAXIMA = 25;
+MikuPuppet.TEMPO_DE_VIDA = 30000;
+MikuPuppet.VIDA_MAXIMA = 15;
 MikuPuppet.VELOCIDADE_ATAQUE = 190;
 MikuPuppet.VELOCIDADE_DURANTE_ATAQUE = 150;
-MikuPuppet.VELOCIDADE_SUPORTE = 165;
+MikuPuppet.VELOCIDADE_SUPORTE = 175;
 MikuPuppet.FORCA_PULO = -300;
 MikuPuppet.DANO_ATAQUE = 5;
 MikuPuppet.KNOCKBACK_X = 165;
-MikuPuppet.INTERVALO_ATAQUE = 1000;
+MikuPuppet.INTERVALO_ATAQUE = 1500;
 MikuPuppet.DURACAO_HITBOX = 130;
 MikuPuppet.TEMPO_RECUO = 420;
-MikuPuppet.DISTANCIA_ATAQUE_X = 72;
+MikuPuppet.DISTANCIA_ATAQUE_X = 62;
 MikuPuppet.DISTANCIA_ATAQUE_Y = 85;
-MikuPuppet.HITSTUN = 400;
-MikuPuppet.CURA = 4;
+MikuPuppet.HITSTUN = 600;
+MikuPuppet.CURA = 5;
 MikuPuppet.INTERVALO_CURA = 5000;
-MikuPuppet.DISTANCIA_CURA = 145;
+MikuPuppet.DISTANCIA_CURA = 200;
 
 MikuPuppet.MARGEM_AREA_SEGURA = 18;
 MikuPuppet.TOLERANCIA_ABAIXO_PLATAFORMA = 28;

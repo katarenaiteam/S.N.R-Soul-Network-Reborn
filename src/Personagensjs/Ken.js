@@ -64,7 +64,7 @@ this.nomePersonagem = "Ken";
         offsetY: -10,
         escala: 1,
         hurtboxes: [
-          { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 50, altura: 60, offsetX: 0, offsetY: -70 },
           { largura: 67, altura: 35, offsetX: 0, offsetY: -18 },
         ],
       },
@@ -76,7 +76,7 @@ this.nomePersonagem = "Ken";
         offsetY: -9,
         escala: 1,
         hurtboxes: [
-          { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 50, altura: 60, offsetX: 0, offsetY: -70 },
           { largura: 60, altura: 35, offsetX: 0, offsetY: -18 },
         ],
       },
@@ -185,7 +185,9 @@ this.nomePersonagem = "Ken";
         offsetY: 40,
         escala: 1,
         hurtboxes: [
-          { largura: 100, altura: 35, offsetX: -10, offsetY: -18 },
+          { largura: 100, altura: 34, offsetX: -10, offsetY: -18 },
+          { largura: 40, altura: 20, offsetX: -60, offsetY: -12 },
+          { largura: 50, altura: 25, offsetX: 50, offsetY: -12 },
         ],
       },
 
@@ -193,7 +195,7 @@ this.nomePersonagem = "Ken";
       getup: {
         largura: 80,
         altura: 100,
-        offsetX: 0,
+        offsetX: 30,
         offsetY: 2,
         escala: 1,
         hurtboxes: [],
@@ -316,6 +318,18 @@ this.nomePersonagem = "Ken";
         ],
       },
 
+       AneSpecial: {
+       largura: 85,
+        altura: 120,
+        offsetX: 25,
+        offsetY: -13,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 55, offsetX: 0, offsetY: -70 },
+          { largura: 90, altura: 35, offsetX: -10, offsetY: -18 },
+        ], 
+      },
+
       AupSpecial: {
         largura: 85,
         altura: 120,
@@ -372,9 +386,9 @@ this.nomePersonagem = "Ken";
       neutro1: {
         animacao: "ken_atack1",
         frameHitbox: 2,
-        offsetX: 50,
+        offsetX: 40,
         offsetY: -80,
-        largura: 55,
+        largura: 75,
         altura: 20,
         cooldown: 700,
         duracao: 350,
@@ -389,9 +403,10 @@ this.nomePersonagem = "Ken";
            tipoSomImpacto: "light",
           dano: 4,
           knockbackX: 30,
-          knockbackY: 0,
+          knockbackY: -20,
           knockbackFixo: true,
-          hitstunFrames: 17,
+          hitstunFrames: 18,
+          hitsSemDecay: 2
         },
 
         comboProximo: "neutro2",
@@ -404,9 +419,9 @@ this.nomePersonagem = "Ken";
 
         frameHitbox: 2,
 
-        offsetX: 55,
+        offsetX: 40,
         offsetY: -80,
-        largura: 55,
+        largura: 73,
         altura: 25,
         duracao: 400,
         cancelavel: true,
@@ -414,7 +429,7 @@ this.nomePersonagem = "Ken";
            tipoSomImpacto: "heavy",
           dano: 4,
           knockbackX: 40,
-          knockbackY: 0,
+          knockbackY: -30,
           knockbackFixo: true,
           hitstunFrames: 18,
         },
@@ -429,11 +444,11 @@ this.nomePersonagem = "Ken";
 
         frameHitbox: 3,
 
-        offsetX: 55,
-        offsetY: -75,
-        largura: 60,
-        altura: 40,
-        duracao: 750,
+        offsetX: 50,
+        offsetY: -72,
+        largura: 80,
+        altura: 36,
+        duracao: 600,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -448,20 +463,21 @@ this.nomePersonagem = "Ken";
            tipoSomImpacto: "heavy",
           dano: 8,
           knockbackX: 350,
-          knockbackY: -300,
-          tumbling: true
+          knockbackY: -310,
+          tumbling: true,
+          hitstunBaseFrames: 18
         },
       },
 
       side: {
         animacao: "ken_sideAtack",
         frameHitbox: 4,
-        offsetX: 52,
-        offsetY: -60,
-        largura: 55,
+        offsetX: 40,
+        offsetY: -57,
+        largura: 80,
         altura: 25,
         cooldown: 900,
-        duracao: 600,
+        duracao: 500,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -480,9 +496,9 @@ this.nomePersonagem = "Ken";
      agachado: {
         animacao: "ken_downAtack",
         frameHitbox: 3,
-        offsetX: 25,
+        offsetX: 26,
         offsetY: -20,
-        largura: 55,
+        largura: 70,
         altura: 25,
         cooldown: 900,
         duracao: 400,
@@ -495,24 +511,25 @@ this.nomePersonagem = "Ken";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 100,
-          knockbackY: -350,
+          knockbackX: 40,
+          knockbackY: -400,
           tumbling: true,
+          knockbackFixo: true,
         },
       },
 
         air_neutro: {
         animacao: "ken_neutralAir",
         frameHitbox: 3,
-        offsetX: 30,
+        offsetX: 28,
         offsetY: -85,
-        largura: 60,
+        largura: 70,
         altura: 25,
         cooldown: 900,
         duracao: 350,
          finalizarAoTocarChao: true,
         atrasoFinalizacaoChao: 30,
-        //cancelavel: true,
+        
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
@@ -522,9 +539,10 @@ this.nomePersonagem = "Ken";
         propriedades: {
           tipoSomImpacto: "light",
           dano: 12,
-          knockbackX: 200,
-          knockbackY: -450,
+          knockbackX: 120,
+          knockbackY: -470,
           tumbling: false,
+          knockbackFixo: true,
         },
       },
 
@@ -532,9 +550,9 @@ this.nomePersonagem = "Ken";
       air_side: {
         animacao: "ken_sideAir",
         frameHitbox: 3,
-        offsetX: 35,
+        offsetX: 26,
         offsetY: -50,
-        largura: 60,
+        largura: 75,
         altura: 30,
         cooldown: 900,
         duracao: 600,
@@ -549,17 +567,17 @@ this.nomePersonagem = "Ken";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 550,
-          knockbackY: -400,
+          knockbackX: 450,
+          knockbackY: -350,
           tumbling: true,
         },
       },
       air_cima: {
         animacao: "ken_upAir",
         frameHitbox: 3,
-        offsetX: 25,
-        offsetY: -80,
-        largura: 60,
+        offsetX: 20,
+        offsetY: -84,
+        largura: 70,
         altura: 30,
         cooldown: 900,
         duracao: 600,
@@ -575,16 +593,16 @@ this.nomePersonagem = "Ken";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 300,
-          knockbackY: -500,
+          knockbackX: 130,
+          knockbackY: -450,
           tumbling: true,
         },
       },
       air_agachado: {
         animacao: "ken_downAir",
         frameHitbox: 3,
-        offsetX: 30,
-        offsetY: -20,
+        offsetX: 35,
+        offsetY: -15,
         largura: 60,
         altura: 60,
         cooldown: 900,
@@ -948,7 +966,7 @@ scene.anims.create({
         start: 0,
         end: 13,
       }),
-      frameRate: 18,
+      frameRate: 20,
       repeat: 0,
     });
     scene.anims.create({

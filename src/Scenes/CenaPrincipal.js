@@ -22,6 +22,13 @@ export default class cenaPrincipal extends Phaser.Scene {
   }
 
   create() {
+    // A luta e exclusiva. Nenhum menu pode continuar atualizando input,
+    // timers ou audio por baixo dela, inclusive quando aberta pelo console.
+    ["CenaStart", "Charmenu", "CenaSelecaoMapa", "CenaHistoria", "CenaGameOver", "CenaCreditos"]
+      .forEach((key) => {
+        if (this.scene.isActive(key)) this.scene.stop(key);
+      });
+
     this.physics.world.setBounds(0, 0, 1920, 640);
     //criar o mapa que vou estar
     // 1. Instancia o mapa dinâmico trazido do init
@@ -62,8 +69,8 @@ export default class cenaPrincipal extends Phaser.Scene {
       cima: Phaser.Input.Keyboard.KeyCodes.UP,
       baixo: Phaser.Input.Keyboard.KeyCodes.DOWN,
       dash: Phaser.Input.Keyboard.KeyCodes.NUMPAD_ZERO,
-      atack: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FOUR,
-      special: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FIVE,
+      atack: Phaser.Input.Keyboard.KeyCodes.J,
+      special: Phaser.Input.Keyboard.KeyCodes.K,
       guard: Phaser.Input.Keyboard.KeyCodes.NUMPAD_SIX,
       taunt: Phaser.Input.Keyboard.KeyCodes.NUMPAD_EIGHT,
     });
@@ -108,45 +115,32 @@ this.jogador2 = this.criarPersonagem(
   //  this.musicaFase.play();
 
     // 2. Cria a HUD do P1 na ESQUERDA
-    const nomeP1 = this.jogador1.nomePersonagem || this.escolhaP1;
-    this.hudP1_Nome = this.add
-      .text(80, 950, nomeP1, {
-        fontSize: "45px",
-        fill: "#27F5F5",
-        fontStyle: "bold",
-      })
-      .setScrollFactor(0);
-    this.jogador1.textoDano = this.add
-      .text(80, 870, "0%", {
-        fontSize: "100px",
-        fill: "#ffffff",
-        fontStyle: "bold",
-      })
-      .setScrollFactor(0);
+    this.hudP1_Nome = this.criarHudPartida(
+      this.jogador1,
+      this.escolhaP1,
+      40,
+      670,
+      false,
+    );
 
       // Texto para exibir as Vidas do P1
-    this.hudP1_Vidas = this.add.text(80, 820, `VIDAS: ${this.vidasP1}`, { fontSize: "32px", fill: "#00ff00", fontStyle: "bold" }).setScrollFactor(0);
+    this.hudP1_Vidas = this.add.text(290, 1010, `VIDAS: ${this.vidasP1}`, { fontSize: "32px", fill: "#e2d8d9", fontStyle: "bold" })
+      .setScrollFactor(0)
+      .setDepth(1100);
 
     // 3. Cria a HUD do P2 na DIREITA
-    const nomeP2 = this.jogador2.nomePersonagem || this.escolhaP2;
-    const posXDireita = this.scale.width - 200; // Alinha perto da borda direita
+    this.hudP2_Nome = this.criarHudPartida(
+      this.jogador2,
+      this.escolhaP2,
+      this.scale.width - 40,
+      670,
+      true,
+    );
 
-    this.hudP2_Nome = this.add
-      .text(1600, 950, nomeP2, {
-        fontSize: "45px",
-        fill: "#F527F5",
-        fontStyle: "bold",
-      })
-      .setScrollFactor(0);
-    this.jogador2.textoDano = this.add
-      .text(1600, 870, "0%", {
-        fontSize: "100px",
-        fill: "#ffffff",
-        fontStyle: "bold",
-      })
-      .setScrollFactor(0);
-
-      this.hudP2_Vidas = this.add.text(1600, 820, `VIDAS: ${this.vidasP2}`, { fontSize: "32px", fill: "#00ff00", fontStyle: "bold" }).setScrollFactor(0);
+      this.hudP2_Vidas = this.add.text(this.scale.width - 80, 1010, `VIDAS: ${this.vidasP2}`, { fontSize: "32px", fill: "#e2d8d9", fontStyle: "bold" })
+        .setOrigin(1, 0)
+        .setScrollFactor(0)
+        .setDepth(1100);
 
     // --- COLISÃO ---
     // Diz que o sprite da Morrigan colide com o grupo de plataformas
@@ -175,6 +169,7 @@ this.jogador2 = this.criarPersonagem(
     this.overlayMorte = this.add.sprite(0, 0, "TVefect");
     this.overlayMorte.setOrigin(0, 0);
     this.overlayMorte.setDisplaySize(this.scale.width, this.scale.height);
+    this.overlayMorte.setDepth(2000);
     this.overlayMorte.setVisible(false);
 
     // 3. REGRA DAS CÂMERAS:
@@ -205,6 +200,57 @@ this.jogador2 = this.criarPersonagem(
     if (this.physics.config.debug || this.physics.world.drawDebug) {
       this.camHUD.ignore(this.physics.world.debugGraphic);
     }
+  }
+
+  criarHudPartida(jogador, personagem, x, y, ladoDireito) {
+    const retratoPorPersonagem = {
+      SpiderMan: "Sp_portrait",
+      Miku: "Miku_portrait",
+      Ken: "Ken_portrait",
+    };
+    const hud = this.add.container(x, y).setScrollFactor(0).setDepth(1000);
+    const chaveRetrato = retratoPorPersonagem[personagem];
+
+    if (chaveRetrato) {
+      const tamanhoRetrato = personagem === "Miku"
+        ? { largura: 468, altura: 380 }
+        : { largura: 440, altura: 358 };
+      const ajusteY = personagem === "Miku" ? -22 : 0;
+      const retrato = this.add.image(0, ajusteY, chaveRetrato)
+        .setOrigin(ladoDireito ? 1 : 0, 0)
+        .setDisplaySize(tamanhoRetrato.largura, tamanhoRetrato.altura);
+      hud.add(retrato);
+    }
+
+    hud.setText = (valor) => {
+      const porcentagem = Math.max(0, Math.floor(Number.parseFloat(valor) || 0));
+      if (hud.numero) hud.remove(hud.numero, true);
+
+      const caracteres = [...String(porcentagem), "%"];
+      const passo = 53;
+      const largura = (caracteres.length - 1) * passo + 72;
+      const inicioX = ladoDireito ? -75 - largura : 225;
+      const numero = this.add.container(0, 0);
+
+      caracteres.forEach((caractere, indice) => {
+        const porcento = caractere === "%";
+        const imagem = this.add.image(
+          inicioX + indice * passo,
+          210,
+          porcento ? "pct.png" : `${caractere}.png`,
+        )
+          .setOrigin(0, 0)
+          .setDisplaySize(porcento ? 58 : 74, porcento ? 58 : 88);
+        numero.add(imagem);
+      });
+
+      hud.add(numero);
+      hud.numero = numero;
+    };
+
+    jogador.textoDano = hud;
+    hud.setText(0);
+    return hud;
   }
 
   criarPersonagem(nome, x, y, teclas, minDano, maxDano, controle) {

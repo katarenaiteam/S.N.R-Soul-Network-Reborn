@@ -60,22 +60,17 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("KatarenaiLogo", "assets/Menus/Preload/KatarenaiLogo.png");
 
     // --- MENUS ---
-    // --- start ---
-    this.load.image("Start_menu", "./assets/Menus/Start_menu/Start_menu.png");
-    this.load.image("Start_VSbuton", "./assets/Menus/Start_menu/Start_VSbuton.png");
-    this.load.image("Start_Storybuton", "./assets/Menus/Start_menu/Start_Storybuton.png");
-    this.load.image("ReZero", "./assets/Menus/Game_Over/ReZero.png");
     // --- new start ---
+    this.load.image("Start_menu", "./assets/Menus/Start_menu/Start_menu.png");
     this.load.image("frontStart", "./assets/Menus/Start_menu/frontStart.png");
     this.load.image("backStart", "./assets/Menus/Start_menu/backStart.png");
     this.load.image("logo", "./assets/Menus/Start_menu/logo.png");
     this.load.spritesheet("glitch", "./assets/Menus/Start_menu/glitch.png", { frameWidth: 683, frameHeight: 365 });
 
-
     // --- charmenu ---
     this.load.image("Charmenu", "assets/Menus/Char_menu/Sprites/Charmenu.png");
     this.load.audio("katarenai8bit", "assets/Menus/Char_menu/Audio/katarenai8bit.mp3");
-    // --- icons ---
+    // icons 
     this.load.image("FJmenu", "assets/Menus/Char_menu/Sprites/FJmenu.png");
     this.load.image("Madomenu", "assets/Menus/Char_menu/Sprites/Madomenu.png");
     this.load.image("Spidermenu", "assets/Menus/Char_menu/Sprites/Spidermenu.png");
@@ -83,15 +78,31 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("Kenmenu", "assets/Menus/Char_menu/Sprites/Kenmenu.png");
     this.load.image("Mikumenu", "assets/Menus/Char_menu/Sprites/Mikumenu.png");
 
+    // --- hud ---
+    //portrait
+    this.load.image("Sp_portrait", "assets/Hud/Portrait/Sp_portrait.png");
+    this.load.image("Miku_portrait", "assets/Hud/Portrait/Miku_portrait.png");
+    this.load.image("Ken_portrait", "assets/Hud/Portrait/Ken_portrait.png");
+    //porcentagem
+    this.load.image("0.png", "assets/Hud/DamagePercentage/0-19_/0.png");
+    this.load.image("1.png", "assets/Hud/DamagePercentage/0-19_/1.png");
+    this.load.image("2.png", "assets/Hud/DamagePercentage/0-19_/2.png");
+    this.load.image("3.png", "assets/Hud/DamagePercentage/0-19_/3.png");
+    this.load.image("4.png", "assets/Hud/DamagePercentage/0-19_/4.png");
+    this.load.image("5.png", "assets/Hud/DamagePercentage/0-19_/5.png");
+    this.load.image("6.png", "assets/Hud/DamagePercentage/0-19_/6.png");
+    this.load.image("7.png", "assets/Hud/DamagePercentage/0-19_/7.png");
+    this.load.image("8.png", "assets/Hud/DamagePercentage/0-19_/8.png");
+    this.load.image("9.png", "assets/Hud/DamagePercentage/0-19_/9.png");
+    this.load.image("pct.png", "assets/Hud/DamagePercentage/0-19_/pct.png");
+
+
     // --- PERSONAGENS ---
     // --- Madotsuki ---
     this.load.spritesheet("Madotsuki", "assets/personagens/Madotsuki/Sprites/Madotsuki.png", { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet("MadoAtack", "assets/personagens/Madotsuki/Sprites/MadoAtack.png", { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet("MadoDano", "assets/personagens/Madotsuki/Sprites/MadoDano.png", { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet("MadoMoreAtack", "assets/personagens/Madotsuki/Sprites/MadoMoreAtack.png", { frameWidth: 32, frameHeight: 32 });
-    // --- Morrigan ---
-    this.load.spritesheet("morrigan", "assets/personagens/morrigan/Sprites/morrigan.png", { frameWidth: 64, frameHeight: 64 });
-    this.load.spritesheet("MorriganDano", "assets/personagens/morrigan/Sprites/MorriganDano.png", { frameWidth: 64, frameHeight: 64 });
     // --- Frederick Johnson ---
     this.load.spritesheet("FJ_idle", "assets/personagens/FrederikJohnson/Sprites/FJ_idle.png", { frameWidth: 64, frameHeight: 64 });
     this.load.spritesheet("FJ_hurt", "assets/personagens/FrederikJohnson/Sprites/FJ_hurt.png", { frameWidth: 64, frameHeight: 64 });
@@ -100,16 +111,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("FJ_walk", "assets/personagens/FrederikJohnson/Sprites/FJ_walk.png", { frameWidth: 64, frameHeight: 64 });
     this.load.spritesheet("FJ_punch1", "assets/personagens/FrederikJohnson/Sprites/FJ_punch1.png", { frameWidth: 64, frameHeight: 64 });
     // --- TH30 ---
-    this.load.spritesheet("Mantra_idle", "assets/personagens/Dio/Sprites/Mantra_idle.png", { frameWidth: 72, frameHeight: 126 });
-    this.load.spritesheet("Mantra_walk", "assets/personagens/Dio/Sprites/Mantra_walk.png", { frameWidth: 96, frameHeight: 126 });
-    this.load.spritesheet("Mantra_jump", "assets/personagens/Dio/Sprites/Mantra_jump.png", { frameWidth: 96, frameHeight: 157 });
-    this.load.spritesheet("Mantra_down", "assets/personagens/Dio/Sprites/Mantra_down.png", { frameWidth: 96, frameHeight: 128 });
-    this.load.spritesheet("Mantra_!down", "assets/personagens/Dio/Sprites/Mantra_!down.png", { frameWidth: 96, frameHeight: 128 });
-    this.load.spritesheet("Mantra_dash", "assets/personagens/Dio/Sprites/Mantra_dash.png", { frameWidth: 130, frameHeight: 130 });
-    this.load.spritesheet("Mantra_atack1", "assets/personagens/Dio/Sprites/Mantra_atack1.png", { frameWidth: 290, frameHeight: 126 });
-    this.load.spritesheet("Mantra_atack2", "assets/personagens/Dio/Sprites/Mantra_atack2.png", { frameWidth: 200, frameHeight: 127 });
-    this.load.spritesheet("TH30_hurt1", "assets/personagens/Dio/Sprites/TH30_hurt1.png", { frameWidth: 98, frameHeight: 120 });
-    this.load.spritesheet("TH30_atack4", "assets/personagens/Dio/Sprites/TH30_atack4.png", { frameWidth: 200, frameHeight: 117 });
+   
     // --- Homem Aranha ---
     //base
     this.load.spritesheet("SpiderMan_idle", "assets/personagens/SpiderMan/Sprites/SpiderMan_idle.png", { frameWidth: 200, frameHeight: 200 });

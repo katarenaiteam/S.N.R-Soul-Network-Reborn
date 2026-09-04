@@ -336,12 +336,13 @@ export default class Personagem {
     }
 
     this.controle?.atualizar();
-    this.sincronizarHurtbox();
     this.processarMovimentacaoAtaque(noChao);
     this.atualizarOffsetFisica();
     this.atualizarLogicasEspeciais();
     this.vfx?.atualizar();
     this.maquinaEstados.update();
+    // Estados, ataques e especiais podem mover o sprite. Sincronize depois deles.
+    this.sincronizarHurtbox();
     this.controle?.salvarAnterior();
   }
   // --- MÉTODOS DE SUPORTE AO UPDATE ---
@@ -390,7 +391,13 @@ export default class Personagem {
     const listaConfigs = cfg.hurtboxes || [];
     const direcaoOlhar = this.sprite.flipX ? -1 : 1;
 
-    // Expande o pool quando necessário; caixas excedentes são desativadas.
+    // Mantem no grupo fisico somente as hurtboxes realmente usadas agora.
+    // Group.remove desregistra o Body do World antes de destruir a Zone.
+    while (this.hurtboxesAtivas.length > listaConfigs.length) {
+      const zone = this.hurtboxesAtivas.pop();
+      if (zone) this.grupoHurtbox.remove(zone, true, true);
+    }
+
     while (this.hurtboxesAtivas.length < listaConfigs.length) {
       const zone = this.scene.add.zone(0, 0, 1, 1).setOrigin(0.5, 1);
       this.grupoHurtbox.add(zone);
@@ -403,21 +410,18 @@ export default class Personagem {
     // Reposiciona cada hurtbox ativa
     this.hurtboxesAtivas.forEach((zone, index) => {
       const boxCfg = listaConfigs[index];
-      if (!boxCfg) {
-        if (zone?.body) zone.body.enable = false;
-        return;
-      }
       if (!zone?.body) return;
-      zone.body.enable = true;
       const offX = boxCfg.offsetX ?? 0;
       const offY = boxCfg.offsetY ?? 0;
+      const posX = this.sprite.x + offX * direcaoOlhar;
+      const posY = this.sprite.y + offY;
 
       zone.body.setSize(boxCfg.largura, boxCfg.altura);
-      zone.setPosition(
-        this.sprite.x + offX * direcaoOlhar,
-        this.sprite.y + offY,
-      );
-
+      // Mantem a mesma referencia de coordenadas usada pelas configuracoes:
+      // a posicao representa o centro da caixa. updateFromGameObject atualiza
+      // o Body imediatamente sem alterar essa referencia como reset() fazia.
+      zone.setPosition(posX, posY);
+      zone.body.updateFromGameObject();
       zone.body.setVelocity(
         this.sprite.body.velocity.x,
         this.sprite.body.velocity.y,
@@ -426,8 +430,10 @@ export default class Personagem {
   }
 
   destruirHurtboxes() {
-    this.hurtboxesAtivas = [];
-    this.grupoHurtbox.clear(true, true);
+    while (this.hurtboxesAtivas.length > 0) {
+      const zone = this.hurtboxesAtivas.pop();
+      if (zone) this.grupoHurtbox.remove(zone, true, true);
+    }
   }
 
   processarMovimentacaoAtaque(noChao) {
@@ -506,7 +512,8 @@ export default class Personagem {
     body.setSize(cfg.largura, cfg.altura, false);
 
     const offsetX = this.centralizarCorpoFisicoX
-      ? (this.sprite.frame.realWidth - cfg.largura) / 2
+      ? (this.sprite.frame.realWidth - cfg.largura) / 2 +
+        (this.ajusteCorpoFisicoX ?? 0) * (this.sprite.flipX ? -1 : 1)
       : this.sprite.flipX
         ? this.sprite.frame.realWidth - cfg.offsetX - cfg.largura
         : cfg.offsetX;

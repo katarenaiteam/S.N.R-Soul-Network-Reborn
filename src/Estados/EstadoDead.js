@@ -49,7 +49,7 @@ export default class EstadoDead extends EstadoBase {
         : "neutro";
 
       if (this.personagem.podeUsarSpecial(tipoSpecial)) {
-        this.personagem.maquinaEstados.mudarEstado("special");
+        this.personagem.maquinaEstados.mudarEstado("special", { tipo: tipoSpecial });
         return;
       }
     }

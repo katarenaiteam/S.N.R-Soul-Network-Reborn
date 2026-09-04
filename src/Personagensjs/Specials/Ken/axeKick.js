@@ -8,10 +8,10 @@ const RECUO_QUIQUE = 75;
 const INTERVALO_RASTRO = 45;
 
 const HITBOX = {
-  largura: 76,
-  altura: 105,
-  offsetX: 18,
-  offsetY: -48,
+  largura: 80,
+  altura: 45,
+  offsetX: 25,
+  offsetY: -30,
 };
 
 import { obterAlvosCombate, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
@@ -95,7 +95,10 @@ export default class AxeKick {
     this.hitbox.body.debugBodyColor = 0xff0000;
     this.hitbox.body.setImmovable(true);
     this.scene.camHUD?.ignore(this.hitbox);
-    registrarAtaqueEspecial(this, this.hitbox, { categoria: "corpo" });
+    registrarAtaqueEspecial(this, this.hitbox, {
+      categoria: "corpo",
+      contraAtacarDono: true,
+    });
     this.atualizarPosicaoHitbox();
 
     this.obterOponentes().forEach((oponente) => {

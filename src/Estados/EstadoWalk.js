@@ -46,7 +46,7 @@ export default class EstadoWalk extends EstadoBase {
       const tipoSpecial = this.personagem.obterTipoSpecial ? this.personagem.obterTipoSpecial() : "neutro";
 
       if (this.personagem.podeUsarSpecial(tipoSpecial)) {
-        this.personagem.maquinaEstados.mudarEstado("special");
+        this.personagem.maquinaEstados.mudarEstado("special", { tipo: tipoSpecial });
         return;
       }
     }

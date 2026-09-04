@@ -1,4 +1,9 @@
-﻿export default class MikuSpin {
+﻿import {
+  obterAlvosCombate,
+  registrarAtaqueEspecial,
+} from "../../../Objetos/SistemaCombateEspecial.js";
+
+export default class MikuSpin {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
     this.scene = personagem.scene;
@@ -71,6 +76,12 @@
     this.hitbox.body.debugBodyColor = 0xff0000;
     this.scene.camHUD?.ignore(this.hitbox);
 
+    registrarAtaqueEspecial(this, this.hitbox, {
+      categoria: "corpo",
+      contraAtacarDono: true,
+      aoColidir: () => this.cancelar(),
+    });
+
     this.obterOponentes().forEach((oponente) => {
       const overlap = this.scene.physics.add.overlap(
         this.hitbox,
@@ -84,14 +95,7 @@
   }
 
   obterOponentes() {
-    if (this.scene.scene.key === "CenaHistoria") {
-      return [this.personagem === this.scene.boss
-        ? this.scene.jogador1
-        : this.scene.boss].filter(Boolean);
-    }
-    return [this.scene.jogador1, this.scene.jogador2].filter(
-      (jogador) => jogador && jogador !== this.personagem
-    );
+    return obterAlvosCombate(this.personagem);
   }
 
   acertar(alvo) {

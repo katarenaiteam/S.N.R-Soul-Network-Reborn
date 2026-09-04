@@ -70,7 +70,10 @@ export default class EstadoTaunt extends EstadoBase {
         }
 
         if (this.personagem.inputJustDown("special")) {
-          this.personagem.maquinaEstados.mudarEstado("special");
+          const tipoSpecial = this.personagem.obterTipoSpecial();
+          if (this.personagem.podeUsarSpecial(tipoSpecial)) {
+            this.personagem.maquinaEstados.mudarEstado("special", { tipo: tipoSpecial });
+          }
           return true;
         }
 

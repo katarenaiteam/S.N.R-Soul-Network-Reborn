@@ -8,7 +8,14 @@ export default class EstadoIdle extends EstadoBase {
 
   execute() {
     // 1. Transição para AGACHADO
-    if (this.personagem.inputDown("baixo")) {
+    // Nao troca para crouch antes de consumir baixo + ataque/special.
+    // Caso as teclas cheguem no mesmo frame, a troca antecipada fazia o
+    // JustDown da acao ser perdido no frame seguinte.
+    if (
+      this.personagem.inputDown("baixo") &&
+      !this.personagem.inputJustDown("special") &&
+      !this.personagem.inputJustDown("atack")
+    ) {
       this.personagem.maquinaEstados.mudarEstado("crouch");
       return;
     }

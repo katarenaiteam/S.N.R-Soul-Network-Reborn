@@ -3,7 +3,7 @@ const MULTIPLICADOR_AVANCO_AEREO = 1.2;
 const MULTIPLICADOR_IMPULSO = 1.2;
 const VELOCIDADE_FINAL = 0.25;
 const INTERVALO_RASTRO = 45;
-const FRAME_INICIO_MOVIMENTO = 3;
+const FRAME_INICIO_MOVIMENTO = 4;
 const FRAME_INICIO_IMPULSO = 6;
 const FRAME_FIM_MOVIMENTO = 20;
 const FRAME_INICIO_HITBOX = 6;
@@ -20,10 +20,10 @@ const PROPRIEDADES_HITS_INICIAIS = {
 };
 
 const HITBOX = {
-  largura: 95,
-  altura: 65,
-  offsetX: 48,
-  offsetY: -45,
+  largura: 65,
+  altura: 50,
+  offsetX: 42,
+  offsetY: -60,
 };
 
 import { obterAlvosCombate, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
@@ -153,7 +153,10 @@ export default class Tatsumaki {
     this.hitbox.body.debugBodyColor = 0xff0000;
     this.hitbox.body.setImmovable(true);
     this.scene.camHUD?.ignore(this.hitbox);
-    registrarAtaqueEspecial(this, this.hitbox, { categoria: "corpo" });
+    registrarAtaqueEspecial(this, this.hitbox, {
+      categoria: "corpo",
+      contraAtacarDono: true,
+    });
 
     this.atualizarPosicaoHitbox();
 

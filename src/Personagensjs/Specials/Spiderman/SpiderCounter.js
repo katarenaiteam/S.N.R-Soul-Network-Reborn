@@ -10,6 +10,8 @@ export default class SpiderCounter {
     this.counterAtivo = false;
     this.hitboxCounter = null;
     this.timerBrilho = null;
+    this.timerCounter = null;
+    this.invulnerabilidadeAnterior = false;
   }
 
   executar() {
@@ -19,7 +21,8 @@ export default class SpiderCounter {
     this.counterAtivo = true;
 
     if (this.personagem) {
-      this.personagem.destruirHurtboxes();
+      this.invulnerabilidadeAnterior = this.personagem.invulneravel;
+      this.personagem.invulneravel = true;
     }
 
     const sprite = this.personagem.sprite;
@@ -44,16 +47,12 @@ export default class SpiderCounter {
     }
 
     // Timer limite de duração do counter (600ms)
-    this.scene.time.delayedCall(600, () => this.desativarCounter());
+    this.timerCounter = this.scene.time.delayedCall(600, () => this.desativarCounter());
   }
 
   atualizar() {
     const hitboxCounter = this.hitboxCounter;
     if (!this.counterAtivo || !hitboxCounter?.active) return;
-
-    if (this.personagem) {
-      this.personagem.destruirHurtboxes();
-    }
 
     const sprite = this.personagem.sprite;
     if (!sprite?.active || !hitboxCounter.active) return;
@@ -101,7 +100,7 @@ export default class SpiderCounter {
       ataqueEspecial.remover?.();
       this.dispararContraAtaque(
         oponente,
-        ataqueEspecial.categoria !== "projetil"
+        ataqueEspecial.contraAtacarDono
       );
     }
   }
@@ -137,7 +136,17 @@ export default class SpiderCounter {
   }
 
   desativarCounter() {
+    const estavaAtivo = this.counterAtivo;
     this.counterAtivo = false;
+
+    if (this.timerCounter) {
+      this.timerCounter.remove(false);
+      this.timerCounter = null;
+    }
+
+    if (estavaAtivo && this.personagem) {
+      this.personagem.invulneravel = this.invulnerabilidadeAnterior;
+    }
 
     if (this.timerBrilho) {
       this.timerBrilho.remove(false);

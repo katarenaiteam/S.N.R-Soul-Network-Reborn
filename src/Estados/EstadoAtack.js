@@ -169,8 +169,11 @@ export default class EstadoAtack extends EstadoBase {
           this.personagem.inputJustDown("special") ||
           (this.intentCancel && this.personagem.inputDown("special"))
         ) {
-          this.personagem.maquinaEstados.mudarEstado("special");
-          return;
+          const tipoSpecial = this.personagem.obterTipoSpecial();
+          if (this.personagem.podeUsarSpecial(tipoSpecial)) {
+            this.personagem.maquinaEstados.mudarEstado("special", { tipo: tipoSpecial });
+            return;
+          }
         }
       }
     }

@@ -21,6 +21,18 @@ export default class AupSpecial {
       detune: 0,
     });
 
+    // O impulso e a animacao continuam acontecendo em todo uso do special,
+    // mas as mini puppets possuem um cooldown independente.
+    const agora = this.scene.time.now;
+    const proximaInvocacao = this.personagem.proximaInvocacaoMiniPuppets ?? 0;
+    if (agora < proximaInvocacao) {
+      this.removerDaListaAtiva();
+      return;
+    }
+
+    this.personagem.proximaInvocacaoMiniPuppets =
+      agora + (this.special.cooldownMiniPuppets ?? 10000);
+
     impulsosX.forEach((impulsoX, indice) => {
         this.criarMini(indice, impulsoX * direcao);
     });

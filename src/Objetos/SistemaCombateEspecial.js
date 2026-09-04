@@ -37,6 +37,9 @@ export function registrarAtaqueEspecial(logica, objeto, opcoes = {}) {
     dono: logica.personagem,
     categoria: opcoes.categoria ?? "corpo",
     contraAtacavel: opcoes.contraAtacavel !== false,
+    // So ataques ligados ao lutador podem transferir o contra-ataque ao dono.
+    // Invocacoes e projeteis devem apenas acionar o counter.
+    contraAtacarDono: opcoes.contraAtacarDono === true,
     aoColidir: opcoes.aoColidir,
     colisores: new Set(),
     encerrado: false,
