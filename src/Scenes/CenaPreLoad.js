@@ -237,6 +237,12 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.spritesheet("Miku_hurtSide", "assets/personagens/Miku/Sprites/Miku_hurtSide.png", { frameWidth: 334, frameHeight: 351 });
     this.load.spritesheet("Miku_hurtDown", "assets/personagens/Miku/Sprites/Miku_hurtDown.png", { frameWidth: 274, frameHeight: 336 });
     this.load.spritesheet("Miku_dead", "assets/personagens/Miku/Sprites/Miku_dead.png", { frameWidth: 360, frameHeight: 130 });
+    this.load.audio("hurt1", "assets/personagens/Miku/Audio/yata.wav");
+    this.load.audio("hurt2", "assets/personagens/Miku/Audio/hurt2.wav");
+    this.load.audio("hurt3", "assets/personagens/Miku/Audio/hurt3.wav");
+    this.load.audio("hurt4", "assets/personagens/Miku/Audio/hurt4.wav");
+    this.load.audio("hurt5", "assets/personagens/Miku/Audio/hurt5.wav");
+    
     //ataque
     this.load.spritesheet("Miku_neutro1", "assets/personagens/Miku/Sprites/Miku_neutro1.png", { frameWidth: 203, frameHeight: 348 });
     this.load.spritesheet("Miku_neutro2", "assets/personagens/Miku/Sprites/Miku_neutro2.png", { frameWidth: 244, frameHeight: 356 });
@@ -257,9 +263,13 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.audio("RollingGirl", "assets/personagens/Miku/Audio/RollingGirl.wav");
     this.load.audio("soree", "assets/personagens/Miku/Audio/soree.wav");
     this.load.audio("yata", "assets/personagens/Miku/Audio/yata.wav");
-    this.load.audio("SnowMix", "assets/personagens/Miku/Audio/SnowMix.wav");
-
-
+    this.load.audio("sing1", "assets/personagens/Miku/Audio/sing1.wav");
+    this.load.audio("sing2", "assets/personagens/Miku/Audio/sing2.wav");
+    this.load.audio("sing3", "assets/personagens/Miku/Audio/sing3.wav");
+    this.load.audio("sing4", "assets/personagens/Miku/Audio/sing4.wav");
+    this.load.audio("sing5", "assets/personagens/Miku/Audio/sing5.wav");
+    this.load.audio("sing6", "assets/personagens/Miku/Audio/sing6.wav");
+    this.load.audio("sing7", "assets/personagens/Miku/Audio/sing7.wav");
     
     // --- Ken ---
     //base
@@ -270,6 +280,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.spritesheet("Ken_crouch3", "assets/personagens/Ken/Sprites/Ken_crouch3.png", { frameWidth: 88, frameHeight: 111 });
     this.load.spritesheet("Ken_dash", "assets/personagens/Ken/Sprites/Ken_dash.png", { frameWidth: 74, frameHeight: 74 });
     this.load.spritesheet("Ken_guard", "assets/personagens/Ken/Sprites/Ken_guard.png", { frameWidth: 78, frameHeight: 105 });
+    this.load.spritesheet("Ken_taunt", "assets/personagens/Ken/Sprites/Ken_taunt.png", { frameWidth: 88, frameHeight: 114 });
     this.load.spritesheet("Ken_hurt", "assets/personagens/Ken/Sprites/Ken_hurt.png", { frameWidth: 76, frameHeight: 96 });
     this.load.spritesheet("Ken_hurts1", "assets/personagens/Ken/Sprites/Ken_hurts1.png", { frameWidth: 138, frameHeight: 111 });
     this.load.spritesheet("Ken_hurts2", "assets/personagens/Ken/Sprites/Ken_hurts2.png", { frameWidth: 140, frameHeight: 138 });

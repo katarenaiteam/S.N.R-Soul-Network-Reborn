@@ -1,7 +1,7 @@
 const IMPULSO_X = 190;
 const IMPULSO_Y = -580;
 const IMPULSO_AEREO_X = 250;
-const IMPULSO_AEREO_Y = -720;
+const IMPULSO_AEREO_Y = -560;
 const FRAME_IMPULSO = 4;
 const FRAMES_DOS_HITS = [5, 9, 13];
 const FRAME_INICIO_HITBOX = 4;

@@ -577,7 +577,7 @@ export default class SpiderMan extends Personagem {
           tipoSomImpacto: "light",
           dano: 11,
           knockbackX: 90,
-          knockbackY: -300,
+          knockbackY: -350,
           tumbling: true
         },
       },
@@ -665,8 +665,8 @@ export default class SpiderMan extends Personagem {
           tipoSomImpacto: "heavy",
           dano: 12,
           knockbackX: 300,
-          knockbackY: -100,
-          impulsoX: 300,
+          knockbackY: -130,
+          impulsoX: 350,
           tumbling: true
         },
       },
@@ -706,7 +706,7 @@ export default class SpiderMan extends Personagem {
           tipoSomImpacto: "heavy",
           dano: 11,
           knockbackX: 60,
-          knockbackY: -600,
+          knockbackY: -500,
           impulsoX: 30,
           tumbling: true
         },

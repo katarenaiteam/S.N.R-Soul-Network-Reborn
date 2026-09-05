@@ -336,6 +336,14 @@ this.vfxAtaqueNormal = {
         ],
       },
     };
+   
+   this.sons = {
+      ...this.sons,
+      vozAtaque: ["sing1", "sing2", "sing3", "sing4", "sing5", "sing6", "sing7"],
+      vozDanoNormal: ["hurt1", "hurt2", "hurt4"],
+      vozDanoForte: ["hurt3", "hurt4", "hurt5"],
+      volumeVoz: 0.2,
+    };
 
    //   this.sons = {
    //  ...this.sons,

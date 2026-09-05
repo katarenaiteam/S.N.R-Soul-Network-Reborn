@@ -10,63 +10,12 @@ export default class EstadoDano extends EstadoBase {
     const body = this.personagem.sprite.body;
     const FRAME_MS = 1000 / 60;
 
-if (false) {
-let forcaImpacto = 0;
-
-if (body) {
-  forcaImpacto = Math.max(
-    Math.abs(body.velocity.x),
-    Math.abs(body.velocity.y)
-  );
-}
-
-let framesStun;
-
-
-// =====================================================
-// GOLPE COMUM
-// Pouco lançamento = recuperação rápida
-// =====================================================
-
-if (!this.personagem.isTumbling) {
-
-  framesStun =
-    5 + forcaImpacto / 100;
-
-  framesStun = Phaser.Math.Clamp(
-    framesStun,
-    6,   // 100ms
-    12   // 200ms
-  );
-}
-
-
-// =====================================================
-// GOLPE DE LANÇAMENTO / TUMBLING
-// O personagem realmente fica incapacitado durante o voo
-// =====================================================
-
-else {
-
-  framesStun =
-    16 + forcaImpacto / 45;
-
-  framesStun = Phaser.Math.Clamp(
-    framesStun,
-    20,  // 333ms mínimo
-    45   // 750ms máximo
-  );
-}
-
-
-this.duracaoStun =
-  framesStun * FRAME_MS;
-}
-
 // O impacto já traz o hitstun calculado. O fallback cobre chamadas antigas
 // que entrem diretamente neste estado sem passar por receberDano.
-this.duracaoStun = this.personagem.ultimoImpacto?.hitstunCalculadoMs
-  ?? (this.personagem.isTumbling ? 22 : 14) * FRAME_MS;
+    const hitstunCalculado = this.personagem.ultimoImpacto?.hitstunCalculadoMs;
+    this.duracaoStun = Number.isFinite(hitstunCalculado)
+      ? Math.max(0, hitstunCalculado)
+      : (this.personagem.isTumbling ? 22 : 14) * FRAME_MS;
 
     //controle para transição vertical sem passar pelo neutro
     this.trocaVerticalAtiva = false;

@@ -614,7 +614,7 @@ this.nomePersonagem = "Ken";
           tipoSomImpacto: "heavy",
           dano: 12,
           knockbackX: 130,
-          knockbackY: -450,
+          knockbackY: -350,
           tumbling: true,
         },
       },
@@ -905,6 +905,16 @@ if (!scene.anims.exists("punch_effect3")) {
         end: 1,
       }),
       frameRate: 8,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_taunt",
+      frames: scene.anims.generateFrameNumbers("Ken_taunt", {
+        start: 0,
+        end: 3,
+      }),
+      frameRate: 12,
       repeat: 0,
     });
 

@@ -248,17 +248,31 @@ export default class Personagem {
     let multiplicadorY = 1;
 
     if (!knockbackFixo) {
-      // Até 180% o dano cresce normalmente.
-      // Depois de 180% ele ainda cresce, mas muito mais devagar,
-      // evitando o estouro absurdo que existia nas porcentagens altas.
-      const danoEscalado = this.porcentagemDano <= 180
-        ? this.porcentagemDano
-        : 180 + (this.porcentagemDano - 180) * 0.20;
+      // A porcentagem deixa de influenciar o lançamento depois de 300%.
+      // Até 180% ela cresce normalmente e, depois disso, cada ponto passa
+      // a valer menos, preservando a curva que o sistema já usava.
+      const tetoPorcentagem = 300;
+      const porcentagemEscalada = Phaser.Math.Clamp(
+        this.porcentagemDano,
+        0,
+        tetoPorcentagem
+      );
+      const danoEscalado = porcentagemEscalada <= 180
+        ? porcentagemEscalada
+        : 180 + (porcentagemEscalada - 180) * 0.20;
 
-      // A porcentagem aumenta o lançamento gradualmente, sem multiplicar
-      // demais o knockback horizontal em valores médios de dano.
-      multiplicadorX = 0.65 + danoEscalado / 100;
-      multiplicadorY = 0.65 + danoEscalado / 180;
+      const multiplicadorBaseX = 0.65 + danoEscalado / 100;
+      const multiplicadorBaseY = 0.65 + danoEscalado / 180;
+
+      // Reforça progressivamente o knockback sem criar outro salto brusco.
+      // A curva perde inclinação ao se aproximar de 300% e, no teto,
+      // entrega 2,1 vezes o knockback que a regulagem anterior entregava.
+      const progresso = porcentagemEscalada / tetoPorcentagem;
+      const progressoSuave = 1 - (1 - progresso) ** 2;
+      const reforcoKnockback = 1 + 1.1 * progressoSuave;
+
+      multiplicadorX = multiplicadorBaseX * reforcoKnockback;
+      multiplicadorY = multiplicadorBaseY * reforcoKnockback;
     }
 
     this.sprite.body.setVelocity(
@@ -281,27 +295,61 @@ export default class Personagem {
       Math.abs(kbY) * multiplicadorY
     );
     const tumbling = propriedades.tumbling ?? false;
-    const baseFrames = propriedades.hitstunBaseFrames ?? (tumbling ? 19 : 13);
-    const porDano = Math.min(6, quantidade * (tumbling ? 0.3 : 0.45));
-    const porImpacto = Math.sqrt(velocidadeImpacto) * (tumbling ? 0.48 : 0.18);
-    let hitstunFrames = propriedades.hitstunFrames
-      ?? baseFrames + porDano + porImpacto;
+    const hitstunFixoMs = propriedades.hitstunFixoMs
+      ?? propriedades.hitstunMs
+      ?? propriedades.duracaoStun;
+    const hitstunFixoFrames = propriedades.hitstunFixoFrames
+      ?? propriedades.hitstunFrames;
+    const temHitstunFixoMs = Number.isFinite(hitstunFixoMs);
+    const temHitstunFixoFrames = Number.isFinite(hitstunFixoFrames);
 
-    const minimo = propriedades.hitstunMinFrames ?? (tumbling ? 22 : 14);
-    const maximo = propriedades.hitstunMaxFrames ?? (tumbling ? 42 : 24);
-    hitstunFrames = Phaser.Math.Clamp(hitstunFrames, minimo, maximo);
+    let hitstunFrames;
 
-    // Preserva combos curtos e reduz progressivamente prisões de muitos hits.
+    if (temHitstunFixoMs) {
+      hitstunFrames = Math.max(0, hitstunFixoMs) / (1000 / 60);
+    } else if (temHitstunFixoFrames) {
+      // Um hitstun declarado no golpe é realmente fixo: não recebe
+      // porcentagem, impacto nem o clamp automático do hitstun variável.
+      hitstunFrames = Math.max(0, hitstunFixoFrames);
+    } else {
+      const baseFrames = propriedades.hitstunBaseFrames ?? (tumbling ? 19 : 13);
+      const porDano = Math.min(6, quantidade * (tumbling ? 0.3 : 0.45));
+      const porImpacto = Math.sqrt(velocidadeImpacto) * (tumbling ? 0.48 : 0.18);
+
+      // A contribuição da porcentagem tem retorno decrescente e derivada
+      // zero no teto: acima de 300% nenhuma adição aumenta o hitstun.
+      const progressoPorcentagem = Phaser.Math.Clamp(
+        this.porcentagemDano / 300,
+        0,
+        1
+      );
+      const progressoStun = 1 - (1 - progressoPorcentagem) ** 2;
+      const porPorcentagem = progressoStun * (tumbling ? 18 : 10);
+
+      hitstunFrames = baseFrames + porDano + porImpacto + porPorcentagem;
+
+      const minimo = propriedades.hitstunMinFrames ?? (tumbling ? 22 : 14);
+      const maximo = propriedades.hitstunMaxFrames ?? (tumbling ? 60 : 36);
+      hitstunFrames = Phaser.Math.Clamp(hitstunFrames, minimo, maximo);
+
+    }
+
+    // O decay de combo continua sendo uma regra global, inclusive para os
+    // valores fixos. ignorarHitstunDecay preserva o valor exato quando o
+    // golpe realmente precisar ignorar essa proteção contra infinitos.
     const hitsSemDecay = propriedades.hitsSemDecay ?? 3;
     const passosDecay = Math.max(0, this.comboHitsRecebidos - hitsSemDecay);
     const multiplicadorDecay = propriedades.ignorarHitstunDecay
       ? 1
       : Math.max(0.6, 1 - passosDecay * 0.1);
-    hitstunFrames = Math.max(10, hitstunFrames * multiplicadorDecay);
+    hitstunFrames = propriedades.ignorarHitstunDecay
+      ? hitstunFrames
+      : Math.max(10, hitstunFrames * multiplicadorDecay);
 
     this.ultimoImpacto = {
       ...propriedades,
       hitstunCalculadoMs: hitstunFrames * (1000 / 60),
+      hitstunCalculadoFrames: hitstunFrames,
       comboHits: this.comboHitsRecebidos,
     };
 
