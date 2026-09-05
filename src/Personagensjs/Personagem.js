@@ -255,12 +255,10 @@ export default class Personagem {
         ? this.porcentagemDano
         : 180 + (this.porcentagemDano - 180) * 0.20;
 
-      // Mantém a lógica original do jogo:
-      // - em porcentagem baixa o lançamento começa mais controlado;
-      // - X cresce muito mais com o dano que Y;
-      // - perto de 180% o lançamento já é muito forte.
-      multiplicadorX = 0.65 + danoEscalado / 34;
-      multiplicadorY = 0.65 + danoEscalado / 135;
+      // A porcentagem aumenta o lançamento gradualmente, sem multiplicar
+      // demais o knockback horizontal em valores médios de dano.
+      multiplicadorX = 0.65 + danoEscalado / 100;
+      multiplicadorY = 0.65 + danoEscalado / 180;
     }
 
     this.sprite.body.setVelocity(

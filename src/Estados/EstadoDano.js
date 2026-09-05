@@ -261,7 +261,9 @@ this.duracaoStun = this.personagem.ultimoImpacto?.hitstunCalculadoMs
   // Preserva a sensação original: o lançamento começa forte e
   // perde velocidade horizontal progressivamente, sem zerar do nada.
   if (body) {
-    body.setVelocityX(body.velocity.x * 0.965);
+    const delta = Math.max(this.personagem.scene.game.loop.delta, 1);
+    const freioPorFrame = Math.pow(0.965, delta / (1000 / 60));
+    body.setVelocityX(body.velocity.x * freioPorFrame);
   }
 
   this.atualizarAnimacaoDano();
