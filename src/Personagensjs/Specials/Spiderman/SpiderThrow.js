@@ -1,4 +1,5 @@
 import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
+import { registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
 
 export default class SpiderThrow {
   constructor(personagem, special, estado) {
@@ -119,6 +120,11 @@ export default class SpiderThrow {
     this.scene.physics.add.existing(this.hitboxTeia);
     this.hitboxTeia.body.setAllowGravity(false);
     this.hitboxTeia.body.debugBodyColor = 0xff0000;
+    registrarAtaqueEspecial(this, this.hitboxTeia, {
+      categoria: "corpo",
+      contraAtacarDono: false,
+      aoAtingirAlvo: (alvo) => this.processarAgarre(alvo),
+    });
 
     const oponentes =
       this.scene.scene.key === "CenaHistoria"
@@ -129,14 +135,7 @@ export default class SpiderThrow {
             (j) => j && j !== this.personagem
           );
 
-    oponentes.forEach((oponente) => {
-      if (!oponente) return;
-      this.overlap = this.scene.physics.add.overlap(
-        this.hitboxTeia,
-        oponente.grupoHurtbox,
-        () => this.processarAgarre(oponente)
-      );
-    });
+    this.overlap = null;
 
     // Tween para fazer a hitbox esticar horizontalmente acompanhando o disparo
     this.tweenTeia = this.scene.tweens.addCounter({

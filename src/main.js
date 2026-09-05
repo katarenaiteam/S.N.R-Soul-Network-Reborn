@@ -18,7 +18,7 @@ const config = {
     forceSetTimeout: true,
   },
 
-  parent: "game-conteiner",
+  parent: "game-container",
   physics: {
     default: "arcade",
     arcade: {

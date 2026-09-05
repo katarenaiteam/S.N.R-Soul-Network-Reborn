@@ -70,6 +70,7 @@ export default class Hadouken {
     registrarAtaqueEspecial(this, this.projetil, {
       categoria: "projetil",
       aoColidir: () => this.finalizarProjetil(true),
+      aoAtingirAlvo: (alvo) => this.processarAcerto(alvo),
     });
 
     this.criarColisoes();
@@ -80,17 +81,7 @@ export default class Hadouken {
   }
 
   criarColisoes() {
-    const oponentes = obterAlvosCombate(this.personagem);
-
-    this.overlaps = oponentes.map((oponente) =>
-      this.scene.physics.add.overlap(
-        this.projetil,
-        oponente.grupoHurtbox,
-        () => this.processarAcerto(oponente),
-        null,
-        this
-      )
-    );
+    this.overlaps = [];
 
     const plataformas = this.scene.mapaAtual?.plataformas
       || this.scene.plataformas

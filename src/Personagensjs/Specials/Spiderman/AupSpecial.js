@@ -1,4 +1,7 @@
-import { obterAlvosCombate } from "../../../Objetos/SistemaCombateEspecial.js";
+import {
+  obterAlvosCombate,
+  registrarAtaqueEspecial,
+} from "../../../Objetos/SistemaCombateEspecial.js";
 import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
 
 export default class SpiderAupSpecial {
@@ -57,23 +60,15 @@ export default class SpiderAupSpecial {
     this.ponta.body.setAllowGravity(false);
     this.ponta.body.setVelocity(540 * this.direcao, -720);
     this.ponta.body.debugBodyColor = 0x00ffff;
+    registrarAtaqueEspecial(this, this.ponta, {
+      categoria: "corpo",
+      contraAtacarDono: false,
+      aoAtingirAlvo: (alvo) => this.puxarInimigo(alvo),
+    });
 
     this.obterEstruturas().forEach((estrutura) => {
       this.colliders.push(
         this.scene.physics.add.collider(this.ponta, estrutura, () => this.ancorar())
-      );
-    });
-
-    obterAlvosCombate(this.personagem).forEach((alvo) => {
-      if (!alvo?.grupoHurtbox) return;
-      this.overlaps.push(
-        this.scene.physics.add.overlap(
-          this.ponta,
-          alvo.grupoHurtbox,
-          () => this.puxarInimigo(alvo),
-          null,
-          this
-        )
       );
     });
 

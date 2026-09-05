@@ -80,18 +80,9 @@ export default class MikuSpin {
       categoria: "corpo",
       contraAtacarDono: true,
       aoColidir: () => this.cancelar(),
+      aoAtingirAlvo: (alvo) => this.acertar(alvo),
     });
 
-    this.obterOponentes().forEach((oponente) => {
-      const overlap = this.scene.physics.add.overlap(
-        this.hitbox,
-        oponente.grupoHurtbox,
-        () => this.acertar(oponente),
-        null,
-        this
-      );
-      this.overlaps.push(overlap);
-    });
   }
 
   obterOponentes() {
@@ -232,6 +223,7 @@ export default class MikuSpin {
         this.personagem.sprite.x + 12 * this.direcao,
         this.personagem.sprite.y - 80
       );
+      this.hitbox.body?.updateFromGameObject();
     }
 
     const tempoDecorrido = this.scene.time.now - this.inicio;
@@ -301,7 +293,6 @@ MikuSpin.DURACAO_MINIMA = 800;
 MikuSpin.DURACAO_MAXIMA = 20000;
 MikuSpin.VELOCIDADE_MAXIMA_QUEDA = 85;
 MikuSpin.IMPULSO_FINAL_Y = -330;
-
 
 
 

@@ -95,19 +95,10 @@ export default class AupSpecial {
       entrada.colliderMapa = this.scene.physics.add.collider(mini, plataformas);
     }
 
-    obterAlvosCombate(this.personagem).forEach((alvo) => {
-      entrada.overlaps.push(this.scene.physics.add.overlap(
-        mini,
-        alvo.grupoHurtbox,
-        () => this.acertar(entrada, alvo),
-        null,
-        this
-      ));
-    });
-
     registrarAtaqueEspecial(this, mini, {
       categoria: "projetil",
       aoColidir: () => this.destruirMini(entrada),
+      aoAtingirAlvo: (alvo) => this.acertar(entrada, alvo),
     });
 
     entrada.timerVida = this.scene.time.delayedCall(

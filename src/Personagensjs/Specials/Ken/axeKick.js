@@ -11,7 +11,7 @@ const HITBOX = {
   largura: 80,
   altura: 45,
   offsetX: 25,
-  offsetY: -30,
+  offsetY: -10,
 };
 
 import { obterAlvosCombate, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
@@ -83,6 +83,7 @@ export default class AxeKick {
         VELOCIDADE_QUEDA
       );
       this.atualizarPosicaoHitbox();
+      this.verificarAcertoManual();
     }
 
     this.criarRastro();
@@ -101,24 +102,46 @@ export default class AxeKick {
     registrarAtaqueEspecial(this, this.hitbox, {
       categoria: "corpo",
       contraAtacarDono: true,
+      aoAtingirAlvo: (alvo) => this.acertarOponente(alvo),
     });
     this.atualizarPosicaoHitbox();
 
-    this.obterOponentes().forEach((oponente) => {
-      if (!oponente?.grupoHurtbox) return;
-      const overlap = this.scene.physics.add.overlap(
-        this.hitbox,
-        oponente.grupoHurtbox,
-        () => this.acertarOponente(oponente),
-        null,
-        this
-      );
-      this.overlaps.push(overlap);
-    });
   }
 
   obterOponentes() {
     return obterAlvosCombate(this.personagem);
+  }
+
+  verificarAcertoManual() {
+    const corpoHitbox = this.hitbox?.body;
+    if (this.finalizado || !corpoHitbox?.enable) return;
+
+    const limitesHitbox = new Phaser.Geom.Rectangle(
+      corpoHitbox.left,
+      corpoHitbox.top,
+      corpoHitbox.width,
+      corpoHitbox.height,
+    );
+
+    for (const oponente of this.obterOponentes()) {
+      const atingiu = oponente.grupoHurtbox.getChildren().some((hurtbox) => {
+        const corpoHurtbox = hurtbox?.body;
+        if (!hurtbox?.active || !corpoHurtbox?.enable) return false;
+        return Phaser.Geom.Intersects.RectangleToRectangle(
+          limitesHitbox,
+          new Phaser.Geom.Rectangle(
+            corpoHurtbox.left,
+            corpoHurtbox.top,
+            corpoHurtbox.width,
+            corpoHurtbox.height,
+          ),
+        );
+      });
+      if (atingiu) {
+        this.acertarOponente(oponente);
+        return;
+      }
+    }
   }
 
   acertarOponente(oponente) {
@@ -146,6 +169,7 @@ export default class AxeKick {
       this.personagem.sprite.x + HITBOX.offsetX * this.direcao,
       this.personagem.sprite.y + HITBOX.offsetY
     );
+    this.hitbox.body?.updateFromGameObject();
   }
 
   criarRastro() {

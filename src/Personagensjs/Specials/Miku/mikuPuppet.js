@@ -133,17 +133,7 @@ export default class MikuPuppet {
       categoria: "corpo",
       contraAtacarDono: false,
       aoColidir: () => this.limparHitboxAtaque(),
-    });
-
-    this.obterOponentes().forEach((oponente) => {
-      const overlap = this.scene.physics.add.overlap(
-        this.hitboxAtaque,
-        oponente.grupoHurtbox,
-        () => this.atacar(oponente),
-        null,
-        this
-      );
-      this.overlapsAtaque.push(overlap);
+      aoAtingirAlvo: (alvo) => this.atacar(alvo),
     });
 
     this.timerHitboxAtaque = this.scene.time.delayedCall(
@@ -482,6 +472,7 @@ export default class MikuPuppet {
         this.sprite.x + 34 * this.direcaoAtaque,
         this.sprite.y - 52
       );
+      this.hitboxAtaque.body?.updateFromGameObject();
     }
     if (
       this.scene.time.now < this.hitstunAte ||

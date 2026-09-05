@@ -59,6 +59,7 @@ export default class SpiderCounter {
     const sprite = this.personagem.sprite;
     if (!sprite?.active || !hitboxCounter.active) return;
     hitboxCounter.setPosition(sprite.x -5, sprite.y - 60);
+    hitboxCounter.body?.updateFromGameObject();
 
     // =========================================================
     // CHECAGEM GEOMÉTRICA MANUAL (Sem travas de overlap do Phaser)
@@ -76,22 +77,22 @@ export default class SpiderCounter {
 
     // Se houver uma hitbox de ataque ATIVA no oponente
     if (hitboxInimiga && hitboxInimiga.active) {
-      const boundsCounter = hitboxCounter.getBounds();
-      const boundsAtaque = hitboxInimiga.getBounds ? hitboxInimiga.getBounds() : hitboxInimiga.body;
+      const boundsCounter = this.obterLimitesCorpo(hitboxCounter);
+      const boundsAtaque = this.obterLimitesCorpo(hitboxInimiga);
 
       // Teste de interseção entre os retângulos
-      if (Phaser.Geom.Intersects.RectangleToRectangle(boundsCounter, boundsAtaque)) {
+      if (boundsCounter && boundsAtaque && Phaser.Geom.Intersects.RectangleToRectangle(boundsCounter, boundsAtaque)) {
         this.dispararContraAtaque(oponente);
         return;
       }
     }
 
     if (!this.counterAtivo || !hitboxCounter.active) return;
-    const boundsCounter = hitboxCounter.getBounds();
+    const boundsCounter = this.obterLimitesCorpo(hitboxCounter);
     const ataqueEspecial = obterAtaquesEspeciaisInimigos(this.scene, this.personagem)
       .find((ataque) => {
-        const boundsAtaque = ataque.objeto.getBounds?.() ?? ataque.objeto.body;
-        return boundsAtaque && Phaser.Geom.Intersects.RectangleToRectangle(
+        const boundsAtaque = this.obterLimitesCorpo(ataque.objeto);
+        return boundsCounter && boundsAtaque && Phaser.Geom.Intersects.RectangleToRectangle(
           boundsCounter,
           boundsAtaque
         );
@@ -105,6 +106,18 @@ export default class SpiderCounter {
         ataqueEspecial.contraAtacarDono
       );
     }
+  }
+
+  obterLimitesCorpo(objeto) {
+    const body = objeto?.body;
+    if (!objeto?.active || !body?.enable) return null;
+
+    return new Phaser.Geom.Rectangle(
+      body.left,
+      body.top,
+      body.width,
+      body.height,
+    );
   }
 
   dispararContraAtaque(oponente, causarDano = true) {

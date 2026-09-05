@@ -156,23 +156,11 @@ export default class Tatsumaki {
     registrarAtaqueEspecial(this, this.hitbox, {
       categoria: "corpo",
       contraAtacarDono: true,
+      aoAtingirAlvo: (alvo) => this.processarAcerto(alvo),
     });
 
     this.atualizarPosicaoHitbox();
 
-    this.obterOponentes().forEach((oponente) => {
-      if (!oponente?.grupoHurtbox) return;
-
-      const overlap = this.scene.physics.add.overlap(
-        this.hitbox,
-        oponente.grupoHurtbox,
-        () => this.processarAcerto(oponente),
-        null,
-        this
-      );
-
-      this.overlaps.push(overlap);
-    });
   }
 
   obterOponentes() {
@@ -321,6 +309,7 @@ export default class Tatsumaki {
       this.personagem.sprite.x + HITBOX.offsetX * this.direcao,
       this.personagem.sprite.y + HITBOX.offsetY
     );
+    this.hitbox.body?.updateFromGameObject();
   }
 
   aoCompletarAnimacao() {

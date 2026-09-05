@@ -24,7 +24,6 @@ export default class cenaPrincipal extends Phaser.Scene {
 
   create() {
     encerrarOutrasCenas(this);
-    this.physics.world.setBounds(0, 0, 1920, 640);
     //criar o mapa que vou estar
     // 1. Instancia o mapa dinâmico trazido do init
    this.mapaAtual = new this.ClasseMapa(this);
@@ -33,6 +32,18 @@ export default class cenaPrincipal extends Phaser.Scene {
    this.limitesArena = this.mapaAtual.limitesArena;
    this.pontoRespawnP1 = this.mapaAtual.spawnsRespawn.p1;
    this.pontoRespawnP2 = this.mapaAtual.spawnsRespawn.p2;
+
+   // O mapa Cidade usa coordenadas ate 2600x1400. O limite antigo de
+   // 1920x640 deixava toda a luta principal fora do mundo fisico.
+   const limitesMundo = this.mapaAtual.configCamera?.limites;
+   if (limitesMundo) {
+     this.physics.world.setBounds(
+       limitesMundo.x,
+       limitesMundo.y,
+       limitesMundo.largura,
+       limitesMundo.altura,
+     );
+   }
 
 
     // --- CONTROLE DE VIDAS ---
@@ -274,6 +285,16 @@ this.jogador2 = this.criarPersonagem(
     if (this.jogador1) this.jogador1.update();
     if (this.jogador2) this.jogador2.update();
 
+    // Neste ponto os dois jogadores ja sincronizaram suas hurtboxes. Fazer a
+    // verificacao tambem aqui evita depender da ordem P1 -> P2 ou do numero de
+    // passos de fisica que couberam no frame atual.
+    [this.jogador1, this.jogador2].forEach((jogador) => {
+      const estadoAtaque = jogador?.maquinaEstados?.estados?.atack;
+      if (jogador?.maquinaEstados?.estadoAtual === estadoAtaque) {
+        estadoAtaque.verificarAcertoManual?.();
+      }
+    });
+
     this.atualizarCamera();
 
     // Checa se alguém saiu da arena (passando o número do jogador como 3º argumento)
@@ -323,12 +344,14 @@ this.jogador2 = this.criarPersonagem(
   }
 
   respawnar(jogador, pontoRespawn) {
-    jogador.sprite.body.setVelocity(0, 0);
-    jogador.sprite.setPosition(pontoRespawn.x, pontoRespawn.y);
+    // reset sincroniza Game Object, Body, prev e prevFrame no mesmo instante.
+    // setPosition isolado deixava o Body na posicao anterior ate outro passo.
+    jogador.sprite.body.reset(pontoRespawn.x, pontoRespawn.y);
     jogador.isTumbling = false;
     jogador.comboHitsRecebidos = 0;
     jogador.tempoUltimoHit = -Infinity;
     jogador.maquinaEstados.mudarEstado("idle");
+    jogador.sincronizarHurtbox();
 
     if (jogador.porcentagemDano !== undefined) {
       jogador.porcentagemDano = 0;

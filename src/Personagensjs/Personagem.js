@@ -533,6 +533,11 @@ export default class Personagem {
       this.sprite.y +
         golpe.offsetY
     );
+
+    // setPosition move a Zone visual, mas o Arcade Body so seria atualizado no
+    // proximo passo da fisica. Em FPS baixo isso deixava a caixa vermelha e a
+    // caixa usada na colisao em frames diferentes.
+    estadoAtack.hitboxAtual.body?.updateFromGameObject();
   }
 }
 

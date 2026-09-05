@@ -11,6 +11,18 @@ export function destruirColisor(colisor) {
   }
 }
 
+function obterLimitesCorpo(objeto) {
+  const body = objeto?.body;
+  if (!objeto?.active || !body?.enable || !Number.isFinite(body.x) || !Number.isFinite(body.y)) return null;
+  return new Phaser.Geom.Rectangle(body.left, body.top, body.width, body.height);
+}
+
+function obterHurtboxesValidas(alvo) {
+  const grupo = alvo?.grupoHurtbox;
+  if (!grupo?.active || typeof grupo.getChildren !== "function") return [];
+  return grupo.getChildren().filter((hurtbox) => obterLimitesCorpo(hurtbox));
+}
+
 export function obterAlvosCombate(personagem) {
   const scene = personagem.scene;
   const jogadores = scene.scene.key === "CenaHistoria"
@@ -41,6 +53,7 @@ export function registrarAtaqueEspecial(logica, objeto, opcoes = {}) {
     // Invocacoes e projeteis devem apenas acionar o counter.
     contraAtacarDono: opcoes.contraAtacarDono === true,
     aoColidir: opcoes.aoColidir,
+    aoAtingirAlvo: opcoes.aoAtingirAlvo,
     colisores: new Set(),
     encerrado: false,
   };
@@ -54,10 +67,33 @@ export function registrarAtaqueEspecial(logica, objeto, opcoes = {}) {
       destruirColisor(colisor);
     });
     entrada.colisores.clear();
+    if (entrada.verificarAlvos) {
+      scene.events.off("postupdate", entrada.verificarAlvos);
+    }
     registro.delete(entrada);
   };
   entrada.remover = remover;
   objeto.once?.("destroy", remover);
+
+  if (entrada.aoAtingirAlvo) {
+    entrada.verificarAlvos = () => {
+      const limitesObjeto = obterLimitesCorpo(objeto);
+      if (!limitesObjeto || entrada.encerrado) return;
+
+      obterAlvosCombate(entrada.dono).forEach((alvo) => {
+        if (entrada.encerrado) return;
+        const atingiu = obterHurtboxesValidas(alvo).some((hurtbox) => {
+          const limitesHurtbox = obterLimitesCorpo(hurtbox);
+          return limitesHurtbox && Phaser.Geom.Intersects.RectangleToRectangle(
+            limitesObjeto,
+            limitesHurtbox,
+          );
+        });
+        if (atingiu && !entrada.encerrado) entrada.aoAtingirAlvo(alvo, objeto);
+      });
+    };
+    scene.events.on("postupdate", entrada.verificarAlvos);
+  }
 
   if (entrada.categoria === "projetil") {
     registro.forEach((outra) => {
@@ -68,6 +104,7 @@ export function registrarAtaqueEspecial(logica, objeto, opcoes = {}) {
         !outra.objeto?.active
       ) return;
 
+      if (!objeto.body || !outra.objeto.body) return;
       const colisor = scene.physics.add.overlap(objeto, outra.objeto, () => {
         if (entrada.encerrado || outra.encerrado) return;
         entrada.aoColidir?.(outra);

@@ -282,19 +282,10 @@ export default class NotaCarregada {
     registrarAtaqueEspecial(this, nota, {
       categoria: "projetil",
       aoColidir: () => this.destruirNota(entrada),
+      aoAtingirAlvo: (alvo) => this.acertar(entrada, alvo, direcao),
     });
 
-    const oponentes = obterAlvosCombate(this.personagem);
-
-    entrada.overlaps = oponentes.filter(Boolean).map((oponente) =>
-      this.scene.physics.add.overlap(
-        nota,
-        oponente.grupoHurtbox,
-        () => this.acertar(entrada, oponente, direcao),
-        null,
-        this
-      )
-    );
+    entrada.overlaps = [];
 
     const plataformas = this.scene.mapaAtual?.plataformas;
     if (plataformas) {

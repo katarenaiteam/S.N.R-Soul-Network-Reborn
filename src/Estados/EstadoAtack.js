@@ -45,6 +45,7 @@ export default class EstadoAtack extends EstadoBase {
      // verifica se jÃ¡ foi acertado o inimigo
      this.jaAcertou = false;
      this.colisoresOverlap = [];
+     this.alvosAtaque = [];
       // verifica se jÃ¡ foi criada a hitbox
      this.hitboxCriada = false;
      //define o tempo para imediato no relogio interno do phaser
@@ -422,23 +423,26 @@ export default class EstadoAtack extends EstadoBase {
 
     this.hitboxCriada = true;
 
-    this.personagem.tocarSomSorteado(
-      this.golpeAtual.vozAtaque ?? this.personagem.sons.vozAtaque,
-      { volume: this.personagem.sons.volumeVoz }
-    );
-
-    // ðŸ”Š SOM DE VENTO (No ar, quando o ataque Ã© gerado)
-    const somVento = this.golpeAtual.somVento || this.personagem.sons?.wind;
-    if (somVento) {
-      this.personagem.tocarSomSorteado(somVento, { volume: 0.1 });
-    }
-
     this.hitboxAtual = this.personagem.criarHitboxAtaque(
       this.golpeAtual.offsetX,
       this.golpeAtual.offsetY,
       this.golpeAtual.largura,
       this.golpeAtual.altura
     );
+
+    try {
+      this.personagem.tocarSomSorteado(
+        this.golpeAtual.vozAtaque ?? this.personagem.sons.vozAtaque,
+        { volume: this.personagem.sons.volumeVoz }
+      );
+
+      const somVento = this.golpeAtual.somVento || this.personagem.sons?.wind;
+      if (somVento) {
+        this.personagem.tocarSomSorteado(somVento, { volume: 0.1 });
+      }
+    } catch (erroAudio) {
+      console.warn("Falha ao tocar o som do ataque; hitbox mantida.", erroAudio);
+    }
     // VFX opcional criado junto da hitbox de ataques normais.
     // Specials usam EstadoSpecial e nÃ£o passam por este bloco.
     const configVFXAtaque = this.personagem.vfxAtaqueNormal;
@@ -524,6 +528,7 @@ export default class EstadoAtack extends EstadoBase {
       (alvo) => alvo?.ativo && alvo.dono !== this.personagem
     );
     alvos = [...new Set([...alvos, ...alvosExtras])];
+    this.alvosAtaque = alvos;
 
     alvos.forEach((alvo) => {
       if (!alvo || !alvo.grupoHurtbox) return;
@@ -532,47 +537,94 @@ export default class EstadoAtack extends EstadoBase {
         this.hitboxAtual,
         alvo.grupoHurtbox,
         (hitbox, hurtboxAtingida) => {
-          if (this.jaAcertou) return;
-
-          this.jaAcertou = true;
-
-          // ðŸ”Š SOM DE IMPACTO (Apenas se atingir um alvo)
-          const tipoImpacto = this.golpeAtual.tipoSomImpacto || "light";
-          const somImpacto = this.golpeAtual.somImpacto || this.personagem.sons?.[tipoImpacto];
-          if (somImpacto) {
-            this.personagem.tocarSomSorteado(somImpacto, { volume: 0.15 });
-          }
-
-          const valorDano = this.golpeAtual.propriedades?.dano || 0;
-          const origem = {
-            direcao: this.personagem.sprite.flipX ? -1 : 1,
-          };
-
-          // VFX acionar
-           this.personagem.vfx?.tocarListaImpacto(
-           this.golpeAtual.vfxAcerto,
-           alvo,
-           hitbox
-           );
-
-          alvo.receberDano(valorDano, this.golpeAtual.propriedades, origem);
-
-          if (this.golpeAtual.finalizarAoAcertarOponente && !this.finalizandoPorAcerto) {
-            this.finalizandoPorAcerto = true;
-            const atraso = this.golpeAtual.atrasoFinalizacaoAcerto ?? 0;
-
-            this.timerFinalizacaoAcerto = cena.time.delayedCall(atraso, () => {
-              if (this.personagem.maquinaEstados.estadoAtual === this) {
-                this.finalizarAtaque();
-              }
-            });
-          }
+          this.aplicarAcerto(alvo, hitbox);
         }
       );
 
       this.colisoresOverlap.push(colisor);
       alvo.registrarColisorRecebido?.(colisor);
     });
+  }
+
+  verificarAcertoManual() {
+    const corpoHitbox = this.hitboxAtual?.body;
+    if (this.jaAcertou || !this.hitboxAtual?.active || !corpoHitbox?.enable) return;
+
+    const limitesHitbox = new Phaser.Geom.Rectangle(
+      corpoHitbox.left,
+      corpoHitbox.top,
+      corpoHitbox.width,
+      corpoHitbox.height,
+    );
+
+    for (const alvo of this.alvosAtaque ?? []) {
+      if (!alvo?.grupoHurtbox || !alvo.sprite?.active) continue;
+
+      const atingiu = alvo.grupoHurtbox.getChildren().some((hurtbox) =>
+        hurtbox?.active && hurtbox.body?.enable &&
+        Phaser.Geom.Intersects.RectangleToRectangle(
+          limitesHitbox,
+          new Phaser.Geom.Rectangle(
+            hurtbox.body.left,
+            hurtbox.body.top,
+            hurtbox.body.width,
+            hurtbox.body.height,
+          ),
+        )
+      );
+
+      if (atingiu) {
+        this.aplicarAcerto(alvo, this.hitboxAtual);
+        return;
+      }
+    }
+  }
+
+  aplicarAcerto(alvo, hitbox) {
+    if (this.jaAcertou || !alvo?.receberDano) return;
+
+    this.jaAcertou = true;
+
+    // A colisao e o dano sao regra de jogo; audio e VFX sao apresentacao.
+    // Falhas de decodificacao de audio ou de renderizacao variam por navegador
+    // e nunca podem consumir o acerto antes de o dano ser aplicado.
+    const valorDano = this.golpeAtual.propriedades?.dano ?? 0;
+    const origem = {
+      direcao: this.personagem.sprite.flipX ? -1 : 1,
+    };
+
+    alvo.receberDano(valorDano, this.golpeAtual.propriedades, origem);
+
+    try {
+      const tipoImpacto = this.golpeAtual.tipoSomImpacto || "light";
+      const somImpacto = this.golpeAtual.somImpacto || this.personagem.sons?.[tipoImpacto];
+      if (somImpacto) {
+        this.personagem.tocarSomSorteado(somImpacto, { volume: 0.15 });
+      }
+    } catch (erroAudio) {
+      console.warn("Falha no som de impacto; dano mantido.", erroAudio);
+    }
+
+    try {
+      this.personagem.vfx?.tocarListaImpacto(
+        this.golpeAtual.vfxAcerto,
+        alvo,
+        hitbox,
+      );
+    } catch (erroVFX) {
+      console.warn("Falha no VFX de impacto; dano mantido.", erroVFX);
+    }
+
+    if (this.golpeAtual.finalizarAoAcertarOponente && !this.finalizandoPorAcerto) {
+      this.finalizandoPorAcerto = true;
+      const atraso = this.golpeAtual.atrasoFinalizacaoAcerto ?? 0;
+
+      this.timerFinalizacaoAcerto = this.personagem.scene.time.delayedCall(atraso, () => {
+        if (this.personagem.maquinaEstados.estadoAtual === this) {
+          this.finalizarAtaque();
+        }
+      });
+    }
   }
 
   // =========================
@@ -606,10 +658,15 @@ export default class EstadoAtack extends EstadoBase {
       if (colisor?.active && colisor.world) colisor.destroy();
     });
     this.colisoresOverlap = [];
+    this.alvosAtaque = [];
 
     if (this.hitboxAtual) {
-      this.hitboxAtual.destroy();
+      const hitboxEncerrada = this.hitboxAtual;
+      hitboxEncerrada.destroy();
       this.hitboxAtual = null;
+      if (this.personagem.hitboxAtiva === hitboxEncerrada) {
+        this.personagem.hitboxAtiva = null;
+      }
     }
 
     if (this.anulouGravidade) {
@@ -636,6 +693,3 @@ export default class EstadoAtack extends EstadoBase {
     this.finalizandoPorAcerto = false;
   }
 }
-
-
-

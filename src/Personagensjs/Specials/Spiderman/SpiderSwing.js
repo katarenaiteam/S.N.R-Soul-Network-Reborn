@@ -1,4 +1,5 @@
 import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
+import { obterAlvosCombate, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
 
 export default class SpiderSwing {
   constructor(personagem, special, estado) {
@@ -236,6 +237,11 @@ export default class SpiderSwing {
       this.hitboxAtaque.body.x = posX - this.hitboxWidth / 2;
       this.hitboxAtaque.body.y = posY - this.hitboxHeight / 2;
     }
+    registrarAtaqueEspecial(this, this.hitboxAtaque, {
+      categoria: "corpo",
+      contraAtacarDono: true,
+      aoAtingirAlvo: (alvo) => this.processarAcerto(alvo),
+    });
 
     const oponentes =
       this.scene.scene && this.scene.scene.key === "CenaHistoria"
@@ -246,14 +252,6 @@ export default class SpiderSwing {
             (j) => j && j !== this.personagem
           );
 
-    oponentes.forEach((oponente) => {
-      if (!oponente || !oponente.grupoHurtbox) return;
-      this.overlap = this.scene.physics.add.overlap(
-        this.hitboxAtaque,
-        oponente.grupoHurtbox,
-        () => this.processarAcerto(oponente)
-      );
-    });
   }
 
   atualizarTeia(direcao) {

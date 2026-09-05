@@ -51,28 +51,11 @@ export default class WebShot {
     registrarAtaqueEspecial(this, this.projetil, {
       categoria: "projetil",
       aoColidir: () => this.destruirEmChoque(),
+      aoAtingirAlvo: (alvo, projetil) => this.processarAcerto(alvo, projetil),
     });
 
     // Colisão com Inimigos
-    const oponentes = obterAlvosCombate(this.personagem);
-
     this.overlaps = [];
-
-    oponentes.forEach((oponente) => {
-      if (!oponente) return;
-
-      const overlap = this.scene.physics.add.overlap(
-        this.projetil,
-        oponente.grupoHurtbox,
-        () => {
-          this.processarAcerto(oponente, this.projetil);
-        },
-        null,
-        this
-      );
-
-      this.overlaps.push(overlap);
-    });
   }
 
   processarAcerto(alvo, projetil) {
