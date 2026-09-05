@@ -1,4 +1,5 @@
 import { obterAlvosCombate } from "../../../Objetos/SistemaCombateEspecial.js";
+import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
 
 export default class SpiderAupSpecial {
   constructor(personagem, special, estado) {
@@ -51,6 +52,7 @@ export default class SpiderAupSpecial {
       return;
     }
     this.ponta = this.scene.add.zone(x, y, 28, 28);
+    tocarSomSeguro(this.scene, "webshot", { volume: 0.2 });
     this.scene.physics.add.existing(this.ponta);
     this.ponta.body.setAllowGravity(false);
     this.ponta.body.setVelocity(540 * this.direcao, -720);

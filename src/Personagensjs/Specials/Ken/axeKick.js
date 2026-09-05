@@ -70,6 +70,12 @@ export default class AxeKick {
     const body = sprite?.body;
     if (this.finalizado || !sprite?.active || !body) return;
 
+    // Responde ao contato antes de voltar a aplicar a velocidade de descida.
+    if (this.emQueda && body.blocked.down) {
+      this.finalizarComQuique();
+      return;
+    }
+
     // Impede input ou gravidade de alterar os impulsos próprios do golpe.
     if (this.emQueda) {
       body.setVelocity(
@@ -81,9 +87,6 @@ export default class AxeKick {
 
     this.criarRastro();
 
-    if (this.emQueda && body.blocked.down) {
-      this.finalizarComQuique();
-    }
   }
 
   criarHitbox() {

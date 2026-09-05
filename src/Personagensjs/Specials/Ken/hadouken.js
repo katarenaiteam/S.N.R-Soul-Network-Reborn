@@ -169,9 +169,11 @@ export default class Hadouken {
   }
 
   atualizar() {
+    // O estado special e reutilizado; o projetil antigo nao controla o golpe seguinte.
     if (
       this.ehAereo &&
       this.personagem.maquinaEstados.estadoAtual === this.estado &&
+      this.estado.logicaSpecial === this &&
       !this.personagem.sprite.body.blocked.down
     ) {
       this.personagem.sprite.setVelocityX(0);

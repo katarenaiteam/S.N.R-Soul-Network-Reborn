@@ -1,9 +1,11 @@
+import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 export default class CenaGameOver extends Phaser.Scene {
   constructor() {
     super({ key: "CenaGameOver" });
   }
 
   create() {
+    encerrarOutrasCenas(this);
     this.cameras.main.setBackgroundColor("#05050a");
 
     // 1. CONTAINER PARA O MENU

@@ -1,3 +1,4 @@
+import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 //import * as Phaser from "phaser";
 import Madotsuki from "../Personagensjs/Madotsuki.js";
 import MapaCidade from "../Mapasjs/Cidade.js";
@@ -22,13 +23,7 @@ export default class cenaPrincipal extends Phaser.Scene {
   }
 
   create() {
-    // A luta e exclusiva. Nenhum menu pode continuar atualizando input,
-    // timers ou audio por baixo dela, inclusive quando aberta pelo console.
-    ["CenaStart", "Charmenu", "CenaSelecaoMapa", "CenaHistoria", "CenaGameOver", "CenaCreditos"]
-      .forEach((key) => {
-        if (this.scene.isActive(key)) this.scene.stop(key);
-      });
-
+    encerrarOutrasCenas(this);
     this.physics.world.setBounds(0, 0, 1920, 640);
     //criar o mapa que vou estar
     // 1. Instancia o mapa dinâmico trazido do init
@@ -203,6 +198,10 @@ this.jogador2 = this.criarPersonagem(
   }
 
   criarHudPartida(jogador, personagem, x, y, ladoDireito) {
+    // Todos os retratos ocupam a mesma largura e ficam alinhados pela base.
+    // A altura vem da proporção original para não esticar imagens diferentes.
+    const larguraRetrato = 440;
+    const alturaBaseRetrato = 358;
     const retratoPorPersonagem = {
       SpiderMan: "Sp_portrait",
       Miku: "Miku_portrait",
@@ -212,13 +211,12 @@ this.jogador2 = this.criarPersonagem(
     const chaveRetrato = retratoPorPersonagem[personagem];
 
     if (chaveRetrato) {
-      const tamanhoRetrato = personagem === "Miku"
-        ? { largura: 468, altura: 380 }
-        : { largura: 440, altura: 358 };
-      const ajusteY = personagem === "Miku" ? -22 : 0;
+      const frameRetrato = this.textures.get(chaveRetrato).getSourceImage();
+      const alturaRetrato = larguraRetrato * (frameRetrato.height / frameRetrato.width);
+      const ajusteY = alturaBaseRetrato - alturaRetrato;
       const retrato = this.add.image(0, ajusteY, chaveRetrato)
         .setOrigin(ladoDireito ? 1 : 0, 0)
-        .setDisplaySize(tamanhoRetrato.largura, tamanhoRetrato.altura);
+        .setDisplaySize(larguraRetrato, alturaRetrato);
       hud.add(retrato);
     }
 

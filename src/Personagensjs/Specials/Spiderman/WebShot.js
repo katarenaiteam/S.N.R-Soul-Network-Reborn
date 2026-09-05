@@ -1,4 +1,5 @@
 import { obterAlvosCombate, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
+import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
 
 export default class WebShot {
   constructor(personagem, special) {
@@ -14,6 +15,7 @@ export default class WebShot {
 
   executar() {
     if (this.projetil || this.timer) return;
+    tocarSomSeguro(this.scene, "sp-WebBall_", { volume: 0.2 });
 
     // Delay de 400ms para casar com a animação do Homem-Aranha
     this.timer = this.scene.time.delayedCall(400, () => {
@@ -32,6 +34,7 @@ export default class WebShot {
     const y = sprite.y - 60;
 
     this.projetil = this.scene.physics.add.sprite(x, y, "webshot", 4);
+    tocarSomSeguro(this.scene, "webshot", { volume: 0.2 });
 
     if (this.scene.camHUD) {
       this.scene.camHUD.ignore(this.projetil);

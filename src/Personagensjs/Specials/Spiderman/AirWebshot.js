@@ -1,5 +1,6 @@
 // AirWebshot.js
 import { obterAlvosCombate, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
+import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
 export default class AirWebShot {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
@@ -17,6 +18,7 @@ export default class AirWebShot {
 
     // Só executa se o Homem-Aranha estiver no ar
     if (this.personagem.sprite.body.blocked.down) return;
+    tocarSomSeguro(this.scene, "sp-WebBall_", { volume: 0.2 });
 
     // Reduz a velocidade Y para dar a leve "flutuada" no ar
     this.personagem.sprite.setVelocityY(40);
@@ -36,6 +38,7 @@ export default class AirWebShot {
 
     // 1. Cria o projétil da teia
     this.projetil = this.scene.physics.add.sprite(x, y, "webshot", 4);
+    tocarSomSeguro(this.scene, "webshot", { volume: 0.2 });
 
     if (this.scene.camHUD) {
       this.scene.camHUD.ignore(this.projetil);

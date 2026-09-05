@@ -10,7 +10,9 @@ export default class EstadoDash extends EstadoBase {
     this.personagem.estaEmDash = true;
     this.personagem.dashs++; // Incrementa para respeitar o maxDash!
 
-    this.personagem.tocarAnimacao("dash");
+    const segundoDashAereo = !this.personagem.sprite.body.blocked.down &&
+      this.personagem.dashs === 2 && this.personagem.animacaoSegundoDash;
+    this.personagem.tocarAnimacao(segundoDashAereo || "dash", true);
 
     let direcao = this.personagem.inputDown("esquerda")
       ? -1
@@ -25,7 +27,9 @@ export default class EstadoDash extends EstadoBase {
     this.personagem.sprite.setVelocityX(direcao * 700);
 
     // Timer de 250ms do Dash
-    this.personagem.scene.time.delayedCall(250, () => {
+    this.timerDash = this.personagem.scene.time.delayedCall(250, () => {
+      this.timerDash = null;
+      if (this.personagem.maquinaEstados.estadoAtual !== this) return;
       this.personagem.estaEmDash = false;
       this.personagem.sprite.body.setAllowGravity(true);
 
@@ -60,5 +64,12 @@ export default class EstadoDash extends EstadoBase {
       this.personagem.sprite.setVelocityX(direcao * 700);
       this.personagem.sprite.setVelocityY(0);
     }
+  }
+
+  exit() {
+    this.timerDash?.remove(false);
+    this.timerDash = null;
+    this.personagem.estaEmDash = false;
+    this.personagem.sprite.body.setAllowGravity(true);
   }
 }

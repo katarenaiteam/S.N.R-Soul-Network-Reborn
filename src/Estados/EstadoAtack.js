@@ -422,6 +422,11 @@ export default class EstadoAtack extends EstadoBase {
 
     this.hitboxCriada = true;
 
+    this.personagem.tocarSomSorteado(
+      this.golpeAtual.vozAtaque ?? this.personagem.sons.vozAtaque,
+      { volume: this.personagem.sons.volumeVoz }
+    );
+
     // ðŸ”Š SOM DE VENTO (No ar, quando o ataque Ã© gerado)
     const somVento = this.golpeAtual.somVento || this.personagem.sons?.wind;
     if (somVento) {

@@ -1,3 +1,4 @@
+import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import Cidade from "../Mapasjs/Cidade.js";
 import SkyTowers from "../Mapasjs/SkyTowers.js";
@@ -16,6 +17,7 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
   }
 
   create() {
+    encerrarOutrasCenas(this);
     this.cameras.main.setBackgroundColor("#05050a");
 
     // 1. CONTAINER PARA O MENU

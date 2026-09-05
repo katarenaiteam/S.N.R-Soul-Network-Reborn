@@ -1,3 +1,15 @@
+// Posicao relativa ao ponto usado em cada chamada abaixo.
+// offsetX positivo = para a frente do Aranha; offsetY positivo = para baixo.
+// camadas soma a luz do efeito sem reintroduzir o fundo preto.
+const AJUSTES_EFEITOS_ULT = {
+  poseEffect: { offsetX: 0, offsetY: -10, camadas: 3 },
+  dashEffect: { offsetX: 15, offsetY: 50, camadas: 2 },
+  "2impact": { offsetX: 0, offsetY: 0, camadas: 2 },
+  "3impact": { offsetX: 0, offsetY: 0, camadas: 2 },
+  "4impact": { offsetX: 0, offsetY: 0, camadas: 2 },
+  finalImpact: { offsetX: -20, offsetY: -20, camadas: 2 }
+};
+
 export default class SpiderUlt {
   constructor(personagem, configUlt, estadoFSM) {
     this.personagem = personagem;
@@ -21,6 +33,8 @@ export default class SpiderUlt {
     this.timerFalhaUlt = null;
     this.intervaloTremorFinal = null;
     this.posCameraAntesTremor = null;
+    this.efeitosUlt = new Set();
+    this.efeitoPose = null;
   }
 
   executar() {
@@ -53,6 +67,11 @@ export default class SpiderUlt {
     const tempoZoom = 200;
     const tempoPausaExtra = 500;
     const tempoTotalFreeze = tempoZoom + tempoPausaExtra;
+    this.efeitoPose = this.tocarEfeitoUlt("poseEffect", {
+      x: this.personagem.sprite.x,
+      y: this.personagem.sprite.y,
+      duracao: tempoTotalFreeze
+    });
 
     const zoomAtual = cam.zoom;
     cam.pan(this.personagem.sprite.x, this.personagem.sprite.y, tempoZoom, "Power2");
@@ -89,6 +108,14 @@ export default class SpiderUlt {
   }
 
   iniciarAvançoTrigger(dir) {
+    this.efeitoPose?.destroy();
+    this.efeitoPose = null;
+    this.tocarEfeitoUlt("dashEffect", {
+      x: this.personagem.sprite.x,
+      y: this.personagem.sprite.y,
+      origemY: 0.8,
+      direcao: dir
+    });
     this.aplicarRitmoAnimacoes();
     this.emAvanço = true;
     this.conectou = false;
@@ -293,7 +320,7 @@ export default class SpiderUlt {
         easeOponente: "Cubic.easeOut"
       },
       {
-        duracao: 300,
+        duracao: 200,
         animAranha: "spy_ult3",
         animOponente: "danoUp",
         dano: 8,
@@ -541,14 +568,14 @@ export default class SpiderUlt {
     if (!this.oponente?.sprite) return;
 
     const impactoPesado = etapa.impactoPesado || etapa.dano >= 8;
-    const efeitos = impactoPesado
-      ? ["punch2", "punch3"]
-      : ["punch1", "punch2", "punch3"];
-
-    this.personagem.vfx?.tocarListaImpacto(
-      [{ escolherUm: efeitos, escala: impactoPesado ? 1.15 : 0.85 }],
-      this.oponente
-    );
+    // O efeito final nasce junto do freeze em executarImpactoFinal.
+    if (etapa.animAranha !== "spy_ult8") {
+      this.tocarEfeitoUlt(Phaser.Utils.Array.GetRandom(["2impact", "3impact", "4impact"]), {
+        x: this.oponente.sprite.x,
+        y: this.oponente.sprite.y - 50,
+        escala: impactoPesado ? 0.65 : 0.5
+      });
+    }
 
     const tipoSom = impactoPesado ? "heavy" : "light";
     const sonsImpacto = etapa.somImpacto || this.personagem.sons?.[tipoSom];
@@ -559,6 +586,74 @@ export default class SpiderUlt {
       if (etapa.somImpacto) configSom.detune = 0;
       this.personagem.tocarSomSorteado(sonsImpacto, configSom);
     }
+  }
+
+  tocarEfeitoUlt(textura, opcoes = {}) {
+    if (!this.scene.textures.exists(textura)) return null;
+
+    // Exclui as celulas vazias no fim das spritesheets.
+    const ultimosFrames = {
+      poseEffect: 15, dashEffect: 11,
+      "2impact": 5, "3impact": 10, "4impact": 11, finalImpact: 9
+    };
+    const animacao = `spider_vfx_${textura}`;
+    if (!this.scene.anims.exists(animacao)) {
+      this.scene.anims.create({
+        key: animacao,
+        frames: this.scene.anims.generateFrameNumbers(textura, {
+          start: 0, end: ultimosFrames[textura]
+        }),
+        frameRate: 28,
+        repeat: 0
+      });
+    }
+
+    const sprite = this.personagem.sprite;
+    const ajustes = AJUSTES_EFEITOS_ULT[textura];
+    const direcaoAranha = sprite.flipX ? -1 : 1;
+    const efeito = this.scene.add.sprite(
+      opcoes.x + ajustes.offsetX * direcaoAranha,
+      opcoes.y + ajustes.offsetY,
+      textura
+    );
+    efeito.setOrigin(opcoes.origemX ?? 0.5, opcoes.origemY ?? 0.5);
+    efeito.setScale(opcoes.escala ?? 0.85);
+    efeito.setDepth(sprite.depth + 2);
+    efeito.setFlipX((opcoes.direcao ?? (sprite.flipX ? -1 : 1)) === -1);
+    efeito.setRotation(opcoes.rotacao ?? 0);
+    // Mesmo filtro dos efeitos da Miku: elimina o preto e soma a luz.
+    efeito.setBlendMode(Phaser.BlendModes.ADD);
+    efeito.setAlpha(1);
+    this.scene.camHUD?.ignore(efeito);
+    this.efeitosUlt.add(efeito);
+    efeito.once("destroy", () => this.efeitosUlt.delete(efeito));
+    efeito.once("animationcomplete", () => efeito.destroy());
+    efeito.play(animacao);
+    if (opcoes.duracao) {
+      efeito.anims.timeScale = efeito.anims.currentAnim.duration / opcoes.duracao;
+    }
+    // Reforca a luminosidade com passadas aditivas sincronizadas.
+    // Funciona tambem sem pipelines de pos-processamento.
+    for (let i = 1; i < ajustes.camadas; i++) {
+      const reforco = this.scene.add.sprite(efeito.x, efeito.y, textura);
+      reforco.setOrigin(efeito.originX, efeito.originY);
+      reforco.setScale(efeito.scaleX, efeito.scaleY);
+      reforco.setDepth(efeito.depth);
+      reforco.setFlipX(efeito.flipX);
+      reforco.setRotation(efeito.rotation);
+      reforco.setBlendMode(Phaser.BlendModes.ADD);
+      this.scene.camHUD?.ignore(reforco);
+      reforco.play(animacao);
+      reforco.anims.timeScale = efeito.anims.timeScale;
+      efeito.once("destroy", () => reforco.destroy());
+    }
+    return efeito;
+  }
+
+  limparEfeitosUlt() {
+    this.efeitosUlt.forEach((efeito) => efeito.destroy());
+    this.efeitosUlt.clear();
+    this.efeitoPose = null;
   }
 
   ativarFundoUltimate() {
@@ -711,6 +806,17 @@ export default class SpiderUlt {
     const cam = this.scene.cameras.main;
     const aranhaSprite = this.personagem.sprite;
     const oponenteSprite = this.oponente?.sprite;
+    if (oponenteSprite) {
+      this.tocarEfeitoUlt("finalImpact", {
+        x: oponenteSprite.x,
+        y: oponenteSprite.y - 50,
+        origemX: 0.75,
+        // A arte aponta para a direita; acompanha o vetor do knockback final.
+        direcao: 1,
+        rotacao: Math.atan2(1200, 500 * dir),
+        escala: 1.15
+      });
+    }
 
     // 1. ATIVA FLAG DE CONTROLE
     this.congelado = true;
@@ -784,6 +890,7 @@ export default class SpiderUlt {
   }
 
   finalizarCinematica() {
+    this.limparEfeitosUlt();
     this.congelado = false;
     this.pararTremorFinal();
     if (this.timerFalhaUlt) {
@@ -819,6 +926,7 @@ export default class SpiderUlt {
     }
   }
   cancelar() {
+    this.limparEfeitosUlt();
     this.congelado = false;
     this.pararTremorFinal();
     if (this.timerFalhaUlt) {

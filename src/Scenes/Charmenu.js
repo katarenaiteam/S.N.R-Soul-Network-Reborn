@@ -1,3 +1,4 @@
+import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import { tocarMusicaSegura } from "../Objetos/AudioSeguro.js";
 
@@ -12,6 +13,7 @@ export default class Charmenu extends Phaser.Scene {
     }
 
     create() {
+    encerrarOutrasCenas(this);
         this.add.image(0, 0, "Charmenu").setOrigin(0, 0).setDisplaySize(this.scale.width, this.scale.height);
 
         this.musica = tocarMusicaSegura(this, 'katarenai8bit', { loop: true, volume: 0.1 });

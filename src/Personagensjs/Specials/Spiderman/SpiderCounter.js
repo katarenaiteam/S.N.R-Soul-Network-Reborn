@@ -1,4 +1,5 @@
 import { obterAtaquesEspeciaisInimigos } from "../../../Objetos/SistemaCombateEspecial.js";
+import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
 
 export default class SpiderCounter {
   constructor(personagem, special, estado) {
@@ -19,6 +20,7 @@ export default class SpiderCounter {
     this.desativarCounter();
 
     this.counterAtivo = true;
+    tocarSomSeguro(this.scene, "sp-close", { volume: 0.2 });
 
     if (this.personagem) {
       this.invulnerabilidadeAnterior = this.personagem.invulneravel;

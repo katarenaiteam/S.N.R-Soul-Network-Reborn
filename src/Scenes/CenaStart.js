@@ -1,3 +1,4 @@
+import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 
 export default class CenaStart extends Phaser.Scene {
@@ -6,6 +7,7 @@ export default class CenaStart extends Phaser.Scene {
   }
 
   create(dados = {}) {
+    encerrarOutrasCenas(this);
     this.cameras.main.setBackgroundColor("#000000");
     const entradaDoPreload = dados.entradaPreload === true;
     if (entradaDoPreload) {

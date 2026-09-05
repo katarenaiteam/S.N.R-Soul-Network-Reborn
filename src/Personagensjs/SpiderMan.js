@@ -24,7 +24,7 @@ export default class SpiderMan extends Personagem {
         velocidade: 240,
         forcaPulo: -600,
         maxPulos: 3,
-        maxDash: 1,
+        maxDash: 2,
         maxComboIndex: 3,
       },
 
@@ -32,6 +32,8 @@ export default class SpiderMan extends Personagem {
       "spy_",
       controle,
     );
+
+    this.animacaoSegundoDash = "dash2";
 
      this.configVFX = {
   ...this.configVFX,
@@ -92,6 +94,29 @@ export default class SpiderMan extends Personagem {
         hurtboxes: [
           { largura: 60, altura: 70, offsetX: 0, offsetY: -90 }, // Tronco/cabeça
           { largura: 30, altura: 50, offsetX: -20, offsetY: -25 }, // parte de baixo parecida
+        ],
+      },
+
+      dash: {
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: 96,
+        escala: 1,
+        hurtboxes: [
+          { largura: 60, altura: 70, offsetX: 0, offsetY: -60 },
+          { largura: 50, altura: 25, offsetX: -10, offsetY: -18 },
+        ],
+      },
+
+      dash2: {
+        largura: 85,
+        altura: 95,
+        offsetX: 2.5,
+        offsetY: 13,
+        escala: 1,
+        hurtboxes: [
+          { largura: 70, altura: 70, offsetX: 0, offsetY: -55 },
         ],
       },
 
@@ -371,14 +396,13 @@ export default class SpiderMan extends Personagem {
       },
    };
 
-   //   this.sons = {
-   //  ...this.sons,
-   //  pulo: ['spy_pulo_1', 'spy_pulo_2'],
-   //  dash: ['spy_web_dash'],
-   //  wind: ['spy_whoosh_leve'],
-   // light: ['spy_hit_light_1'],
-   //  heavy: ['spy_hit_heavy_1']
-   // };
+    this.sons = {
+      ...this.sons,
+      vozAtaque: ["sp-atack", "sp-atack2", "sp-atack3"],
+      vozDanoNormal: ["sp-hurt", "sp-hurt2"],
+      vozDanoForte: ["sp-hurt", "sp-hurt2", "sp-hurt3"],
+      volumeVoz: 0.2,
+    };
 
 
   
@@ -409,7 +433,7 @@ export default class SpiderMan extends Personagem {
           tipoSomImpacto: "light",
           dano: 4,
           knockbackX: 40,
-          knockbackY: -10,
+          knockbackY: -20,
           knockbackFixo: true,
         },
 
@@ -444,7 +468,7 @@ export default class SpiderMan extends Personagem {
           tipoSomImpacto: "light",
           dano: 4,
           knockbackX: 30,
-          knockbackY: -10,
+          knockbackY: -30,
           knockbackFixo: true,
         },
 
@@ -493,14 +517,15 @@ export default class SpiderMan extends Personagem {
         offsetY: -25,
         largura: 75,
         altura: 30,
-        cooldown: 700,
+        cooldown: 500,
         duracao: 560,
         cancelavel: true,
         propriedades: {
           tipoSomImpacto: "heavy",
-          dano: 8,
+          dano: 6,
           knockbackX: 50,
-          knockbackY: -100,
+          knockbackY: -350,
+          knockbackFixo: true,
           tumbling: true
           //freioKnockback: 700
         },
@@ -515,6 +540,12 @@ export default class SpiderMan extends Personagem {
         cooldown: 900,
         duracao: 300,
         cancelavel: true,
+
+        vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
@@ -535,11 +566,18 @@ export default class SpiderMan extends Personagem {
         cooldown: 500,
         duracao: 300,
         cancelavel: true,
+        knockbackFixo: true,
+
+        vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
         propriedades: {
           tipoSomImpacto: "light",
-          dano: 12,
+          dano: 11,
           knockbackX: 90,
-          knockbackY: -200,
+          knockbackY: -300,
           tumbling: true
         },
       },
@@ -554,6 +592,11 @@ export default class SpiderMan extends Personagem {
   cooldown: 500,
 
   duracao: 1000,
+
+  vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
 
   finalizarAoTocarChao: true,
   atrasoFinalizacaoChao: 90,
@@ -580,7 +623,7 @@ export default class SpiderMan extends Personagem {
 
   propriedades: {
     tipoSomImpacto: "heavy",
-    dano: 12,
+    dano: 11,
     knockbackX: 50,
     knockbackY: 400,
     quiqueChaoY: 350,
@@ -595,7 +638,26 @@ export default class SpiderMan extends Personagem {
         largura: 65,
         altura: 55,
         cooldown: 500,
-        duracao: 350,
+        duracao: 350, 
+        cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
+         movimento: {
+    inicio: 0,
+    fim: 300,
+
+    x: {
+      de: 300,
+      para: 450,
+    },
+
+    curva: "easeOut",
+  },
+
         finalizarAoTocarChao: false,
         atrasoFinalizacaoChao: 100,
         finalizarAoAcertarOponente: false,
@@ -617,8 +679,13 @@ export default class SpiderMan extends Personagem {
         largura: 50,
         altura: 50,
         cooldown: 900,
-        // Finalização do ataque
         duracao: 300,
+
+        vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
         finalizarAoTocarChao: false,
         atrasoFinalizacaoChao: 100,
         finalizarAoAcertarOponente: false,
@@ -628,8 +695,8 @@ export default class SpiderMan extends Personagem {
     fim: 300,
 
     y: {
-      de: -200,
-      para: -350,
+      de: -350,
+      para: -200,
     },
 
     curva: "easeOut",
@@ -637,7 +704,7 @@ export default class SpiderMan extends Personagem {
 
         propriedades: {
           tipoSomImpacto: "heavy",
-          dano: 12,
+          dano: 11,
           knockbackX: 60,
           knockbackY: -600,
           impulsoX: 30,
@@ -702,7 +769,7 @@ export default class SpiderMan extends Personagem {
         // atrasoFinalizacaoChao: 50,
         // finalizarAoAcertarOponente: false,
         propriedades: {
-          dano: 10,
+          dano: 5,
           knockbackX: 0,
           knockbackY: 0,
           anularGravidade: true,
@@ -722,9 +789,9 @@ export default class SpiderMan extends Personagem {
         // finalizarAoAcertarOponente: false,
         propriedades: {
           travarMovimentoAir: true,
-          dano: 10,
-          knockbackX: 500,
-          knockbackY: -180,
+          dano: 21,
+          knockbackX: 600,
+          knockbackY: -10,
           anularGravidade: true,
           //impulsoX: 0,                    
           //impulsoY: 0,
@@ -866,6 +933,13 @@ if (!scene.anims.exists("punch_effect3")) {
       repeat: 0,
     });
 
+    scene.anims.create({
+      key: "spy_dash2",
+      frames: scene.anims.generateFrameNumbers("Spiderflip", { start: 0, end: 8 }),
+      frameRate: 36,
+      repeat: 0,
+    });
+
      scene.anims.create({
       key: "spy_guard",
       frames: scene.anims.generateFrameNumbers("SpiderMan_guard", {
@@ -979,7 +1053,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 6,
       }),
-      frameRate: 11,
+      frameRate: 16,
       repeat: 0,
     });
 

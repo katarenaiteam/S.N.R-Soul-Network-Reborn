@@ -64,18 +64,15 @@ export function instalarComandosDebug(game) {
         return false;
       }
 
-      const origem = cenaAtual();
-
-      if (origem) {
-        // ScenePlugin.start garante a ordem correta: primeiro encerra a cena
-        // que possui os inputs e depois inicia o destino.
-        game.scene.getScenes(true)
-          .filter((scene) => scene !== origem)
-          .forEach((scene) => game.scene.stop(scene.scene.key));
-        origem.scene.start(destino, dados ?? {});
-      } else {
-        game.scene.start(destino, dados ?? {});
-      }
+      // Inclui cenas pausadas/adormecidas e encerra antes de iniciar o destino.
+      // Nao deixa um start enfileirado na cena antiga entre comandos do console.
+      game.scene.getScenes(false).forEach((scene) => {
+        if (scene.sys.isActive() || scene.sys.isPaused() || scene.sys.isSleeping()) {
+          game.scene.stop(scene.scene.key);
+        }
+      });
+      game.sound.stopAll();
+      game.scene.start(destino, dados ?? {});
       console.log(`Indo para: ${destino}`);
       return true;
     },
@@ -96,7 +93,7 @@ export function instalarComandosDebug(game) {
         };
       }
 
-      scene.scene.restart(dadosReset ?? {});
+      api.ir(scene.scene.key, dadosReset ?? {});
       console.log(`Cena reiniciada: ${scene.scene.key}`);
       return true;
     },

@@ -65,6 +65,11 @@ export default class Personagem {
 
     // sons
     this.sons = {
+      // Cada personagem preenche suas proprias vozes; listas vazias ficam mudas.
+      vozAtaque: [],
+      vozDanoNormal: [],
+      vozDanoForte: [],
+      volumeVoz: 0.2,
       pulo: ['jump1'],
       pouso: ['generic-landing1', 'generic-landing2'],
       dash: ['dash1', 'dash2'],
@@ -200,6 +205,18 @@ export default class Personagem {
     this.porcentagemDano += quantidade;
     if (this.textoDano) this.textoDano.setText(`${Math.floor(this.porcentagemDano)}%`);
 
+    if (quantidade > 0) {
+      // tipoVozDano: "normal" ou "forte" permite escolher por golpe.
+      const tipoVoz = propriedades.tipoVozDano ?? (
+        propriedades.tipoSomImpacto === "heavy" || propriedades.tumbling
+          ? "forte" : "normal"
+      );
+      this.tocarSomSorteado(
+        tipoVoz === "forte" ? this.sons.vozDanoForte : this.sons.vozDanoNormal,
+        { volume: this.sons.volumeVoz }
+      );
+    }
+
     // Hiper armadura recebe o dano normalmente, mas um número limitado de
     // golpes não aplica knockback nem interrompe o estado atual.
     if (this.hiperArmaduraHits > 0) {
@@ -299,13 +316,29 @@ export default class Personagem {
   // --- LOOP PRINCIPAL ---
  update() {
     const noChao = this.sprite.body.blocked.down;
+    const baseCorpo = this.sprite.body.bottom;
+
+    if (!noChao) {
+      this.menorBaseNoAr = Math.min(
+        this.menorBaseNoAr ?? this.ultimaBaseNoChao ?? baseCorpo,
+        baseCorpo
+      );
+    }
 
     if (noChao && !this.estavaNoChao) {
       this.pulos = 0;
       this.dashs = 0;
       this.resetarCooldownsAereos();
-      this.tocarSomSorteado(this.sons.pouso, { volume: 0.4 });
-      this.scene.time.delayedCall(0, () => this.aplicarSquashPouso());
+      // Perder blocked.down durante o dash horizontal nao e uma queda.
+      // Exige deslocamento vertical real antes de tocar o som e comprimir o sprite.
+      if (baseCorpo - (this.menorBaseNoAr ?? baseCorpo) > 4) {
+        this.tocarSomSorteado(this.sons.pouso, { volume: 0.4 });
+        this.scene.time.delayedCall(0, () => this.aplicarSquashPouso());
+      }
+    }
+    if (noChao) {
+      this.ultimaBaseNoChao = baseCorpo;
+      this.menorBaseNoAr = null;
     }
     this.estavaNoChao = noChao;
 

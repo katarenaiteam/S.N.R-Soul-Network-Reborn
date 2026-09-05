@@ -1,3 +1,4 @@
+import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import Morrigan from "../Personagensjs/Morr.js";
 import Madotsuki from "../Personagensjs/Madotsuki.js";
 import SkyTowers from "../Mapasjs/SkyTowers.js";
@@ -23,6 +24,7 @@ export default class CenaHistoria extends Phaser.Scene {
   }
 
   create() {
+    encerrarOutrasCenas(this);
     this.physics.world.setBounds(0, 0, 2600, 1400);
 
     this.mapaAtual = new SkyTowers(this);

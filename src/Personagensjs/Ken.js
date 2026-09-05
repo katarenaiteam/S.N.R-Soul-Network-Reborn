@@ -381,6 +381,28 @@ this.nomePersonagem = "Ken";
    };
     
   
+    // Corrige somente a entrada e a saida dos especiais envolvidos no bug.
+    const especiaisComAjuste = ["ken_AneSpecial", "ken_doSpecial", "ken_AdoSpecial"];
+    let animacaoAnterior = this.sprite.anims.currentAnim?.key;
+    this.sprite.on("animationstart", (animacao) => {
+      const anterior = animacaoAnterior;
+      animacaoAnterior = animacao.key;
+      if (animacao.key === "ken_dash" || anterior === "ken_dash") return;
+      if (!especiaisComAjuste.includes(animacao.key) &&
+          !especiaisComAjuste.includes(anterior)) return;
+
+      const body = this.sprite.body;
+      const centroX = body.center.x;
+      const baseY = body.bottom;
+      this.aplicarConfiguracao(animacao.key.replace(this.prefixoAnim, ""));
+      body.updateFromGameObject();
+      this.sprite.x += centroX - body.center.x;
+      this.sprite.y += baseY - body.bottom;
+      body.updateFromGameObject();
+      // A posicao ja foi aplicada ao sprite; postUpdate nao deve soma-la de novo.
+      body.prevFrame.copy(body.position);
+    });
+
     // ============================ tabela de golpes =====================================
     this.golpes = {
       neutro1: {
@@ -529,13 +551,11 @@ this.nomePersonagem = "Ken";
         duracao: 350,
          finalizarAoTocarChao: true,
         atrasoFinalizacaoChao: 30,
-        
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
           },
         ],
-
         propriedades: {
           tipoSomImpacto: "light",
           dano: 12,

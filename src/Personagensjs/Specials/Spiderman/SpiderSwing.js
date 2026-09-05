@@ -1,3 +1,5 @@
+import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
+
 export default class SpiderSwing {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
@@ -82,11 +84,13 @@ export default class SpiderSwing {
     this.timerHitbox = this.scene.time.delayedCall(this.hitboxDelayMs, () => {
       this.timerHitbox = null;
       if (this.fase === "swing") {
+        tocarSomSeguro(this.scene, "jogar", { volume: 0.2 });
         this.criarHitbox();
       }
     });
 
     sprite.anims.play(keyAnim, true);
+    tocarSomSeguro(this.scene, "sp-WebSwing_", { volume: 0.2 });
 
     // --- OPÇÃO 2 AQUI: TWEEN COM VERIFICAÇÃO DE SOBREPOSIÇÃO/COLISÃO ---
     this.tweenMovimento = this.scene.tweens.addCounter({

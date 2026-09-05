@@ -1,3 +1,5 @@
+import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
+
 export default class SpiderThrow {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
@@ -51,6 +53,7 @@ export default class SpiderThrow {
     sprite.on("animationstart", this.fnMonitorHit);
 
     sprite.anims.play("spy_siSpecial", true);
+    tocarSomSeguro(this.scene, "sp-Comon", { volume: 0.2 });
 
     this.fnSiSpecial = (anim) => {
       if (anim.key === "spy_siSpecial") {
@@ -210,6 +213,7 @@ export default class SpiderThrow {
     this.deslocamentoAcumuladoX -= recuoThrow;
 
     sprite.anims.play("spy_spider_throw", true);
+    tocarSomSeguro(this.scene, "webshot2", { rate: 1.7, volume: 0.2 });
 
     // Se estava caído, troca apenas a animação visual durante o agarrão
     if (alvo.maquinaEstados?.estadoAtual?.nome === "dead") {
@@ -258,11 +262,24 @@ export default class SpiderThrow {
     ];
 
     let jaLancouOponente = false;
+    let tocouGiro1 = false;
+    let tocouGiro2 = false;
 
     this.fnUpdate = (anim, frame) => {
       if (anim.key !== "spy_spider_throw" || !alvo.sprite) return;
 
       const index = frame.index - 1;
+
+      // A 16 fps: disparo ate 0,49 s, giros em 0,50 s e 1,19 s,
+      // terminando antes do lancamento no frame 29 (1,81 s).
+      if (index >= 8 && index < 19 && !tocouGiro1) {
+        tocouGiro1 = true;
+        tocarSomSeguro(this.scene, "sp-web-throw1", { rate: 1.2, volume: 0.2 });
+      }
+      if (index >= 19 && index < 29 && !tocouGiro2) {
+        tocouGiro2 = true;
+        tocarSomSeguro(this.scene, "sp-web-throw2", { rate: 1.1, volume: 0.2 });
+      }
 
       if (index < 29 && !jaLancouOponente) {
         const ponto =
@@ -273,6 +290,7 @@ export default class SpiderThrow {
         }
       } else if (index >= 29 && !jaLancouOponente) {
         jaLancouOponente = true;
+        tocarSomSeguro(this.scene, "jogar", { volume: 0.2 });
 
         // RESTAURA AS PERMISSÕES DO INIMIGO NO MOMENTO DO LANÇAMENTO
         if (this.podeUsarAtaqueOriginal) alvo.podeUsarAtaque = this.podeUsarAtaqueOriginal;

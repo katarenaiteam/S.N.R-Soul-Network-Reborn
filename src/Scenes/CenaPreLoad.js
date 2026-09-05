@@ -1,3 +1,4 @@
+import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import { tocarMusicaSegura } from "../Objetos/AudioSeguro.js";
 
 export default class CenaPreload extends Phaser.Scene {
@@ -6,6 +7,12 @@ export default class CenaPreload extends Phaser.Scene {
   }
 
   preload() {
+    this.transicaoStartAtiva = false;
+    this.podeAssinar = false;
+    this.assinando = false;
+    this.logText = null;
+    this.footerStatus = null;
+    this.footerProgress = null;
     this.cameras.main.setBackgroundColor("#000000");
 
     const margemX = 240;
@@ -125,7 +132,9 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("SpiderMan_getup", "assets/personagens/SpiderMan/Sprites/SpiderMan_getup.png", { frameWidth: 145, frameHeight: 96 });
     this.load.spritesheet("SpiderMan_guard", "assets/personagens/SpiderMan/Sprites/SpiderMan_guard.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_taunt1", "assets/personagens/SpiderMan/Sprites/SpiderMan_taunt1.png", { frameWidth: 200, frameHeight: 200 });
-
+    this.load.audio("sp-hurt", "assets/personagens/SpiderMan/Audio/sp-hurt.wav");
+    this.load.audio("sp-hurt2", "assets/personagens/SpiderMan/Audio/sp-hurt2.wav");
+    this.load.audio("sp-hurt3", "assets/personagens/SpiderMan/Audio/sp-hurt3.wav");
     //ataques
     this.load.spritesheet("SpiderMan_atack1", "assets/personagens/SpiderMan/Sprites/SpiderMan_atack1.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_atack2", "assets/personagens/SpiderMan/Sprites/SpiderMan_atack2.png", { frameWidth: 200, frameHeight: 200 });
@@ -136,27 +145,37 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("SpiderMan_sideAir", "assets/personagens/SpiderMan/Sprites/SpiderMan_sideAir.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_downAtack", "assets/personagens/SpiderMan/Sprites/SpiderMan_downAtack.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_sideAtack", "assets/personagens/SpiderMan/Sprites/SpiderMan_sideAtack.png", { frameWidth: 200, frameHeight: 200 });
+    this.load.audio("sp-atack", "assets/personagens/SpiderMan/Audio/sp-atack.wav");
+    this.load.audio("sp-atack2", "assets/personagens/SpiderMan/Audio/sp-atack2.wav");
+    this.load.audio("sp-atack3", "assets/personagens/SpiderMan/Audio/sp-atack3.wav");
     //specials
     this.load.spritesheet("SpiderMan_neSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_neSpecial.png", { frameWidth: 200, frameHeight: 200 });
-    
+    this.load.audio("sp-WebBall_", "assets/personagens/SpiderMan/Audio/sp_WebBall_.wav");
+    this.load.audio("webshot", "assets/personagens/SpiderMan/Audio/webshot.wav");
+    this.load.audio("preso", "assets/personagens/SpiderMan/Audio/preso.wav");
+    this.load.audio("solto", "assets/personagens/SpiderMan/Audio/solto.wav");
     this.load.spritesheet("SpiderMan_AneSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AneSpecial.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_doSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_doSpecial.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("Counter", "assets/personagens/SpiderMan/Sprites/Counter.png", { frameWidth: 500, frameHeight: 200 });
-
+    this.load.audio("sp-close", "assets/personagens/SpiderMan/Audio/sp-close.wav");
     this.load.spritesheet("SpiderMan_siSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_siSpecial.png", { frameWidth: 154, frameHeight: 94 });
     this.load.spritesheet("Side_teia", "assets/personagens/SpiderMan/Sprites/Side_teia.png", { frameWidth: 320, frameHeight: 79 });
     this.load.spritesheet("Spider_throw", "assets/personagens/SpiderMan/Sprites/Spider_throw.png", { frameWidth: 640, frameHeight: 140 });
-
+    this.load.audio("sp-Comon", "assets/personagens/SpiderMan/Audio/sp_Cmon.wav");
+    this.load.audio("webshot2", "assets/personagens/SpiderMan/Audio/webshot2.wav");
+    this.load.audio("sp-web-throw1", "assets/personagens/SpiderMan/Audio/sp-web-throw1.wav");
+    this.load.audio("sp-web-throw2", "assets/personagens/SpiderMan/Audio/sp-web-throw2.wav");
+    this.load.audio("jogar", "assets/personagens/SpiderMan/Audio/jogar.wav");
     this.load.spritesheet("SpiderMan_AsiSpecial", "assets/personagens/SpiderMan/Sprites/SpiderMan_AsiSpecial.png", { frameWidth: 245, frameHeight: 202 });
     this.load.spritesheet("Spiderflip", "assets/personagens/SpiderMan/Sprites/Spiderflip.png", { frameWidth: 105, frameHeight: 117 }); 
-     
+    this.load.audio("sp-WebSwing_", "assets/personagens/SpiderMan/Audio/sp_WebSwing_.wav");
     this.load.spritesheet("Sp_AupSpecial", "assets/personagens/SpiderMan/Sprites/Sp_AupSpecial.png", { frameWidth: 106, frameHeight: 116 });
     this.load.spritesheet("teiagrow", "assets/personagens/SpiderMan/Sprites/teiagrow.png", { frameWidth: 209, frameHeight: 10 });
     this.load.spritesheet("extragrow", "assets/personagens/SpiderMan/Sprites/growextra.png", { frameWidth: 209, frameHeight: 10 });
     this.load.spritesheet("teiabroke", "assets/personagens/SpiderMan/Sprites/teiabroke.png", { frameWidth: 174, frameHeight: 34 });
 
-
 //ult
+this.load.audio("ult-sound", "assets/personagens/SpiderMan/Audio/ult-sound.wav");
 this.load.spritesheet("ultimateback", "assets/personagens/SpiderMan/Sprites/ultimate/ultimatebackground.png", { frameWidth: 640, frameHeight: 480 });
 this.load.audio("sp_ShowTime", "assets/personagens/SpiderMan/Audio/sp_ShowTime.wav");
 this.load.spritesheet("SpiderMan_ult0", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult0.png", { frameWidth: 200, frameHeight: 200 }); 
@@ -168,7 +187,14 @@ this.load.spritesheet("SpiderMan_ult5", "assets/personagens/SpiderMan/Sprites/ul
 this.load.spritesheet("SpiderMan_ult6", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult6.png", { frameWidth: 315, frameHeight: 245 });
 this.load.spritesheet("SpiderMan_ult7", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult7.png", { frameWidth: 360, frameHeight: 256 });
 this.load.spritesheet("SpiderMan_ult8", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult8.png", { frameWidth: 122, frameHeight: 119 });
-this.load.audio("finish", "assets/personagens/SpiderMan/Audio/finish.wav");  
+this.load.audio("finish", "assets/personagens/SpiderMan/Audio/finish.wav"); 
+this.load.spritesheet("2impact", "assets/personagens/SpiderMan/Sprites/ultimate/2impact.png", { frameWidth: 320, frameHeight: 240 });
+this.load.spritesheet("3impact", "assets/personagens/SpiderMan/Sprites/ultimate/3impact.png", { frameWidth: 550, frameHeight: 407 });
+this.load.spritesheet("4impact", "assets/personagens/SpiderMan/Sprites/ultimate/4impact.png", { frameWidth: 588, frameHeight: 480 });
+this.load.spritesheet("finalImpact", "assets/personagens/SpiderMan/Sprites/ultimate/finalImpact.png", { frameWidth: 270, frameHeight: 274 });
+this.load.spritesheet("poseEffect", "assets/personagens/SpiderMan/Sprites/ultimate/poseEffect.png", { frameWidth: 320, frameHeight: 72 });
+this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultimate/dashEffect.png", { frameWidth: 314, frameHeight: 274 });
+
 
     if (!this.textures.exists('textura_teia')) {
     const canvas = document.createElement('canvas');
@@ -274,7 +300,8 @@ this.load.audio("finish", "assets/personagens/SpiderMan/Audio/finish.wav");
     this.load.spritesheet("Ken_AdoSpecial", "assets/personagens/Ken/Sprites/Ken_AdoSpecial.png", { frameWidth: 166, frameHeight: 132 });
   
 
-
+    // --- visual effects ---
+    //
     
     //--Sound effects
     //-pulos
@@ -489,8 +516,8 @@ this.load.audio("finish", "assets/personagens/SpiderMan/Audio/finish.wav");
     });
   }
   create() {
-    this.musicaFundo = this.sound.add('Aria8bit', { volume: 0.5, loop: true });
-    tocarMusicaSegura(this, "Aria8bit", { loop: true, volume: 0.1 });
+    encerrarOutrasCenas(this);
+    this.musicaFundo = tocarMusicaSegura(this, "Aria8bit", { loop: true, volume: 0.1 });
 
     // --- ATALHO DE DEV (ESC para Pular Intro) ---
     this.input.keyboard.once('keydown-ESC', () => {
@@ -504,8 +531,8 @@ this.load.audio("finish", "assets/personagens/SpiderMan/Audio/finish.wav");
     this.podeAssinar = false;
     this.cursorTimer?.destroy();
 
-    if (this.musicaFundo) this.musicaFundo.stop();
-    else this.sound.stopAll();
+    this.musicaFundo?.destroy();
+    this.musicaFundo = null;
 
     const largura = this.scale.width;
     const altura = this.scale.height;

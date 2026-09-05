@@ -1,9 +1,11 @@
+import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 export default class CenaCreditos extends Phaser.Scene {
   constructor() {
     super({ key: "CenaCreditos" });
   }
 
   create() {
+    encerrarOutrasCenas(this);
     this.add.image(0, 0, "backStart")
       .setOrigin(0)
       .setDisplaySize(this.scale.width, this.scale.height);

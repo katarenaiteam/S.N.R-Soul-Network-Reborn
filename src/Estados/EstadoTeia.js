@@ -1,8 +1,10 @@
 import EstadoBase from "./EstadoBase.js";
+import { tocarSomSeguro } from "../Objetos/AudioSeguro.js";
 
 export default class EstadoTeia extends EstadoBase {
 
     enter() {
+        tocarSomSeguro(this.personagem.scene, "preso", { volume: 0.2 });
         const body = this.personagem.sprite.body;
 
         if (body) {
@@ -26,6 +28,7 @@ export default class EstadoTeia extends EstadoBase {
     }
 
     exit() {
+        tocarSomSeguro(this.personagem.scene, "solto", { volume: 0.04 });
         const body = this.personagem.sprite.body;
 
         if (body) {
