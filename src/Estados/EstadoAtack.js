@@ -1,7 +1,17 @@
 ﻿import EstadoBase from "./EstadoBase.js";
 
 export default class EstadoAtack extends EstadoBase {
+  constructor(personagem) {
+    super(personagem);
+    this.limpezaShutdownRegistrada = false;
+  }
+
   enter(dados = {}) {
+   if (!this.limpezaShutdownRegistrada) {
+      this.limpezaShutdownRegistrada = true;
+      this.personagem.scene.events.once("shutdown", () => this.limparRecursos());
+   }
+
    const noChao = this.personagem.sprite.body.blocked.down;
    const direcaoOlhar = this.personagem.sprite.flipX ? -1 : 1;
 
@@ -525,13 +535,19 @@ export default class EstadoAtack extends EstadoBase {
 
     // Entidades auxiliares podem se registrar como alvos sem regras de personagem aqui.
     const alvosExtras = (cena.alvosAtaqueExtras ?? []).filter(
-      (alvo) => alvo?.ativo && alvo.dono !== this.personagem
+      (alvo) => alvo?.ativo && alvo.dono !== this.personagem &&
+        alvo.sprite?.active && alvo.grupoHurtbox?.active &&
+        typeof alvo.grupoHurtbox.getChildren === "function"
     );
     alvos = [...new Set([...alvos, ...alvosExtras])];
     this.alvosAtaque = alvos;
 
     alvos.forEach((alvo) => {
-      if (!alvo || !alvo.grupoHurtbox) return;
+      if (
+        !alvo?.sprite?.active ||
+        !alvo.grupoHurtbox?.active ||
+        typeof alvo.grupoHurtbox.getChildren !== "function"
+      ) return;
 
       const colisor = cena.physics.add.overlap(
         this.hitboxAtual,
@@ -653,6 +669,10 @@ export default class EstadoAtack extends EstadoBase {
   }
 
   exit() {
+    this.limparRecursos();
+  }
+
+  limparRecursos() {
     // Limpa o evento de colisÃ£o da fÃ­sica do Phaser
     (this.colisoresOverlap ?? []).forEach((colisor) => {
       if (colisor?.active && colisor.world) colisor.destroy();
@@ -660,7 +680,7 @@ export default class EstadoAtack extends EstadoBase {
     this.colisoresOverlap = [];
     this.alvosAtaque = [];
 
-    if (this.hitboxAtual) {
+    if (this.hitboxAtual?.active) {
       const hitboxEncerrada = this.hitboxAtual;
       hitboxEncerrada.destroy();
       this.hitboxAtual = null;
@@ -669,12 +689,12 @@ export default class EstadoAtack extends EstadoBase {
       }
     }
 
-    if (this.anulouGravidade) {
+    if (this.anulouGravidade && this.personagem.sprite?.body) {
       this.personagem.sprite.body.setAllowGravity(true);
       this.anulouGravidade = false;
     }
 
-    this.personagem.sprite.off("animationupdate", this.atualizarHitbox, this);
+    this.personagem.sprite?.off("animationupdate", this.atualizarHitbox, this);
 
     this.hitboxCriada = false;
 

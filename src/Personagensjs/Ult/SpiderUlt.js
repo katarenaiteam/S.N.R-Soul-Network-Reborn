@@ -280,7 +280,7 @@ export default class SpiderUlt {
     });
 
     if (this.oponente.maquinaEstados) {
-      this.oponente.maquinaEstados.mudarEstado("hit");
+      this.oponente.maquinaEstados.mudarEstado("dano");
     }
 
     this.etapas = [
@@ -593,7 +593,7 @@ export default class SpiderUlt {
 
     // Exclui as celulas vazias no fim das spritesheets.
     const ultimosFrames = {
-      poseEffect: 15, dashEffect: 11,
+      poseEffect: 15, dashEffect: 9,
       "2impact": 5, "3impact": 10, "4impact": 11, finalImpact: 9
     };
     const animacao = `spider_vfx_${textura}`;
@@ -868,7 +868,7 @@ export default class SpiderUlt {
         const forcaY = 1200 * multPorcentagem;  //1600 original
 
         if (this.oponente.maquinaEstados && typeof this.oponente.maquinaEstados.mudarEstado === "function") {
-          this.oponente.maquinaEstados.mudarEstado("hit", {
+          this.oponente.maquinaEstados.mudarEstado("dano", {
             knockbackX: forcaX,
             knockbackY: forcaY
           });
