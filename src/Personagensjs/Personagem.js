@@ -737,7 +737,7 @@ export default class Personagem {
 }
 
   atualizarLogicasEspeciais() {
-    this.logicasEspeciaisAtivas.forEach((logica) => {
+    [...this.logicasEspeciaisAtivas].forEach((logica) => {
       logica.atualizar?.();
     });
   }

@@ -1,4 +1,4 @@
-import { obterAlvosCombate, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
+import { destruirColisor, registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
 import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
 
 export default class WebShot {
@@ -6,18 +6,17 @@ export default class WebShot {
     this.personagem = personagem;
     this.scene = personagem.scene;
     this.special = special;
-
+    this.aereo = false;
     this.projetil = null;
-    this.acertou = false;
+    this.encerrado = false;
     this.timer = null;
-    this.overlaps = [];
+    this.colisorCenario = null;
+    this.scene.events.once("shutdown", this.finalizarProjetil, this);
   }
 
   executar() {
-    if (this.projetil || this.timer) return;
+    if (this.encerrado || this.projetil || this.timer) return;
     tocarSomSeguro(this.scene, "sp-WebBall_", { volume: 0.2 });
-
-    // Delay de 400ms para casar com a animação do Homem-Aranha
     this.timer = this.scene.time.delayedCall(400, () => {
       this.timer = null;
       this.criarProjetil();
@@ -25,73 +24,64 @@ export default class WebShot {
   }
 
   criarProjetil() {
-    if (!this.personagem || !this.personagem.sprite || !this.personagem.sprite.active) return;
-
+    if (this.encerrado || this.projetil) return;
+    if (!this.personagem.sprite?.active) {
+      this.finalizarProjetil();
+      return;
+    }
     const sprite = this.personagem.sprite;
     const direcao = sprite.flipX ? -1 : 1;
-
-    const x = sprite.x + 30 * direcao;
-    const y = sprite.y - 60;
-
-    this.projetil = this.scene.physics.add.sprite(x, y, "webshot", 4);
+    this.projetil = this.scene.physics.add.sprite(
+      sprite.x + (this.aereo ? 25 : 30) * direcao,
+      sprite.y - (this.aereo ? 10 : 60), "webshot", 4
+    );
     tocarSomSeguro(this.scene, "webshot", { volume: 0.2 });
-
-    if (this.scene.camHUD) {
-      this.scene.camHUD.ignore(this.projetil);
-    }
-
-    this.projetil.setFlipX(direcao === -1);
+    this.scene.camHUD?.ignore(this.projetil);
+    this.projetil.setFlipX(direcao < 0);
+    if (this.aereo) this.projetil.setAngle(35 * direcao);
     this.projetil.anims.play("spy_webShot");
-
     this.projetil.body.setAllowGravity(false);
     this.projetil.body.debugBodyColor = 0xff0000;
     this.projetil.body.setSize(30, 30);
-    this.projetil.body.setVelocityX(600 * direcao);
+    this.projetil.body.setVelocity((this.aereo ? 500 : 600) * direcao, this.aereo ? 400 : 0);
 
     registrarAtaqueEspecial(this, this.projetil, {
       categoria: "projetil",
-      aoColidir: () => this.destruirEmChoque(),
-      aoAtingirAlvo: (alvo, projetil) => this.processarAcerto(alvo, projetil),
+      aoColidir: () => this.finalizarProjetil(),
+      aoAtingirAlvo: (alvo) => this.processarAcerto(alvo),
     });
-
-    // Colisão com Inimigos
-    this.overlaps = [];
+    const plataformas = this.scene.mapaAtual?.plataformas || this.scene.plataformas || this.scene.chao;
+    if (this.aereo && plataformas) {
+      this.colisorCenario = this.scene.physics.add.collider(
+        this.projetil, plataformas, () => this.finalizarProjetil()
+      );
+    }
   }
 
-  processarAcerto(alvo, projetil) {
-    if (this.acertou) return;
-    this.acertou = true;
-
-    // Remove os overlaps para evitar acertos múltiplos
-    this.overlaps.forEach((ov) => {
-      if (ov && ov.active) ov.destroy();
-    });
-    this.overlaps = [];
-
+  processarAcerto(alvo) {
+    if (this.encerrado) return;
+    // A logica e dona das colisoes: encerra todas antes de descartar o projetil.
+    this.finalizarProjetil();
     const props = this.special?.propriedades || {};
-
-    // 1. Aplica o dano no alvo e verifica se foi bloqueado pela Guarda
     const defendeu = alvo.receberDano(props.dano || 8, props);
-
-    // 2. SÓ PRENDE SE NÃO TIVER DEFENDIDO NA GUARDA!
     if (!defendeu && alvo.maquinaEstados && !alvo.estaPresoNaTeia && !alvo.imuneTeia) {
       this.prenderOponente(alvo);
     }
-
-    // Destrói o projétil no impacto
-    if (projetil && projetil.active) {
-      projetil.destroy();
-      this.projetil = null;
-    }
   }
 
-  destruirEmChoque() {
-    if (this.acertou) return;
-    this.acertou = true;
-    this.overlaps.forEach((overlap) => overlap?.destroy());
-    this.overlaps = [];
+  finalizarProjetil() {
+    if (this.encerrado) return;
+    this.encerrado = true;
+    this.scene.events.off("shutdown", this.finalizarProjetil, this);
+    this.timer?.remove(false);
+    this.timer = null;
+    destruirColisor(this.colisorCenario);
+    this.colisorCenario = null;
     this.projetil?.destroy();
     this.projetil = null;
+    const lista = this.personagem.logicasEspeciaisAtivas;
+    const indice = lista.indexOf(this);
+    if (indice >= 0) lista.splice(indice, 1);
   }
 
   prenderOponente(alvo) {
@@ -133,6 +123,7 @@ export default class WebShot {
     // Função para desfazer a teia (se tomar dano ou acabar o tempo)
     alvo.estourarTeia = (tocarAnimacao = true) => {
       alvo.estaPresoNaTeia = false;
+      alvo.sprite?.setVisible(true);
 
       if (alvo.timerTeia) {
         alvo.timerTeia.remove(false);
@@ -175,11 +166,8 @@ export default class WebShot {
   }
 
   atualizar() {
-    if (this.projetil && this.projetil.active) {
-      if (Math.abs(this.projetil.x - this.personagem.sprite.x) > 1000) {
-        this.projetil.destroy();
-        this.projetil = null;
-      }
+    if (this.projetil && Math.abs(this.projetil.x - this.personagem.sprite.x) > 1000) {
+      this.finalizarProjetil();
     }
   }
 }

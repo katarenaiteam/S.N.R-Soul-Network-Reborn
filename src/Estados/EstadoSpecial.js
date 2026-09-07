@@ -153,8 +153,9 @@ export default class EstadoSpecial extends EstadoBase {
         this
       );
 
-      this.logicaSpecial.executar();
       this.personagem.logicasEspeciaisAtivas.push(this.logicaSpecial);
+      this.logicaSpecial.executar();
+      if (this.personagem.maquinaEstados.estadoAtual !== this) return;
     }
 
     // ===================================

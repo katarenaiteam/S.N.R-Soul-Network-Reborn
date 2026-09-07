@@ -1,12 +1,16 @@
 function obterRegistro(scene) {
   if (!scene.registroCombateEspecial) {
     scene.registroCombateEspecial = new Set();
+    scene.events.once("shutdown", () => {
+      scene.registroCombateEspecial.forEach((entrada) => entrada.remover());
+      scene.registroCombateEspecial = null;
+    });
   }
   return scene.registroCombateEspecial;
 }
 
 export function destruirColisor(colisor) {
-  if (colisor?.active && colisor.world) {
+  if (colisor?.world) {
     colisor.destroy();
   }
 }
@@ -19,7 +23,7 @@ function obterLimitesCorpo(objeto) {
 
 function obterHurtboxesValidas(alvo) {
   const grupo = alvo?.grupoHurtbox;
-  if (!grupo?.active || typeof grupo.getChildren !== "function") return [];
+  if (!grupo?.active || !grupo.children || typeof grupo.getChildren !== "function") return [];
   return grupo.getChildren().filter((hurtbox) => obterLimitesCorpo(hurtbox));
 }
 
@@ -54,16 +58,16 @@ export function registrarAtaqueEspecial(logica, objeto, opcoes = {}) {
     contraAtacarDono: opcoes.contraAtacarDono === true,
     aoColidir: opcoes.aoColidir,
     aoAtingirAlvo: opcoes.aoAtingirAlvo,
-    colisores: new Set(),
+    colisores: new Map(),
     encerrado: false,
   };
 
   const remover = () => {
     if (entrada.encerrado) return;
     entrada.encerrado = true;
-    entrada.colisores.forEach((colisor) => {
-      // O mesmo overlap pertence aos dois ataques. O primeiro lado pode já
-      // tê-lo destruído enquanto o segundo está sendo removido.
+    objeto.off?.("destroy", remover);
+    entrada.colisores.forEach((outra, colisor) => {
+      outra.colisores.delete(colisor);
       destruirColisor(colisor);
     });
     entrada.colisores.clear();
@@ -112,8 +116,8 @@ export function registrarAtaqueEspecial(logica, objeto, opcoes = {}) {
         entrada.remover();
         outra.remover();
       });
-      entrada.colisores.add(colisor);
-      outra.colisores.add(colisor);
+      entrada.colisores.set(colisor, outra);
+      outra.colisores.set(colisor, entrada);
     });
   }
 

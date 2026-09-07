@@ -1,0 +1,184 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Regressao de combate</title>
+<pre id="resultado">Executando...</pre>
+<script>
+window.addEventListener('error', (evento) => {
+  document.querySelector('#resultado').textContent = 'FAIL: ' + (evento.error?.stack || evento.message);
+});
+window.addEventListener('unhandledrejection', (evento) => {
+  document.querySelector('#resultado').textContent = 'FAIL: ' + evento.reason;
+});
+</script>
+<script src="../src/phaser.min.js"></script>
+<script type="module">
+import { registrarAtaqueEspecial, obterAtaquesEspeciaisInimigos } from '../src/Objetos/SistemaCombateEspecial.js';
+import WebShot from '../src/Personagensjs/Specials/Spiderman/WebShot.js';
+import AirWebShot from '../src/Personagensjs/Specials/Spiderman/AirWebshot.js';
+import EstadoSpecial from '../src/Estados/EstadoSpecial.js';
+const resultados = [];
+let anteriores = null;
+function verificar(condicao, mensagem) { if (!condicao) throw new Error(mensagem); }
+function concluir(scene, erro) {
+  document.querySelector('#resultado').textContent = resultados.join('\n') + (erro ? '\nFAIL: '+erro.stack : '\nALL PASS');
+  scene.game.loop.stop();
+}
+new Phaser.Game({
+  type: Phaser.HEADLESS, width: 100, height: 100,
+  audio: { noAudio: true }, banner: false,
+  physics: { default: 'arcade', arcade: { gravity: { y: 0 } } },
+  scene: { create() {
+    try {
+      const corpo = () => {
+        const zona = this.add.zone(50, 50, 20, 20);
+        this.physics.add.existing(zona);
+        return zona;
+      };
+      const atacante = this.physics.add.sprite(50, 50, '__WHITE');
+      const personagem = {scene:this, sprite:atacante, logicasEspeciaisAtivas:[]};
+      this.mapaAtual = {plataformas: this.physics.add.staticGroup()};
+      this.jogador2 = {sprite:corpo(), grupoHurtbox:this.physics.add.group(), receberDano:()=>true};
+      const criar = (Classe) => {
+        const logica = new Classe(personagem, {});
+        personagem.logicasEspeciaisAtivas.push(logica);
+        logica.criarProjetil();
+        return logica;
+      };
+      const verificarEncerrado = (logica, colisores) => {
+        verificar(logica.encerrado && !logica.projetil && !logica.timer, 'Ataque nao encerrado');
+        verificar(!personagem.logicasEspeciaisAtivas.includes(logica), 'Logica orfa');
+        verificar(colisores.every(c=>!c.active && !c.world), 'Colisao orfa');
+        this.physics.world.colliders.update();
+      };
+      if (anteriores) {
+        verificar(anteriores.colisores.every(c=>!c.active && !c.world), 'Reinicio deixou colisoes antigas');
+        verificar(anteriores.personagem.logicasEspeciaisAtivas.length === 0, 'Reinicio deixou logicas antigas');
+        verificar(this.registroCombateEspecial === null, 'Registro atravessou a partida');
+        verificar(anteriores.pendente.encerrado && !anteriores.pendente.timer, 'Timer atravessou a partida');
+        const novo = criar(AirWebShot);
+        const colisores = [novo.colisorCenario];
+        novo.finalizarProjetil();
+        verificarEncerrado(novo, colisores);
+        resultados.push('PASS: reinicio real da cena limpa grupos, colisoes, timers e permite novo ataque');
+        concluir(this);
+        return;
+      }
+      const textura = this.textures.addCanvas('webshot', Object.assign(document.createElement('canvas'), {width:32,height:32}));
+      textura.add(4,0,0,0,32,32);
+      this.anims.create({key:'spy_webShot',frames:[{key:'webshot'}],frameRate:1});
+
+      // Condicao do motor da foto; nao e uma reproducao da partida do usuario.
+      const grupoAntigo = this.physics.add.group();
+      const original = this.physics.add.overlap(atacante, grupoAntigo);
+      grupoAntigo.destroy();
+      let reproduziu = false;
+      try { original.update(); } catch (erro) { reproduziu = /size/.test(erro.message); }
+      verificar(reproduziu, 'Condicao original deve falhar lendo size');
+      original.destroy();
+      resultados.push('PASS: condicao de grupo destruido reproduz reading size no Phaser original');
+
+      obterAtaquesEspeciaisInimigos(this, personagem);
+      const listenersIniciais = this.events.listenerCount('shutdown');
+      const listenersAlvos = this.events.listenerCount('postupdate');
+      for (const Classe of [WebShot, AirWebShot]) {
+        for (let i=0; i<250; i++) {
+          const logica = criar(Classe);
+          const colisores = [logica.colisorCenario].filter(Boolean);
+          verificar(colisores.every(c=>c.update===Phaser.Physics.Arcade.Collider.prototype.update && c.destroy===Phaser.Physics.Arcade.Collider.prototype.destroy), 'Motor foi sobrescrito');
+          if (i%2) logica.processarAcerto(this.jogador2);
+          else { logica.projetil.x=atacante.x+1500; logica.atualizar(); }
+          logica.finalizarProjetil();
+          verificarEncerrado(logica, colisores);
+        }
+      }
+      verificar(this.events.listenerCount('shutdown')===listenersIniciais, 'Listeners acumulados');
+      verificar(this.events.listenerCount('postupdate')===listenersAlvos, 'Detectores de acerto acumulados');
+      verificar(this.registroCombateEspecial.size===0, 'Registros acumulados');
+      verificar(this.physics.world.colliders.getActive().length===0, 'Colisores acumulados');
+      resultados.push('PASS: 500 teias reais encerram por alcance/impacto sem acumulo e sem modificar o motor');
+
+      const tiro = criar(WebShot);
+      const hurtbox = corpo();
+      hurtbox.setPosition(tiro.projetil.x, tiro.projetil.y);
+      hurtbox.body.updateFromGameObject();
+      this.jogador2.grupoHurtbox.add(hurtbox);
+      let acertos=0;
+      this.jogador2.receberDano=()=>{acertos++; return true;};
+      this.physics.world.update(0,34);
+      this.events.emit('postupdate');
+      verificar(acertos===1, 'Impacto nao aplicou dano uma vez');
+      verificarEncerrado(tiro,[]);
+      this.jogador2.grupoHurtbox.clear(true,true);
+      resultados.push('PASS: acerto por aoAtingirAlvo encerra a teia em postupdate');
+
+      for (const Classe of [WebShot, AirWebShot]) {
+        const dinamico=criar(Classe);
+        this.jogador2.grupoHurtbox.destroy();
+        this.events.emit('postupdate');
+        verificar(!dinamico.encerrado, 'Grupo destruido gerou acerto');
+        this.jogador2.grupoHurtbox=this.physics.add.group();
+        const novaHurtbox=corpo();
+        novaHurtbox.setPosition(dinamico.projetil.x,dinamico.projetil.y);
+        novaHurtbox.body.updateFromGameObject();
+        this.jogador2.grupoHurtbox.add(novaHurtbox);
+        this.events.emit('postupdate');
+        verificarEncerrado(dinamico,[]);
+        this.jogador2.grupoHurtbox.clear(true,true);
+      }
+      verificar(acertos===3, 'Teias nao detectaram hurtboxes criadas depois do disparo');
+      verificar(this.events.listenerCount('postupdate')===listenersAlvos, 'Detector persistiu apos acerto');
+      resultados.push('PASS: ambas as teias toleram grupo destruido e detectam hurtboxes novas');
+
+      const aereo=criar(AirWebShot);
+      const chao=this.physics.add.staticSprite(aereo.projetil.x,aereo.projetil.y+28,'__WHITE');
+      chao.setDisplaySize(100,20).refreshBody();
+      this.mapaAtual.plataformas.add(chao);
+      const colisoresChao=[aereo.colisorCenario];
+      this.physics.world.update(34,34);
+      verificarEncerrado(aereo,colisoresChao);
+      this.mapaAtual.plataformas.clear(true,true);
+      resultados.push('PASS: teia aerea encerra ao colidir com o mapa real');
+
+      const p1=corpo(), p2=corpo();
+      let choques=0;
+      registrarAtaqueEspecial({scene:this,personagem:{}},p1,{categoria:'projetil',aoColidir:()=>{choques++;p1.destroy();}});
+      registrarAtaqueEspecial({scene:this,personagem:{}},p2,{categoria:'projetil',aoColidir:()=>{choques++;p2.destroy();}});
+      this.physics.world.update(68,34);
+      verificar(choques===2 && this.registroCombateEspecial.size===0,'Choque deixou registros');
+      const sobrevivente=corpo();
+      const registro=registrarAtaqueEspecial({scene:this,personagem:{}},sobrevivente,{categoria:'projetil'});
+      for(let i=0;i<100;i++) {
+        const outro=corpo();
+        registrarAtaqueEspecial({scene:this,personagem:{}},outro,{categoria:'projetil'});
+        outro.destroy();
+        verificar(registro.colisores.size===0,'Registro do sobrevivente acumula colisoes mortas');
+      }
+      sobrevivente.destroy();
+      resultados.push('PASS: choque e 100 remocoes de adversarios limpam os dois donos da colisao');
+
+      const estado=new EstadoSpecial(personagem);
+      personagem.maquinaEstados={estadoAtual:estado};
+      estado.tempoInicio=this.time.now;
+      estado.specialAtual={duracao:0,logica:class {
+        executar() {
+          verificar(personagem.logicasEspeciaisAtivas.includes(this),'Especial executou antes de ser registrado');
+          personagem.logicasEspeciaisAtivas.splice(personagem.logicasEspeciaisAtivas.indexOf(this),1);
+          estado.exit();
+          personagem.maquinaEstados.estadoAtual={};
+        }
+      }};
+      estado.finalizarSpecial=()=>{throw new Error('Estado antigo continuou depois da transicao');};
+      estado.execute();
+      verificar(personagem.logicasEspeciaisAtivas.length===0,'Encerramento imediato deixou entrada invalida');
+      resultados.push('PASS: especial que termina durante executar nao deixa entrada invalida nem continua estado antigo');
+
+      const ativo=criar(AirWebShot);
+      const pendente=new WebShot(personagem,{});
+      personagem.logicasEspeciaisAtivas.push(pendente);
+      pendente.executar();
+      anteriores={personagem,pendente,colisores:[ativo.colisorCenario]};
+      this.scene.restart();
+    } catch(erro) { concluir(this,erro); }
+  }}
+});
+</script>
