@@ -427,7 +427,7 @@ if (!scene.anims.exists("punch_effect3")) {
       key: "fj_idle",
       frames: scene.anims.generateFrameNumbers("FJ_idle", {
         start: 0,
-        end: 141,
+        end: 29,
       }),
       frameRate: 12,
       repeat: -1,
@@ -436,7 +436,7 @@ if (!scene.anims.exists("punch_effect3")) {
     scene.anims.create({
       key: "fj_walk",
       frames: scene.anims.generateFrameNumbers("FJ_walk", {
-        start: 0,
+        start: 2,
         end: 8,
       }),
       frameRate: 14,
