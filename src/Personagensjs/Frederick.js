@@ -484,8 +484,8 @@ if (!scene.anims.exists("punch_effect3")) {
     });
 
     scene.anims.create({
-      key: "ken_dash",
-      frames: scene.anims.generateFrameNumbers("Ken_dash", {
+      key: "fj_dash",
+      frames: scene.anims.generateFrameNumbers("FJ_dash", {
         start: 0,
         end: 7,
       }),
