@@ -56,6 +56,8 @@ export default class EstadoAtack extends EstadoBase {
      this.timerFinalizacaoAcerto = null;
      this.finalizandoPorAcerto = false;
      this.comboBuffer = false;
+    this.acertoPendente = false;
+    this.timerAcertoPendente = null;
     
      // Zera o buffer apenas na entrada do estado
      this.inputBuffer = null;
@@ -531,13 +533,38 @@ export default class EstadoAtack extends EstadoBase {
     this.alvosAtaque = alvos;
 
     alvos.forEach((alvo) => {
-      if (!alvo || !alvo.grupoHurtbox) return;
+      if (
+        !alvo?.grupoHurtbox?.active ||
+        !this.hitboxAtual?.active ||
+        !this.hitboxAtual.body?.enable
+      ) return;
 
       const colisor = cena.physics.add.overlap(
         this.hitboxAtual,
         alvo.grupoHurtbox,
         (hitbox, hurtboxAtingida) => {
-          this.aplicarAcerto(alvo, hitbox);
+          if (
+            this.jaAcertou ||
+            this.acertoPendente ||
+            !hitbox?.active ||
+            !hitbox.body?.enable ||
+            !hurtboxAtingida?.active ||
+            !hurtboxAtingida.body?.enable
+          ) return;
+
+          this.acertoPendente = true;
+          this.timerAcertoPendente = cena.time.delayedCall(0, () => {
+            this.timerAcertoPendente = null;
+            this.acertoPendente = false;
+            if (
+              this.personagem.maquinaEstados.estadoAtual === this &&
+              hitbox?.active &&
+              hitbox.body?.enable &&
+              alvo?.sprite?.active
+            ) {
+              this.aplicarAcerto(alvo, hitbox);
+            }
+          });
         }
       );
 
@@ -689,6 +716,12 @@ export default class EstadoAtack extends EstadoBase {
       this.timerFinalizacaoAcerto.remove(false);
       this.timerFinalizacaoAcerto = null;
     }
+
+    if (this.timerAcertoPendente) {
+      this.timerAcertoPendente.remove(false);
+      this.timerAcertoPendente = null;
+    }
+    this.acertoPendente = false;
 
     this.finalizandoPorAcerto = false;
   }
