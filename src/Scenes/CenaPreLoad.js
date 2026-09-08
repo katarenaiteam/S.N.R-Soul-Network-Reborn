@@ -82,7 +82,6 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("Madomenu", "assets/Menus/Char_menu/Sprites/Madomenu.png");
     this.load.image("Spidermenu", "assets/Menus/Char_menu/Sprites/Spidermenu.png");
     this.load.image("Kenmenu", "assets/Menus/Char_menu/Sprites/Kenmenu.png");
-    this.load.image("Kenmenu", "assets/Menus/Char_menu/Sprites/Kenmenu.png");
     this.load.image("Mikumenu", "assets/Menus/Char_menu/Sprites/Mikumenu.png");
 
     // --- hud ---
@@ -110,13 +109,16 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("MadoAtack", "assets/personagens/Madotsuki/Sprites/MadoAtack.png", { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet("MadoDano", "assets/personagens/Madotsuki/Sprites/MadoDano.png", { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet("MadoMoreAtack", "assets/personagens/Madotsuki/Sprites/MadoMoreAtack.png", { frameWidth: 32, frameHeight: 32 });
+
     // --- Frederick Johnson ---
-    this.load.spritesheet("FJ_idle", "assets/personagens/FrederikJohnson/Sprites/FJ_idle.png", { frameWidth: 64, frameHeight: 64 });
-    this.load.spritesheet("FJ_hurt", "assets/personagens/FrederikJohnson/Sprites/FJ_hurt.png", { frameWidth: 64, frameHeight: 64 });
-    this.load.spritesheet("FJ_jump", "assets/personagens/FrederikJohnson/Sprites/FJ_jump.png", { frameWidth: 64, frameHeight: 64 });
-    this.load.spritesheet("FJ_roll", "assets/personagens/FrederikJohnson/Sprites/FJ_roll.png", { frameWidth: 64, frameHeight: 64 });
-    this.load.spritesheet("FJ_walk", "assets/personagens/FrederikJohnson/Sprites/FJ_walk.png", { frameWidth: 64, frameHeight: 64 });
-    this.load.spritesheet("FJ_punch1", "assets/personagens/FrederikJohnson/Sprites/FJ_punch1.png", { frameWidth: 64, frameHeight: 64 });
+    //base
+    this.load.spritesheet("FJ_idle", "assets/personagens/FJ/Sprites/FJ_idle.png", { frameWidth: 379, frameHeight: 409 });
+    this.load.spritesheet("FJ_walk", "assets/personagens/FJ/Sprites/FJ_walk.png", { frameWidth: 411, frameHeight: 335 });
+    this.load.spritesheet("FJ_jump", "assets/personagens/FJ/Sprites/FJ_jump.png", { frameWidth: 342, frameHeight: 553 });
+    this.load.spritesheet("FJ_crouch1", "assets/personagens/FJ/Sprites/FJ_crouch1.png", { frameWidth: 317, frameHeight: 340 });
+    this.load.spritesheet("FJ_crouch3", "assets/personagens/FJ/Sprites/FJ_crouch3.png", { frameWidth: 317, frameHeight: 340 });
+    this.load.spritesheet("FJ_dash", "assets/personagens/FJ/Sprites/FJ_dash.png", { frameWidth: 380, frameHeight: 333 });
+
     // --- TH30 ---
    
     // --- Homem Aranha ---

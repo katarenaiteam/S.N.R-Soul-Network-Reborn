@@ -1,175 +1,761 @@
 import Personagem from "./Personagem.js";
 
-export default class Frederick extends Personagem {
+
+export default class FJ extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
     // Garante que as animações existam no Phaser ANTES de criar o Personagem e a FSM
-    Frederick.criarAnimacoes(scene);
+
+    FJ.criarAnimacoes(scene);
 
     // chama o constructor pai com tudo pronto
     super(
       scene,
       x,
       y,
-      "FJ_idle",
+      "fj_idle",
       "0",
       {
         velocidade: 240,
         forcaPulo: -600,
         maxPulos: 2,
         maxDash: 1,
+        maxComboIndex: 3,
       },
 
       teclas,
-      "FJ_",
+      "fj_",
       controle,
     );
 
-    this.nomePersonagem = "Frederik Johnson";
+       this.configVFX = {
+  ...this.configVFX,
+
+   punch1: {
+    textura: "punch_effect",
+    animacao: "punch_effect",
+    escala: 1,
+  },
+
+  punch2: {
+    textura: "punch_effect2",
+    animacao: "punch_effect2",
+    escala: 1,
+  },
+
+  punch3: {
+    textura: "punch_effect3",
+    animacao: "punch_effect3",
+    escala: 1,
+  },
+};
+
+this.nomePersonagem = "Frederick Johnson";
+    //============================= hitboxes ========================================
+   
     this.configAnimacoes = {
-      idle: {
-        largura: 36,
-        altura: 46,
-        offsetX: 15,
-        offsetY: 18,
-        escala: 2,
+      
+       idle: {
+        largura: 80,
+        altura: 400,
+        offsetX: 150,
+        offsetY: -10,
+        escala: 0.33,
         hurtboxes: [
-          { largura: 66, altura: 88, offsetX: 3, offsetY: -45 }, //frederick
+          { largura: 50, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 67, altura: 35, offsetX: 0, offsetY: -18 },
         ],
       },
 
       walk: {
-        largura: 36,
-        altura: 46,
-        offsetX: 15,
-        offsetY: 18,
-        escala: 2,
+        largura: 80,
+        altura: 400,
+        offsetX: 17,
+        offsetY: -80,
+        escala: 0.33,
         hurtboxes: [
-          { largura: 66, altura: 88, offsetX: 3, offsetY: -45 }, //frederick
+          { largura: 50, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 60, altura: 35, offsetX: 0, offsetY: -18 },
         ],
       },
 
       jump: {
-        largura: 36,
-        altura: 46,
-        offsetX: 15,
-        offsetY: 18,
-        escala: 2,
+        largura: 80,
+        altura: 400,
+        offsetX: 300,
+        offsetY: 134,
+        escala: 0.33,
         hurtboxes: [
-          { largura: 66, altura: 88, offsetX: 3, offsetY: -45 }, //frederick
+          { largura: 45, altura: 70, offsetX: 0, offsetY: -90 },
+          { largura: 30, altura: 50, offsetX: -5, offsetY: -25 },
         ],
       },
 
+      
       crouch: {
-        largura: 36,
-        altura: 23,
-        offsetX: 15,
-        offsetY: 41,
-        escala: 2,
+        largura: 80,
+        altura: 60,
+        offsetX: 5,
+        offsetY: 50,
+        escala: 0.33,
         hurtboxes: [
-          { largura: 66, altura: 74, offsetX: 3, offsetY: -70 }, //frederick
+          { largura: 65, altura: 60, offsetX: 0, offsetY: -35 },
         ],
       },
-    };
 
-    // tabela de golpes frederick
-    this.golpes = {
-      neutro: {
-        animacao: "FJ_atack", 
-        frameHitbox: 3, 
-        offsetX: 40, 
-        offsetY: -43, 
-        largura: 50, 
-        altura: 25, 
-        cooldown: 700,
-         duracao: 400,
-        propriedades: {
-          dano: 120,
-          knockbackX: 1000,
-          knockbackY: -100,
-        },
+      dash: {
+        largura: 70,
+        altura: 80,
+        offsetX: 4,
+        offsetY: 10,
+        escala: 0.33,
+        hurtboxes: [
+           ],
       },
-    };
+
+      guard: {
+        largura: 80,
+        altura: 120,
+        offsetX: 0,
+        offsetY: -16,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 45, altura: 50, offsetX: -5, offsetY: -75 },
+          { largura: 50, altura: 50, offsetX: -5, offsetY: -25 },
+        ],
+      },
+
+        dano: {
+  largura: 80,
+  altura: 100,
+  offsetX: 0,
+  offsetY: -5,
+  escala: 0.33,
+  hurtboxes: [
+    { largura: 50, altura: 65, offsetX: -10, offsetY: -60 }, // Tronco inclinado
+    { largura: 50, altura: 30, offsetX: 0, offsetY: -15 },   // Pernas
+  ],
+},
+
+
+     
+      danoUp: {
+        largura: 80,
+        altura: 100,
+        offsetX: 0,
+        offsetY: 5,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 55, altura: 70, offsetX: 20, offsetY: -80 },
+          { largura: 45, altura: 40, offsetX: 0, offsetY: -15 },
+        ],
+      },
+
+      danoSide: {
+        largura: 80,
+        altura: 100,
+        offsetX: 0,
+        offsetY: -5,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 65, altura: 55, offsetX: -15, offsetY: -90 }, // Tronco inclinado
+          { largura: 50, altura: 45, offsetX: 30, offsetY: -70 },   // Pernas
+        ],
+      },
+     
+      danoDown: {
+        largura: 80,
+        altura: 100,
+        offsetX: 0,
+        offsetY: 35,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 60, altura: 65, offsetX: -10, offsetY: -60 }, 
+          { largura: 50, altura: 45, offsetX: 0, offsetY: -10 },
+        ],
+      },
+
+      // Dead (Ken_dead - 76px de altura)
+      dead: {
+        largura: 80,
+        altura: 33,
+        offsetX: 49,
+        offsetY: 40,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 100, altura: 34, offsetX: -10, offsetY: -18 },
+          { largura: 40, altura: 20, offsetX: -60, offsetY: -12 },
+          { largura: 50, altura: 25, offsetX: 50, offsetY: -12 },
+        ],
+      },
+
+      // Getup (Ken_getup - 105px de altura)
+      getup: {
+        largura: 80,
+        altura: 100,
+        offsetX: 30,
+        offsetY: 2,
+        escala: 0.3,
+        hurtboxes: [],
+      },
+
+      atack1: {
+        largura: 80,
+        altura: 120,
+        offsetX: 41,
+        offsetY: -10,
+        escala: 1,
+        hurtboxes: [
+          { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 67, altura: 35, offsetX: 0, offsetY: -18 },
+        ],
+      },
+
+      atack2: {
+        largura: 80,
+        altura: 120,
+        offsetX: 61,
+        offsetY: -10,
+        escala: 1,
+        hurtboxes: [
+          { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 67, altura: 35, offsetX: 0, offsetY: -18 },
+        ],
+      },
+
+      atack3: {
+        largura: 80,
+        altura: 120,
+        offsetX: 70,
+        offsetY: 0,
+        escala: 1,
+        hurtboxes: [
+          { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 35, altura: 35, offsetX: 17, offsetY: -18 },
+        ],
+      },
+
+      neutralAir: {
+        largura: 85,
+        altura: 120,
+        offsetX: 22,
+        offsetY: -5,
+        escala: 1,
+        hurtboxes: [
+          { largura: 50, altura: 55, offsetX: -20, offsetY: -85 },
+          { largura: 60, altura: 25, offsetX: -25, offsetY: -40 },
+        ],
+      },
+
+      sideAtack: {
+        largura: 85,
+        altura: 120,
+        offsetX: 30,
+        offsetY: 0,
+        escala: 1,
+        hurtboxes: [{ largura: 60, altura: 100, offsetX: -20, offsetY: -50 }],
+      },
+
+      downAtack: {
+        largura: 85,
+        altura: 60,
+        offsetX: 36,
+        offsetY: 12,
+        escala: 1,
+        hurtboxes: [{ largura: 50, altura: 60, offsetX: -10, offsetY: -30 }],
+      },
+
+      sideAir: {
+        largura: 85,
+        altura: 120,
+        offsetX: 25,
+        offsetY: -11,
+        escala: 1,
+        hurtboxes: [{ largura: 55, altura: 80, offsetX: -20, offsetY: -65 }],
+      },
+
+      upAir: {  
+        largura: 85,
+        altura: 120,
+        offsetX: 19,
+        offsetY: -5,
+        escala: 1,
+        hurtboxes: [{ largura: 45, altura: 80, offsetX: -20, offsetY: -70 }],
+      },
+
+      downAir: {
+        largura: 85,
+        altura: 120,
+        offsetX: 12,
+        offsetY: 12,
+        escala: 1,
+        hurtboxes: [{ largura: 60, altura: 80, offsetX: -10, offsetY: -70 }],
+      },
+
+      neSpecial: {
+        largura: 85,
+        altura: 120,
+        offsetX: 25,
+        offsetY: -13,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 55, offsetX: 0, offsetY: -70 },
+          { largura: 90, altura: 35, offsetX: -10, offsetY: -18 },
+        ], 
+      },
+
+      doSpecial: {
+        largura: 85,
+        altura: 120,
+        offsetX: 5,
+        offsetY: 44,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 60, altura: 35, offsetX: -3, offsetY: -18 },
+        ],
+      },
+
+       AneSpecial: {
+       largura: 85,
+        altura: 120,
+        offsetX: 25,
+        offsetY: -13,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 55, offsetX: 0, offsetY: -70 },
+          { largura: 90, altura: 35, offsetX: -10, offsetY: -18 },
+        ], 
+      },
+
+      AupSpecial: {
+        largura: 85,
+        altura: 120,
+        offsetX: 5,
+        offsetY: 44,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 60, altura: 35, offsetX: -3, offsetY: -18 },
+        ],
+      },
+
+      siSpecial: {
+        largura: 80,
+        altura: 110,
+        offsetX: 39.5,
+        offsetY: 9,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 75, offsetX: 0, offsetY: -65 },
+          { largura: 35, altura: 35, offsetX: 0, offsetY: -18 },
+        ],
+      },
+
+      AsiSpecial: {
+        largura: 80,
+        altura: 110,
+        offsetX: 39.5,
+        offsetY: 14,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 75, offsetX: 0, offsetY: -65 },
+          { largura: 35, altura: 35, offsetX: 0, offsetY: -18 },
+        ],
+      },
+
+      AdoSpecial: {
+        largura: 90,
+        altura: 115,
+        offsetX: 38,
+        offsetY: 17,
+        escala: 1,
+        hurtboxes: [
+          { largura: 65, altura: 75, offsetX: 0, offsetY: -68 },
+          { largura: 70, altura: 40, offsetX: 5, offsetY: -22 },
+        ],
+      },
+   
+   };
+    
+  
+
+    // ============================ tabela de golpes =====================================
+   
+
+    // specials
+   
   }
 
-  // criando animaçoes
+  //animaçoes====================================================
+  
   static criarAnimacoes(scene) {
-    // Se a animação "idle" já existe na cena, não recria
-    if (scene.anims.exists("FJ_idle")) return;
+
+   // efeitos anim
+  if (!scene.anims.exists("punch_effect")) {
+  scene.anims.create({
+    key: "punch_effect",
+    frames: scene.anims.generateFrameNumbers("punch_effect"),
+    frameRate: 18,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("punch_effect2")) {
+  scene.anims.create({
+    key: "punch_effect2",
+    frames: scene.anims.generateFrameNumbers("punch_effect2"),
+    frameRate: 18,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("punch_effect3")) {
+  scene.anims.create({
+    key: "punch_effect3",
+    frames: scene.anims.generateFrameNumbers("punch_effect3"),
+    frameRate: 18,
+    repeat: 0,
+  });
+}
+
+// personagem
+
+    if (scene.anims.exists("fj_idle")) return;
 
     // Idle (Parada)
     scene.anims.create({
-      key: "FJ_idle",
+      key: "fj_idle",
       frames: scene.anims.generateFrameNumbers("FJ_idle", {
         start: 0,
-        end: 9,
+        end: 141,
       }),
-      frameRate: 10,
+      frameRate: 12,
       repeat: -1,
     });
 
-    // Walk (Andando)
     scene.anims.create({
-      key: "FJ_walk",
+      key: "fj_walk",
       frames: scene.anims.generateFrameNumbers("FJ_walk", {
+        start: 0,
+        end: 8,
+      }),
+      frameRate: 14,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "fj_jump",
+      frames: scene.anims.generateFrameNumbers("FJ_jump", {
+        start: 0,
+        end: 10,
+      }),
+      frameRate: 18,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "fj_crouch",
+      frames: scene.anims.generateFrameNumbers("FJ_crouch1", {
+        start: 0,
+        end: 2,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "fj_crouch2",
+      frames: scene.anims.generateFrameNumbers("FJ_crouch1", {
+        start: 2,
+        end: 2,
+      }),
+      frameRate: 10,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "fj_crouch3",
+      frames: scene.anims.generateFrameNumbers("FJ_crouch3", {
+        start: 0,
+        end: 2,
+      }),
+      frameRate: 15,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_dash",
+      frames: scene.anims.generateFrameNumbers("Ken_dash", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 16,
+      repeat: 0,
+    });
+
+     scene.anims.create({
+      key: "ken_guard",
+      frames: scene.anims.generateFrameNumbers("Ken_guard", {
+        start: 0,
+        end: 1,
+      }),
+      frameRate: 8,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_taunt",
+      frames: scene.anims.generateFrameNumbers("Ken_taunt", {
         start: 0,
         end: 3,
       }),
-      frameRate: 7,
-      repeat: -1,
+      frameRate: 12,
+      repeat: 0,
     });
 
-    // Jump (Pulo)
     scene.anims.create({
-      key: "FJ_jump",
-      frames: scene.anims.generateFrameNumbers("FJ_jump", {
+      key: "ken_dano",
+      frames: scene.anims.generateFrameNumbers("Ken_hurt", {
+        start: 0,
+        end: 1,
+      }),
+      frameRate: 4,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+     key: "ken_danoUp",
+     frames: scene.anims.generateFrameNumbers("Ken_hurts1", { start: 0, end: 2 }),
+     frameRate: 10,
+     repeat: 0,
+   });
+
+    scene.anims.create({
+  key: "ken_danoSide",
+  frames: scene.anims.generateFrameNumbers("Ken_hurts2", { start: 0, end: 14 }),
+  frameRate: 22,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "ken_danoDown",
+  frames: scene.anims.generateFrameNumbers("Ken_hurts2", { start: 15, end: 18 }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+     scene.anims.create({
+     key: "ken_dead",
+     frames: scene.anims.generateFrameNumbers("Ken_dead", { start: 0, end: 9 }),
+     frameRate: 16,
+     repeat: 0,
+   });
+
+     scene.anims.create({
+     key: "ken_getup",
+     frames: scene.anims.generateFrameNumbers("Ken_getup", { start: 0, end: 10 }),
+     frameRate: 18,
+     repeat: 0,
+   });
+
+    scene.anims.create({
+      key: "ken_atack1",
+      frames: scene.anims.generateFrameNumbers("Ken_combo1", {
         start: 0,
         end: 4,
       }),
-      frameRate: 32,
+      frameRate: 16,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "ken_atack2",
+      frames: scene.anims.generateFrameNumbers("Ken_combo2", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 16,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "ken_atack3",
+      frames: scene.anims.generateFrameNumbers("Ken_combo3", {
+        start: 0,
+        end: 13,
+      }),
+      frameRate: 18,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "ken_sideAtack",
+      frames: scene.anims.generateFrameNumbers("Ken_sideAtack", {
+        start: 0,
+        end: 13,
+      }),
+      frameRate: 20,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "ken_downAtack",
+      frames: scene.anims.generateFrameNumbers("Ken_downAtack", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "ken_neutralAir",
+      frames: scene.anims.generateFrameNumbers("Ken_neutralAir", {
+        start: 0,
+        end: 8,
+      }),
+      frameRate: 16,
+      repeat: 0,
+    });
+     scene.anims.create({
+      key: "ken_upAir",
+      frames: scene.anims.generateFrameNumbers("Ken_upAir", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+     scene.anims.create({
+      key: "ken_sideAir",
+      frames: scene.anims.generateFrameNumbers("Ken_sideAir", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+     scene.anims.create({
+      key: "ken_downAir",
+      frames: scene.anims.generateFrameNumbers("Ken_downAir", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "ken_neSpecial",
+      frames: scene.anims.generateFrameNumbers("Ken_neSpecial", {
+        start: 0,
+        end: 15,
+      }),
+      frameRate: 16,
       repeat: 0,
     });
 
-    // Crouch (Agachar
     scene.anims.create({
-      key: "FJ_crouch",
-      frames: scene.anims.generateFrameNumbers("FJ_roll", {
+      key: "ken_hadouken_inicio",
+      frames: scene.anims.generateFrameNumbers("hadouken1", {
         start: 0,
-        end: 3,
+        end: 9,
       }),
-      frameRate: 5,
+      frameRate: 20,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_hadouken_loop",
+      frames: scene.anims.generateFrameNumbers("hadouken1", {
+        start: 1,
+        end: 9,
+      }),
+      frameRate: 16,
       repeat: -1,
     });
 
-    // Dash
     scene.anims.create({
-      key: "FJ_dash",
-      frames: scene.anims.generateFrameNumbers("FJ_roll", {
+      key: "ken_hadouken_impacto",
+      frames: scene.anims.generateFrameNumbers("hadouken2", {
         start: 0,
-        end: 3,
+        end: 9,
       }),
-      frameRate: 32,
+      frameRate: 24,
       repeat: 0,
     });
 
-    // atack
     scene.anims.create({
-      key: "FJ_atack",
-      frames: scene.anims.generateFrameNumbers("FJ_punch1", {
-        start: 0,
-        end: 3,
-      }),
-      frameRate: 11,
+      key: "ken_siSpecial",
+      frames: [
+        ...scene.anims.generateFrameNumbers("Ken_siSpecial", {
+          start: 0,
+          end: 4,
+        }).map((frame) => ({ ...frame, duration: 25 })),
+        ...scene.anims.generateFrameNumbers("Ken_siSpecial", {
+          start: 5,
+          end: 19,
+        }),
+        ...scene.anims.generateFrameNumbers("Ken_siSpecial", {
+          start: 30,
+          end: 35,
+        }).map((frame) => ({ ...frame, duration: 70 })),
+      ],
+      frameRate: 24,
       repeat: 0,
     });
 
-    // dano
     scene.anims.create({
-      key: "FJ_dano",
-      frames: scene.anims.generateFrameNumbers("FJ_hurt", {
+      key: "ken_doSpecial",
+      frames: scene.anims.generateFrameNumbers("Ken_doSpecial", {
         start: 0,
-        end: 0,
+        end: 13,
       }),
-      frameRate: 1,
+      frameRate: 18,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_shoryuken_chamas",
+      frames: scene.anims.generateFrameNumbers("flames", {
+        start: 0,
+        end: 8,
+      }),
+      frameRate: 18,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_AneSpecial",
+      frames: scene.anims.generateFrameNumbers("Ken_AneSpecial", {
+        start: 0,
+        end: 12,
+      }),
+      frameRate: 18,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_AupSpecial",
+      frames: scene.anims.generateFrameNumbers("Ken_doSpecial", {
+        start: 2,
+        end: 14,
+      }),
+      frameRate: 20,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_AsiSpecial",
+      frames: scene.anims.generateFrameNumbers("Ken_AsiSpecial", {
+        start: 0,
+        end: 23,
+      }),
+      frameRate: 24,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_AdoSpecial",
+      frames: scene.anims.generateFrameNumbers("Ken_AdoSpecial", {
+        start: 4,
+        end: 14,
+      }),
+      frameRate: 24,
       repeat: 0,
     });
   }

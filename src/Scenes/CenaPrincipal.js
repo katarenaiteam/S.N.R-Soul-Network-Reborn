@@ -2,7 +2,7 @@ import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 //import * as Phaser from "phaser";
 import Madotsuki from "../Personagensjs/Madotsuki.js";
 import MapaCidade from "../Mapasjs/Cidade.js";
-import Frederick from "../Personagensjs/Frederick.js";
+import FJ from "../Personagensjs/Frederick.js";
 import SpiderMan from "../Personagensjs/SpiderMan.js";
 import Miku from "../Personagensjs/Miku.js";
 import Ken from "../Personagensjs/Ken.js";
@@ -264,8 +264,8 @@ this.jogador2 = this.criarPersonagem(
 
   criarPersonagem(nome, x, y, teclas, minDano, maxDano, controle) {
     switch (nome) {
-      case "Frederick":
-        return new Frederick(this, x, y, teclas, minDano, maxDano, controle);
+      case "FJ":
+        return new FJ(this, x, y, teclas, minDano, maxDano, controle);
       case "Madotsuki":
         return new Madotsuki(this, x, y, teclas, minDano, maxDano, controle);
       case "SpiderMan":
