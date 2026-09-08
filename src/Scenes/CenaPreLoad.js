@@ -251,7 +251,6 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.spritesheet("Miku_upAtack", "assets/personagens/Miku/Sprites/Miku_upAtack.png", { frameWidth: 393, frameHeight: 424 });
     this.load.spritesheet("Miku_airplosion", "assets/personagens/Miku/Sprites/Miku_airplosion.png", { frameWidth: 490, frameHeight: 342 });
     this.load.spritesheet("Miku_downAtack", "assets/personagens/Miku/Sprites/Miku_downAtack.png", { frameWidth: 390, frameHeight: 381 });
-    this.load.spritesheet("Miku_megasing", "assets/personagens/Miku/Sprites/Miku_megasing.png", { frameWidth: 423, frameHeight: 364 });
     this.load.spritesheet("Miku_sing1", "assets/personagens/Miku/Sprites/Miku_sing1.png", { frameWidth: 274, frameHeight: 376 });
     this.load.spritesheet("Miku_sing2", "assets/personagens/Miku/Sprites/Miku_sing2.png", { frameWidth: 308, frameHeight: 382 });
     this.load.spritesheet("Miku_effects", "assets/personagens/Miku/Sprites/Miku_effects.png", { frameWidth: 400, frameHeight: 400 });
@@ -270,6 +269,19 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.audio("sing5", "assets/personagens/Miku/Audio/sing5.wav");
     this.load.audio("sing6", "assets/personagens/Miku/Audio/sing6.wav");
     this.load.audio("sing7", "assets/personagens/Miku/Audio/sing7.wav");
+    // ult
+    this.load.spritesheet("Miku_megasing", "assets/personagens/Miku/Sprites/Miku_megasing.png", { frameWidth: 423, frameHeight: 364 });
+    this.load.spritesheet("beam_back", "assets/personagens/Miku/Sprites/ult/beam_back.png", { frameWidth: 640, frameHeight: 360 });
+    this.load.spritesheet("miku_pose", "assets/personagens/Miku/Sprites/ult/miku_pose.png", { frameWidth: 96, frameHeight: 110 });
+    this.load.spritesheet("miku_pose2", "assets/personagens/Miku/Sprites/ult/miku_pose2.png", { frameWidth: 153, frameHeight: 101 });
+    this.load.spritesheet("miku_beam1", "assets/personagens/Miku/Sprites/ult/miku_beam1.png", { frameWidth: 500, frameHeight: 123 });
+    this.load.spritesheet("miku_beam2", "assets/personagens/Miku/Sprites/ult/miku_beam2.png", { frameWidth: 385, frameHeight: 114 });
+    this.load.spritesheet("beam_reflected", "assets/personagens/Miku/Sprites/ult/beam_reflected.png", { frameWidth: 88, frameHeight: 140 });
+    this.load.spritesheet("beam_sparkles", "assets/personagens/Miku/Sprites/ult/beam_sparkles.png", { frameWidth: 159, frameHeight: 161 });
+    this.load.audio("miku-beam", "assets/personagens/Miku/Audio/miku-beam.wav");
+
+
+
     
     // --- Ken ---
     //base

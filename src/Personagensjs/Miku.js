@@ -3,6 +3,7 @@ import NotaCarregada from "./Specials/Miku/NotaCarregada.js";
 import MikuSpin from "./Specials/Miku/mikuSpin.js";
 import MikuPuppet from "./Specials/Miku/mikuPuppet.js";
 import AupSpecial from "./Specials/Miku/AupSpecial.js";
+import MikuUlt from "./Ult/MikuUlt.js";
 
 export default class Miku extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -342,7 +343,7 @@ this.vfxAtaqueNormal = {
       vozAtaque: ["sing1", "sing2", "sing3", "sing4", "sing5", "sing6", "sing7"],
       vozDanoNormal: ["hurt1", "hurt2", "hurt4"],
       vozDanoForte: ["hurt3", "hurt4", "hurt5"],
-      volumeVoz: 0.2,
+      volumeVoz: 0.4,
     };
 
    //   this.sons = {
@@ -777,6 +778,15 @@ this.vfxAtaqueNormal = {
     },
   };
 
+        this.ult = {
+        animacao: "miku_megasing",
+        logica: MikuUlt,
+
+        propriedades: {
+        anularGravidade: true
+       }
+     };
+
   }
   //animaoes====================================================
   static criarAnimacoes(scene) {
@@ -1100,6 +1110,41 @@ scene.anims.create({
       frameRate: 10,
       repeat: -1,
     });
+
+     if (!scene.anims.exists("miku_megasing")) {
+  scene.anims.create({
+    key: "miku_megasing",
+
+    frames: scene.anims.generateFrameNumbers(
+      "Miku_megasing",
+      {
+        start: 0,
+        end: 13
+      }
+    ),
+
+    frameRate: 12,
+    repeat: 0
+  });
+}
+
+
+if (!scene.anims.exists("miku_megasing_loop")) {
+  scene.anims.create({
+    key: "miku_megasing_loop",
+
+    frames: scene.anims.generateFrameNumbers(
+      "Miku_megasing",
+      {
+        start: 10,
+        end: 13
+      }
+    ),
+
+    frameRate: 12,
+    repeat: -1
+  });
+}
   }
 }
 

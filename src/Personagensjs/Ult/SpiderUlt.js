@@ -31,6 +31,8 @@ export default class SpiderUlt {
     this.fundoFaseEraVisivel = true;
     this.visibilidadePlataformas = [];
     this.timerFalhaUlt = null;
+    this.timerFreezeUlt = null;
+    this.cancelada = false;
     this.intervaloTremorFinal = null;
     this.posCameraAntesTremor = null;
     this.efeitosUlt = new Set();
@@ -38,6 +40,7 @@ export default class SpiderUlt {
   }
 
   executar() {
+    this.cancelada = false;
     if (!this.oponente) {
       this.estadoFSM.finalizarUlt();
       return;
@@ -77,7 +80,9 @@ export default class SpiderUlt {
     cam.pan(this.personagem.sprite.x, this.personagem.sprite.y, tempoZoom, "Power2");
     cam.zoomTo(zoomAtual * 1.4, tempoZoom);
 
-    this.scene.time.delayedCall(tempoTotalFreeze, () => {
+    this.timerFreezeUlt = this.scene.time.delayedCall(tempoTotalFreeze, () => {
+      this.timerFreezeUlt = null;
+      if (this.cancelada) return;
       this.scene.physics.resume();
 
       if (this.personagem.sprite.anims) {
@@ -593,7 +598,7 @@ export default class SpiderUlt {
 
     // Exclui as celulas vazias no fim das spritesheets.
     const ultimosFrames = {
-      poseEffect: 15, dashEffect: 9,
+      poseEffect: 15, dashEffect: 11,
       "2impact": 5, "3impact": 10, "4impact": 11, finalImpact: 9
     };
     const animacao = `spider_vfx_${textura}`;
@@ -926,6 +931,7 @@ export default class SpiderUlt {
     }
   }
   cancelar() {
+    this.cancelada = true;
     this.limparEfeitosUlt();
     this.congelado = false;
     this.pararTremorFinal();
@@ -942,6 +948,12 @@ export default class SpiderUlt {
       this.timerEtapa.remove();
       this.timerEtapa = null;
     }
+    if (this.timerFreezeUlt) {
+      this.timerFreezeUlt.remove(false);
+      this.timerFreezeUlt = null;
+    }
+
+    this.scene.physics.resume();
 
     if (this.personagem && this.personagem.sprite && this.personagem.sprite.body) {
       this.personagem.sprite.body.setAllowGravity(true);
