@@ -112,7 +112,7 @@ export default class CenaPreload extends Phaser.Scene {
 
     // --- Frederick Johnson ---
     //base
-    this.load.spritesheet("FJ_idle", "assets/personagens/FJ/Sprites/FJ_idle.png", { frameWidth: 379, frameHeight: 409 });
+    this.load.spritesheet("FJ_idle", "assets/personagens/FJ/Sprites/FJ_Idle.png", { frameWidth: 379, frameHeight: 409 });
     this.load.spritesheet("FJ_walk", "assets/personagens/FJ/Sprites/FJ_walk.png", { frameWidth: 411, frameHeight: 335 });
     this.load.spritesheet("FJ_jump", "assets/personagens/FJ/Sprites/FJ_jump.png", { frameWidth: 342, frameHeight: 553 });
     this.load.spritesheet("FJ_crouch1", "assets/personagens/FJ/Sprites/FJ_crouch1.png", { frameWidth: 317, frameHeight: 340 });
