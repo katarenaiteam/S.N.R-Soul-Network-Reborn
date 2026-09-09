@@ -105,20 +105,7 @@ this.jogador2 = this.criarPersonagem(
   controleP2
 );
 
-    //efeito aura==================
-    // Verifica se a Madotsuki foi escolhida no P1 ou no P2
-  //  const temDio =
-  //    this.jogador1.nomePersonagem === "Dio" ||
-  //    this.jogador2.nomePersonagem === "Dio";
-
-    // Se ela estiver na partida, usa a música dela, senão usa a normal da fase
- //   const musicaParaTocar = temDio ? "DiosAmendment" : "ClockTower";
-
-  //  this.musicaFase = this.sound.add(musicaParaTocar, {
-  //    loop: true,
-  //    volume: 0.1,
-  //  });
-  //  this.musicaFase.play();
+  
 
     // 2. Cria a HUD do P1 na ESQUERDA
     this.hudP1_Nome = this.criarHudPartida(
@@ -130,7 +117,7 @@ this.jogador2 = this.criarPersonagem(
     );
 
       // Texto para exibir as Vidas do P1
-    this.hudP1_Vidas = this.add.text(290, 1010, `VIDAS: ${this.vidasP1}`, { fontSize: "32px", fill: "#e2d8d9", fontStyle: "bold" })
+    this.hudP1_Vidas = this.add.text(290, 840, `VIDAS: ${this.vidasP1}`, { fontSize: "32px", fill: "#e2d8d9", fontStyle: "bold" })
       .setScrollFactor(0)
       .setDepth(1100);
 
@@ -143,10 +130,14 @@ this.jogador2 = this.criarPersonagem(
       true,
     );
 
-      this.hudP2_Vidas = this.add.text(this.scale.width - 80, 1010, `VIDAS: ${this.vidasP2}`, { fontSize: "32px", fill: "#e2d8d9", fontStyle: "bold" })
+      this.hudP2_Vidas = this.add.text(this.scale.width - 80, 840, `VIDAS: ${this.vidasP2}`, { fontSize: "32px", fill: "#e2d8d9", fontStyle: "bold" })
         .setOrigin(1, 0)
         .setScrollFactor(0)
         .setDepth(1100);
+
+
+    // --- criar barra ---
+
 
     // --- COLISÃO ---
     // Diz que o sprite da Morrigan colide com o grupo de plataformas
@@ -231,6 +222,16 @@ this.jogador2 = this.criarPersonagem(
       hud.add(retrato);
     }
 
+    // A arte fica no rodape do frame de 800x650: use a mesma escala
+    // do retrato para que a barra nao seja desenhada abaixo da tela.
+    const barraUlt = this.add.sprite(0, 0, "ultbar", 0)
+      .setOrigin(ladoDireito ? 1 : 0, 0)
+      .setDisplaySize(larguraRetrato, larguraRetrato * (650 / 800));
+
+    hud.add(barraUlt);
+    hud.barraUlt = barraUlt;
+    hud.frameUltAtual = 0;
+
     hud.setText = (valor) => {
       const porcentagem = Math.max(0, Math.floor(Number.parseFloat(valor) || 0));
       if (hud.numero) hud.remove(hud.numero, true);
@@ -279,11 +280,57 @@ this.jogador2 = this.criarPersonagem(
     }
   }
 
+      atualizarBarraUlt(jogador, hud) {
+  if (!jogador || !hud?.barraUlt) {
+    return;
+  }
+
+  const progresso = Phaser.Math.Clamp(
+    jogador.ultCarga / jogador.ultCargaMax,
+    0,
+    1
+  );
+
+  const ultimoFrame = 65;
+
+  const frame = progresso >= 1
+    ? ultimoFrame
+    : Math.floor(
+        progresso * ultimoFrame
+      );
+
+  if (hud.frameUltAtual === frame) {
+    return;
+  }
+
+  hud.frameUltAtual = frame;
+
+  hud.barraUlt.setFrame(frame);
+}
+
   // 3. LOOP DE ATUALIZAÇÃO
-  update() {
-    // Manda o Personagem.js atualizar o movimento e animações a cada frame
-    if (this.jogador1) this.jogador1.update();
-    if (this.jogador2) this.jogador2.update();
+  update(time, delta) {
+
+      if (this.jogador1) {
+    this.jogador1.atualizarCargaUlt(delta);
+    this.jogador1.update();
+  }
+
+  if (this.jogador2) {
+    this.jogador2.atualizarCargaUlt(delta);
+    this.jogador2.update();
+  }
+
+  this.atualizarBarraUlt(
+    this.jogador1,
+    this.hudP1_Nome
+  );
+
+  this.atualizarBarraUlt(
+    this.jogador2,
+    this.hudP2_Nome
+  );
+
 
     // Neste ponto os dois jogadores ja sincronizaram suas hurtboxes. Fazer a
     // verificacao tambem aqui evita depender da ordem P1 -> P2 ou do numero de

@@ -101,6 +101,8 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("8.png", "assets/Hud/DamagePercentage/0-19_/8.png");
     this.load.image("9.png", "assets/Hud/DamagePercentage/0-19_/9.png");
     this.load.image("pct.png", "assets/Hud/DamagePercentage/0-19_/pct.png");
+    //ultbar
+    this.load.spritesheet("ultbar", "assets/Hud/Portrait/ultbar.png", { frameWidth: 800, frameHeight: 650 });
 
 
     // --- PERSONAGENS ---
@@ -323,7 +325,15 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.spritesheet("Ken_AneSpecial", "assets/personagens/Ken/Sprites/Ken_AneSpecial.png", { frameWidth: 146, frameHeight: 113 });
     this.load.spritesheet("Ken_AsiSpecial", "assets/personagens/Ken/Sprites/Ken_AsiSpecial.png", { frameWidth: 159, frameHeight: 124 });
     this.load.spritesheet("Ken_AdoSpecial", "assets/personagens/Ken/Sprites/Ken_AdoSpecial.png", { frameWidth: 166, frameHeight: 132 });
-  
+    //ult
+     this.load.spritesheet("Ken_AdoSpecial", "assets/personagens/Ken/Sprites/Ken_AdoSpecial.png", { frameWidth: 166, frameHeight: 132 });
+    //ult
+     this.load.spritesheet("Ken_ult", "assets/personagens/Ken/Sprites/ult/Ken_ult.png", { frameWidth: 155, frameHeight: 233 });
+     this.load.spritesheet("ken-pose1", "assets/personagens/Ken/Sprites/ult/ken-pose1.png", { frameWidth: 415, frameHeight: 320 });
+     this.load.spritesheet("ken-pose2", "assets/personagens/Ken/Sprites/ult/ken-pose2.png", { frameWidth: 328, frameHeight: 266 });
+     this.load.spritesheet("ken-pose1", "assets/personagens/Ken/Sprites/ult/ken-pose1.png", { frameWidth: 415, frameHeight: 320 });
+     this.load.spritesheet("ken-pose3", "assets/personagens/Ken/Sprites/ult/ken-pose3.png", { frameWidth: 488, frameHeight: 95 });
+     this.load.spritesheet("ken-launch", "assets/personagens/Ken/Sprites/ult/ken-launch.png", { frameWidth: 144, frameHeight: 60 });
 
     // --- visual effects ---
     //

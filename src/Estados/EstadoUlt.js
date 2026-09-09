@@ -1,73 +1,249 @@
 import EstadoBase from "./EstadoBase.js";
 
 export default class EstadoUlt extends EstadoBase {
+
+  // ============================================================
+  // VERIFICA SE PODE ENTRAR NA ULT
+  // ============================================================
+
+  podeEntrar() {
+
+  const scene =
+    this.personagem.scene;
+
+
+  // Personagem nem possui Ult.
+  if (!this.personagem.ult) {
+    return false;
+  }
+
+
+  // ============================================================
+  // BARRA PRECISA ESTAR CHEIA
+  // ============================================================
+
+  if (
+    !this.personagem.ultEstaCarregada()
+  ) {
+    return false;
+  }
+
+
+  // ============================================================
+  // NÃO PODE TER OUTRA ULT RODANDO
+  // ============================================================
+
+  if (
+    scene.ultEmAndamento &&
+    scene.ultEmAndamento !==
+      this.personagem
+  ) {
+    return false;
+  }
+
+
+  return true;
+}
+
+
+  // ============================================================
+  // ENTRA NA ULT
+  // ============================================================
+
   enter(dados = {}) {
     this.ultAtual = this.personagem.ult;
 
-    // Se o personagem não tiver ult definida, ignora e volta pro idle
     if (!this.ultAtual) {
       this.finalizarUlt();
       return;
     }
 
-    const direcaoOlhar = this.personagem.sprite.flipX ? -1 : 1;
-    this.tempoInicio = this.personagem.scene.time.now;
+    const scene = this.personagem.scene;
 
-    // Trava movimentação e botões padrão do personagem
+    // ============================================================
+    // RESERVA A ULT PARA ESTE PERSONAGEM
+    // ============================================================
+
+    scene.ultEmAndamento = this.personagem;
+
+    this.possuiBloqueioUlt = true;
+
+    this.personagem.consumirUlt();
+
+
+    this.tempoInicio =
+      scene.time.now;
+
+
+    // ============================================================
+    // TRAVA CONTROLES NORMAIS
+    // ============================================================
+
     this.personagem.podeMover = false;
     this.personagem.podeAtacar = false;
 
-    // Anular gravidade se configurado
-    if (this.ultAtual?.propriedades?.anularGravidade) {
+
+    // ============================================================
+    // GRAVIDADE
+    // ============================================================
+
+    if (
+      this.ultAtual?.propriedades?.anularGravidade
+    ) {
       this.anulouGravidade = true;
-      this.personagem.sprite.body.setAllowGravity(false);
-      this.personagem.sprite.body.setVelocity(0, 0);
+
+      this.personagem.sprite.body.setAllowGravity(
+        false
+      );
+
+      this.personagem.sprite.body.setVelocity(
+        0,
+        0
+      );
+
     } else {
+
       this.anulouGravidade = false;
     }
 
-    // Toca a animação da Ult definida na ficha do personagem
-    const animChave = this.ultAtual?.animacao;
-    if (animChave && this.personagem.scene.anims.exists(animChave)) {
-      this.personagem.sprite.anims.play(animChave, true);
+
+    // ============================================================
+    // ANIMAÇÃO INICIAL
+    // ============================================================
+
+    const animChave =
+      this.ultAtual?.animacao;
+
+    if (
+      animChave &&
+      scene.anims.exists(animChave)
+    ) {
+      this.personagem.sprite.anims.play(
+        animChave,
+        true
+      );
     }
 
-    // Instancia a lógica específica (SpiderUlt ou a Ult de qualquer outro boneco)
-    if (this.ultAtual?.logica && !this.logicaUlt) {
-      const LogicaUlt = this.ultAtual.logica;
-      this.logicaUlt = new LogicaUlt(this.personagem, this.ultAtual, this);
+
+    // ============================================================
+    // LÓGICA ESPECÍFICA
+    // ============================================================
+
+    if (
+      this.ultAtual?.logica &&
+      !this.logicaUlt
+    ) {
+
+      const LogicaUlt =
+        this.ultAtual.logica;
+
+      this.logicaUlt =
+        new LogicaUlt(
+          this.personagem,
+          this.ultAtual,
+          this
+        );
+
       this.logicaUlt.executar();
     }
   }
 
+
+  // ============================================================
+  // UPDATE
+  // ============================================================
+
   execute() {
-    // Repassa o ciclo de update para a classe de lógica (se ela possuir método atualizar)
-    if (this.logicaUlt && typeof this.logicaUlt.atualizar === "function") {
+    if (
+      this.logicaUlt &&
+      typeof this.logicaUlt.atualizar === "function"
+    ) {
       this.logicaUlt.atualizar();
     }
   }
+
+
+  // ============================================================
+  // FINALIZA
+  // ============================================================
 
   finalizarUlt() {
     this.personagem.podeMover = true;
     this.personagem.podeAtacar = true;
 
-    if (this.personagem.sprite.body.blocked.down) {
-      this.personagem.maquinaEstados.mudarEstado("idle");
+    if (
+      this.personagem.sprite.body.blocked.down
+    ) {
+      this.personagem.maquinaEstados.mudarEstado(
+        "idle"
+      );
     } else {
-      this.personagem.maquinaEstados.mudarEstado("jump");
+      this.personagem.maquinaEstados.mudarEstado(
+        "jump"
+      );
     }
   }
 
+
+  // ============================================================
+  // SAI DA ULT
+  // ============================================================
+
   exit() {
-    if (this.logicaUlt && typeof this.logicaUlt.cancelar === "function") {
+    const scene =
+      this.personagem.scene;
+
+
+    // ============================================================
+    // CANCELA LÓGICA DA ULT
+    // ============================================================
+
+    if (
+      this.logicaUlt &&
+      typeof this.logicaUlt.cancelar === "function"
+    ) {
       this.logicaUlt.cancelar();
     }
 
+
+    // ============================================================
+    // RESTAURA GRAVIDADE
+    // ============================================================
+
     if (this.anulouGravidade) {
-      this.personagem.sprite.body.setAllowGravity(true);
+
+      this.personagem.sprite.body.setAllowGravity(
+        true
+      );
+
       this.anulouGravidade = false;
     }
 
+
     this.logicaUlt = null;
+
+
+    // ============================================================
+    // LIBERA A ULT GLOBAL
+    // ============================================================
+
+    /*
+      MUITO IMPORTANTE:
+
+      só libera se ESTE personagem for realmente
+      o dono da Ult ativa.
+
+      Assim um personagem bloqueado nunca consegue
+      apagar o lock de outra pessoa.
+    */
+
+    if (
+      this.possuiBloqueioUlt &&
+      scene.ultEmAndamento === this.personagem
+    ) {
+      scene.ultEmAndamento = null;
+    }
+
+    this.possuiBloqueioUlt = false;
   }
 }

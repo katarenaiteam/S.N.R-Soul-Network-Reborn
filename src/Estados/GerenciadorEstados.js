@@ -19,20 +19,33 @@ export default class GerenciadorEstados {
    * Faz a transição de um estado para outro
    * @param {string} nome - O nome do estado para o qual quer mudar
    */
-  mudarEstado(nome, dados = {}) {
-    if (!this.estados[nome]) {
-      console.warn(`O estado "${nome}" não foi registrado!`);
-      return;
-    }
+ mudarEstado(nome, dados = {}) {
+  const proximoEstado = this.estados[nome];
 
-    if (this.estadoAtual) {
-      this.estadoAtual.exit();
-    }
-
-    this.estadoAtual = this.estados[nome];
-
-    this.estadoAtual.enter(dados);
+  if (!proximoEstado) {
+    console.warn(`O estado "${nome}" não foi registrado!`);
+    return false;
   }
+
+  // Permite que um estado recuse a entrada
+  // ANTES de cancelar o estado atual.
+  if (
+    typeof proximoEstado.podeEntrar === "function" &&
+    !proximoEstado.podeEntrar(dados)
+  ) {
+    return false;
+  }
+
+  if (this.estadoAtual) {
+    this.estadoAtual.exit();
+  }
+
+  this.estadoAtual = proximoEstado;
+
+  this.estadoAtual.enter(dados);
+
+  return true;
+}
 
   /**
    * Atualização contínua (deve ser chamada dentro do update do Personagem)

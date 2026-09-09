@@ -3,6 +3,7 @@ import Hadouken from "./Specials/Ken/hadouken.js";
 import Tatsumaki from "./Specials/Ken/tatsumaki.js";
 import Shoryuken from "./Specials/Ken/shoryuken.js";
 import AxeKick from "./Specials/Ken/axeKick.js";
+import KenUlt from "./Ult/KenUlt.js";
 
 export default class Ken extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -786,6 +787,16 @@ this.nomePersonagem = "Ken";
 
     };
 
+
+    this.ult = {
+  animacao: "ken_ult",
+  logica: KenUlt,
+
+  propriedades: {
+    anularGravidade: true
+  }
+};
+
   }
 
   //animaçoes====================================================
@@ -1161,6 +1172,26 @@ scene.anims.create({
         end: 14,
       }),
       frameRate: 24,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_ult",
+      frames: scene.anims.generateFrameNumbers("Ken_ult", {
+        start: 2,
+        end: 28,
+      }),
+      frameRate: 18,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "ken_ult",
+      frames: scene.anims.generateFrameNumbers("Ken_ult", {
+        start: 2,
+        end: 28,
+      }),
+      frameRate: 18,
       repeat: 0,
     });
   }

@@ -15,7 +15,7 @@ export default class FJ extends Personagem {
       "fj_idle",
       "0",
       {
-        velocidade: 240,
+        velocidade: 290,
         forcaPulo: -600,
         maxPulos: 2,
         maxDash: 1,
@@ -93,14 +93,27 @@ this.nomePersonagem = "Frederick Johnson";
       
       crouch: {
         largura: 80,
-        altura: 60,
-        offsetX: 5,
-        offsetY: 50,
+        altura: 240,
+        offsetX: 118,
+        offsetY: 80,
         escala: 0.33,
         hurtboxes: [
           { largura: 65, altura: 60, offsetX: 0, offsetY: -35 },
         ],
       },
+      crouch3: {
+        largura: 80,
+        altura: 240,
+        offsetX: 118,
+        offsetY: 80,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 65, altura: 60, offsetX: 0, offsetY: -35 },
+        ],
+      },
+       
+
+  
 
       dash: {
         largura: 70,
@@ -449,7 +462,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 10,
       }),
-      frameRate: 18,
+      frameRate: 12,
       repeat: 0,
     });
 
@@ -459,7 +472,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 2,
       }),
-      frameRate: 12,
+      frameRate: 16,
       repeat: 0,
     });
 
@@ -470,7 +483,7 @@ if (!scene.anims.exists("punch_effect3")) {
         end: 2,
       }),
       frameRate: 10,
-      repeat: 0,
+      repeat: -1,
     });
 
     scene.anims.create({
@@ -479,7 +492,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 2,
       }),
-      frameRate: 15,
+      frameRate: 18,
       repeat: 0,
     });
 

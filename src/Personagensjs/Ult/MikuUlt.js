@@ -1,9 +1,9 @@
 const INTRO = {
-  duracao: 9000,
+  duracao: 9300,
 
   // Mesmo SpiderUlt
   tempoZoom: 200,
-  zoom: 1.4,
+  zoom: 1.8,
 
   // Escurece só perto do fim da intro
   escurecerAos: 7000,
@@ -26,12 +26,12 @@ const RAIO = {
 
   // multihit
   intervaloHit: 180,
-  danoHit: 0.8,
-  knockHit: 45,
+  danoHit: 2,
+  knockHit: 85,
 
   // final
   danoFinal: 10,
-  knockFinal: 900,
+  knockFinal:1400,
 
   fadeOut: 700
 };
@@ -183,10 +183,13 @@ restaurarMusicaFase() {
     this.pose1 = this.criarVFX(
       "miku_pose",
       true,
-      this.personagem.sprite.x + 10,
+       this.personagem.sprite.x +
+    (this.personagem.sprite.flipX ? -15 : 15),
       this.personagem.sprite.y - 55
     );
-
+      this.pose1?.setFlipX(
+     this.personagem.sprite.flipX
+   );
     // ========================================================
     // CAMERA = MESMO SPIDERULT
     // ========================================================
@@ -195,7 +198,7 @@ restaurarMusicaFase() {
 
     cam.pan(
       this.personagem.sprite.x,
-      this.personagem.sprite.y,
+      this.personagem.sprite.y - 50,
       INTRO.tempoZoom,
       "Power2"
     );
@@ -379,11 +382,16 @@ restaurarMusicaFase() {
     this.pose1 = null;
 
     this.pose2 = this.criarVFX(
-      "miku_pose2",
-      true,
-      this.personagem.sprite.x +10,
-      this.personagem.sprite.y - 55
-    );
+  "miku_pose2",
+  true,
+  this.personagem.sprite.x +
+    (this.personagem.sprite.flipX ? -15 : 15),
+  this.personagem.sprite.y - 55
+);
+
+this.pose2?.setFlipX(
+  this.personagem.sprite.flipX
+);
 
     // Revela beam_back
     if (this.overlayPreto) {
@@ -841,7 +849,7 @@ if (agora < bloqueadoAte) {
 
         tumbling: false,
 
-        hitstunFixoFrames: 3,
+        hitstunFixoFrames: 12,
 
         ignorarHitstunDecay: true
       },
@@ -947,7 +955,7 @@ if (agora < bloqueadoAte) {
             ),
 
           knockbackY:
-            y * RAIO.knockFinal - 150,
+            y * RAIO.knockFinal - 450,
 
           tumbling: true
         },

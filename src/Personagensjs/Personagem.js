@@ -51,6 +51,20 @@ export default class Personagem {
     this.tempoUltimoHit = -Infinity;
     this.tweenSquashPouso = null;
 
+    //--ult
+    this.ultCarga = 0;
+    this.ultCargaMax = 100;
+    // 1 minuto e 30 segundos
+    this.ultTempoCarga = 90000;
+    // Boost ao receber dano
+    this.ultMultiplicadorCarga = 1;
+    this.ultBoostAte = 0;
+    // Quanto tempo dura o aumento de velocidade
+    this.ultDuracaoBoost = 4000;
+    // Multiplicador máximo
+    this.ultMultiplicadorMax = 3;
+
+
     // Atributos
     this.velocidade = config.velocidade;
     this.forcaPulo = config.forcaPulo;
@@ -203,6 +217,11 @@ export default class Personagem {
 
     //. LÓGICA PADRÃO DE DANO (Quando toma golpe sem escudo):
     this.porcentagemDano += quantidade;
+
+    this.aplicarBoostUltPorDano(
+    quantidade
+    );
+
     if (this.textoDano) this.textoDano.setText(`${Math.floor(this.porcentagemDano)}%`);
 
     if (quantidade > 0) {
@@ -358,6 +377,160 @@ export default class Personagem {
 
     return false;
   }
+
+  // ============================================================
+// ATUALIZA A CARGA DA ULT
+// ============================================================
+
+atualizarCargaUlt(delta) {
+
+  if (!this.ult) {
+    return;
+  }
+
+  // Já está cheia.
+  if (this.ultCarga >= this.ultCargaMax) {
+    this.ultCarga = this.ultCargaMax;
+    return;
+  }
+
+  // Não recarrega enquanto alguma Ult está acontecendo.
+  if (this.scene.ultEmAndamento) {
+    return;
+  }
+
+
+  const agora = this.scene.time.now;
+
+
+  // ============================================================
+  // TERMINOU O BOOST DE DANO
+  // ============================================================
+
+  if (
+    this.ultMultiplicadorCarga > 1 &&
+    agora >= this.ultBoostAte
+  ) {
+    this.ultMultiplicadorCarga = 1;
+  }
+
+
+  // ============================================================
+  // VELOCIDADE BASE
+  // ============================================================
+  //
+  // 100 / 90000
+  //
+  // = 1.111... de Ult por segundo
+  //
+
+  const cargaPorMs =
+    this.ultCargaMax /
+    this.ultTempoCarga;
+
+
+  const ganho =
+    cargaPorMs *
+    delta *
+    this.ultMultiplicadorCarga;
+
+
+  this.ultCarga = Phaser.Math.Clamp(
+    this.ultCarga + ganho,
+    0,
+    this.ultCargaMax
+  );
+}
+
+
+// ============================================================
+// BOOST POR RECEBER DANO
+// ============================================================
+
+aplicarBoostUltPorDano(dano) {
+
+  if (
+    !Number.isFinite(dano) ||
+    dano <= 0
+  ) {
+    return;
+  }
+
+
+  /*
+    Cada ponto de dano aumenta um pouco
+    a velocidade.
+
+    10 de dano:
+    +0.25x
+
+    20 de dano:
+    +0.50x
+
+    40 de dano:
+    +1.00x
+  */
+
+  const bonus =
+    dano * 0.025;
+
+
+  const agora =
+    this.scene.time.now;
+
+
+  // Se já estava boostado,
+  // o novo dano aumenta ainda mais.
+  if (agora < this.ultBoostAte) {
+
+    this.ultMultiplicadorCarga =
+      Phaser.Math.Clamp(
+        this.ultMultiplicadorCarga + bonus,
+        1,
+        this.ultMultiplicadorMax
+      );
+
+  } else {
+
+    this.ultMultiplicadorCarga =
+      Phaser.Math.Clamp(
+        1 + bonus,
+        1,
+        this.ultMultiplicadorMax
+      );
+  }
+
+
+  // Cada novo dano renova os 4 segundos.
+  this.ultBoostAte =
+    agora + this.ultDuracaoBoost;
+}
+
+
+// ============================================================
+// ULT CHEIA
+// ============================================================
+
+ultEstaCarregada() {
+  return (
+    this.ultCarga >=
+    this.ultCargaMax
+  );
+}
+
+
+// ============================================================
+// GASTA ULT
+// ============================================================
+
+consumirUlt() {
+
+  this.ultCarga = 0;
+
+  this.ultMultiplicadorCarga = 1;
+
+  this.ultBoostAte = 0;
+}
 
   // --- LOOP PRINCIPAL ---
  update() {

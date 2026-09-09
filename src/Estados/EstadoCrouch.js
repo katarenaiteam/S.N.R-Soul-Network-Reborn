@@ -75,14 +75,6 @@ export default class EstadoCrouch extends EstadoBase {
       return;
     }
 
-    if (
-      !this.personagem.sprite.body.blocked.down &&
-      !this.personagem.sprite.body.touching.down
-    ) {
-      this.personagem.maquinaEstados.mudarEstado("jump");
-      return;
-    }
-
     //taunt <3
     if (this.personagem.inputJustDown("taunt")) {
     this.personagem.maquinaEstados.mudarEstado("taunt");
