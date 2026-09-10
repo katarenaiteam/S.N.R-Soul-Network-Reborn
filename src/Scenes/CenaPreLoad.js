@@ -127,7 +127,17 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("FJ_hurt2", "assets/personagens/FJ/Sprites/FJ_hurt2.png", { frameWidth: 318, frameHeight: 449 });
     this.load.spritesheet("FJ_dead", "assets/personagens/FJ/Sprites/FJ_dead.png", { frameWidth: 510, frameHeight: 259 });
     this.load.spritesheet("FJ_getup", "assets/personagens/FJ/Sprites/FJ_getup.png", { frameWidth: 406, frameHeight: 343 });
-
+    //atack
+    this.load.spritesheet("FJ_neu1", "assets/personagens/FJ/Sprites/FJ_neu1.png", { frameWidth: 470, frameHeight: 380 });
+    this.load.spritesheet("FJ_neu2", "assets/personagens/FJ/Sprites/FJ_neu2.png", { frameWidth: 882, frameHeight: 363 });
+    this.load.spritesheet("FJ_neu3", "assets/personagens/FJ/Sprites/FJ_neu3.png", { frameWidth: 468, frameHeight: 448 });
+    this.load.spritesheet("FJ_SideAtack", "assets/personagens/FJ/Sprites/FJ_SideAtack.png", { frameWidth: 452, frameHeight: 385 });
+    this.load.spritesheet("FJ_downAtack", "assets/personagens/FJ/Sprites/FJ_downAtack.png", { frameWidth: 514, frameHeight: 687 });
+    this.load.spritesheet("FJ_AirNeutro", "assets/personagens/FJ/Sprites/FJ_AirNeutro.png", { frameWidth: 499, frameHeight: 533 });
+    //airSide
+    //airUP
+    this.load.spritesheet("FJ_airDown", "assets/personagens/FJ/Sprites/FJ_airDown.png", { frameWidth: 508, frameHeight: 553 });
+    //specials
 
     // --- TH30 ---
    

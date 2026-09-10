@@ -215,69 +215,81 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
       atack1: {
-        largura: 80,
-        altura: 120,
-        offsetX: 41,
-        offsetY: -10,
-        escala: 1,
+        largura: 250,
+        altura: 400,
+        offsetX: 130,
+        offsetY: -40,
+        escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
-          { largura: 67, altura: 35, offsetX: 0, offsetY: -18 },
+          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
         ],
       },
 
       atack2: {
-        largura: 80,
-        altura: 120,
-        offsetX: 61,
-        offsetY: -10,
-        escala: 1,
+        largura: 250,
+        altura: 400,
+        offsetX: 130,
+        offsetY: -60,
+        escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
-          { largura: 67, altura: 35, offsetX: 0, offsetY: -18 },
+          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
         ],
       },
 
       atack3: {
-        largura: 80,
-        altura: 120,
-        offsetX: 70,
-        offsetY: 0,
-        escala: 1,
+         largura: 250,
+        altura: 400,
+        offsetX: 130,
+        offsetY: 20,
+        escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
-          { largura: 35, altura: 35, offsetX: 17, offsetY: -18 },
+          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
         ],
       },
 
       neutralAir: {
-        largura: 85,
-        altura: 120,
-        offsetX: 22,
-        offsetY: -5,
-        escala: 1,
+         largura: 250,
+        altura: 400,
+        offsetX: 130,
+        offsetY: -10,
+        escala: 0.33,
         hurtboxes: [
-          { largura: 50, altura: 55, offsetX: -20, offsetY: -85 },
-          { largura: 60, altura: 25, offsetX: -25, offsetY: -40 },
+          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
         ],
       },
 
       sideAtack: {
-        largura: 85,
-        altura: 120,
-        offsetX: 30,
-        offsetY: 0,
-        escala: 1,
-        hurtboxes: [{ largura: 60, altura: 100, offsetX: -20, offsetY: -50 }],
+         largura: 250,
+        altura: 400,
+        offsetX: 130,
+        offsetY: -10,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
+        ],
       },
 
       downAtack: {
-        largura: 85,
-        altura: 60,
-        offsetX: 36,
-        offsetY: 12,
-        escala: 1,
-        hurtboxes: [{ largura: 50, altura: 60, offsetX: -10, offsetY: -30 }],
+         largura: 250,
+        altura: 400,
+        offsetX: 130,
+        offsetY: -10,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
+        ],
       },
 
       sideAir: {
@@ -299,12 +311,16 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
       downAir: {
-        largura: 85,
-        altura: 120,
-        offsetX: 12,
-        offsetY: 12,
-        escala: 1,
-        hurtboxes: [{ largura: 60, altura: 80, offsetX: -10, offsetY: -70 }],
+         largura: 250,
+        altura: 400,
+        offsetX: 130,
+        offsetY: -10,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
+        ],
       },
 
       neSpecial: {
@@ -396,7 +412,195 @@ this.nomePersonagem = "Frederick Johnson";
   
 
     // ============================ tabela de golpes =====================================
-   
+   this.golpes = {
+      neutro1: {
+        animacao: "fj_atack1",
+        frameHitbox: 2,
+        offsetX: 40,
+        offsetY: -80,
+        largura: 75,
+        altura: 20,
+        cooldown: 700,
+        duracao: 350,
+        cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
+        propriedades: {
+           tipoSomImpacto: "light",
+          dano: 4,
+          knockbackX: 30,
+          knockbackY: -20,
+          knockbackFixo: true,
+          hitstunFrames: 18,
+          hitsSemDecay: 2
+        },
+
+        comboProximo: "neutro2",
+        comboJanelaInicio: 200,
+        comboJanelaFim: 300,
+      },
+
+      neutro2: {
+        animacao: "fj_atack2",
+
+        frameHitbox: 2,
+
+        offsetX: 40,
+        offsetY: -80,
+        largura: 73,
+        altura: 25,
+        duracao: 400,
+        cancelavel: true,
+        propriedades: {
+           tipoSomImpacto: "heavy",
+          dano: 4,
+          knockbackX: 40,
+          knockbackY: -30,
+          knockbackFixo: true,
+          hitstunFrames: 18,
+        },
+
+        comboProximo: "neutro3",
+        comboJanelaInicio: 200,
+        comboJanelaFim: 400,
+      },
+
+      neutro3: {
+        animacao: "fj_atack3",
+
+        frameHitbox: 3,
+
+        offsetX: 50,
+        offsetY: -72,
+        largura: 80,
+        altura: 36,
+        duracao: 600,
+        cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
+        bufferInputs: true,
+        bufferJanelaInicio: 50,
+        bufferJanelaFim: 350,
+        propriedades: {
+           tipoSomImpacto: "heavy",
+          dano: 8,
+          knockbackX: 350,
+          knockbackY: -310,
+          tumbling: true,
+          hitstunBaseFrames: 18
+        },
+      },
+
+      side: {
+        animacao: "fj_sideAtack",
+        frameHitbox: 4,
+        offsetX: 40,
+        offsetY: -57,
+        largura: 80,
+        altura: 25,
+        cooldown: 900,
+        duracao: 500,
+        cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
+        propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 12,
+          knockbackX: 550,
+          knockbackY: -400,
+          tumbling: true,
+        },
+      },
+     agachado: {
+        animacao: "fj_downAtack",
+        frameHitbox: 3,
+        offsetX: 26,
+        offsetY: -20,
+        largura: 70,
+        altura: 25,
+        cooldown: 900,
+        duracao: 400,
+        cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+        propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 12,
+          knockbackX: 40,
+          knockbackY: -400,
+          tumbling: true,
+          knockbackFixo: true,
+        },
+      },
+
+        air_neutro: {
+        animacao: "fj_neutralAir",
+        frameHitbox: 3,
+        offsetX: 28,
+        offsetY: -85,
+        largura: 70,
+        altura: 25,
+        cooldown: 900,
+        duracao: 350,
+         finalizarAoTocarChao: true,
+        atrasoFinalizacaoChao: 30,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+        propriedades: {
+          tipoSomImpacto: "light",
+          dano: 12,
+          knockbackX: 120,
+          knockbackY: -470,
+          tumbling: false,
+          knockbackFixo: true,
+        },
+      },
+
+
+      air_agachado: {
+        animacao: "fj_sideAir",
+        frameHitbox: 3,
+        offsetX: 26,
+        offsetY: -50,
+        largura: 75,
+        altura: 30,
+        cooldown: 900,
+        duracao: 600,
+         finalizarAoTocarChao: true,
+        atrasoFinalizacaoChao: 30,
+        cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+        propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 12,
+          knockbackX: 450,
+          knockbackY: -350,
+          tumbling: true,
+        },
+      },
+   }
 
     // specials
    
@@ -575,8 +779,8 @@ scene.anims.create({
    });
 
     scene.anims.create({
-      key: "ken_atack1",
-      frames: scene.anims.generateFrameNumbers("Ken_combo1", {
+      key: "fj_atack1",
+      frames: scene.anims.generateFrameNumbers("FJ_neu1", {
         start: 0,
         end: 4,
       }),
@@ -584,17 +788,17 @@ scene.anims.create({
       repeat: 0,
     });
     scene.anims.create({
-      key: "ken_atack2",
-      frames: scene.anims.generateFrameNumbers("Ken_combo2", {
+      key: "fj_atack2",
+      frames: scene.anims.generateFrameNumbers("FJ_neu2", {
         start: 0,
-        end: 5,
+        end: 14,
       }),
-      frameRate: 16,
+      frameRate: 18,
       repeat: 0,
     });
     scene.anims.create({
-      key: "ken_atack3",
-      frames: scene.anims.generateFrameNumbers("Ken_combo3", {
+      key: "fj_atack3",
+      frames: scene.anims.generateFrameNumbers("FJ_neu3", {
         start: 0,
         end: 13,
       }),
@@ -602,30 +806,30 @@ scene.anims.create({
       repeat: 0,
     });
     scene.anims.create({
-      key: "ken_sideAtack",
-      frames: scene.anims.generateFrameNumbers("Ken_sideAtack", {
-        start: 0,
-        end: 13,
-      }),
-      frameRate: 20,
-      repeat: 0,
-    });
-    scene.anims.create({
-      key: "ken_downAtack",
-      frames: scene.anims.generateFrameNumbers("Ken_downAtack", {
-        start: 0,
-        end: 5,
-      }),
-      frameRate: 12,
-      repeat: 0,
-    });
-    scene.anims.create({
-      key: "ken_neutralAir",
-      frames: scene.anims.generateFrameNumbers("Ken_neutralAir", {
+      key: "fj_sideAtack",
+      frames: scene.anims.generateFrameNumbers("FJ_SideAtack", {
         start: 0,
         end: 8,
       }),
       frameRate: 16,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "fj_downAtack",
+      frames: scene.anims.generateFrameNumbers("FJ_downAtack", {
+        start: 0,
+        end: 8,
+      }),
+      frameRate: 14,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "fj_neutralAir",
+      frames: scene.anims.generateFrameNumbers("FJ_AirNeutro", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 14,
       repeat: 0,
     });
      scene.anims.create({
@@ -647,12 +851,12 @@ scene.anims.create({
       repeat: 0,
     });
      scene.anims.create({
-      key: "ken_downAir",
-      frames: scene.anims.generateFrameNumbers("Ken_downAir", {
+      key: "fj_downAir",
+      frames: scene.anims.generateFrameNumbers("FJ_airDown", {
         start: 0,
-        end: 4,
+        end: 14,
       }),
-      frameRate: 12,
+      frameRate: 16,
       repeat: 0,
     });
     scene.anims.create({
