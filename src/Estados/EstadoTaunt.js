@@ -26,7 +26,7 @@ export default class EstadoTaunt extends EstadoBase {
     const animData = this.personagem.scene.anims.get(this.animChaveAtual);
     this.isLooping = animData && animData.repeat === -1;
 
-    // TIPO 1: Animação Finita -> Aguarda terminar e aplica os 500ms
+    // TIPO 1: Animação Finita -> Aguarda terminar e aplica a pausa configurada
     if (!this.isLooping) {
       this.personagem.sprite.once(
         `animationcomplete-${this.animChaveAtual}`,
@@ -100,8 +100,14 @@ export default class EstadoTaunt extends EstadoBase {
   finalizarTaunt() {
     if (this.personagem.maquinaEstados.estadoAtual !== this) return;
 
-    // Aguarda os 500ms fixos após o término do taunt finito antes de voltar ao idle
-    this.timerDelay = this.personagem.scene.time.delayedCall(500, () => {
+    // Pausa em milissegundos: padrão de 500; zero volta ao idle imediatamente.
+    const pausaFinal = this.personagem.tauntPausaFinal ?? 500;
+    if (pausaFinal <= 0) {
+      this.personagem.maquinaEstados.mudarEstado("idle");
+      return;
+    }
+
+    this.timerDelay = this.personagem.scene.time.delayedCall(pausaFinal, () => {
       if (this.personagem.maquinaEstados.estadoAtual === this) {
         this.personagem.maquinaEstados.mudarEstado("idle");
       }

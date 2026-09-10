@@ -50,6 +50,7 @@ export default class FJ extends Personagem {
 };
 
 this.nomePersonagem = "Frederick Johnson";
+    this.tauntPausaFinal = 0; // Encerra o taunt sem segurar o último frame.
     //============================= hitboxes ========================================
    
     this.configAnimacoes = {
@@ -61,8 +62,9 @@ this.nomePersonagem = "Frederick Johnson";
         offsetY: -10,
         escala: 0.33,
         hurtboxes: [
-          { largura: 50, altura: 60, offsetX: 0, offsetY: -70 },
-          { largura: 67, altura: 35, offsetX: 0, offsetY: -18 },
+          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
         ],
       },
 
@@ -73,8 +75,9 @@ this.nomePersonagem = "Frederick Johnson";
         offsetY: -80,
         escala: 0.33,
         hurtboxes: [
-          { largura: 50, altura: 60, offsetX: 0, offsetY: -70 },
-          { largura: 60, altura: 35, offsetX: 0, offsetY: -18 },
+           { largura: 50, altura: 20, offsetX: 25, offsetY: -85 },
+          { largura: 40, altura: 18, offsetX: 17, offsetY: -57 },
+          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
         ],
       },
 
@@ -85,8 +88,9 @@ this.nomePersonagem = "Frederick Johnson";
         offsetY: 134,
         escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 30, altura: 50, offsetX: -5, offsetY: -25 },
+           { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
         ],
       },
 
@@ -94,7 +98,7 @@ this.nomePersonagem = "Frederick Johnson";
       crouch: {
         largura: 250,
         altura: 240,
-        offsetX: 80,
+        offsetX: 95,
         offsetY: 80,
         escala: 0.33,
         hurtboxes: [
@@ -104,7 +108,7 @@ this.nomePersonagem = "Frederick Johnson";
       crouch3: {
         largura: 250,
         altura: 240,
-        offsetX: 80,
+        offsetX: 95,
         offsetY: 80,
         escala: 0.33,
         hurtboxes: [
@@ -119,7 +123,7 @@ this.nomePersonagem = "Frederick Johnson";
         largura: 250,
         altura: 400,
         offsetX: 140,
-        offsetY: -70,
+        offsetY: -80,
         escala: 0.33,
         hurtboxes: [],
       },
@@ -127,7 +131,7 @@ this.nomePersonagem = "Frederick Johnson";
       guard: {
         largura: 250,
         altura: 400,
-        offsetX: 70,
+        offsetX: 130,
         offsetY: -50,
         escala: 0.33,
         hurtboxes: [
@@ -153,7 +157,7 @@ this.nomePersonagem = "Frederick Johnson";
       danoUp: {
         largura: 250,
         altura: 400,
-        offsetX: 113,
+        offsetX: 90,
         offsetY: 80,
         escala: 0.33,
         hurtboxes: [
@@ -177,7 +181,7 @@ this.nomePersonagem = "Frederick Johnson";
       danoDown: {
         largura: 250,
         altura: 400,
-        offsetX: 113,
+        offsetX: 100,
         offsetY: 100,
         escala: 0.33,
         hurtboxes: [
