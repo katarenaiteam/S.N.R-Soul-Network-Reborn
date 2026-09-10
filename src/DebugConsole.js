@@ -98,6 +98,31 @@ export function instalarComandosDebug(game) {
       return true;
     },
 
+    carregarUlt(alvo = 1) {
+      const numero = normalizar(alvo).replace(/^p/, "");
+      if (numero !== "1" && numero !== "2") {
+        console.error("Jogador invalido. Use carregarUlt(1) ou carregarUlt(2).");
+        return false;
+      }
+
+      const scene = game.scene.getScene("cenaPrincipal");
+      if (!scene?.scene.isActive()) {
+        console.error("Entre em uma luta antes de carregar a ult.");
+        return false;
+      }
+
+      const jogador = scene[`jogador${numero}`];
+      if (!jogador?.ult) {
+        console.error(`O jogador P${numero} nao possui ult disponivel.`);
+        return false;
+      }
+
+      jogador.ultCarga = jogador.ultCargaMax;
+      scene.atualizarBarraUlt(jogador, scene[`hudP${numero}_Nome`]);
+      console.log(`Ult do P${numero} totalmente carregada.`);
+      return true;
+    },
+
     diagnosticarSpecials() {
       removerDiagnosticoSpecial?.();
 
@@ -140,6 +165,8 @@ export function instalarComandosDebug(game) {
         "  atual()                 mostra a tela atual",
         "  ir('luta')              abre uma tela",
         "  resetar()               reinicia a tela/fase atual",
+        "  carregarUlt()           carrega totalmente a ult do P1",
+        "  carregarUlt(2)          carrega totalmente a ult do P2",
         "  SNR.diagnosticarSpecials() registra a leitura de G/K",
         "Aliases: preload, start, personagens, mapas, luta, historia, gameover, creditos",
       ].join("\n"));
@@ -151,6 +178,7 @@ export function instalarComandosDebug(game) {
   window.atual = api.atual.bind(api);
   window.ir = api.ir.bind(api);
   window.resetar = api.resetar.bind(api);
+  window.carregarUlt = api.carregarUlt.bind(api);
 
   console.log("Comandos de teste carregados. Digite SNR.ajuda() no console.");
 }

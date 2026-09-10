@@ -15,7 +15,7 @@ export default class FJ extends Personagem {
       "fj_idle",
       "0",
       {
-        velocidade: 290,
+        velocidade: 310,
         forcaPulo: -600,
         maxPulos: 2,
         maxDash: 1,
@@ -55,9 +55,9 @@ this.nomePersonagem = "Frederick Johnson";
     this.configAnimacoes = {
       
        idle: {
-        largura: 80,
+        largura: 250,
         altura: 400,
-        offsetX: 150,
+        offsetX: 130,
         offsetY: -10,
         escala: 0.33,
         hurtboxes: [
@@ -67,9 +67,9 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
       walk: {
-        largura: 80,
+        largura: 250,
         altura: 400,
-        offsetX: 17,
+        offsetX: 145,
         offsetY: -80,
         escala: 0.33,
         hurtboxes: [
@@ -79,9 +79,9 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
       jump: {
-        largura: 80,
+        largura: 250,
         altura: 400,
-        offsetX: 300,
+        offsetX: 113,
         offsetY: 134,
         escala: 0.33,
         hurtboxes: [
@@ -92,9 +92,9 @@ this.nomePersonagem = "Frederick Johnson";
 
       
       crouch: {
-        largura: 80,
+        largura: 250,
         altura: 240,
-        offsetX: 118,
+        offsetX: 80,
         offsetY: 80,
         escala: 0.33,
         hurtboxes: [
@@ -102,9 +102,9 @@ this.nomePersonagem = "Frederick Johnson";
         ],
       },
       crouch3: {
-        largura: 80,
+        largura: 250,
         altura: 240,
-        offsetX: 118,
+        offsetX: 80,
         offsetY: 80,
         escala: 0.33,
         hurtboxes: [
@@ -116,20 +116,19 @@ this.nomePersonagem = "Frederick Johnson";
   
 
       dash: {
-        largura: 70,
-        altura: 80,
-        offsetX: 4,
-        offsetY: 10,
+        largura: 250,
+        altura: 400,
+        offsetX: 140,
+        offsetY: -70,
         escala: 0.33,
-        hurtboxes: [
-           ],
+        hurtboxes: [],
       },
 
       guard: {
-        largura: 80,
-        altura: 120,
-        offsetX: 0,
-        offsetY: -16,
+        largura: 250,
+        altura: 400,
+        offsetX: 70,
+        offsetY: -50,
         escala: 0.33,
         hurtboxes: [
           { largura: 45, altura: 50, offsetX: -5, offsetY: -75 },
@@ -138,10 +137,10 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
         dano: {
-  largura: 80,
-  altura: 100,
-  offsetX: 0,
-  offsetY: -5,
+  largura: 250,
+  altura: 400,
+  offsetX: 154,
+  offsetY: -80,
   escala: 0.33,
   hurtboxes: [
     { largura: 50, altura: 65, offsetX: -10, offsetY: -60 }, // Tronco inclinado
@@ -152,10 +151,10 @@ this.nomePersonagem = "Frederick Johnson";
 
      
       danoUp: {
-        largura: 80,
-        altura: 100,
-        offsetX: 0,
-        offsetY: 5,
+        largura: 250,
+        altura: 400,
+        offsetX: 113,
+        offsetY: 80,
         escala: 0.33,
         hurtboxes: [
           { largura: 55, altura: 70, offsetX: 20, offsetY: -80 },
@@ -164,10 +163,10 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
       danoSide: {
-        largura: 80,
-        altura: 100,
-        offsetX: 0,
-        offsetY: -5,
+        largura: 250,
+        altura: 400,
+        offsetX: 113,
+        offsetY: 80,
         escala: 0.33,
         hurtboxes: [
           { largura: 65, altura: 55, offsetX: -15, offsetY: -90 }, // Tronco inclinado
@@ -176,10 +175,10 @@ this.nomePersonagem = "Frederick Johnson";
       },
      
       danoDown: {
-        largura: 80,
-        altura: 100,
-        offsetX: 0,
-        offsetY: 35,
+        largura: 250,
+        altura: 400,
+        offsetX: 113,
+        offsetY: 100,
         escala: 0.33,
         hurtboxes: [
           { largura: 60, altura: 65, offsetX: -10, offsetY: -60 }, 
@@ -187,12 +186,12 @@ this.nomePersonagem = "Frederick Johnson";
         ],
       },
 
-      // Dead (Ken_dead - 76px de altura)
+    
       dead: {
-        largura: 80,
-        altura: 33,
-        offsetX: 49,
-        offsetY: 40,
+        largura: 250,
+        altura: 250,
+        offsetX: 113,
+        offsetY: 0,
         escala: 0.33,
         hurtboxes: [
           { largura: 100, altura: 34, offsetX: -10, offsetY: -18 },
@@ -201,12 +200,12 @@ this.nomePersonagem = "Frederick Johnson";
         ],
       },
 
-      // Getup (Ken_getup - 105px de altura)
+      
       getup: {
-        largura: 80,
-        altura: 100,
-        offsetX: 30,
-        offsetY: 2,
+        largura: 250,
+        altura: 400,
+        offsetX: 113,
+        offsetY: -70,
         escala: 0.3,
         hurtboxes: [],
       },
@@ -507,28 +506,28 @@ if (!scene.anims.exists("punch_effect3")) {
     });
 
      scene.anims.create({
-      key: "ken_guard",
-      frames: scene.anims.generateFrameNumbers("Ken_guard", {
+      key: "fj_guard",
+      frames: scene.anims.generateFrameNumbers("FJ_guard", {
         start: 0,
-        end: 1,
+        end: 37,
       }),
       frameRate: 8,
       repeat: 0,
     });
 
     scene.anims.create({
-      key: "ken_taunt",
-      frames: scene.anims.generateFrameNumbers("Ken_taunt", {
+      key: "fj_taunt",
+      frames: scene.anims.generateFrameNumbers("FJ_taunt", {
         start: 0,
-        end: 3,
+        end: 15,
       }),
       frameRate: 12,
       repeat: 0,
     });
 
     scene.anims.create({
-      key: "ken_dano",
-      frames: scene.anims.generateFrameNumbers("Ken_hurt", {
+      key: "fj_dano",
+      frames: scene.anims.generateFrameNumbers("FJ_hurt", {
         start: 0,
         end: 1,
       }),
@@ -537,36 +536,36 @@ if (!scene.anims.exists("punch_effect3")) {
     });
 
     scene.anims.create({
-     key: "ken_danoUp",
-     frames: scene.anims.generateFrameNumbers("Ken_hurts1", { start: 0, end: 2 }),
-     frameRate: 10,
+     key: "fj_danoUp",
+     frames: scene.anims.generateFrameNumbers("FJ_hurt2", { start: 0, end: 8 }),
+     frameRate: 14,
      repeat: 0,
    });
 
     scene.anims.create({
-  key: "ken_danoSide",
-  frames: scene.anims.generateFrameNumbers("Ken_hurts2", { start: 0, end: 14 }),
-  frameRate: 22,
+  key: "fj_danoSide",
+  frames: scene.anims.generateFrameNumbers("FJ_hurt1", { start: 0, end: 10 }),
+  frameRate: 18,
   repeat: 0,
 });
 
 scene.anims.create({
-  key: "ken_danoDown",
-  frames: scene.anims.generateFrameNumbers("Ken_hurts2", { start: 15, end: 18 }),
+  key: "fj_danoDown",
+  frames: scene.anims.generateFrameNumbers("FJ_hurt1", { start: 11, end: 14 }),
   frameRate: 12,
   repeat: 0,
 });
 
      scene.anims.create({
-     key: "ken_dead",
-     frames: scene.anims.generateFrameNumbers("Ken_dead", { start: 0, end: 9 }),
-     frameRate: 16,
+     key: "fj_dead",
+     frames: scene.anims.generateFrameNumbers("FJ_dead", { start: 0, end: 4 }),
+     frameRate: 12,
      repeat: 0,
    });
 
      scene.anims.create({
-     key: "ken_getup",
-     frames: scene.anims.generateFrameNumbers("Ken_getup", { start: 0, end: 10 }),
+     key: "fj_getup",
+     frames: scene.anims.generateFrameNumbers("FJ_getup", { start: 0, end: 6 }),
      frameRate: 18,
      repeat: 0,
    });

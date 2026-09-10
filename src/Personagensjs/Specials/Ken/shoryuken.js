@@ -294,17 +294,7 @@ export default class Shoryuken {
         return;
       }
 
-      const xDesejado = spriteKen.x + 28 * this.direcao;
-      const yDesejado = spriteKen.y - 18;
-      const distanciaX = xDesejado - spriteAlvo.x;
-      const distanciaY = yDesejado - spriteAlvo.y;
-
-      bodyAlvo.setVelocity(
-        (spriteKen.body?.velocity.x ?? 0) +
-          Phaser.Math.Clamp(distanciaX * 10, -220, 220),
-        (spriteKen.body?.velocity.y ?? 0) +
-          Phaser.Math.Clamp(distanciaY * 8, -180, 180)
-      );
+      conduzirAlvoShoryuken(spriteKen, spriteAlvo, this.direcao);
     });
   }
 
@@ -418,4 +408,14 @@ export default class Shoryuken {
     this.finalizado = true;
     this.emHitStop = false;
   }
+}
+
+// Retencao compartilhada pelo special e pela ult: acompanha por velocidade.
+export function conduzirAlvoShoryuken(spriteKen, spriteAlvo, direcao) {
+  const distanciaX = spriteKen.x + 28 * direcao - spriteAlvo.x;
+  const distanciaY = spriteKen.y - 18 - spriteAlvo.y;
+  spriteAlvo.body.setVelocity(
+    (spriteKen.body?.velocity.x ?? 0) + Phaser.Math.Clamp(distanciaX * 10, -220, 220),
+    (spriteKen.body?.velocity.y ?? 0) + Phaser.Math.Clamp(distanciaY * 8, -180, 180)
+  );
 }

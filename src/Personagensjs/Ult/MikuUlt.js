@@ -88,6 +88,7 @@ export default class MikuUlt {
     // freeze
     this.pauseiFisica = false;
     this.animacoesPausadas = [];
+    this.controlesPausados = new Map();
 
     // timers
     this.timers = new Set();
@@ -1438,13 +1439,26 @@ if (agora < bloqueadoAte) {
       this.pauseiFisica = true;
     }
 
-    this.animacoesPausadas = [];
-
     for (
       const p of
       this.obterPersonagens()
     ) {
       if (p === this.personagem) continue;
+      if (this.controlesPausados.has(p)) continue;
+
+      const propriedades = ["update", "inputDown", "inputJustDown", "podeMover", "podeAtacar"];
+      this.controlesPausados.set(p, propriedades.map(nome => [
+        nome, Object.getOwnPropertyDescriptor(p, nome)
+      ]));
+      p.podeMover = false;
+      p.podeAtacar = false;
+      p.inputDown = p.inputJustDown = () => false;
+      // Pausar apenas a fisica permite que a FSM continue lendo ataques e pulos.
+      // Durante a intro, consome os inputs sem executar a logica do personagem.
+      p.update = () => {
+        p.controle?.atualizar();
+        p.controle?.salvarAnterior();
+      };
 
       if (
         p.sprite?.anims?.isPlaying &&
@@ -1459,6 +1473,14 @@ if (agora < bloqueadoAte) {
 
 
   descongelarLuta() {
+    for (const [p, propriedades] of this.controlesPausados) {
+      for (const [nome, descritor] of propriedades) {
+        if (descritor) Object.defineProperty(p, nome, descritor);
+        else delete p[nome];
+      }
+    }
+    this.controlesPausados.clear();
+
     if (
       this.pauseiFisica &&
       this.scene.physics.world.isPaused

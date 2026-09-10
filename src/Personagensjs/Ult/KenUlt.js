@@ -1,55 +1,59 @@
+import { conduzirAlvoShoryuken } from "../Specials/Ken/shoryuken.js";
 import {
   obterAlvosCombate,
   registrarAtaqueEspecial
 } from "../../Objetos/SistemaCombateEspecial.js";
 
 
-// ============================================================
-// AJUSTES
-// ============================================================
-
 const INTRO = {
-  zoom: 1.6,
-  tempoZoom: 200,
-  tempoTravado: 900
+  zoom: 1.9,
+  tempoZoom: 250,
+  duracaoPose: 650,
+  pausaFinal: 250
 };
 
+
 const SHORYUKEN = {
-  impulsoX1: 150,
-  impulsoY1: -650,
+  impulsoX1: 350,
+  impulsoY1: -680,
 
-  impulsoX2: 180,
-  impulsoY2: -900,
+  impulsoX2: 370,
+  impulsoY2: -740,
 
-  intervaloHit: 500,
+  gravidadeExtra: 900,
+  frameRate: 30,
+  danoMaximo: 50,
 
-  danoHit1: 4,
-  danoHit2: 5,
+  dano1: 12,
+  dano2: 12,
 
-  // primeiro shoryuken prende no combo
-  knockHit1X: 35,
-  knockHit1Y: -90,
+  knock1X: 25,
+  knock1Y: -45,
 
-  // hits normais do segundo
-  knockHit2X: 45,
-  knockHit2Y: -120,
+  knock2X: 30,
+  knock2Y: -60,
 
-  // último impacto
-  danoFinal: 14,
-  knockFinalX: 180,
-  knockFinalY: -1500,
+  knockFinalX: 650,
+  knockFinalY: -1700,
 
-  hitStopNormal: 90,
-  hitStopFinal: 650
+  hitStop: 180,
+  freezeFinal: 1300
 };
 
 
 const HITBOX = {
-  largura: 80,
-  altura: 145,
-  offsetX: 30,
-  offsetY: -100
+  largura: 95,
+  altura: 115,
+  offsetX: 25,
+  offsetY: -65
 };
+
+
+const FRAME_HITBOX_INICIO = 4;
+const FRAME_HITBOX_FIM = 22;
+const FRAME_FINAL = 18;
+const FRAME_PULO = 7;
+const FRAMES_DOS_HITS = [4, 11, FRAME_FINAL];
 
 
 const VFX_FRAMES = {
@@ -58,7 +62,6 @@ const VFX_FRAMES = {
   "ken-pose3": null,
   "ken-launch": null,
 
-  // efeitos reutilizados do Spider
   "2impact": 5,
   "3impact": 10,
   "4impact": 11,
@@ -66,35 +69,45 @@ const VFX_FRAMES = {
 };
 
 
-// ============================================================
-// KEN ULT
-// ============================================================
-
 export default class KenUlt {
 
   constructor(personagem, configUlt, estadoFSM) {
     this.personagem = personagem;
     this.scene = personagem.scene;
+    this.config = configUlt;
     this.estadoFSM = estadoFSM;
 
     this.direcao =
       personagem.sprite.flipX ? -1 : 1;
 
+    this.oponente =
+      obterAlvosCombate(personagem)[0] ?? null;
+
     this.cancelada = false;
     this.finalizada = false;
 
-    this.etapa = "intro";
     this.numeroShoryuken = 0;
-
-    this.funcaoCamOriginal = null;
+    this.frameUltAtual = 0;
 
     this.hitbox = null;
-    this.alvosCarregados = new Set();
+
     this.ultimoHit = new Map();
+    this.alvosCarregados = new Set();
+    this.danoPorAlvo = new Map();
+    this.corposCongelados = new Map();
+    this.aguardandoPouso = false;
+    this.origemOriginal = null;
+    this.puloIniciado = false;
 
     this.emHitStop = false;
+
     this.velocidadeKenAntesStop = null;
-    this.alvoHitStop = null;
+    this.velocidadeAlvoAntesStop = null;
+
+    this.funcaoCamOriginal = null;
+    this.zoomOriginal = null;
+
+    this.estadoOponenteSalvo = null;
 
     this.fundoUlt = null;
     this.fundoOriginal = null;
@@ -104,7 +117,12 @@ export default class KenUlt {
     this.efeitos = new Set();
     this.timers = new Set();
 
+    this.fnAnimUpdate = null;
     this.fnAnimComplete = null;
+
+    this.launchCriado = false;
+
+    this.impactoFinalAtivado = false;
   }
 
 
@@ -113,8 +131,11 @@ export default class KenUlt {
   // ============================================================
 
   executar() {
-    const sprite = this.personagem.sprite;
-    const body = sprite?.body;
+    const sprite =
+      this.personagem.sprite;
+
+    const body =
+      sprite?.body;
 
     if (!sprite?.active || !body) {
       this.estadoFSM.finalizarUlt();
@@ -122,34 +143,28 @@ export default class KenUlt {
     }
 
     this.cancelada = false;
-    this.etapa = "intro";
+    this.origemOriginal = { x: sprite.originX, y: sprite.originY };
+    // Compensa o espaco reservado ao fogo abaixo dos pes no spritesheet.
+    sprite.setOrigin(0.5, 155 / 233);
+    this.personagem.atualizarOffsetFisica();
+    body.updateFromGameObject();
 
     this.direcao =
       sprite.flipX ? -1 : 1;
 
 
-    // ==========================================================
-    // FUNDO
-    // ==========================================================
-
     this.ativarFundoUltimate();
 
-
-    // ==========================================================
-    // TRAVA A CENA
-    // ==========================================================
-
     this.travarCamera();
+
+    this.bloquearOponente();
 
     this.scene.physics.pause();
 
     body.setVelocity(0, 0);
 
 
-    // ==========================================================
-    // KEN PARADO NO FRAME 0
-    // ==========================================================
-
+    // Ken parado no frame 0 da Ult
     sprite.anims.stop();
 
     sprite.setTexture(
@@ -158,81 +173,140 @@ export default class KenUlt {
     );
 
 
-    // ==========================================================
-    // EFEITOS DE POSE
-    // todos tocam UMA vez
-    // ==========================================================
-
-    this.criarVFX(
-      "ken-pose1",
-      sprite.x,
-      sprite.y - 70,
-      {
-        escala: 0.85
-      }
-    );
-
-    this.criarVFX(
-      "ken-pose2",
-      sprite.x,
-      sprite.y - 65,
-      {
-        escala: 0.85
-      }
-    );
-
-    this.criarVFX(
-      "ken-pose3",
-      sprite.x,
-      sprite.y - 45,
-      {
-        escala: 0.9
-      }
-    );
-
-
-    // ==========================================================
-    // CAMERA
-    // ==========================================================
-
     const cam =
       this.scene.cameras.main;
 
-    const zoomOriginal =
+    this.zoomOriginal =
       cam.zoom;
+
 
     cam.pan(
       sprite.x,
-      sprite.y - 55,
+      sprite.y - 70,
       INTRO.tempoZoom,
       "Power2"
     );
 
+
     cam.zoomTo(
-      zoomOriginal * INTRO.zoom,
+      this.zoomOriginal *
+        INTRO.zoom,
+
       INTRO.tempoZoom
     );
 
 
-    // ==========================================================
-    // LIBERA INTRO
-    // ==========================================================
-
+    // espera o close chegar antes das poses
     this.agendar(
-      INTRO.tempoTravado,
+      INTRO.tempoZoom,
       () => {
-
-        if (this.cancelada) {
-          return;
-        }
-
-        this.scene.physics.resume();
-
-        this.restaurarCamera();
-
-        this.iniciarPrimeiroShoryuken();
+        this.tocarPose1();
       }
     );
+  }
+
+
+  // ============================================================
+  // POSES
+  // ============================================================
+
+  tocarPose1() {
+    if (this.cancelada) return;
+
+    const sprite =
+      this.personagem.sprite;
+
+    this.criarVFX(
+      "ken-pose1",
+
+      sprite.x,
+      sprite.y - 70,
+
+      {
+        escala: 1.8,
+        duracao: INTRO.duracaoPose,
+
+        aoCompletar:
+          () => this.tocarPose2()
+      }
+    );
+  }
+
+
+  tocarPose2() {
+    if (this.cancelada) return;
+
+    const sprite =
+      this.personagem.sprite;
+
+    this.criarVFX(
+      "ken-pose2",
+
+      sprite.x,
+      sprite.y - 65,
+
+      {
+        escala: 1.8,
+        duracao: INTRO.duracaoPose,
+
+        aoCompletar:
+          () => this.tocarPose3()
+      }
+    );
+  }
+
+
+  tocarPose3() {
+    if (this.cancelada) return;
+
+    const sprite =
+      this.personagem.sprite;
+
+    this.criarVFX(
+      "ken-pose3",
+
+      sprite.x,
+      sprite.y - 55,
+
+      {
+        escala: 1.9,
+        duracao: INTRO.duracaoPose,
+
+        aoCompletar: () => {
+
+          this.agendar(
+            INTRO.pausaFinal,
+            () => this.liberarIntro()
+          );
+        }
+      }
+    );
+  }
+
+
+  liberarIntro() {
+    if (this.cancelada) return;
+
+    const cam =
+      this.scene.cameras.main;
+
+
+    this.scene.physics.resume();
+
+    this.restaurarOponente();
+
+
+    if (this.zoomOriginal !== null) {
+      cam.setZoom(
+        this.zoomOriginal
+      );
+    }
+
+
+    this.restaurarCamera();
+
+
+    this.iniciarPrimeiroShoryuken();
   }
 
 
@@ -244,10 +318,17 @@ export default class KenUlt {
     if (this.cancelada) return;
 
     this.numeroShoryuken = 1;
-    this.etapa = "shoryuken1";
 
     this.ultimoHit.clear();
+    this.danoPorAlvo.clear();
+    this.ultimoAlvoDoImpulso = null;
+    this.frameUltAtual = 2;
     this.alvosCarregados.clear();
+
+    this.launchCriado = false;
+
+    this.impactoFinalAtivado = false;
+
 
     const sprite =
       this.personagem.sprite;
@@ -255,66 +336,35 @@ export default class KenUlt {
     const body =
       sprite.body;
 
+
     body.setAllowGravity(true);
 
+
+    this.ativarControleAnimacao();
+
+
     sprite.anims.play(
-      "ken_ult",
+      { key: "ken_ult", frameRate: SHORYUKEN.frameRate },
       true
     );
 
 
-    // faísca do lançamento
-    this.criarLaunch();
-
-
-    body.setVelocity(
-      SHORYUKEN.impulsoX1 *
-        this.direcao,
-
-      SHORYUKEN.impulsoY1
-    );
-
-
-    this.ativarHitbox();
+    this.puloIniciado = false;
+    body.setVelocity(body.velocity.x, 0);
 
 
     this.aguardarFimAnimacao(
-      () => this.finalizarPrimeiroShoryuken()
+      () =>
+        this.finalizarPrimeiroShoryuken()
     );
   }
 
 
   finalizarPrimeiroShoryuken() {
     if (this.cancelada) return;
-
     this.destruirHitbox();
-
-    /*
-      Não joga os inimigos para longe.
-      Quem foi pego fica perto do Ken para
-      poder entrar no segundo Shoryuken.
-    */
-
-    for (
-      const alvo of
-      this.alvosCarregados
-    ) {
-      if (!alvo?.sprite?.body) continue;
-
-      alvo.sprite.body.setVelocity(
-        0,
-        40
-      );
-    }
-
-
-    // pequeno intervalo entre os dois
-    this.agendar(
-      180,
-      () => {
-        this.iniciarSegundoShoryuken();
-      }
-    );
+    this.aguardandoPouso = true;
+    if (this.personagem.sprite.body.blocked.down) this.iniciarSegundoShoryuken();
   }
 
 
@@ -326,9 +376,17 @@ export default class KenUlt {
     if (this.cancelada) return;
 
     this.numeroShoryuken = 2;
-    this.etapa = "shoryuken2";
+    this.aguardandoPouso = false;
 
     this.ultimoHit.clear();
+    this.danoPorAlvo.clear();
+    this.ultimoAlvoDoImpulso = null;
+    this.frameUltAtual = 2;
+
+    this.launchCriado = false;
+
+    this.impactoFinalAtivado = false;
+
 
     const sprite =
       this.personagem.sprite;
@@ -338,72 +396,114 @@ export default class KenUlt {
 
 
     sprite.anims.play(
-      "ken_ult",
+      { key: "ken_ult", frameRate: SHORYUKEN.frameRate },
       true
     );
 
 
-    this.criarLaunch();
-
-
-    // SEGUNDO É MAIOR
-    body.setVelocity(
-      SHORYUKEN.impulsoX2 *
-        this.direcao,
-
-      SHORYUKEN.impulsoY2
-    );
-
-
-    this.ativarHitbox();
+    this.puloIniciado = false;
+    body.setVelocity(0, 0);
 
 
     this.aguardarFimAnimacao(
-      () => this.finalizarSegundoShoryuken()
-    );
-  }
+      () => {
 
-
-  finalizarSegundoShoryuken() {
-    if (this.cancelada) return;
-
-    this.destruirHitbox();
-
-    /*
-      Se ninguém foi pego no segundo,
-      simplesmente termina.
-      O impacto final acontece quando
-      o segundo Shoryuken realmente acerta.
-    */
-
-    this.agendar(
-      150,
-      () => this.finalizarUlt()
+        if (
+          !this.impactoFinalAtivado
+        ) {
+          if (this.ultimoAlvoDoImpulso?.sprite?.active) this.executarImpactoFinal(this.ultimoAlvoDoImpulso);
+          else this.finalizarUlt();
+        }
+      }
     );
   }
 
 
   // ============================================================
-  // UPDATE
+  // CONTROLE DA ANIMAÇÃO
   // ============================================================
 
-  atualizar() {
-    if (
-      this.cancelada ||
-      this.finalizada
-    ) {
-      return;
-    }
+  ativarControleAnimacao() {
+    if (this.fnAnimUpdate) return;
 
-    this.ajustarFundoNaCamera();
 
-    if (this.emHitStop) {
-      return;
-    }
+    const sprite =
+      this.personagem.sprite;
 
-    this.atualizarHitbox();
 
-    this.atualizarAlvosCarregados();
+    this.fnAnimUpdate =
+      (animacao, frame) => {
+        if (this.cancelada || this.finalizada || this.impactoFinalAtivado) return;
+
+        if (
+          animacao.key !==
+          "ken_ult"
+        ) {
+          return;
+        }
+
+
+        this.frameUltAtual =
+          Number(
+            frame.textureFrame ??
+            frame.index
+          );
+
+
+        if (!this.puloIniciado && this.frameUltAtual >= FRAME_PULO) {
+          this.puloIniciado = true;
+          const segundo = this.numeroShoryuken === 2;
+          sprite.body.setVelocity(
+            (segundo ? SHORYUKEN.impulsoX2 : SHORYUKEN.impulsoX1) * this.direcao,
+            segundo ? SHORYUKEN.impulsoY2 : SHORYUKEN.impulsoY1
+          );
+        }
+        if (this.numeroShoryuken === 1 && this.frameUltAtual >= FRAME_FINAL) {
+          for (const alvo of this.alvosCarregados) {
+            if (alvo.sprite?.active) this.processarAcerto(alvo);
+          }
+        }
+        if (this.numeroShoryuken === 2 && this.frameUltAtual >= FRAME_FINAL) {
+          const alvo = [...this.alvosCarregados].find(alvo => alvo.sprite?.active)
+            ?? this.ultimoAlvoDoImpulso;
+          if (alvo) {
+            this.executarImpactoFinal(alvo);
+            return;
+          }
+        }
+
+        if (
+          !this.launchCriado &&
+          this.frameUltAtual >= FRAME_PULO
+        ) {
+          this.launchCriado = true;
+
+          this.criarLaunch();
+        }
+
+
+        // Hitbox só durante os frames do golpe
+        if (
+          this.frameUltAtual >=
+            FRAME_HITBOX_INICIO &&
+
+          this.frameUltAtual <=
+            FRAME_HITBOX_FIM
+        ) {
+
+          this.ativarHitbox();
+
+        } else {
+
+          this.destruirHitbox();
+        }
+      };
+
+
+    sprite.on(
+      "animationupdate",
+      this.fnAnimUpdate
+    );
   }
 
 
@@ -412,49 +512,57 @@ export default class KenUlt {
   // ============================================================
 
   ativarHitbox() {
-    if (this.hitbox) {
-      return;
-    }
+    if (this.hitbox) return;
+
 
     this.hitbox =
       this.scene.add.zone(
         0,
         0,
+
         HITBOX.largura,
         HITBOX.altura
       );
+
 
     this.scene.physics.add.existing(
       this.hitbox
     );
 
-    this.hitbox.body.setAllowGravity(
-      false
-    );
 
-    this.hitbox.body.setImmovable(
-      true
-    );
+    this.hitbox.body
+      .setAllowGravity(false);
+
+
+    this.hitbox.body
+      .setImmovable(true);
+
 
     this.hitbox.body.debugBodyColor =
       0xff0000;
 
-    this.scene.camHUD?.ignore(
-      this.hitbox
-    );
+
+    this.scene.camHUD
+      ?.ignore(
+        this.hitbox
+      );
 
 
     registrarAtaqueEspecial(
       this,
+
       this.hitbox,
+
       {
         categoria: "corpo",
 
         contraAtacarDono: true,
 
         aoAtingirAlvo:
-          (alvo) =>
-            this.processarAcerto(alvo)
+          alvo =>
+            this.processarAcerto(
+              alvo
+            )
       }
     );
 
@@ -468,8 +576,10 @@ export default class KenUlt {
       return;
     }
 
+
     const sprite =
       this.personagem.sprite;
+
 
     this.hitbox.setPosition(
       sprite.x +
@@ -479,6 +589,7 @@ export default class KenUlt {
       sprite.y +
         HITBOX.offsetY
     );
+
 
     this.hitbox.body
       ?.updateFromGameObject();
@@ -497,82 +608,55 @@ export default class KenUlt {
 
 
   // ============================================================
-  // ACERTO
+  // HIT
   // ============================================================
 
   processarAcerto(alvo) {
-    if (
-      !alvo ||
-      this.cancelada ||
-      this.finalizada ||
-      this.emHitStop
-    ) {
-      return;
-    }
-
-
-    const agora =
-      this.scene.time.now;
-
-    const ultimo =
-      this.ultimoHit.get(alvo)
-      ?? -Infinity;
-
-
-    // UM HIT A CADA 0,5 SEGUNDO
-    if (
-      agora - ultimo <
-      SHORYUKEN.intervaloHit
-    ) {
-      return;
-    }
-
-
-    this.ultimoHit.set(
-      alvo,
-      agora
+    if (!alvo || this.cancelada || this.finalizada || this.emHitStop || this.impactoFinalAtivado) return;
+    const indice = FRAMES_DOS_HITS.reduce(
+      (atual, frame, i) => this.frameUltAtual >= frame ? i : atual, -1
     );
-
-
-    if (
-      this.numeroShoryuken === 1
-    ) {
-      this.acertoPrimeiro(
-        alvo
-      );
-
+    if (indice < 0 || (this.ultimoHit.get(alvo) ?? -1) >= indice) return;
+    this.ultimoHit.set(alvo, indice);
+    if (this.numeroShoryuken === 2 && this.frameUltAtual >= FRAME_FINAL) {
+      if (!alvo.invulneravel && alvo.maquinaEstados?.estadoAtual?.nome !== 'guard') {
+        this.executarImpactoFinal(alvo);
+      }
       return;
     }
+    if (this.numeroShoryuken === 1) this.acertoPrimeiro(alvo);
+    else this.acertoSegundo(alvo);
+  }
 
-
-    this.acertoSegundo(
-      alvo
-    );
+  aplicarDanoLimitado(alvo, quantidade, propriedades, origem) {
+    const acumulado = this.danoPorAlvo.get(alvo) ?? 0;
+    const dano = Math.min(quantidade, Math.max(0, SHORYUKEN.danoMaximo - acumulado));
+    if (dano <= 0) return true;
+    const bloqueado = alvo.receberDano(dano, propriedades, origem);
+    if (!bloqueado) this.danoPorAlvo.set(alvo, acumulado + dano);
+    return bloqueado;
   }
 
 
   // ============================================================
-  // PRIMEIRO SHORYUKEN
+  // HIT PRIMEIRO SHORYUKEN
   // ============================================================
 
   acertoPrimeiro(alvo) {
-    this.alvosCarregados.add(
-      alvo
-    );
-
-
-    alvo.receberDano(
-      SHORYUKEN.danoHit1,
+    const bloqueado = this.aplicarDanoLimitado(alvo,
+      this.frameUltAtual >= FRAME_FINAL
+        ? SHORYUKEN.danoMaximo - (this.danoPorAlvo.get(alvo) ?? 0)
+        : SHORYUKEN.dano1,
 
       {
         tipoSomImpacto:
           "light",
 
         knockbackX:
-          SHORYUKEN.knockHit1X,
+          SHORYUKEN.knock1X,
 
         knockbackY:
-          SHORYUKEN.knockHit1Y,
+          SHORYUKEN.knock1Y,
 
         knockbackFixo:
           true,
@@ -580,9 +664,8 @@ export default class KenUlt {
         tumbling:
           false,
 
-        // segura no combo
         hitstunFixoFrames:
-          22,
+          75,
 
         ignorarHitstunDecay:
           true
@@ -598,89 +681,30 @@ export default class KenUlt {
     );
 
 
-    this.criarImpactoNormal(
-      alvo
-    );
+    if (bloqueado) return;
+    this.ultimoAlvoDoImpulso = alvo;
+    this.prenderAlvo(alvo);
+    this.tocarSomImpacto(this.numeroShoryuken === 1 ? "light" : "heavy");
+    this.criarImpactoNormal(alvo);
 
 
     this.aplicarHitStop(
-      alvo,
-      SHORYUKEN.hitStopNormal
+      alvo
     );
   }
 
 
   // ============================================================
-  // SEGUNDO SHORYUKEN
+  // HIT SEGUNDO SHORYUKEN
   // ============================================================
 
   acertoSegundo(alvo) {
-    this.alvosCarregados.add(
-      alvo
-    );
-
-
-    /*
-      Enquanto o segundo Shoryuken ainda
-      está subindo, os golpes continuam
-      prendendo o inimigo.
-    */
-
-    alvo.receberDano(
-      SHORYUKEN.danoHit2,
-
-      {
-        tipoSomImpacto:
-          "heavy",
-
-        knockbackX:
-          SHORYUKEN.knockHit2X,
-
-        knockbackY:
-          SHORYUKEN.knockHit2Y,
-
-        knockbackFixo:
-          true,
-
-        tumbling:
-          false,
-
-        hitstunFixoFrames:
-          24,
-
-        ignorarHitstunDecay:
-          true
-      },
-
-      {
-        direcao:
-          this.direcao,
-
-        x:
-          this.personagem.sprite.x
-      }
-    );
-
-
-    this.criarImpactoNormal(
-      alvo
-    );
-
-
-    /*
-      Se o Ken já está na parte alta da subida,
-      transforma esse impacto no finalizador.
-
-      Assim o último golpe do segundo Shoryuken
-      é que joga o inimigo para cima.
-    */
-
-    const body =
-      this.personagem.sprite.body;
-
+    // Último hit do segundo
     if (
-      body.velocity.y > -350
+      this.frameUltAtual >=
+      FRAME_FINAL
     ) {
+
       this.executarImpactoFinal(
         alvo
       );
@@ -689,181 +713,132 @@ export default class KenUlt {
     }
 
 
+    const bloqueado = this.aplicarDanoLimitado(alvo,
+      SHORYUKEN.dano2,
+
+      {
+        tipoSomImpacto:
+          "heavy",
+
+        knockbackX:
+          SHORYUKEN.knock2X,
+
+        knockbackY:
+          SHORYUKEN.knock2Y,
+
+        knockbackFixo:
+          true,
+
+        tumbling:
+          false,
+
+        hitstunFixoFrames:
+          75,
+
+        ignorarHitstunDecay:
+          true
+      },
+
+      {
+        direcao:
+          this.direcao,
+
+        x:
+          this.personagem.sprite.x
+      }
+    );
+
+
+    if (bloqueado) return;
+    this.ultimoAlvoDoImpulso = alvo;
+    this.prenderAlvo(alvo);
+    this.tocarSomImpacto(this.numeroShoryuken === 1 ? "light" : "heavy");
+    this.criarImpactoNormal(alvo);
+
+
     this.aplicarHitStop(
-      alvo,
-      SHORYUKEN.hitStopNormal
+      alvo
     );
   }
 
 
   // ============================================================
-  // INIMIGO SEGUE O KEN
+  // SEGURA INIMIGO NO COMBO
   // ============================================================
 
+  prenderAlvo(alvo) {
+    this.alvosCarregados.add(alvo);
+  }
+
+  liberarAlvos() {
+    this.alvosCarregados.clear();
+  }
+
   atualizarAlvosCarregados() {
-    if (this.emHitStop) {
-      return;
-    }
-
-    const ken =
-      this.personagem.sprite;
-
-    for (
-      const alvo of
-      this.alvosCarregados
-    ) {
-      const sprite =
-        alvo?.sprite;
-
-      const body =
-        sprite?.body;
-
-      if (
-        !sprite?.active ||
-        !body
-      ) {
-        this.alvosCarregados.delete(
-          alvo
-        );
-
+    if (this.emHitStop || this.impactoFinalAtivado) return;
+    for (const alvo of this.alvosCarregados) {
+      if (!alvo.sprite?.active || !alvo.sprite.body || alvo.invulneravel) {
+        this.alvosCarregados.delete(alvo);
         continue;
       }
-
-
-      /*
-        Mesma ideia do Shoryuken normal:
-        inimigo é puxado junto com o Ken.
-      */
-
-      const xDesejado =
-        ken.x +
-        32 *
-        this.direcao;
-
-      const yDesejado =
-        ken.y - 35;
-
-
-      const dx =
-        xDesejado -
-        sprite.x;
-
-      const dy =
-        yDesejado -
-        sprite.y;
-
-
-      body.setVelocity(
-        (ken.body?.velocity.x ?? 0) +
-          Phaser.Math.Clamp(
-            dx * 10,
-            -250,
-            250
-          ),
-
-        (ken.body?.velocity.y ?? 0) +
-          Phaser.Math.Clamp(
-            dy * 9,
-            -220,
-            220
-          )
-      );
+      conduzirAlvoShoryuken(this.personagem.sprite, alvo.sprite, this.direcao);
+      // Mantem o hitstun entre os saltos sem desligar a maquina de estados.
+      const estado = alvo.maquinaEstados?.estadoAtual;
+      if (estado?.nome === 'dano') {
+        estado.duracaoStun = Math.max(estado.duracaoStun,
+          this.scene.time.now - estado.tempoInicial + 350);
+      }
     }
   }
 
+  congelarCorpo(sprite, alvo = null) {
+    if (!sprite?.body || this.corposCongelados.has(sprite)) return;
+    this.corposCongelados.set(sprite, {
+      moves: sprite.body.moves,
+      x: sprite.body.velocity.x,
+      y: sprite.body.velocity.y,
+      animacaoPausada: sprite.anims.isPaused,
+      alvo,
+      updateFSM: alvo?.maquinaEstados?.update,
+      inicio: this.scene.time.now
+    });
+    sprite.body.moves = false;
+    sprite.body.setVelocity(0, 0);
+    sprite.anims.pause();
+    if (alvo?.maquinaEstados) alvo.maquinaEstados.update = () => {};
+  }
+
+  descongelarCorpos() {
+    for (const [sprite, salvo] of this.corposCongelados) {
+      if (salvo.alvo?.maquinaEstados) {
+        salvo.alvo.maquinaEstados.update = salvo.updateFSM;
+        const estado = salvo.alvo.maquinaEstados.estadoAtual;
+        if (estado?.nome === 'dano') estado.tempoInicial += this.scene.time.now - salvo.inicio;
+      }
+      if (!sprite.active || !sprite.body) continue;
+      sprite.body.moves = salvo.moves;
+      sprite.body.setVelocity(salvo.x, salvo.y);
+      if (!salvo.animacaoPausada) sprite.anims.resume();
+    }
+    this.corposCongelados.clear();
+  }
 
   // ============================================================
   // HIT STOP NORMAL
   // ============================================================
 
-  aplicarHitStop(
-    alvo,
-    duracao
-  ) {
-    if (
-      this.emHitStop ||
-      this.cancelada
-    ) {
-      return;
-    }
-
-
-    const sprite =
-      this.personagem.sprite;
-
-    const body =
-      sprite.body;
-
-
+  aplicarHitStop(alvo) {
+    if (this.emHitStop || this.cancelada) return;
     this.emHitStop = true;
-
-
-    this.velocidadeKenAntesStop = {
-      x: body.velocity.x,
-      y: body.velocity.y
-    };
-
-
-    sprite.anims.pause();
-
-    alvo.sprite?.anims?.pause();
-
-
-    body.setVelocity(
-      0,
-      0
-    );
-
-
-    alvo.sprite?.body
-      ?.setVelocity(
-        0,
-        0
-      );
-
-
-    // pequena travada da câmera
-    const cam =
-      this.scene.cameras.main;
-
-    cam.shake(
-      duracao,
-      0.004
-    );
-
-
-    this.agendar(
-      duracao,
-      () => {
-
-        if (this.cancelada) {
-          return;
-        }
-
-
-        sprite.anims.resume();
-
-        alvo.sprite?.anims
-          ?.resume();
-
-
-        if (
-          this.velocidadeKenAntesStop
-        ) {
-          body.setVelocity(
-            this.velocidadeKenAntesStop.x,
-            this.velocidadeKenAntesStop.y
-          );
-        }
-
-
-        this.velocidadeKenAntesStop =
-          null;
-
-        this.emHitStop =
-          false;
-      }
-    );
+    this.travarCamera();
+    this.congelarCorpo(this.personagem.sprite);
+    this.congelarCorpo(alvo.sprite, alvo);
+    this.agendar(SHORYUKEN.hitStop, () => {
+      if (this.impactoFinalAtivado) return;
+      this.descongelarCorpos();
+      this.restaurarCamera();
+      this.emHitStop = false;
+    });
   }
 
 
@@ -872,194 +847,121 @@ export default class KenUlt {
   // ============================================================
 
   executarImpactoFinal(alvo) {
-    if (
-      this.etapa ===
-      "impactoFinal"
-    ) {
-      return;
-    }
-
-    this.etapa =
-      "impactoFinal";
-
-
-    const ken =
-      this.personagem.sprite;
-
-    const alvoSprite =
-      alvo.sprite;
-
-    const cam =
-      this.scene.cameras.main;
-
-
+    if (this.impactoFinalAtivado || this.cancelada || !alvo.sprite?.active) return;
+    this.impactoFinalAtivado = true;
     this.destruirHitbox();
-
-
-    // efeito pesado igual ao Spider
-    this.criarVFX(
-      "finalImpact",
-      alvoSprite.x,
-      alvoSprite.y - 45,
-      {
-        escala: 1.15,
-
-        rotacao:
-          -Math.PI / 2
-      }
-    );
-
-
-    // ==========================================================
-    // CLOSE
-    // ==========================================================
-
     this.travarCamera();
-
+    const ken = this.personagem.sprite;
+    const cam = this.scene.cameras.main;
+    this.zoomAntesFinal = cam.zoom;
+    this.congelarCorpo(ken);
+    this.congelarCorpo(alvo.sprite, alvo);
+    // Mesmo close direto do SpiderUlt: nao depende do termino de pan/zoomTo.
+    cam.panEffect?.reset();
+    cam.zoomEffect?.reset();
     cam.stopFollow();
-
-    cam.centerOn(
-      ken.x,
-      ken.y - 70
-    );
-
-    cam.setZoom(
-      3.0
-    );
-
-
-    // ==========================================================
-    // CONGELA
-    // ==========================================================
-
+    cam.setZoom(3.2);
+    cam.centerOn((ken.x + alvo.sprite.x) / 2, (ken.y + alvo.sprite.y) / 2 - 65);
+    this.ajustarFundoNaCamera();
+    // Duas passadas aditivas, origem e deslocamentos iguais ao SpiderUlt.
+    for (let camada = 0; camada < 2; camada++) {
+      this.criarVFX('finalImpact', alvo.sprite.x - 20 * this.direcao, alvo.sprite.y - 70, {
+        origemX: 0.75, escala: 1.15, direcao: 1,
+        rotacao: Math.atan2(SHORYUKEN.knockFinalY, SHORYUKEN.knockFinalX * this.direcao)
+      });
+    }
+    this.tocarSomImpacto('heavy', 0.45);
+    this.clockAntesFinal = this.scene.time.paused;
     this.scene.physics.pause();
-
-    ken.anims.pause();
-
-    alvoSprite.anims?.pause();
-
-
-    cam.shake(
-      350,
-      0.012
-    );
-
-
-    /*
-      Usa setTimeout aqui pelo mesmo motivo
-      do SpiderUlt: se o relógio da cena for
-      congelado, delayedCall também congela.
-    */
-
-    setTimeout(
-      () => {
-
-        if (
-          this.cancelada ||
-          !this.scene
-        ) {
-          return;
-        }
-
-
-        this.scene.physics.resume();
-
-
-        ken.anims.resume();
-
-        alvoSprite.anims
-          ?.resume();
-
-
-        // ======================================================
-        // GRANDE LANÇAMENTO PARA CIMA
-        // ======================================================
-
-        alvoSprite.body
-          ?.setAllowGravity(
-            true
-          );
-
-
-        alvo.receberDano(
-          SHORYUKEN.danoFinal,
-
-          {
-            tipoSomImpacto:
-              "heavy",
-
-            knockbackX:
-              SHORYUKEN.knockFinalX,
-
-            knockbackY:
-              SHORYUKEN.knockFinalY,
-
-            knockbackFixo:
-              true,
-
-            tumbling:
-              true,
-
-            hitstunFixoFrames:
-              35,
-
-            ignorarHitstunDecay:
-              true
-          },
-
-          {
-            direcao:
-              this.direcao,
-
-            x:
-              ken.x
-          }
-        );
-
-
-        this.alvosCarregados.delete(
-          alvo
-        );
-
-
-        cam.setZoom(
-          1
-        );
-
-
-        this.restaurarCamera();
-
-
-        this.finalizarUlt();
-
-      },
-
-      SHORYUKEN.hitStopFinal
-    );
+    this.scene.time.paused = true;
+    this.iniciarTremorFinal(cam);
+    // Timer real: o clock do Phaser esta congelado, como na ult do Aranha.
+    this.agendarFinal(SHORYUKEN.freezeFinal, () => {
+      this.pararTremorFinal();
+      cam.resetFX();
+      this.scene.time.paused = this.clockAntesFinal;
+      this.clockAntesFinal = null;
+      this.scene.physics.resume();
+      this.descongelarCorpos();
+      this.liberarAlvos();
+      if (alvo.sprite?.active && alvo.sprite.body) {
+        // Completa os 50 deste impulso mesmo se algum acerto intermediario falhou.
+        const danoRestante = SHORYUKEN.danoMaximo - (this.danoPorAlvo.get(alvo) ?? 0);
+        this.aplicarDanoLimitado(alvo, danoRestante, {
+          tipoSomImpacto: 'heavy',
+          knockbackX: SHORYUKEN.knockFinalX,
+          knockbackY: SHORYUKEN.knockFinalY,
+          knockbackFixo: true,
+          tumbling: true,
+          hitstunFixoFrames: 60,
+          ignorarHitstunDecay: true
+        }, { direcao: this.direcao, x: ken.x });
+      }
+      cam.setZoom(this.zoomAntesFinal);
+      this.restaurarCamera();
+      this.finalizarUlt();
+    });
   }
 
 
   // ============================================================
-  // IMPACTO NORMAL
+  // EFEITOS DE IMPACTO
   // ============================================================
 
-  criarImpactoNormal(alvo) {
-    const lista = [
-      "2impact",
-      "3impact",
-      "4impact"
-    ];
+  tocarSomImpacto(tipo, volume = 0.22) {
+    const sons = this.personagem.sons?.[tipo];
+    if (sons) this.personagem.tocarSomSorteado(sons, { volume });
+  }
 
+  agendarFinal(tempo, callback) {
+    this.timerFinal = setTimeout(() => {
+      this.timerFinal = null;
+      if (!this.cancelada && !this.finalizada) callback();
+    }, tempo);
+  }
+
+  iniciarTremorFinal(cam) {
+    this.pararTremorFinal();
+    const inicio = performance.now();
+    this.posCameraAntesTremor = { x: cam.scrollX, y: cam.scrollY };
+    this.intervaloTremorFinal = setInterval(() => {
+      const progresso = Math.min((performance.now() - inicio) / 800, 1);
+      const amplitude = (150 / cam.zoom) * Math.pow(1 - progresso, 0.65);
+      const base = this.posCameraAntesTremor;
+      cam.setScroll(
+        base.x + Phaser.Math.FloatBetween(-amplitude, amplitude),
+        base.y + Phaser.Math.FloatBetween(-amplitude, amplitude)
+      );
+      this.ajustarFundoNaCamera();
+      if (progresso >= 1) this.pararTremorFinal();
+    }, 45);
+  }
+
+  pararTremorFinal() {
+    if (this.intervaloTremorFinal) clearInterval(this.intervaloTremorFinal);
+    this.intervaloTremorFinal = null;
+    if (this.posCameraAntesTremor) {
+      const { x, y } = this.posCameraAntesTremor;
+      this.scene.cameras.main.setScroll(x, y);
+      this.posCameraAntesTremor = null;
+    }
+  }
+
+  criarImpactoNormal(alvo) {
     const textura =
-      Phaser.Utils.Array
-        .GetRandom(lista);
+      Phaser.Utils.Array.GetRandom(
+        [
+          "2impact",
+          "3impact",
+          "4impact"
+        ]
+      );
 
 
     this.criarVFX(
       textura,
 
       alvo.sprite.x,
-
       alvo.sprite.y - 45,
 
       {
@@ -1069,13 +971,10 @@ export default class KenUlt {
   }
 
 
-  // ============================================================
-  // EFEITO DE LANÇAMENTO
-  // ============================================================
-
   criarLaunch() {
     const sprite =
       this.personagem.sprite;
+
 
     this.criarVFX(
       "ken-launch",
@@ -1084,10 +983,10 @@ export default class KenUlt {
         5 *
         this.direcao,
 
-      sprite.y - 10,
+      sprite.y - 25,
 
       {
-        escala: 0.9
+        escala: 0.95
       }
     );
   }
@@ -1103,10 +1002,19 @@ export default class KenUlt {
     y,
     opcoes = {}
   ) {
+
     if (
-      !this.scene.textures
-        .exists(textura)
+      !this.scene.textures.exists(
+        textura
+      )
     ) {
+
+      console.warn(
+        `[KenUlt] textura não encontrada: ${textura}`
+      );
+
+      opcoes.aoCompletar?.();
+
       return null;
     }
 
@@ -1116,25 +1024,32 @@ export default class KenUlt {
 
 
     if (
-      !this.scene.anims
-        .exists(animKey)
+      !this.scene.anims.exists(
+        animKey
+      )
     ) {
 
+      const texturaObj =
+        this.scene.textures.get(
+          textura
+        );
+
+
       const frameTotal =
-        this.scene.textures
-          .get(textura)
-          .frameTotal;
+        texturaObj.frameTotal;
 
 
-      const ultimoConfigurado =
+      const configurado =
         VFX_FRAMES[textura];
 
 
       const ultimoFrame =
         Number.isInteger(
-          ultimoConfigurado
+          configurado
         )
-          ? ultimoConfigurado
+
+          ? configurado
+
           : Math.max(
               0,
               frameTotal - 2
@@ -1148,6 +1063,7 @@ export default class KenUlt {
           this.scene.anims
             .generateFrameNumbers(
               textura,
+
               {
                 start: 0,
                 end: ultimoFrame
@@ -1188,7 +1104,7 @@ export default class KenUlt {
 
 
     efeito.setFlipX(
-      this.personagem.sprite.flipX
+      opcoes.direcao !== undefined ? opcoes.direcao < 0 : this.personagem.sprite.flipX
     );
 
 
@@ -1197,14 +1113,15 @@ export default class KenUlt {
     );
 
 
-    // MESMO FILTRO DAS OUTRAS ULTS
     efeito.setBlendMode(
       Phaser.BlendModes.ADD
     );
 
 
     this.scene.camHUD
-      ?.ignore(efeito);
+      ?.ignore(
+        efeito
+      );
 
 
     this.efeitos.add(
@@ -1214,16 +1131,21 @@ export default class KenUlt {
 
     efeito.once(
       "destroy",
-      () =>
+      () => {
         this.efeitos.delete(
           efeito
-        )
+        );
+      }
     );
 
 
     efeito.once(
       "animationcomplete",
       () => {
+
+        opcoes.aoCompletar?.();
+
+
         if (efeito.active) {
           efeito.destroy();
         }
@@ -1236,12 +1158,23 @@ export default class KenUlt {
     );
 
 
+    if (
+      opcoes.duracao &&
+      efeito.anims.currentAnim
+    ) {
+
+      efeito.anims.timeScale =
+        efeito.anims.currentAnim.duration /
+        opcoes.duracao;
+    }
+
+
     return efeito;
   }
 
 
   // ============================================================
-  // ANIMAÇÃO PRINCIPAL
+  // FIM DA ANIMAÇÃO
   // ============================================================
 
   aguardarFimAnimacao(callback) {
@@ -1250,6 +1183,7 @@ export default class KenUlt {
 
 
     if (this.fnAnimComplete) {
+
       sprite.off(
         "animationcomplete-ken_ult",
         this.fnAnimComplete
@@ -1257,20 +1191,21 @@ export default class KenUlt {
     }
 
 
-    this.fnAnimComplete = () => {
+    this.fnAnimComplete =
+      () => {
 
-      sprite.off(
-        "animationcomplete-ken_ult",
-        this.fnAnimComplete
-      );
-
-
-      this.fnAnimComplete =
-        null;
+        sprite.off(
+          "animationcomplete-ken_ult",
+          this.fnAnimComplete
+        );
 
 
-      callback();
-    };
+        this.fnAnimComplete =
+          null;
+
+
+        callback();
+      };
 
 
     sprite.once(
@@ -1281,46 +1216,182 @@ export default class KenUlt {
 
 
   // ============================================================
-  // FUNDO IGUAL SPIDERULT
+  // OPONENTE TRAVADO NO INTRO
   // ============================================================
 
-  ativarFundoUltimate() {
+  bloquearOponente() {
+    const alvo =
+      this.oponente;
+
+    if (!alvo) return;
+
+
+    this.estadoOponenteSalvo = {
+      podeMover:
+        alvo.podeMover,
+
+      podeAtacar:
+        alvo.podeAtacar,
+
+      podeUsarAtaque:
+        alvo.podeUsarAtaque,
+
+      podeUsarSpecial:
+        alvo.podeUsarSpecial,
+
+      updateFSM:
+        alvo.maquinaEstados?.update
+    };
+
+
+    alvo.podeMover = false;
+    alvo.podeAtacar = false;
+
+
     if (
-      this.fundoUlt?.active ||
-      !this.scene.textures
-        .exists("ultimateback")
+      typeof alvo.podeUsarAtaque ===
+      "function"
+    ) {
+
+      alvo.podeUsarAtaque =
+        () => false;
+    }
+
+
+    if (
+      typeof alvo.podeUsarSpecial ===
+      "function"
+    ) {
+
+      alvo.podeUsarSpecial =
+        () => false;
+    }
+
+
+    if (
+      alvo.maquinaEstados
+    ) {
+
+      alvo.maquinaEstados.update =
+        () => {};
+    }
+
+
+    alvo.sprite?.body
+      ?.setVelocity(
+        0,
+        0
+      );
+
+
+    alvo.sprite?.anims
+      ?.pause();
+  }
+
+
+  restaurarOponente() {
+    const alvo =
+      this.oponente;
+
+    const salvo =
+      this.estadoOponenteSalvo;
+
+
+    if (
+      !alvo ||
+      !salvo
     ) {
       return;
     }
 
 
-    const fundoFase =
+    alvo.podeMover =
+      salvo.podeMover;
+
+
+    alvo.podeAtacar =
+      salvo.podeAtacar;
+
+
+    if (
+      salvo.podeUsarAtaque
+    ) {
+
+      alvo.podeUsarAtaque =
+        salvo.podeUsarAtaque;
+    }
+
+
+    if (
+      salvo.podeUsarSpecial
+    ) {
+
+      alvo.podeUsarSpecial =
+        salvo.podeUsarSpecial;
+    }
+
+
+    if (
+      alvo.maquinaEstados &&
+      salvo.updateFSM
+    ) {
+
+      alvo.maquinaEstados.update =
+        salvo.updateFSM;
+    }
+
+
+    alvo.sprite?.anims
+      ?.resume();
+
+
+    this.estadoOponenteSalvo =
+      null;
+  }
+
+
+  // ============================================================
+  // FUNDO
+  // ============================================================
+
+  ativarFundoUltimate() {
+    if (
+      this.fundoUlt?.active ||
+      !this.scene.textures.exists(
+        "ultimateback"
+      )
+    ) {
+      return;
+    }
+
+
+    const fundo =
       this.scene.mapaAtual
         ?.imagemFundo;
 
 
     this.fundoOriginal =
-      fundoFase ?? null;
+      fundo ?? null;
 
 
     this.fundoOriginalVisivel =
-      fundoFase?.visible ?? true;
+      fundo?.visible ?? true;
 
 
     if (
-      !this.scene.anims
-        .exists(
-          "ken_ultimateback"
-        )
+      !this.scene.anims.exists(
+        "ken_ultimateback"
+      )
     ) {
+
       this.scene.anims.create({
-        key:
-          "ken_ultimateback",
+        key: "ken_ultimateback",
 
         frames:
           this.scene.anims
             .generateFrameNumbers(
               "ultimateback",
+
               {
                 start: 0,
                 end: 115
@@ -1344,14 +1415,12 @@ export default class KenUlt {
 
 
     this.fundoUlt.setDepth(
-      (fundoFase?.depth ?? -100)
-      + 1
+      (fundo?.depth ?? -100) + 1
     );
 
 
-    this.fundoUlt.setScrollFactor(
-      1
-    );
+    this.fundoUlt
+      .setScrollFactor(1);
 
 
     this.fundoUlt.play(
@@ -1359,7 +1428,7 @@ export default class KenUlt {
     );
 
 
-    fundoFase?.setVisible(
+    fundo?.setVisible(
       false
     );
 
@@ -1383,9 +1452,7 @@ export default class KenUlt {
 
     plataformas.forEach(
       plataforma =>
-        plataforma.setVisible(
-          false
-        )
+        plataforma.setVisible(false)
     );
 
 
@@ -1428,6 +1495,7 @@ export default class KenUlt {
     if (
       this.fundoOriginal?.active
     ) {
+
       this.fundoOriginal.setVisible(
         this.fundoOriginalVisivel
       );
@@ -1443,9 +1511,11 @@ export default class KenUlt {
       const item of
       this.visibilidadePlataformas
     ) {
+
       if (
         item.plataforma?.active
       ) {
+
         item.plataforma.setVisible(
           item.visivel
         );
@@ -1469,6 +1539,7 @@ export default class KenUlt {
         .atualizarCamera ===
         "function"
     ) {
+
       this.funcaoCamOriginal =
         this.scene.atualizarCamera;
 
@@ -1483,6 +1554,7 @@ export default class KenUlt {
     if (
       this.funcaoCamOriginal
     ) {
+
       this.scene.atualizarCamera =
         this.funcaoCamOriginal;
 
@@ -1501,17 +1573,22 @@ export default class KenUlt {
     tempo,
     callback
   ) {
+
     const timer =
       this.scene.time.delayedCall(
         tempo,
+
         () => {
+
           this.timers.delete(
             timer
           );
 
+
           if (
             !this.cancelada
           ) {
+
             callback();
           }
         }
@@ -1528,7 +1605,45 @@ export default class KenUlt {
 
 
   // ============================================================
-  // FINALIZAÇÃO
+  // UPDATE
+  // ============================================================
+
+  atualizar() {
+    if (
+      this.cancelada ||
+      this.finalizada
+    ) {
+      return;
+    }
+
+
+    this.ajustarFundoNaCamera();
+
+
+    if (
+      this.emHitStop ||
+      this.impactoFinalAtivado
+    ) {
+      return;
+    }
+
+
+    const body = this.personagem.sprite.body;
+    if (this.puloIniciado) {
+      body.setGravityY(SHORYUKEN.gravidadeExtra);
+      // Desacelera gradualmente; conserva um pequeno avanco na descida.
+      const delta = Math.min(this.scene.game.loop.delta, 50) / 1000;
+      const velocidadeAlvo = body.blocked.down ? 0 : body.velocity.y >= 0 ? 65 * this.direcao : body.velocity.x;
+      body.setVelocityX(velocidadeAlvo + (body.velocity.x - velocidadeAlvo) * Math.exp(-8 * delta));
+    }
+    if (this.aguardandoPouso && body.blocked.down) this.iniciarSegundoShoryuken();
+    this.atualizarHitbox();
+    this.atualizarAlvosCarregados();
+  }
+
+
+  // ============================================================
+  // FINAL
   // ============================================================
 
   finalizarUlt() {
@@ -1539,12 +1654,13 @@ export default class KenUlt {
     }
 
 
-    this.finalizada =
-      true;
+    this.finalizada = true;
 
 
     this.destruirHitbox();
 
+
+    this.restaurarOponente();
 
     this.restaurarCamera();
 
@@ -1557,7 +1673,7 @@ export default class KenUlt {
       );
 
 
-    this.alvosCarregados.clear();
+    this.liberarAlvos();
 
 
     if (
@@ -1566,18 +1682,27 @@ export default class KenUlt {
         .finalizarUlt ===
         "function"
     ) {
-      this.estadoFSM
-        .finalizarUlt();
+
+      this.estadoFSM.finalizarUlt();
     }
   }
 
 
   // ============================================================
-  // CANCELAMENTO
+  // CANCELAR
   // ============================================================
 
   cancelar() {
     this.cancelada = true;
+    if (this.timerFinal) clearTimeout(this.timerFinal);
+    this.timerFinal = null;
+    this.pararTremorFinal();
+    if (this.clockAntesFinal != null) {
+      this.scene.time.paused = this.clockAntesFinal;
+      this.clockAntesFinal = null;
+    }
+    this.descongelarCorpos();
+    this.emHitStop = false;
 
 
     this.scene.physics.resume();
@@ -1591,16 +1716,34 @@ export default class KenUlt {
         timer.remove(false)
     );
 
+
     this.timers.clear();
+
+
+    if (
+      this.fnAnimUpdate
+    ) {
+
+      this.personagem.sprite.off(
+        "animationupdate",
+        this.fnAnimUpdate
+      );
+
+
+      this.fnAnimUpdate =
+        null;
+    }
 
 
     if (
       this.fnAnimComplete
     ) {
+
       this.personagem.sprite.off(
         "animationcomplete-ken_ult",
         this.fnAnimComplete
       );
+
 
       this.fnAnimComplete =
         null;
@@ -1611,22 +1754,23 @@ export default class KenUlt {
       .anims?.resume();
 
 
-    this.alvoHitStop
-      ?.sprite
-      ?.anims
-      ?.resume();
-
-
     this.efeitos.forEach(
       efeito => {
-        if (efeito?.active) {
+
+        if (
+          efeito?.active
+        ) {
+
           efeito.destroy();
         }
       }
     );
 
+
     this.efeitos.clear();
 
+
+    this.restaurarOponente();
 
     this.restaurarFundo();
 
@@ -1639,17 +1783,13 @@ export default class KenUlt {
       );
 
 
-    for (
-      const alvo of
-      this.alvosCarregados
-    ) {
-      alvo?.sprite?.body
-        ?.setAllowGravity(
-          true
-        );
+    this.liberarAlvos();
+    const sprite = this.personagem.sprite;
+    sprite.body.setGravityY(0);
+    if (this.origemOriginal) {
+      sprite.setOrigin(this.origemOriginal.x, this.origemOriginal.y);
+      this.origemOriginal = null;
     }
-
-
-    this.alvosCarregados.clear();
+    if (this.zoomOriginal !== null) this.scene.cameras.main.setZoom(this.zoomOriginal);
   }
 }

@@ -55,9 +55,9 @@ export default class Ken extends Personagem {
 
 this.nomePersonagem = "Ken";
     //============================= hitboxes ========================================
-   
+
     this.configAnimacoes = {
-      
+
        idle: {
         largura: 80,
         altura: 120,
@@ -94,7 +94,7 @@ this.nomePersonagem = "Ken";
         ],
       },
 
-      
+
       crouch: {
         largura: 80,
         altura: 60,
@@ -141,7 +141,7 @@ this.nomePersonagem = "Ken";
 },
 
 
-     
+
       danoUp: {
         largura: 80,
         altura: 100,
@@ -165,7 +165,7 @@ this.nomePersonagem = "Ken";
           { largura: 50, altura: 45, offsetX: 30, offsetY: -70 },   // Pernas
         ],
       },
-     
+
       danoDown: {
         largura: 80,
         altura: 100,
@@ -378,10 +378,22 @@ this.nomePersonagem = "Ken";
           { largura: 70, altura: 40, offsetX: 5, offsetY: -22 },
         ],
       },
-   
+
+      ult: {
+        largura: 80,
+        altura: 120,
+        offsetX: 37.5,
+        offsetY: 35,
+        escala: 1,
+        hurtboxes: [
+          { largura: 45, altura: 70, offsetX: 0, offsetY: -90 },
+          { largura: 30, altura: 50, offsetX: -5, offsetY: -25 },
+        ],
+      },
+
    };
-    
-  
+
+
     // Corrige somente a entrada e a saida dos especiais envolvidos no bug.
     const especiaisComAjuste = ["ken_AneSpecial", "ken_doSpecial", "ken_AdoSpecial"];
     let animacaoAnterior = this.sprite.anims.currentAnim?.key;
@@ -803,7 +815,7 @@ this.nomePersonagem = "Ken";
 
 
 
-  
+
   static criarAnimacoes(scene) {
 
    // efeitos anim
@@ -1185,14 +1197,6 @@ scene.anims.create({
       repeat: 0,
     });
 
-    scene.anims.create({
-      key: "ken_ult",
-      frames: scene.anims.generateFrameNumbers("Ken_ult", {
-        start: 2,
-        end: 28,
-      }),
-      frameRate: 18,
-      repeat: 0,
-    });
+
   }
 }
