@@ -69,7 +69,7 @@ export default class MikuSpin {
 
   criarHitbox() {
     const sprite = this.personagem.sprite;
-    this.hitbox = this.scene.add.zone(sprite.x, sprite.y - 80, 100, 60);
+    this.hitbox = this.scene.add.zone(sprite.x, sprite.y - 80, 130, 60);
     this.scene.physics.add.existing(this.hitbox);
     this.hitbox.body.setAllowGravity(false);
     this.hitbox.body.setImmovable(true);

@@ -131,6 +131,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("FJ_neu1", "assets/personagens/FJ/Sprites/FJ_neu1.png", { frameWidth: 470, frameHeight: 380 });
     this.load.spritesheet("FJ_neu2", "assets/personagens/FJ/Sprites/FJ_neu2.png", { frameWidth: 882, frameHeight: 363 });
     this.load.spritesheet("FJ_neu3", "assets/personagens/FJ/Sprites/FJ_neu3.png", { frameWidth: 468, frameHeight: 448 });
+    this.load.spritesheet("FJ_speedNeu", "assets/personagens/FJ/Sprites/FJ_speedNeu.png", { frameWidth: 882, frameHeight: 448 });
     this.load.spritesheet("FJ_SideAtack", "assets/personagens/FJ/Sprites/FJ_SideAtack.png", { frameWidth: 452, frameHeight: 385 });
     this.load.spritesheet("FJ_downAtack", "assets/personagens/FJ/Sprites/FJ_downAtack.png", { frameWidth: 514, frameHeight: 687 });
     this.load.spritesheet("FJ_AirNeutro", "assets/personagens/FJ/Sprites/FJ_AirNeutro.png", { frameWidth: 499, frameHeight: 533 });

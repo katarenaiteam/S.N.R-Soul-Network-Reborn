@@ -742,7 +742,7 @@ consumirUlt() {
       this.sprite.flipX ? -1 : 1;
 
     const golpe =
-      estadoAtack.golpeAtual;
+      estadoAtack.dadosHitboxAtual ?? estadoAtack.golpeAtual;
 
     estadoAtack.hitboxAtual.setPosition(
       this.sprite.x +
@@ -776,6 +776,18 @@ consumirUlt() {
         : cfg.offsetX;
 
     body.setOffset(offsetX, cfg.offsetY);
+
+    const temOffsetVisual = cfg.offsetVisualX !== undefined || cfg.offsetVisualY !== undefined;
+    if (temOffsetVisual || this.origemAntesOffsetVisual) {
+      const sprite = this.sprite;
+      const origem = this.origemAntesOffsetVisual ?? { x: sprite.originX, y: sprite.originY };
+      this.origemAntesOffsetVisual = temOffsetVisual ? origem : null;
+      const x = (cfg.offsetVisualX ?? 0) * (sprite.flipX ? -1 : 1) / sprite.scaleX;
+      const y = (cfg.offsetVisualY ?? 0) / sprite.scaleY;
+      sprite.setOrigin(origem.x - x / sprite.width, origem.y - y / sprite.height);
+      // Move apenas o desenho; ao sair da animacao, restaura a origem anterior.
+      body.setOffset(offsetX - x, cfg.offsetY - y);
+    }
   }
 
  inputDown(nome) {

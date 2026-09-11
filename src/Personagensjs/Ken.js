@@ -239,14 +239,15 @@ this.nomePersonagem = "Ken";
       },
 
       neutralAir: {
+         offsetVisualX: 21,
         largura: 85,
         altura: 120,
         offsetX: 22,
         offsetY: -5,
         escala: 1,
         hurtboxes: [
-          { largura: 50, altura: 55, offsetX: -20, offsetY: -85 },
-          { largura: 60, altura: 25, offsetX: -25, offsetY: -40 },
+          { largura: 50, altura: 55, offsetX: 1, offsetY: -85 },
+          { largura: 60, altura: 25, offsetX: -4, offsetY: -40 },
         ],
       },
 
@@ -386,8 +387,8 @@ this.nomePersonagem = "Ken";
         offsetY: 35,
         escala: 1,
         hurtboxes: [
-          { largura: 45, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 30, altura: 50, offsetX: -5, offsetY: -25 },
+        //  { largura: 45, altura: 70, offsetX: 0, offsetY: -90 },
+        //  { largura: 30, altura: 50, offsetX: -5, offsetY: -25 },
         ],
       },
 
@@ -556,7 +557,7 @@ this.nomePersonagem = "Ken";
         air_neutro: {
         animacao: "ken_neutralAir",
         frameHitbox: 3,
-        offsetX: 28,
+        offsetX: 48,
         offsetY: -85,
         largura: 70,
         altura: 25,

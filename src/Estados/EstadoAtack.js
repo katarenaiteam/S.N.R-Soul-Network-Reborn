@@ -1,5 +1,7 @@
 ﻿import EstadoBase from "./EstadoBase.js";
 
+import AtaqueMultiplo from "./AtaqueMultiplo.js";
+
 export default class EstadoAtack extends EstadoBase {
   enter(dados = {}) {
    const noChao = this.personagem.sprite.body.blocked.down;
@@ -56,6 +58,9 @@ export default class EstadoAtack extends EstadoBase {
      this.timerFinalizacaoAcerto = null;
      this.finalizandoPorAcerto = false;
      this.comboBuffer = false;
+     this.ataqueMultiplo = this.golpeAtual.multiHit
+       ? new AtaqueMultiplo(this, this.golpeAtual.multiHit)
+       : null;
     
      // Zera o buffer apenas na entrada do estado
      this.inputBuffer = null;
@@ -182,7 +187,9 @@ export default class EstadoAtack extends EstadoBase {
     // =========================
     // INPUT DO COMBO DE ATAQUE
     // =========================
+    if (this.ataqueMultiplo?.atualizar(agora)) return;
     if (
+      !this.ataqueMultiplo?.comboRapido &&
       this.golpeAtual?.comboProximo &&
       this.personagem.inputJustDown("atack")
     ) {
@@ -212,6 +219,8 @@ export default class EstadoAtack extends EstadoBase {
     // PROGRESSÃƒO DO COMBO
     // =========================
     if (
+      this.hitboxCriada &&
+      !this.ataqueMultiplo?.comboRapido &&
       this.comboBuffer &&
       this.golpeAtual?.comboProximo &&
       this.golpeAtual?.comboJanelaInicio !== undefined &&
@@ -221,14 +230,7 @@ export default class EstadoAtack extends EstadoBase {
         tempoDecorrido >= this.golpeAtual.comboJanelaInicio &&
         tempoDecorrido <= this.golpeAtual.comboJanelaFim
       ) {
-        this.comboBuffer = false;
-        this.comboIndex++;
-
-        this.personagem.maquinaEstados.mudarEstado("atack", {
-          tipo: this.golpeAtual.comboProximo,
-          combo: true,
-        });
-
+        this.avancarCombo();
         return;
       }
     }
@@ -237,6 +239,8 @@ export default class EstadoAtack extends EstadoBase {
     // FINALIZAÃ‡ÃƒO POR DURAÃ‡ÃƒO
     // =========================
     if (
+      !this.ataqueMultiplo?.comboRapido &&
+      (!this.ataqueMultiplo || this.ataqueMultiplo.concluido) &&
       this.golpeAtual?.duracao !== undefined &&
       tempoDecorrido >= this.golpeAtual.duracao
     ) {
@@ -417,26 +421,36 @@ export default class EstadoAtack extends EstadoBase {
   // HITBOX
   // =========================
   atualizarHitbox(anim, frame) {
+    if (this.ataqueMultiplo) return;
     if (anim.key !== this.golpeAtual.animacao) return;
     if (this.hitboxCriada) return;
     if (frame.index !== this.golpeAtual.frameHitbox) return;
 
+    this.criarHitbox(this.golpeAtual);
+  }
+
+  criarHitbox(golpe) {
+    const primeiraHitbox = !this.hitboxCriada;
     this.hitboxCriada = true;
+    this.dadosHitboxAtual = golpe;
+    this.alvosAtingidosHitbox = new Set();
 
     this.hitboxAtual = this.personagem.criarHitboxAtaque(
-      this.golpeAtual.offsetX,
-      this.golpeAtual.offsetY,
-      this.golpeAtual.largura,
-      this.golpeAtual.altura
+      golpe.offsetX,
+      golpe.offsetY,
+      golpe.largura,
+      golpe.altura
     );
 
     try {
-      this.personagem.tocarSomSorteado(
-        this.golpeAtual.vozAtaque ?? this.personagem.sons.vozAtaque,
-        { volume: this.personagem.sons.volumeVoz }
-      );
+      if (primeiraHitbox) {
+        this.personagem.tocarSomSorteado(
+          golpe.vozAtaque ?? this.personagem.sons.vozAtaque,
+          { volume: this.personagem.sons.volumeVoz }
+        );
+      }
 
-      const somVento = this.golpeAtual.somVento || this.personagem.sons?.wind;
+      const somVento = golpe.somVento || this.personagem.sons?.wind;
       if (somVento) {
         this.personagem.tocarSomSorteado(somVento, { volume: 0.1 });
       }
@@ -472,12 +486,12 @@ export default class EstadoAtack extends EstadoBase {
         const ponto = formacao[indice] ?? formacao[formacao.length - 1];
         const efeito = this.personagem.vfx?.tocar(configDesteAtaque.efeito, {
           offsetX:
-            this.golpeAtual.offsetX +
+            golpe.offsetX +
             (configVFXAtaque.offsetX ?? 0) +
             (configDesteAtaque.offsetX ?? 0) +
             ponto.x,
           offsetY:
-            this.golpeAtual.offsetY +
+            golpe.offsetY +
             (configVFXAtaque.offsetY ?? 0) +
             (configDesteAtaque.offsetY ?? 0) +
             ponto.y,
@@ -548,7 +562,7 @@ export default class EstadoAtack extends EstadoBase {
 
   verificarAcertoManual() {
     const corpoHitbox = this.hitboxAtual?.body;
-    if (this.jaAcertou || !this.hitboxAtual?.active || !corpoHitbox?.enable) return;
+    if ((!this.ataqueMultiplo && this.jaAcertou) || !this.hitboxAtual?.active || !corpoHitbox?.enable) return;
 
     const limitesHitbox = new Phaser.Geom.Rectangle(
       corpoHitbox.left,
@@ -558,7 +572,7 @@ export default class EstadoAtack extends EstadoBase {
     );
 
     for (const alvo of this.alvosAtaque ?? []) {
-      if (!alvo?.grupoHurtbox || !alvo.sprite?.active) continue;
+      if (!alvo?.grupoHurtbox || !alvo.sprite?.active || this.alvosAtingidosHitbox?.has(alvo)) continue;
 
       const atingiu = alvo.grupoHurtbox.getChildren().some((hurtbox) =>
         hurtbox?.active && hurtbox.body?.enable &&
@@ -575,29 +589,33 @@ export default class EstadoAtack extends EstadoBase {
 
       if (atingiu) {
         this.aplicarAcerto(alvo, this.hitboxAtual);
-        return;
+        if (!this.ataqueMultiplo) return;
       }
     }
   }
 
   aplicarAcerto(alvo, hitbox) {
-    if (this.jaAcertou || !alvo?.receberDano) return;
+    if (hitbox !== this.hitboxAtual || !hitbox?.active || !alvo?.receberDano) return;
+    if (this.ataqueMultiplo && this.personagem.scene.time.now >= this.ataqueMultiplo.fimHit) return;
+    if (this.ataqueMultiplo ? this.alvosAtingidosHitbox.has(alvo) : this.jaAcertou) return;
 
     this.jaAcertou = true;
+    this.alvosAtingidosHitbox.add(alvo);
+    const golpe = this.dadosHitboxAtual;
 
     // A colisao e o dano sao regra de jogo; audio e VFX sao apresentacao.
     // Falhas de decodificacao de audio ou de renderizacao variam por navegador
     // e nunca podem consumir o acerto antes de o dano ser aplicado.
-    const valorDano = this.golpeAtual.propriedades?.dano ?? 0;
+    const valorDano = golpe.propriedades?.dano ?? 0;
     const origem = {
       direcao: this.personagem.sprite.flipX ? -1 : 1,
     };
 
-    alvo.receberDano(valorDano, this.golpeAtual.propriedades, origem);
+    alvo.receberDano(valorDano, golpe.propriedades, origem);
 
     try {
-      const tipoImpacto = this.golpeAtual.tipoSomImpacto || "light";
-      const somImpacto = this.golpeAtual.somImpacto || this.personagem.sons?.[tipoImpacto];
+      const tipoImpacto = golpe.tipoSomImpacto || "light";
+      const somImpacto = golpe.somImpacto || this.personagem.sons?.[tipoImpacto];
       if (somImpacto) {
         this.personagem.tocarSomSorteado(somImpacto, { volume: 0.15 });
       }
@@ -607,7 +625,7 @@ export default class EstadoAtack extends EstadoBase {
 
     try {
       this.personagem.vfx?.tocarListaImpacto(
-        this.golpeAtual.vfxAcerto,
+        golpe.vfxAcerto,
         alvo,
         hitbox,
       );
@@ -630,6 +648,19 @@ export default class EstadoAtack extends EstadoBase {
   // =========================
   // FINALIZA ATAQUE
   // =========================
+  avancarCombo() {
+    if (!this.golpeAtual?.comboProximo) {
+      this.finalizarAtaque();
+      return;
+    }
+    this.comboBuffer = false;
+    this.comboIndex++;
+    this.personagem.maquinaEstados.mudarEstado("atack", {
+      tipo: this.golpeAtual.comboProximo,
+      combo: true,
+    });
+  }
+
   finalizarAtaque() {
     // Se registrou o pulo durante o ataque, executa o pulo ao sair do ataque
     if (this.inputBuffer === "pulo") {
@@ -652,7 +683,7 @@ export default class EstadoAtack extends EstadoBase {
     }
   }
 
-  exit() {
+  destruirHitbox() {
     // Limpa o evento de colisÃ£o da fÃ­sica do Phaser
     (this.colisoresOverlap ?? []).forEach((colisor) => {
       if (colisor?.active && colisor.world) colisor.destroy();
@@ -668,6 +699,13 @@ export default class EstadoAtack extends EstadoBase {
         this.personagem.hitboxAtiva = null;
       }
     }
+
+    this.dadosHitboxAtual = null;
+  }
+
+  exit() {
+    this.destruirHitbox();
+    this.ataqueMultiplo = null;
 
     if (this.anulouGravidade) {
       this.personagem.sprite.body.setAllowGravity(true);
