@@ -14,6 +14,7 @@ import EstadoTaunt from "../Estados/EstadoTaunt.js";
 import EstadoUlt from "../Estados/EstadoUlt.js";
 import GerenciadorVFX from "../Objetos/GerenciadorVFX.js";
 import { tocarSomSeguro } from "../Objetos/AudioSeguro.js";
+import EstadoAtordoado from "../Estados/EstadoAtordoado.js";
 
 
 export default class Personagem {
@@ -146,6 +147,7 @@ export default class Personagem {
     this.maquinaEstados.adicionarEstado("dead", new EstadoDead(this));
     this.maquinaEstados.adicionarEstado("taunt", new EstadoTaunt(this));
     this.maquinaEstados.adicionarEstado("ult", new EstadoUlt(this));
+    this.maquinaEstados.adicionarEstado("atordoado", new EstadoAtordoado(this));
 
     this.maquinaEstados.mudarEstado("idle");
   }
@@ -186,21 +188,9 @@ export default class Personagem {
         // Define que a guarda fica bloqueada por 3 segundos
         this.tempoLiberacaoGuard = this.scene.time.now + this.tempoCooldownGuard;
 
-        // Ao quebrar o escudo, zera a velocidade antes de dar o Stun
         this.sprite.body.setVelocity(0, 0);
-
-        // Mudar para o estado de Dano
-        this.ultimoImpacto = propriedades;
-
-        this.maquinaEstados.mudarEstado("dano");
-        
-        // Sobrescreve a duração do Stun especificamente para a Quebra de Guarda (1 segundo)
-        const estadoDano = this.maquinaEstados.estados["dano"];
-        if (estadoDano) {
-          estadoDano.duracaoStun = 1000;
-          estadoDano.tempoInicial = this.scene.time.now;
-        }
-        return false; // Escudo quebrou
+        this.maquinaEstados.mudarEstado("atordoado");
+        return false;
       }
 
       // Repulsão de impacto leve ao defender o golpe sem quebrar

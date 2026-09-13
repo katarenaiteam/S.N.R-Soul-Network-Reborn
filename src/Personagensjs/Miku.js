@@ -201,6 +201,13 @@ this.vfxAtaqueNormal = {
           { largura: 40, altura: 62, offsetX: 0, offsetY: -42 },
         ],
       },
+      stun: {
+        largura: 85, altura: 340, offsetX: 80, offsetY: 20, escala: 0.34,
+        hurtboxes: [
+          { largura: 20, altura: 45, offsetX: 3, offsetY: -95 },
+          { largura: 30, altura: 70, offsetX: 3, offsetY: -35 },
+        ],
+      },
       dano: {
         largura: 85, altura: 340, offsetX: 138, offsetY: 11, escala: 0.34,
         hurtboxes: [
@@ -974,6 +981,13 @@ scene.anims.create({
      frames: scene.anims.generateFrameNumbers("Miku_dead", { start: 0, end: 2 }),
      frameRate: 10,
      repeat: 0,
+   });
+
+    scene.anims.create({
+    key: "miku_stun",
+    frames: scene.anims.generateFrameNumbers("Miku_cry"),
+    frameRate: 12,
+    repeat: 0
    });
 
     scene.anims.create({

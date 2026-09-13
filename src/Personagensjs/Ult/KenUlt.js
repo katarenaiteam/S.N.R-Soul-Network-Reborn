@@ -34,7 +34,7 @@ const SHORYUKEN = {
   knock2Y: -60,
 
   knockFinalX: 650,
-  knockFinalY: -1700,
+  knockFinalY: -1900,
 
   hitStop: 180,
   freezeFinal: 1300

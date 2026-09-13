@@ -156,6 +156,17 @@ export default class SpiderMan extends Personagem {
           { largura: 55, altura: 35, offsetX: -5, offsetY: -18 }, // Agachado / pernas abertas
      ]
       },
+      stun: {
+        largura: 85,
+        altura: 76,
+        offsetX: 0,
+        offsetY: -10,
+        escala: 1,
+        hurtboxes: [
+          
+          { largura: 65, altura: 75, offsetX: -10, offsetY: -42 }, // Agachado / pernas abertas
+        ],
+      },
 
       dano: {
         largura: 85,
@@ -1005,6 +1016,12 @@ if (!scene.anims.exists("punch_effect3")) {
      repeat: 0,
    });
 
+    scene.anims.create({
+    key: "spy_stun",
+    frames: scene.anims.generateFrameNumbers("SpiderMan_stun", { start: 0, end: 5 }),
+    frameRate: 12,
+    repeat: -1
+   });
      
 //golpes 
     scene.anims.create({

@@ -106,6 +106,17 @@ this.nomePersonagem = "Ken";
         ],
       },
 
+      stun: {
+        largura: 80,
+        altra: 60,
+        offsetX: 5,
+        offsetY: 0,
+        escuala: 1,
+        hurtboxes: [
+          { largura: 65, altura: 100, offsetX: 0, offsetY: -55 },
+        ],
+      },
+
       dash: {
         largura: 70,
         altura: 80,
@@ -139,8 +150,6 @@ this.nomePersonagem = "Ken";
     { largura: 50, altura: 30, offsetX: 0, offsetY: -15 },   // Pernas
   ],
 },
-
-
 
       danoUp: {
         largura: 80,
@@ -986,6 +995,13 @@ scene.anims.create({
      frameRate: 18,
      repeat: 0,
    });
+
+   scene.anims.create({
+  key: "ken_stun",
+  frames: scene.anims.generateFrameNumbers("Ken_stun", { start: 0, end: 6 }),
+  frameRate: 8,
+  repeat: -1
+});
 
     scene.anims.create({
       key: "ken_atack1",

@@ -1,4 +1,5 @@
 import Personagem from "./Personagem.js";
+import NeSpecial from "./Specials/FJ/NeSpecial.js";
 
 
 export default class FJ extends Personagem {
@@ -136,6 +137,16 @@ this.nomePersonagem = "Frederick Johnson";
           { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
           { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
           { largura: 67, altura: 40, offsetX: 20, offsetY: -25 }
+        ],
+      },
+      stun: {
+        largura: 250,
+        altura: 240,
+        offsetX: 95,
+        offsetY: 80,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 45, altura: 70, offsetX: 23, offsetY: -38 },
         ],
       },
 
@@ -346,11 +357,12 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
       neSpecial: {
-        largura: 85,
-        altura: 120,
-        offsetX: 25,
-        offsetY: -13,
-        escala: 1,
+        offsetVisualX: 18,
+        largura: 250,
+        altura: 400,
+        offsetX: 130,
+        offsetY: 62,
+        escala: 0.33,
         hurtboxes: [
           { largura: 55, altura: 55, offsetX: 0, offsetY: -70 },
           { largura: 90, altura: 35, offsetX: -10, offsetY: -18 },
@@ -456,10 +468,10 @@ this.nomePersonagem = "Frederick Johnson";
       neutro1: {
         animacao: "fj_atack1",
         frameHitbox: 2,
-        offsetX: 40,
-        offsetY: -80,
-        largura: 75,
-        altura: 20,
+        offsetX: 60,
+        offsetY: -100,
+        largura: 65,
+        altura: 17,
         cooldown: 700,
         duracao: 350,
         cancelavel: true,
@@ -489,10 +501,10 @@ this.nomePersonagem = "Frederick Johnson";
 
         frameHitbox: 5,
 
-        offsetX: 40,
+        offsetX: 55,
         offsetY: -80,
-        largura: 73,
-        altura: 25,
+        largura: 33,
+        altura: 45,
         duracao: 550,
         cancelavel: true,
         propriedades: {
@@ -548,10 +560,10 @@ this.nomePersonagem = "Frederick Johnson";
 
         frameHitbox: 3,
 
-        offsetX: 50,
-        offsetY: -72,
-        largura: 80,
-        altura: 36,
+        offsetX: 60,
+        offsetY: -89,
+        largura: 65,
+        altura: 26,
         duracao: 600,
         cancelavel: true,
 
@@ -589,8 +601,8 @@ this.nomePersonagem = "Frederick Johnson";
           ],
         },
         offsetX: 40,
-        offsetY: -57,
-        largura: 80,
+        offsetY: -77,
+        largura: 60,
         altura: 25,
         cooldown: 900,
         duracao: 500,
@@ -623,10 +635,10 @@ this.nomePersonagem = "Frederick Johnson";
      agachado: {
         animacao: "fj_downAtack",
         frameHitbox: 3,
-        offsetX: 26,
+        offsetX: 66,
         offsetY: -20,
-        largura: 70,
-        altura: 25,
+        largura: 50,
+        altura: 45,
         cooldown: 900,
         duracao: 500,
         cancelavel: true,
@@ -648,9 +660,9 @@ this.nomePersonagem = "Frederick Johnson";
         air_neutro: {
         animacao: "fj_neutralAir",
         frameHitbox: 3,
-        offsetX: 28,
-        offsetY: -85,
-        largura: 70,
+        offsetX: 58,
+        offsetY: -97,
+        largura: 65,
         altura: 25,
         cooldown: 900,
         duracao: 350,
@@ -673,12 +685,12 @@ this.nomePersonagem = "Frederick Johnson";
 
 
       air_agachado: {
-        animacao: "fj_sideAir",
+        animacao: "fj_downAir",
         frameHitbox: 3,
-        offsetX: 26,
-        offsetY: -50,
-        largura: 75,
-        altura: 30,
+        offsetX: 60,
+        offsetY: -70,
+        largura: 55,
+        altura: 40,
         cooldown: 900,
         duracao: 600,
          finalizarAoTocarChao: true,
@@ -698,37 +710,17 @@ this.nomePersonagem = "Frederick Johnson";
         },
       },
 
-      air_agachado: {
-        animacao: "fj_downAir",
-        frameHitbox: 3,
-        offsetX: 35,
-        offsetY: -15,
-        largura: 60,
-        altura: 60,
-        cooldown: 900,
-        duracao: 900,
-        finalizarAoTocarChao: true,
-        atrasoFinalizacaoChao: 0,
-        finalizarAoAcertarOponente: true,
-        atrasoFinalizacaoAcerto: 50,
-        cancelavel: false,
-
-         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
-           ],
-          },
-        ],
-
-        propriedades: {
-          tipoSomImpacto: "heavy",
-          dano: 12,
-          knockbackX: 80,
-          knockbackY: 400,
-          quiqueChaoY: 350,
-        },
-      },
    }
 
-    // specials
+    // specials ==========================
+    this.specials = {
+      neutro: {
+        animacao: "fj_neSpecial",
+        logica: NeSpecial,
+        cooldown: 600,
+        propriedades: { travarMovimentoAir: true },
+      },
+    };
    
   }
 
@@ -767,6 +759,21 @@ if (!scene.anims.exists("punch_effect3")) {
 // personagem
 
     if (scene.anims.exists("fj_idle")) return;
+
+    scene.anims.create({
+      key: "fj_neSpecial",
+      frames: scene.anims.generateFrameNumbers("FJ_neSpecial", {
+        start: 0,
+        end: 8,
+      }).map((frame, indice) => ({
+        ...frame,
+        // Progressao manual de 12 a 14 FPS, sem pico de velocidade no meio.
+        // A pose final tem sua propria pausa na logica do special.
+        duration: [1000 / 15, 62, 58, 54, 50, 50, 46, 42, 1000 / 16, 250][indice],
+      })),
+      frameRate: 15,
+      repeat: 0,
+    });
 
     // Idle (Parada)
     scene.anims.create({
@@ -902,6 +909,13 @@ scene.anims.create({
      frames: scene.anims.generateFrameNumbers("FJ_getup", { start: 0, end: 6 }),
      frameRate: 18,
      repeat: 0,
+   });
+
+    scene.anims.create({
+    key: "fj_stun",
+    frames: scene.anims.generateFrameNumbers("FJ_stun", { start: 0, end: 3 }),
+    frameRate: 8,
+    repeat: 0
    });
 
     scene.anims.create({

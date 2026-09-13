@@ -1,5 +1,4 @@
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
-import Morrigan from "../Personagensjs/Morr.js";
 import Madotsuki from "../Personagensjs/Madotsuki.js";
 import SkyTowers from "../Mapasjs/SkyTowers.js";
 import Frederick from "../Personagensjs/Frederick.js";
@@ -218,7 +217,6 @@ export default class CenaHistoria extends Phaser.Scene {
     switch (nome) {
       case "Frederick": return new Frederick(this, x, y, teclas, minDano, maxDano, controle);
       case "Madotsuki": return new Madotsuki(this, x, y, teclas, minDano, maxDano, controle);
-      case "Morrigan": return new Morrigan(this, x, y, teclas, minDano, maxDano, controle);
       case "Dio": return new Dio(this, x, y, teclas, minDano, maxDano, controle);
       case "SpiderMan": return new SpiderMan(this, x, y, teclas, minDano, maxDano, controle);
       case "Miku": return new Miku(this, x, y, teclas, minDano, maxDano, controle);

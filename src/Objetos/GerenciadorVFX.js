@@ -1,3 +1,18 @@
+
+const VFX_GLOBAIS = {
+  stun: {
+    textura: "Stun_Effect",
+    animacao: "stun_effect",
+    escala: 1,
+    seguir: true,
+    offsetX: 0,
+    offsetY: -125,
+    espelharSprite: false,
+    loop: true,
+    depthOffset: 2
+  }
+};
+
 export default class GerenciadorVFX {
   constructor(personagem) {
     this.personagem = personagem;
@@ -5,6 +20,7 @@ export default class GerenciadorVFX {
 
     // Efeitos que precisam acompanhar o personagem.
     this.efeitosSeguindo = [];
+    this.criarAnimacoesGlobais();
   }
 
   // ============================================================
@@ -12,10 +28,11 @@ export default class GerenciadorVFX {
   // ============================================================
 
   tocar(nome, opcoes = {}) {
-    const configBase = this.personagem.configVFX?.[nome];
+    const configBase =
+  this.personagem.configVFX?.[nome] ??
+   VFX_GLOBAIS[nome];
 
-    // Personagem pode simplesmente não possuir aquele efeito.
-    if (!configBase) return null;
+   if (!configBase) return null;
 
     // Permite alterar alguma propriedade apenas naquela chamada.
     const config = {
@@ -381,4 +398,23 @@ export default class GerenciadorVFX {
       camHUD.ignore(objeto);
     }
   }
+
+  criarAnimacoesGlobais() {
+  if (
+    this.scene.textures.exists("Stun_Effect") &&
+    !this.scene.anims.exists("stun_effect")
+  ) {
+    this.scene.anims.create({
+      key: "stun_effect",
+
+      frames:
+        this.scene.anims.generateFrameNumbers(
+          "Stun_Effect"
+        ),
+
+      frameRate: 18,
+      repeat: -1
+    });
+  }
+}
 }

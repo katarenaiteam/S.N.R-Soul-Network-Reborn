@@ -276,7 +276,7 @@ this.jogador2 = this.criarPersonagem(
         case "Ken":
         return new Ken(this, x, y, teclas, minDano, maxDano, controle);
       default:
-        return new Frederick(this, x, y, teclas, minDano, maxDano, controle);
+        return new Ken(this, x, y, teclas, minDano, maxDano, controle);
     }
   }
 

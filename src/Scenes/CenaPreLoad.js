@@ -84,6 +84,41 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("Kenmenu", "assets/Menus/Char_menu/Sprites/Kenmenu.png");
     this.load.image("Mikumenu", "assets/Menus/Char_menu/Sprites/Mikumenu.png");
 
+    // --- new charmenu ---
+    // - grade
+    this.load.spritesheet("grade", "/assets/Menus/Char_menu/Sprites/grade.png", { frameWidth: 1920, frameHeight: 1080 });
+    // - ficha
+    this.load.image("P1maoCficha", "/assets/Menus/Char_menu/Sprites/ficha/P1maoCficha.png");
+    this.load.image("P1maoSficha", "/assets/Menus/Char_menu/Sprites/ficha/P1maoSficha.png");
+    this.load.image("P1_ficha", "/assets/Menus/Char_menu/Sprites/ficha/P1_ficha.png");
+    this.load.image("P2maoCficha", "/assets/Menus/Char_menu/Sprites/ficha/P2maoCficha.png");
+    this.load.image("P2maoSficha", "/assets/Menus/Char_menu/Sprites/ficha/P2maoSficha.png");
+    this.load.image("P2_ficha", "/assets/Menus/Char_menu/Sprites/ficha/P2_ficha.png");
+    // - baner
+    this.load.image("Aig_baner", "/assets/Menus/Char_menu/Sprites/baners/Aig_baner.png");
+    this.load.image("FJ_baner", "/assets/Menus/Char_menu/Sprites/baners/FJ_baner.png");
+    this.load.image("GK_baner", "/assets/Menus/Char_menu/Sprites/baners/GK_baner.png");
+    this.load.image("Ken_baner", "/assets/Menus/Char_menu/Sprites/baners/Ken_baner.png");
+    this.load.image("Miku_baner", "/assets/Menus/Char_menu/Sprites/baners/Miku_baner.png");
+    this.load.image("Pin_baner", "/assets/Menus/Char_menu/Sprites/baners/Pin_baner.png");
+    this.load.image("Slen_baner", "/assets/Menus/Char_menu/Sprites/baners/Slen_baner.png");
+    this.load.image("Spy_baner", "/assets/Menus/Char_menu/Sprites/baners/Spy_baner.png");
+    this.load.image("Stor_baner", "/assets/Menus/Char_menu/Sprites/baners/Stor_baner.png");
+    this.load.image("TH_baner", "/assets/Menus/Char_menu/Sprites/baners/TH_baner.png");
+    // - icon
+    this.load.image("aigis-icon", "/assets/Menus/Char_menu/Sprites/icons/aigis-icon.png");
+    this.load.image("fj-icon", "/assets/Menus/Char_menu/Sprites/icons/fj-icon.png");
+    this.load.image("goku-icon", "/assets/Menus/Char_menu/Sprites/icons/goku-icon.png");
+    this.load.image("ken-icon", "/assets/Menus/Char_menu/Sprites/icons/ken-icon.png");
+    this.load.image("miku-icon", "/assets/Menus/Char_menu/Sprites/icons/miku-icon.png");
+    this.load.image("slender-icon", "/assets/Menus/Char_menu/Sprites/icons/slender-icon.png");
+    this.load.image("spider-icon", "/assets/Menus/Char_menu/Sprites/icons/spider-icon.png");
+    this.load.image("storm-icon", "/assets/Menus/Char_menu/Sprites/icons/storm-icon.png");
+    this.load.image("th-icon", "/assets/Menus/Char_menu/Sprites/icons/th-icon.png");
+    this.load.image("pingu-icon", "/assets/Menus/Char_menu/Sprites/icons/pingu-icon.png");
+
+
+
     // --- hud ---
     //portrait
     this.load.image("Sp_portrait", "assets/Hud/Portrait/Sp_portrait.png");
@@ -127,6 +162,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("FJ_hurt2", "assets/personagens/FJ/Sprites/FJ_hurt2.png", { frameWidth: 318, frameHeight: 449 });
     this.load.spritesheet("FJ_dead", "assets/personagens/FJ/Sprites/FJ_dead.png", { frameWidth: 510, frameHeight: 259 });
     this.load.spritesheet("FJ_getup", "assets/personagens/FJ/Sprites/FJ_getup.png", { frameWidth: 406, frameHeight: 343 });
+    this.load.spritesheet("FJ_stun", "assets/personagens/FJ/Sprites/FJ_stun.png", { frameWidth: 322, frameHeight: 340 });
     //atack
     this.load.spritesheet("FJ_neu1", "assets/personagens/FJ/Sprites/FJ_neu1.png", { frameWidth: 470, frameHeight: 380 });
     this.load.spritesheet("FJ_neu2", "assets/personagens/FJ/Sprites/FJ_neu2.png", { frameWidth: 882, frameHeight: 363 });
@@ -139,6 +175,14 @@ export default class CenaPreload extends Phaser.Scene {
     //airUP
     this.load.spritesheet("FJ_airDown", "assets/personagens/FJ/Sprites/FJ_airDown.png", { frameWidth: 508, frameHeight: 553 });
     //specials
+    this.load.spritesheet("FJ_neSpecial", "assets/personagens/FJ/Sprites/FJ_neSpecial.png", { frameWidth: 416, frameHeight: 481 });
+    this.load.spritesheet("FJ_siSpecial", "assets/personagens/FJ/Sprites/FJ_siSpecial.png", { frameWidth: 526, frameHeight: 530 });
+    this.load.spritesheet("FJ_grab", "assets/personagens/FJ/Sprites/FJ_grab.png", { frameWidth: 461, frameHeight: 400 });
+    this.load.spritesheet("FJ_doSpecial", "assets/personagens/FJ/Sprites/FJ_doSpecial.png", { frameWidth: 417, frameHeight: 442 });
+    this.load.spritesheet("FJ_AupSpecial", "assets/personagens/FJ/Sprites/FJ_AupSpecial.png", { frameWidth: 446, frameHeight: 553 });
+    this.load.spritesheet("FJ_AdoSpecial", "assets/personagens/FJ/Sprites/FJ_AdoSpecial.png", { frameWidth: 370, frameHeight: 374 });
+    this.load.spritesheet("FJ_ground", "assets/personagens/FJ/Sprites/FJ_ground.png", { frameWidth: 280, frameHeight: 327 });
+    this.load.spritesheet("ground_effect", "assets/personagens/FJ/Sprites/ground_effect.png", { frameWidth: 628, frameHeight: 348 });
 
     // --- TH30 ---
    
@@ -155,6 +199,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("SpiderMan_getup", "assets/personagens/SpiderMan/Sprites/SpiderMan_getup.png", { frameWidth: 145, frameHeight: 96 });
     this.load.spritesheet("SpiderMan_guard", "assets/personagens/SpiderMan/Sprites/SpiderMan_guard.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_taunt1", "assets/personagens/SpiderMan/Sprites/SpiderMan_taunt1.png", { frameWidth: 200, frameHeight: 200 });
+    this.load.spritesheet("SpiderMan_stun", "assets/personagens/SpiderMan/Sprites/SpiderMan_stun.png", { frameWidth: 96, frameHeight: 72 });
     this.load.audio("sp-hurt", "assets/personagens/SpiderMan/Audio/sp-hurt.wav");
     this.load.audio("sp-hurt2", "assets/personagens/SpiderMan/Audio/sp-hurt2.wav");
     this.load.audio("sp-hurt3", "assets/personagens/SpiderMan/Audio/sp-hurt3.wav");
@@ -260,6 +305,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.spritesheet("Miku_hurtSide", "assets/personagens/Miku/Sprites/Miku_hurtSide.png", { frameWidth: 334, frameHeight: 351 });
     this.load.spritesheet("Miku_hurtDown", "assets/personagens/Miku/Sprites/Miku_hurtDown.png", { frameWidth: 274, frameHeight: 336 });
     this.load.spritesheet("Miku_dead", "assets/personagens/Miku/Sprites/Miku_dead.png", { frameWidth: 360, frameHeight: 130 });
+    this.load.spritesheet("Miku_cry", "assets/personagens/Miku/Sprites/Miku_cry.png", { frameWidth: 302, frameHeight: 356 });
     this.load.audio("hurt1", "assets/personagens/Miku/Audio/yata.wav");
     this.load.audio("hurt2", "assets/personagens/Miku/Audio/hurt2.wav");
     this.load.audio("hurt3", "assets/personagens/Miku/Audio/hurt3.wav");
@@ -321,6 +367,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.spritesheet("Ken_hurts2", "assets/personagens/Ken/Sprites/Ken_hurts2.png", { frameWidth: 140, frameHeight: 138 });
     this.load.spritesheet("Ken_dead", "assets/personagens/Ken/Sprites/Ken_dead.png", { frameWidth: 177, frameHeight: 76 });
     this.load.spritesheet("Ken_getup", "assets/personagens/Ken/Sprites/Ken_getup.png", { frameWidth: 137, frameHeight: 105 });
+    this.load.spritesheet("Ken_stun", "assets/personagens/Ken/Sprites/Ken_stun.png", { frameWidth: 89, frameHeight: 106 });
     //golpes
     this.load.spritesheet("Ken_combo1", "assets/personagens/Ken/Sprites/Ken_combo1.png", { frameWidth: 160, frameHeight: 111 });
     this.load.spritesheet("Ken_combo2", "assets/personagens/Ken/Sprites/Ken_combo2.png", { frameWidth: 200, frameHeight: 111 });
@@ -409,6 +456,8 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.audio("punch21", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch21.wav");
     this.load.audio("punch24", "assets/personagens/SoundEffects_geral/punch-block/normal-punch/punch24.wav");
 
+    //=stun
+    
 
     // --- MAPAS ---
     
@@ -433,14 +482,16 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.audio("DiosAmendment", "assets/cenarios/DiosAmendment.mp3");
 
 
-    
+
     
     // --- EFEITOS ---
      this.load.spritesheet("TVefect", "assets/efeitos/TVefect.png", { frameWidth: 800, frameHeight: 400 });
      this.load.spritesheet("punch_effect", "assets/efeitos/atack_effects/punch_effect.png", { frameWidth: 109, frameHeight: 107, });
      this.load.spritesheet("punch_effect2", "assets/efeitos/atack_effects/punch_effect2.png", { frameWidth: 200, frameHeight: 250, });
      this.load.spritesheet("punch_effect3", "assets/efeitos/atack_effects/punch_effect3.png", { frameWidth: 200, frameHeight: 250, });
-
+     
+     //- stun
+     this.load.spritesheet("Stun_Effect", "assets/efeitos/Stun_Effect.png", { frameWidth: 128, frameHeight: 128, });
 
   }
 
