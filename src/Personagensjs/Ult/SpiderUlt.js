@@ -1,4 +1,5 @@
 import { obterAlvosCombate } from "../../Objetos/SistemaCombateEspecial.js";
+import { garantirQuiqueImpacto } from "../../Objetos/QuiqueImpacto.js";
 // Posicao relativa ao ponto usado em cada chamada abaixo.
 // offsetX positivo = para a frente do Aranha; offsetY positivo = para baixo.
 // camadas soma a luz do efeito sem reintroduzir o fundo preto.
@@ -847,8 +848,9 @@ export default class SpiderUlt {
     this.iniciarTremorFinal(cam);
 
     // Mantém o close congelado depois do tremor para destacar a pose final.
-    setTimeout(() => {
-      if (!this.scene || !this.scene.time) return;
+    this.timerImpactoFinal = setTimeout(() => {
+      this.timerImpactoFinal = null;
+      if (this.cancelada || !this.scene || !this.scene.time) return;
 
       // PARA QUALQUER EFEITO SOBRANTE DA CÂMERA
       cam.resetFX();
@@ -866,6 +868,9 @@ export default class SpiderUlt {
 
       // APLICA O KNOCKBACK E DANO FINAL NO OPONENTE
       if (this.oponente && oponenteSprite && oponenteSprite.body) {
+        this.restaurarOponente();
+        oponenteSprite.body.reset(oponenteSprite.x, oponenteSprite.y);
+        oponenteSprite.body.moves = true;
         oponenteSprite.body.setAllowGravity(true);
 
         const pctDano = this.oponente.porcentagemDano || this.oponente.danoAcumulado || 0;
@@ -874,21 +879,26 @@ export default class SpiderUlt {
         const forcaX = 500 * dir * multPorcentagem;
         const forcaY = 1200 * multPorcentagem;  //1600 original
 
-        if (this.oponente.maquinaEstados && typeof this.oponente.maquinaEstados.mudarEstado === "function") {
-          this.oponente.maquinaEstados.mudarEstado("dano", {
-            knockbackX: forcaX,
-            knockbackY: forcaY
-          });
-        }
-
-        oponenteSprite.body.setVelocity(forcaX, forcaY);
-
         if (typeof this.oponente.receberDano === "function") {
           this.oponente.receberDano(25, {
-            knockbackX: forcaX,
+            knockbackX: Math.abs(forcaX),
             knockbackY: forcaY,
+            knockbackFixo: false,
+            tumbling: true,
             semEmpurrao: false
-          });
+          }, { direcao: dir, x: aranhaSprite.x });
+          // A animacao de dano pode alterar o tamanho e o offset do corpo.
+          oponenteSprite.body.updateFromGameObject();
+          const velocidadeImpactoX = oponenteSprite.body.velocity.x;
+          const velocidadeImpactoY = oponenteSprite.body.velocity.y;
+          for (const plataforma of this.scene.mapaAtual?.plataformas?.getChildren() ?? []) {
+            const p = plataforma.body, b = oponenteSprite.body;
+            if (p?.enable && b.right > p.left && b.left < p.right && b.top < p.top && b.bottom > p.top) {
+              b.reset(oponenteSprite.x, oponenteSprite.y + p.top - b.bottom);
+              b.setVelocity(velocidadeImpactoX, velocidadeImpactoY);
+            }
+          }
+          garantirQuiqueImpacto(this.oponente);
         }
       }
 
@@ -934,6 +944,9 @@ export default class SpiderUlt {
   }
   cancelar() {
     this.cancelada = true;
+    clearTimeout(this.timerImpactoFinal);
+    this.timerImpactoFinal = null;
+    this.scene.time.paused = false;
     this.limparEfeitosUlt();
     this.congelado = false;
     this.pararTremorFinal();

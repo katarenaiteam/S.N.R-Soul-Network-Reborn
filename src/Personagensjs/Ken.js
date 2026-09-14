@@ -400,8 +400,15 @@ this.nomePersonagem = "Ken";
         //  { largura: 30, altura: 50, offsetX: -5, offsetY: -25 },
         ],
       },
+    };
 
-   };
+    this.sons = {
+      ...this.sons,
+      vozAtaque: ["ken-punch1", "ken-punch1", "ken-punch2", "ken-punch3", "ken-punch4"],
+      vozDanoNormal: ["ken-damaged1", "ken-damaged2", "ken-damaged3"],
+      vozDanoForte: ["ken-damaged1", "ken-damaged2", "ken-damaged3"],
+      volumeVoz: 0.4,
+    };
 
 
     // Corrige somente a entrada e a saida dos especiais envolvidos no bug.

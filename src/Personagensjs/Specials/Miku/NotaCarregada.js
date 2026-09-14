@@ -124,7 +124,7 @@ export default class NotaCarregada {
   }
 
   tocarAudioAereoSemCarga() {
-    const volume = this.special.volumeSom ?? 0.7;
+    const volume = this.special.volumeSom ?? 0.5;
     if (!this.scene.cache.audio.exists("sek")) {
       if (this.scene.cache.audio.exists("kai")) {
         tocarSomSeguro(this.scene, "kai", { volume });
@@ -145,7 +145,7 @@ export default class NotaCarregada {
   iniciarCancao() {
     if (this.scene.cache.audio.exists("sek")) {
       this.somSek = this.scene.sound.add("sek", {
-        volume: this.special.volumeSom ?? 0.7,
+        volume: this.special.volumeSom ?? 0.5,
       });
       this.somSek.once("complete", () => {
         if (this.carregando && !this.cancelado) this.iniciarVogal();
@@ -164,7 +164,7 @@ export default class NotaCarregada {
   tocarVogalContinua(primeira = false) {
     if (!this.carregando || this.cancelado) return;
 
-    const volume = this.special.volumeSom ?? 0.7;
+    const volume = this.special.volumeSom ?? 0.5;
     const sobreposicao = this.special.crossfadeVogal ?? 0.12;
     const som = this.scene.sound.add("e", { volume: primeira ? volume : 0 });
     this.sonsE.push(som);
@@ -241,6 +241,19 @@ export default class NotaCarregada {
     this.carregando = false;
     this.lancado = true;
     this.pararEscutaCarregamento();
+    // Como no disparo aereo, deixa "sek" terminar antes de tocar "kai".
+    // Retira o audio da limpeza da carga para nao cortar a primeira silaba.
+    if (this.somSek?.isPlaying) {
+      const intro = this.somSek;
+      this.somSek = null;
+      this.audioLancamentoGerenciado = true;
+      intro.once("complete", () => {
+        intro.destroy();
+        if (this.scene.cache.audio.exists("kai")) {
+          tocarSomSeguro(this.scene, "kai", { volume: this.special.volumeSom ?? 0.7 });
+        }
+      });
+    }
     this.pararCargaSonora();
 
     if (!this.audioLancamentoGerenciado && this.scene.cache.audio.exists("kai")) {

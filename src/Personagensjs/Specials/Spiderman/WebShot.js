@@ -31,19 +31,28 @@ export default class WebShot {
     }
     const sprite = this.personagem.sprite;
     const direcao = sprite.flipX ? -1 : 1;
+    let offsetX = (this.aereo ? 25 : 30) * direcao;
+    let offsetY = this.aereo ? -10 : -60;
+    if (this.aereo && this.disparoHorizontal) {
+      // A origem do tiro acompanha a mao quando o corpo inclina para tras.
+      const angulo = -35 * direcao * Math.PI / 180;
+      const x = offsetX;
+      offsetX = x * Math.cos(angulo) - offsetY * Math.sin(angulo);
+      offsetY = x * Math.sin(angulo) + offsetY * Math.cos(angulo);
+    }
     this.projetil = this.scene.physics.add.sprite(
-      sprite.x + (this.aereo ? 25 : 30) * direcao,
-      sprite.y - (this.aereo ? 10 : 60), "webshot", 4
+      sprite.x + offsetX,
+      sprite.y + offsetY, "webshot", 4
     );
     tocarSomSeguro(this.scene, "webshot", { volume: 0.2 });
     this.scene.camHUD?.ignore(this.projetil);
     this.projetil.setFlipX(direcao < 0);
-    if (this.aereo) this.projetil.setAngle(35 * direcao);
+    if (this.aereo && !this.disparoHorizontal) this.projetil.setAngle(35 * direcao);
     this.projetil.anims.play("spy_webShot");
     this.projetil.body.setAllowGravity(false);
     this.projetil.body.debugBodyColor = 0xff0000;
     this.projetil.body.setSize(30, 30);
-    this.projetil.body.setVelocity((this.aereo ? 500 : 600) * direcao, this.aereo ? 400 : 0);
+    this.projetil.body.setVelocity((this.aereo ? 500 : 600) * direcao, this.aereo && !this.disparoHorizontal ? 400 : 0);
 
     registrarAtaqueEspecial(this, this.projetil, {
       categoria: "projetil",

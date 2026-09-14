@@ -47,6 +47,8 @@ export default class SkyTowers {
         this.plataformas = scene.physics.add.staticGroup();
         this.criarPlataformas();
 
+        
+
         if (!this.scene.anims.exists("tocarFundo")) {
             this.scene.anims.create({
                 key: "tocarFundo",
@@ -62,6 +64,8 @@ export default class SkyTowers {
         this.imagemFundo.setDisplaySize(larguraMundo, alturaMundo);
         this.imagemFundo.play("tocarFundo");
     }
+
+
 
     adicionarPlataformaSprite(x, y, chaveImagem, larguraPixels, alturaPixels) {
     const p = this.plataformas.create(x, y, chaveImagem);
@@ -79,12 +83,33 @@ export default class SkyTowers {
 
     return p;
 }
+adicionarPlataformaAtravessavel(x, y, largura, chaveImagem) {
+    const grupo = this.scene.sistemaPlataformasAtravessaveis.grupo;
+
+    const p = grupo.create(x, y, chaveImagem);
+
+    p.setOrigin(0.5, 0.5);
+    p.setDisplaySize(largura, 60);
+
+    // Primeiro atualiza o StaticBody para o tamanho visual.
+    p.refreshBody();
+
+    // DEPOIS reduz a colisão para a metade inferior.
+    p.body.setSize(largura, 30, false);
+
+    // metade inferior do sprite
+    p.body.x = x - largura / 2;
+    p.body.y = y;
+
+    return p;
+}
 
     // 5. PLATAFORMAS CENTRALIZADAS NO NOVO TAMANHO
     criarPlataformas() {
         this.adicionarPlataformaSprite(1300, 900, 'plat525', 900, 60); // Plataforma principal
-        this.adicionarPlataformaSprite(1800, 650, 'plat525', 450, 60);
-        this.adicionarPlataformaSprite(800, 500, 'plat525', 450, 60);
-        this.adicionarPlataformaSprite(1500, 380, 'plat525', 450, 60);
+        this.adicionarPlataformaSprite(2150, 650, 'plat525', 450, 60);
+        this.adicionarPlataformaSprite(500, 650, 'plat525', 450, 60);
+
+        this.adicionarPlataformaAtravessavel(1300, 650, 700, "Plat-trans", 450, 40);  
     }
 }

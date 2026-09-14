@@ -1,6 +1,7 @@
 ﻿import EstadoBase from "./EstadoBase.js";
 
 import AtaqueMultiplo from "./AtaqueMultiplo.js";
+import { tentarCancelarEmUlt } from "./CancelamentoUlt.js";
 
 export default class EstadoAtack extends EstadoBase {
   enter(dados = {}) {
@@ -8,6 +9,7 @@ export default class EstadoAtack extends EstadoBase {
    const direcaoOlhar = this.personagem.sprite.flipX ? -1 : 1;
 
    this.intentCancel = false;
+   this.intentCancelUlt = false;
    this.intentCancelAgachar = false;
 
    // reseta o combro pra 1, se o ataque vier sem dados(cima,baxo) ou se tiver combo false ! -> se nao for
@@ -123,6 +125,7 @@ export default class EstadoAtack extends EstadoBase {
    // CANCELAMENTO INSTANTÃ‚NEO PÃ“S-HIT
     // ==========================================
     if (this.golpeAtual?.cancelavel) {
+      if (tentarCancelarEmUlt(this, this.jaAcertou)) return;
       if (noChao && this.personagem.inputJustDown("baixo")) {
         this.intentCancelAgachar = true;
       }

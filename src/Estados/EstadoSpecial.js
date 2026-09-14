@@ -1,5 +1,7 @@
 import EstadoBase from "./EstadoBase.js";
 
+import { tentarCancelarEmUlt } from "./CancelamentoUlt.js";
+
 export default class EstadoSpecial extends EstadoBase {
   enter(dados = {}) {
     const noChao = this.personagem.sprite.body.blocked.down;
@@ -8,6 +10,7 @@ export default class EstadoSpecial extends EstadoBase {
     let tipoSpecial = dados?.tipo;
 
     this.intentCancel = false;
+    this.intentCancelUlt = false;
     this.intentCancelAgachar = false;
 
     // Se não veio tipo nos dados, descobre pelas direções
@@ -85,6 +88,7 @@ export default class EstadoSpecial extends EstadoBase {
     // CANCELAMENTO INSTANTÂNEO PÓS-HIT
     // ==========================================
     if (this.specialAtual?.cancelavel) {
+      if (tentarCancelarEmUlt(this, this.finalizandoPorAcerto)) return;
       if (noChao && this.personagem.inputJustDown("baixo")) {
         this.intentCancelAgachar = true;
       }

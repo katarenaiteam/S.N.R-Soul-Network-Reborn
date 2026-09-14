@@ -197,7 +197,8 @@ export default class Spider_IA {
     } else {
       if (dist<110 && Math.abs(dy)<100) { adicionar(dy<-35?'air_cima':dy>40?'air_agachado':'air_neutro',90); adicionar('air_side',75); }
       if (dist>120 && dist<320 && Math.abs(dy)<90) adicionar('air_lado',80,true);
-      if (dist>150 && dist<500 && dy>50 && dy<280) adicionar('air_neutro',85,true);
+      if (dist>150 && dist<500 && dy>50 && dy<280) adicionar('air_agachado',85,true);
+      if (dist>180 && dist<600 && Math.abs(dy)<55) adicionar('air_neutro',85,true);
       if (dy<-45 && dist>45 && dist<250) adicionar('air_cima',85,true);
     }
     opcoes.sort((a,b)=>b.nota-a.nota);

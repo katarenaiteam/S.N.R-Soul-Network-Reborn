@@ -9,6 +9,7 @@ import SpiderMan from "../Personagensjs/SpiderMan.js";
 import Miku from "../Personagensjs/Miku.js";
 import Ken from "../Personagensjs/Ken.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
+import SistemaPlataformasAtravessaveis from "../Objetos/SistemaPlataformasAtravessaveis.js";
 
 export default class cenaPrincipal extends Phaser.Scene {
   constructor() {
@@ -26,6 +27,10 @@ export default class cenaPrincipal extends Phaser.Scene {
 
   create() {
     encerrarOutrasCenas(this);
+
+    this.sistemaPlataformasAtravessaveis =
+    new SistemaPlataformasAtravessaveis(this);
+
     //criar o mapa que vou estar
     // 1. Instancia o mapa dinâmico trazido do init
    this.mapaAtual = new this.ClasseMapa(this);
@@ -106,6 +111,9 @@ this.jogador2 = this.criarPersonagem(
   600,
   controleP2
 );
+  
+   this.sistemaPlataformasAtravessaveis.registrar(this.jogador1);
+   this.sistemaPlataformasAtravessaveis.registrar(this.jogador2);
 
   
 
@@ -203,6 +211,7 @@ this.indicadorP2 = this.criarIndicador(
     // Diga para a câmera de HUD mostrar SOMENTE o HUD e ignorar o jogo/cenário/personagens:
     this.camHUD.ignore([
       this.mapaAtual.plataformas,
+      ...this.sistemaPlataformasAtravessaveis.grupo.getChildren(),
       this.mapaAtual.imagemFundo,
       this.jogador1.sprite,
       this.jogador2.sprite,
@@ -250,6 +259,8 @@ this.indicadorP2 = this.criarIndicador(
     this.jogador2.atualizarCargaUlt(delta);
     this.jogador2.update();
   }
+
+    this.sistemaPlataformasAtravessaveis.atualizar();
 
   this.atualizarBarraUlt(
     this.jogador1,

@@ -18,6 +18,8 @@ export default class ControleEntrada {
     };
 
     this.estadoAnterior = { ...this.estadoAtual };
+    this.ultimoBaixo = -Infinity;
+    this.duploBaixo = false;
   }
 
   get pad() {
@@ -37,6 +39,21 @@ export default class ControleEntrada {
     const padCima = y < -this.deadZone;
     const padBaixo = y > this.deadZone;
 
+    const baixoAgora = this._teclaDown("baixo") || padBaixo;
+
+    this.duploBaixo = false;
+
+    if (baixoAgora && !this.estadoAtual.baixo) {
+    const agora = this.scene.time.now;
+
+    if (agora - this.ultimoBaixo <= 500) {
+    this.duploBaixo = true;
+    this.ultimoBaixo = -Infinity;
+     } else {
+    this.ultimoBaixo = agora;
+     }
+    }
+
     const padDash = this._botaoPadPressionado(pad, 4);
     const padAtack = this._botaoPadPressionado(pad, 3);
     const padPular = this._botaoPadPressionado(pad, 2);
@@ -47,7 +64,7 @@ export default class ControleEntrada {
     this.estadoAtual.esquerda = this._teclaDown("esquerda") || padEsquerda;
     this.estadoAtual.direita = this._teclaDown("direita") || padDireita;
     this.estadoAtual.cima = this._teclaDown("cima") || padCima || padPular;
-    this.estadoAtual.baixo = this._teclaDown("baixo") || padBaixo;
+    this.estadoAtual.baixo = baixoAgora;
     this.estadoAtual.dash = this._teclaDown("dash") || padDash;
     this.estadoAtual.atack = this._teclaDown("atack") || padAtack;
     this.estadoAtual.special = this._teclaDown("special") || padSpecial;
@@ -79,4 +96,8 @@ export default class ControleEntrada {
   salvarAnterior() {
     this.estadoAnterior = { ...this.estadoAtual };
   }
+
+  foiDuploBaixo() {
+  return this.duploBaixo;
+ }
 }

@@ -698,7 +698,8 @@ this.vfxAtaqueNormal = {
       quedaNota: 0,
       tempoNota: 4000,
       tempoPoseLancamento: 560,
-      tempoMinimoCarga: 1100,
+      tempoMinimoCarga: 560,
+      tempoEntreNotas: 600,
       volumeSom: 0.8,
       propriedades: {
         tipoSomImpacto: "light",
@@ -1052,7 +1053,7 @@ scene.anims.create({
         start: 0,
         end: 5,
       }),
-      frameRate: 12,
+      frameRate: 16,
       repeat: 0,
     });
      scene.anims.create({
@@ -1061,7 +1062,7 @@ scene.anims.create({
         start: 0,
         end: 4,
       }),
-      frameRate: 12,
+      frameRate: 14,
       repeat: 0,
     });
 

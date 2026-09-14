@@ -11,7 +11,7 @@ function preparar() {
   const bot={scene,sprite:{x:1600,y:900,active:true,flipX:false,setFlipX(v){this.flipX=v;},body:{bottom:900,width:60,velocity:{x:0,y:0},blocked:{down:true}}},
     pulos:0,maxPulos:3,forcaPulo:-600,velocidade:240,dashs:0,maxDash:2,podeDash:true,
     maquinaEstados:{estadoAtual:{nome:'idle'}},ult:{},ultEstaCarregada:()=>false,
-    specials:Object.fromEntries(['neutro','lado','agachado','air_neutro','air_lado','air_cima'].map(k=>[k,{animacao:k}])),
+    specials:Object.fromEntries(['neutro','lado','agachado','air_neutro','air_agachado','air_lado','air_cima'].map(k=>[k,{animacao:k}])),
     golpes:Object.fromEntries(['neutro1','side','agachado','air_neutro','air_side','air_cima','air_agachado'].map(k=>[k,{}])),
     podeUsarAtaque:()=>true,podeUsarSpecial:()=>true};
   const alvo={sprite:{x:1650,y:650,active:true},maquinaEstados:{estadoAtual:{nome:'idle'}}};
@@ -74,7 +74,7 @@ test('ataque aereo e teia aerea usam as respectivas direcoes',()=>{
   alvo.sprite.y=950;ia.tomarDecisao(bot,alvo,1000);
   assert.equal(ctrl.teclas.atack.justDown,true);assert.equal(ctrl.teclas.baixo.isDown,true);
   ctrl.soltarTudo();alvo.sprite.x=2000;alvo.sprite.y=980;ia.tomarDecisao(bot,alvo,1300);
-  assert.equal(ctrl.teclas.special.justDown,true);assert.equal(ia.usos.has('air_neutro'),true);
+  assert.equal(ctrl.teclas.special.justDown,true);assert.equal(ia.usos.has('air_agachado'),true);
 });
 
 test('pulso renovado cancela timer anterior e preserva duracao do pulo',()=>{

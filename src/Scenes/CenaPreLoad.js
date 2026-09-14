@@ -385,6 +385,14 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.spritesheet("Ken_upAir", "assets/personagens/Ken/Sprites/Ken_upAir.png", { frameWidth: 126, frameHeight: 116 });
     this.load.spritesheet("Ken_downAir", "assets/personagens/Ken/Sprites/Ken_downAir.png", { frameWidth: 107, frameHeight: 135 });
     this.load.spritesheet("Ken_sideAir", "assets/personagens/Ken/Sprites/Ken_sideAir.png", { frameWidth: 134, frameHeight: 110 });
+    this.load.audio("ken-punch1", "assets/personagens/Ken/Audio/ken-punch1.mp3");
+    this.load.audio("ken-punch2", "assets/personagens/Ken/Audio/ken-punch2.mp3");
+    this.load.audio("ken-punch3", "assets/personagens/Ken/Audio/ken-punch3.mp3");
+    this.load.audio("ken-punch4", "assets/personagens/Ken/Audio/ken-punch4.mp3");
+    this.load.audio("ken-taunt", "assets/personagens/Ken/Audio/ken-taunt.mp3");
+    this.load.audio("ken-damaged1", "assets/personagens/Ken/Audio/ken-damaged1.mp3");
+    this.load.audio("ken-damaged2", "assets/personagens/Ken/Audio/ken-damaged2.mp3");
+    this.load.audio("ken-damaged3", "assets/personagens/Ken/Audio/ken-damaged3.mp3");
     //specials
     this.load.spritesheet("Ken_neSpecial", "assets/personagens/Ken/Sprites/Ken_neSpecial.png", { frameWidth: 135, frameHeight: 108 });
     this.load.spritesheet("hadouken1", "assets/personagens/Ken/Sprites/hadouken1.png", { frameWidth: 88, frameHeight: 54 });
@@ -473,6 +481,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     // ---Skytowers
     this.load.spritesheet("525", "assets/cenarios/MapaSkytowers/Sprites/525.png", { frameWidth: 6000, frameHeight: 3000 });
     this.load.image("plat525", "assets/cenarios/MapaSkytowers/Sprites/plat525.png");
+    this.load.image("Plat-trans", "assets/cenarios/Plat-trans.png");
     this.load.image("thumb_skytowers", "assets/cenarios/MapaSkytowers/Sprites/thumb_skytowers.png");
     this.load.audio("Gathers_Under_Night", "assets/cenarios/MapaSkytowers/Ost/Gathers_Under_Night.mp3");
     // --- Cidade ---

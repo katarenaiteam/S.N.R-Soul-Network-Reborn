@@ -11,6 +11,7 @@ import Miku from "../Personagensjs/Miku.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import BotController from "../Objetos/BotController.js";
 import Spider_IA from "../Objetos/Spider_IA.js";
+import SistemaPlataformasAtravessaveis from "../Objetos/SistemaPlataformasAtravessaveis.js";
 
 export default class CenaHistoria extends Phaser.Scene {
   constructor() {
@@ -32,6 +33,10 @@ export default class CenaHistoria extends Phaser.Scene {
 
   create() {
     encerrarOutrasCenas(this);
+
+    this.sistemaPlataformasAtravessaveis =
+    new SistemaPlataformasAtravessaveis(this);
+
     this.physics.world.setBounds(0, 0, 2600, 1400);
 
     this.mapaAtual = new SkyTowers(this);
@@ -115,6 +120,14 @@ export default class CenaHistoria extends Phaser.Scene {
     // 5. Vincula a entidade do Boss no Controlador de Bot e na IA
     this.botIA.bot = this.boss;
 
+    this.sistemaPlataformasAtravessaveis.registrar(this.jogador1);
+
+    if (this.jogador2) {
+     this.sistemaPlataformasAtravessaveis.registrar(this.jogador2);
+    }
+
+   this.sistemaPlataformasAtravessaveis.registrar(this.boss, false);
+
     this.participantes = [
       { jogador: this.jogador1, escolha: this.escolhaP1, vidas: 'vidasP1', spawn: this.pontoRespawnP1, rotulo: 'P1' },
       ...(this.jogador2 ? [{ jogador: this.jogador2, escolha: this.escolhaP2, vidas: 'vidasP2',
@@ -176,6 +189,7 @@ export default class CenaHistoria extends Phaser.Scene {
     this.camJogo.ignore([this.containerHUD]);
     this.camHUD.ignore([
       this.mapaAtual.plataformas, 
+      ...this.sistemaPlataformasAtravessaveis.grupo.getChildren(),
       this.mapaAtual.imagemFundo, 
       this.jogador1.sprite, 
       this.jogador1.grupoHurtbox, 
@@ -241,6 +255,9 @@ this.indicadorCPU = this.criarIndicador(
       }
       atualizarBarraUlt.call(this, jogador, entrada.hud);
     }
+ 
+      this.sistemaPlataformasAtravessaveis.atualizar();
+     
     // Usa o mesmo sistema de hitboxes da batalha normal, sem dano duplicado.
     for (const { jogador } of this.participantes) {
       if (jogador.eliminado) continue;

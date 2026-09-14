@@ -340,16 +340,15 @@ export default class SpiderMan extends Personagem {
         offsetY: 90,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 75, altura: 45, offsetX: -20, offsetY: -60 }, // Tronco/cabeça
         ],
       },
 
       AupSpecial: {
         largura: 85,
         altura: 95,
-        offsetX: 64,
-        offsetY: 90,
+        offsetX: 0,
+        offsetY: 10,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
@@ -358,6 +357,19 @@ export default class SpiderMan extends Personagem {
       },
 
       AneSpecial: {
+        offsetVisualX: 19,
+        largura: 85,
+        altura: 95,
+        offsetX: 50,
+        offsetY: 96,
+        escala: 1,
+        hurtboxes: [
+          { largura: 77, altura: 55, offsetX: -33, offsetY: -50 }, // Tronco/cabeça
+          
+        ],
+      },
+
+      AdoSpecial: {
         largura: 85,
         altura: 95,
         offsetX: 50,
@@ -531,6 +543,12 @@ export default class SpiderMan extends Personagem {
         cooldown: 500,
         duracao: 560,
         cancelavel: true,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 6,
@@ -544,18 +562,29 @@ export default class SpiderMan extends Personagem {
       side: {
         animacao: "spy_sideAtack",
         frameHitbox: 3,
-        offsetX: 52,
+        offsetX: 40,
         offsetY: -60,
-        largura: 60,
-        altura: 25,
+        largura: 80,
+        altura: 30,
         cooldown: 900,
-        duracao: 300,
-        cancelavel: true,
+        duracao: 400,
+        cancelavel: false,
 
         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
           },
         ],
+
+        movimento: {
+         inicio: 50,
+         fim: 400,
+      x: {
+         de: 350,
+         para: 150,
+        },
+
+        curva: "easeIn",
+       },
 
         propriedades: {
           tipoSomImpacto: "heavy",
@@ -570,14 +599,14 @@ export default class SpiderMan extends Personagem {
       air_neutro: {
         animacao: "spy_neutralAir",
         frameHitbox: 2,
-        offsetX: 34,
+        offsetX: 42,
         offsetY: -70,
-        largura: 60,
+        largura: 62,
         altura: 70,
         cooldown: 500,
         duracao: 300,
         cancelavel: true,
-        knockbackFixo: true,
+        
 
         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
@@ -589,7 +618,8 @@ export default class SpiderMan extends Personagem {
           dano: 11,
           knockbackX: 90,
           knockbackY: -350,
-          tumbling: true
+          tumbling: false,
+          knockbackFixo: true,
         },
       },
 
@@ -650,7 +680,7 @@ export default class SpiderMan extends Personagem {
         altura: 55,
         cooldown: 500,
         duracao: 350, 
-        cancelavel: true,
+        cancelavel: false,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
@@ -685,9 +715,9 @@ export default class SpiderMan extends Personagem {
       air_cima: {
         animacao: "spy_upAir",
         frameHitbox: 2,
-        offsetX: 15,
-        offsetY: -120,
-        largura: 50,
+        offsetX: 17,
+        offsetY: -116,
+        largura: 55,
         altura: 50,
         cooldown: 900,
         duracao: 300,
@@ -772,6 +802,27 @@ export default class SpiderMan extends Personagem {
 
        air_neutro: {
         animacao: "spy_AneSpecial",
+        disparoHorizontal: true,
+        duracao: 300,
+        cooldown: 2000,
+        logica: AirWebShot,
+         tempoProjetil: 5000,
+        // finalizarAoTocarChao: true,       
+        // atrasoFinalizacaoChao: 50,
+        // finalizarAoAcertarOponente: false,
+        propriedades: {
+          dano: 5,
+          knockbackX: 0,
+          knockbackY: 0,
+          anularGravidade: true,
+          //impulsoX: 0,                    
+          //impulsoY: 0,
+          
+        },
+      },
+
+       air_agachado: {
+        animacao: "spy_AdoSpecial",
         duracao: 300,
         cooldown: 2000,
         logica: AirWebShot,
@@ -1138,6 +1189,26 @@ if (!scene.anims.exists("punch_effect3")) {
 
 scene.anims.create({
       key: "spy_AneSpecial",
+      frames: scene.anims.generateFrameNumbers("SpiderMan_AneSpecial", {
+        start: 0,
+        end: 8,
+      }),
+      frameRate: 28,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+  key: "spy_webShot",
+  frames: scene.anims.generateFrameNumbers("webshot", {
+    start: 4,
+    end: 9,
+  }),
+  frameRate: 12,
+  repeat: -1,
+});
+
+scene.anims.create({
+      key: "spy_AdoSpecial",
       frames: scene.anims.generateFrameNumbers("SpiderMan_AneSpecial", {
         start: 0,
         end: 8,
