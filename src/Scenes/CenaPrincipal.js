@@ -1,3 +1,4 @@
+import { criarIndicador, atualizarIndicador } from "../Objetos/IndicadorPersonagem.js";
 import { criarHudPartida, atualizarBarraUlt } from "../Objetos/HudPartida.js";
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 //import * as Phaser from "phaser";
@@ -187,6 +188,18 @@ this.jogador2 = this.criarPersonagem(
     this.hudP2_Nome
   ]);
 
+  this.indicadorP1 = this.criarIndicador(
+  this.jogador1,
+  "P1-ind",
+  "P1-indV"
+);
+
+this.indicadorP2 = this.criarIndicador(
+  this.jogador2,
+  "P2-ind",
+  "P2-indV"
+);
+
     // Diga para a câmera de HUD mostrar SOMENTE o HUD e ignorar o jogo/cenário/personagens:
     this.camHUD.ignore([
       this.mapaAtual.plataformas,
@@ -260,6 +273,9 @@ this.jogador2 = this.criarPersonagem(
     });
 
     this.atualizarCamera();
+
+    this.atualizarIndicador(this.indicadorP1);
+    this.atualizarIndicador(this.indicadorP2);
 
     // Checa se alguém saiu da arena (passando o número do jogador como 3º argumento)
     this.verificarMorte(this.jogador1, this.pontoRespawnP1, 1);
@@ -335,7 +351,15 @@ this.jogador2 = this.criarPersonagem(
     }
   }
 
- atualizarCamera() {
+  criarIndicador(...args) {
+    return criarIndicador.call(this, ...args);
+  }
+
+  atualizarIndicador(indicador) {
+    return atualizarIndicador.call(this, indicador);
+  }
+
+  atualizarCamera() {
     if (!this.jogador1 || !this.jogador2) return;
 
     const p1 = this.jogador1.sprite;

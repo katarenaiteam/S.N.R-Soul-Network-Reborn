@@ -1,3 +1,4 @@
+import { criarIndicador, atualizarIndicador } from "../Objetos/IndicadorPersonagem.js";
 import { criarHudPartida, atualizarBarraUlt } from "../Objetos/HudPartida.js";
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import Madotsuki from "../Personagensjs/Madotsuki.js";
@@ -188,6 +189,27 @@ export default class CenaHistoria extends Phaser.Scene {
         this.jogador2.grupoHurtbox
       ].filter(Boolean));
     }
+
+    this.indicadorP1 = this.criarIndicador(
+  this.jogador1,
+  "P1-ind",
+  "P1-indV"
+);
+
+if (this.jogador2) {
+  this.indicadorP2 = this.criarIndicador(
+    this.jogador2,
+    "P2-ind",
+    "P2-indV"
+  );
+}
+
+this.indicadorCPU = this.criarIndicador(
+  this.boss,
+  "CPU-ind",
+  "CPU-indV"
+);
+
   }
 
   criarPersonagem(nome, x, y, teclas, minDano, maxDano, controle) {
@@ -230,6 +252,13 @@ export default class CenaHistoria extends Phaser.Scene {
       if (this.partidaEncerrada) return;
     }
     this.atualizarCamera();
+
+    this.atualizarIndicador(this.indicadorP1);
+
+    if (this.indicadorP2) {
+    this.atualizarIndicador(this.indicadorP2);
+    }
+    this.atualizarIndicador(this.indicadorCPU);
   }
 
   verificarMorte(jogador, spawn) {
@@ -311,6 +340,14 @@ export default class CenaHistoria extends Phaser.Scene {
     if (this.overlayMorte) {
       this.overlayMorte.setVisible(true).play('TVefect');
     }
+  }
+
+  criarIndicador(...args) {
+    return criarIndicador.call(this, ...args);
+  }
+
+  atualizarIndicador(indicador) {
+    return atualizarIndicador.call(this, indicador);
   }
 
   atualizarCamera() {

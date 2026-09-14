@@ -120,6 +120,13 @@ export default class CenaPreload extends Phaser.Scene {
 
 
     // --- hud ---
+    //ind
+    this.load.image("P1-ind", "assets/Hud/P1-ind.png");
+    this.load.image("P1-indV", "assets/Hud/P1-indV.png");
+    this.load.image("P2-ind", "assets/Hud/P2-ind.png");
+    this.load.image("P2-indV", "assets/Hud/P2-indV.png");
+    this.load.image("CPU-ind", "assets/Hud/CPU-ind.png");
+    this.load.image("CPU-indV", "assets/Hud/CPU-indV.png");
     //portrait
     this.load.image("Sp_portrait", "assets/Hud/Portrait/Sp_portrait.png");
     this.load.image("Miku_portrait", "assets/Hud/Portrait/Miku_portrait.png");
