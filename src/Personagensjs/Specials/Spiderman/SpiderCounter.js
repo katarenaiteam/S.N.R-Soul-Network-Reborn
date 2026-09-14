@@ -1,4 +1,4 @@
-import { obterAtaquesEspeciaisInimigos } from "../../../Objetos/SistemaCombateEspecial.js";
+import { obterAlvosCombate, obterAtaquesEspeciaisInimigos } from "../../../Objetos/SistemaCombateEspecial.js";
 import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
 
 export default class SpiderCounter {
@@ -64,8 +64,7 @@ export default class SpiderCounter {
     // =========================================================
     // CHECAGEM GEOMÉTRICA MANUAL (Sem travas de overlap do Phaser)
     // =========================================================
-    const oponente = this.scene.jogador1 === this.personagem ? this.scene.jogador2 : this.scene.jogador1;
-    if (!oponente) return;
+    for (const oponente of obterAlvosCombate(this.personagem)) {
 
     const estadoOponente = oponente.maquinaEstados?.estadoAtual;
     
@@ -87,6 +86,7 @@ export default class SpiderCounter {
       }
     }
 
+    }
     if (!this.counterAtivo || !hitboxCounter.active) return;
     const boundsCounter = this.obterLimitesCorpo(hitboxCounter);
     const ataqueEspecial = obterAtaquesEspeciaisInimigos(this.scene, this.personagem)
@@ -102,7 +102,7 @@ export default class SpiderCounter {
       ataqueEspecial.aoColidir?.();
       ataqueEspecial.remover?.();
       this.dispararContraAtaque(
-        oponente,
+        ataqueEspecial.dono,
         ataqueEspecial.contraAtacarDono
       );
     }

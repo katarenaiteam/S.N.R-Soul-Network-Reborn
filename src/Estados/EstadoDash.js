@@ -3,6 +3,7 @@ import EstadoBase from "./EstadoBase.js";
 
 export default class EstadoDash extends EstadoBase {
   enter() {
+    const iniciouNoChao = this.personagem.sprite.body.blocked.down;
     this.personagem.tocarSomSorteado(this.personagem.sons.dash, { volume: 0.5 });
     // Registra o tempo do dash atual
     this.personagem.tempoUltimoDash = this.personagem.scene.time.now;
@@ -22,6 +23,9 @@ export default class EstadoDash extends EstadoBase {
           ? -1
           : 1;
 
+    if (iniciouNoChao) {
+      this.personagem.vfx.tocar("fumacaDash", { direcao });
+    }
     this.personagem.sprite.body.setAllowGravity(false);
     this.personagem.sprite.setVelocityY(0);
     this.personagem.sprite.setVelocityX(direcao * 700);

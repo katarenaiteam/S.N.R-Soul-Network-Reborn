@@ -30,7 +30,7 @@ function obterHurtboxesValidas(alvo) {
 export function obterAlvosCombate(personagem) {
   const scene = personagem.scene;
   const jogadores = scene.scene.key === "CenaHistoria"
-    ? [personagem === scene.boss ? scene.jogador1 : scene.boss]
+    ? (personagem === scene.boss ? [scene.jogador1, scene.jogador2] : [scene.boss])
     : [scene.jogador1, scene.jogador2, scene.jogador3, scene.jogador4];
   const extras = scene.alvosAtaqueExtras ?? [];
 
@@ -38,6 +38,7 @@ export function obterAlvosCombate(personagem) {
     alvo &&
     alvo !== personagem &&
     alvo.dono !== personagem &&
+    !alvo.eliminado &&
     alvo.sprite?.active &&
     alvo.grupoHurtbox
   );
@@ -130,6 +131,8 @@ export function obterAtaquesEspeciaisInimigos(scene, personagem) {
     !entrada.encerrado &&
     entrada.contraAtacavel &&
     entrada.dono !== personagem &&
+    (scene.scene.key !== "CenaHistoria" ||
+      (personagem === scene.boss ? entrada.dono !== scene.boss : entrada.dono === scene.boss)) &&
     entrada.objeto?.active
   );
 }

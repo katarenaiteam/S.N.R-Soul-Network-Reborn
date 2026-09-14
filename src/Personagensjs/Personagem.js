@@ -177,6 +177,16 @@ export default class Personagem {
   receberDano(quantidade, propriedades = {}, origem = null) {
     if (this.invulneravel) return true;
 
+     const atacante =
+    this.scene.jogador1 === this
+      ? this.scene.jogador2
+      : this.scene.jogador1;
+
+  if (atacante?.sprite) {
+    atacante.sprite.setDepth(2);
+    this.sprite.setDepth(1);
+  }
+
     //  SE ESTIVER EM ESTADO DE GUARD:
     if (this.maquinaEstados.estadoAtual?.nome === "guard") {
       this.vidaGuard -= quantidade;
@@ -922,6 +932,9 @@ consumirUlt() {
     // Permite pular enquanto o contador for menor que o máximo permitido
     if (this.pulos >= this.maxPulos) return;
 
+    if (this.sprite.body.blocked.down) {
+      this.vfx.tocar("fumacaPulo");
+    }
     this.sprite.setVelocityY(this.forcaPulo);
     this.pulos++;
 

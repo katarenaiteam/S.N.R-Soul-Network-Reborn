@@ -1,5 +1,6 @@
 import Personagem from "./Personagem.js";
 import NeSpecial from "./Specials/FJ/NeSpecial.js";
+import SiSpecial from "./Specials/FJ/SiSpecial.js";
 
 
 export default class FJ extends Personagem {
@@ -48,7 +49,12 @@ export default class FJ extends Personagem {
     animacao: "punch_effect3",
     escala: 1,
   },
+
+  fumacaPulo: { escala: 0.25, offsetX: 30, offsetY: -10 },
+
 };
+
+
 
 this.nomePersonagem = "Frederick Johnson";
     this.tauntPausaFinal = 0; // Encerra o taunt sem segurar o último frame.
@@ -406,14 +412,27 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
       siSpecial: {
-        largura: 80,
-        altura: 110,
-        offsetX: 39.5,
-        offsetY: 9,
-        escala: 1,
+        largura: 250,
+        altura: 400,
+        offsetX: 180,
+        offsetY: 111,
+        escala: 0.33,
         hurtboxes: [
           { largura: 55, altura: 75, offsetX: 0, offsetY: -65 },
           { largura: 35, altura: 35, offsetX: 0, offsetY: -18 },
+        ],
+      },
+
+      grab: {
+        largura: 250,
+        altura: 400,
+        offsetX: 150,
+        offsetY: -19,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
         ],
       },
 
@@ -664,7 +683,7 @@ this.nomePersonagem = "Frederick Johnson";
         offsetY: -97,
         largura: 65,
         altura: 25,
-        cooldown: 900,
+        cooldown: 400,
         duracao: 350,
          finalizarAoTocarChao: true,
         atrasoFinalizacaoChao: 30,
@@ -714,6 +733,12 @@ this.nomePersonagem = "Frederick Johnson";
 
     // specials ==========================
     this.specials = {
+      lado: {
+        animacao: "fj_siSpecial",
+        logica: SiSpecial,
+        cooldown: 900,
+        propriedades: { travarMovimentoAir: true },
+      },
       neutro: {
         animacao: "fj_neSpecial",
         logica: NeSpecial,
@@ -759,6 +784,19 @@ if (!scene.anims.exists("punch_effect3")) {
 // personagem
 
     if (scene.anims.exists("fj_idle")) return;
+
+    scene.anims.create({
+      key: "fj_siSpecial",
+      frames: scene.anims.generateFrameNumbers("FJ_siSpecial", { start: 0, end: 5 }),
+      frameRate: 12,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "fj_grab",
+      frames: scene.anims.generateFrameNumbers("FJ_grab", { start: 0, end: 13 }),
+      frameRate: 18,
+      repeat: 0,
+    });
 
     scene.anims.create({
       key: "fj_neSpecial",
@@ -1023,124 +1061,6 @@ scene.anims.create({
       frameRate: 16,
       repeat: 0,
     });
-    scene.anims.create({
-      key: "ken_neSpecial",
-      frames: scene.anims.generateFrameNumbers("Ken_neSpecial", {
-        start: 0,
-        end: 15,
-      }),
-      frameRate: 16,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "ken_hadouken_inicio",
-      frames: scene.anims.generateFrameNumbers("hadouken1", {
-        start: 0,
-        end: 9,
-      }),
-      frameRate: 20,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "ken_hadouken_loop",
-      frames: scene.anims.generateFrameNumbers("hadouken1", {
-        start: 1,
-        end: 9,
-      }),
-      frameRate: 16,
-      repeat: -1,
-    });
-
-    scene.anims.create({
-      key: "ken_hadouken_impacto",
-      frames: scene.anims.generateFrameNumbers("hadouken2", {
-        start: 0,
-        end: 9,
-      }),
-      frameRate: 24,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "ken_siSpecial",
-      frames: [
-        ...scene.anims.generateFrameNumbers("Ken_siSpecial", {
-          start: 0,
-          end: 4,
-        }).map((frame) => ({ ...frame, duration: 25 })),
-        ...scene.anims.generateFrameNumbers("Ken_siSpecial", {
-          start: 5,
-          end: 19,
-        }),
-        ...scene.anims.generateFrameNumbers("Ken_siSpecial", {
-          start: 30,
-          end: 35,
-        }).map((frame) => ({ ...frame, duration: 70 })),
-      ],
-      frameRate: 24,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "ken_doSpecial",
-      frames: scene.anims.generateFrameNumbers("Ken_doSpecial", {
-        start: 0,
-        end: 13,
-      }),
-      frameRate: 18,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "ken_shoryuken_chamas",
-      frames: scene.anims.generateFrameNumbers("flames", {
-        start: 0,
-        end: 8,
-      }),
-      frameRate: 18,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "ken_AneSpecial",
-      frames: scene.anims.generateFrameNumbers("Ken_AneSpecial", {
-        start: 0,
-        end: 12,
-      }),
-      frameRate: 18,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "ken_AupSpecial",
-      frames: scene.anims.generateFrameNumbers("Ken_doSpecial", {
-        start: 2,
-        end: 14,
-      }),
-      frameRate: 20,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "ken_AsiSpecial",
-      frames: scene.anims.generateFrameNumbers("Ken_AsiSpecial", {
-        start: 0,
-        end: 23,
-      }),
-      frameRate: 24,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "ken_AdoSpecial",
-      frames: scene.anims.generateFrameNumbers("Ken_AdoSpecial", {
-        start: 4,
-        end: 14,
-      }),
-      frameRate: 24,
-      repeat: 0,
-    });
+    
   }
 }

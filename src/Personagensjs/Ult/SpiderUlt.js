@@ -1,3 +1,4 @@
+import { obterAlvosCombate } from "../../Objetos/SistemaCombateEspecial.js";
 // Posicao relativa ao ponto usado em cada chamada abaixo.
 // offsetX positivo = para a frente do Aranha; offsetY positivo = para baixo.
 // camadas soma a luz do efeito sem reintroduzir o fundo preto.
@@ -16,8 +17,9 @@ export default class SpiderUlt {
     this.scene = personagem.scene;
     this.config = configUlt;
     this.estadoFSM = estadoFSM;
-    this.oponente = personagem.oponente ||
-      (this.scene.jogador1 === personagem ? this.scene.jogador2 : this.scene.jogador1);
+    this.oponente = obterAlvosCombate(personagem).sort((a, b) =>
+      Math.abs(a.sprite.x - personagem.sprite.x) - Math.abs(b.sprite.x - personagem.sprite.x)
+    )[0] ?? null;
     this.conectou = false;
     this.funcaoCamOriginal = null;
     this.etapaAtual = 0;

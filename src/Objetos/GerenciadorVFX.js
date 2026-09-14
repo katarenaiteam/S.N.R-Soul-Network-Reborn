@@ -1,5 +1,26 @@
 
 const VFX_GLOBAIS = {
+  fumacaDash: {
+    blendMode: "ADD",
+    textura: "dash-effect",
+    animacao: "dash-effect",
+    escala: 0.33,
+    offsetX: -15,
+    offsetY: -13,
+    seguir: false,
+    depthOffset: 1,
+  },
+  fumacaPulo: {
+    blendMode: "ADD",
+    textura: "jump-effect",
+    animacao: "jump-effect",
+    escala: 0.25,
+    offsetX: 10,
+    offsetY: -10,
+    seguir: false,
+    espelharSprite: false,
+    depthOffset: 1,
+  },
   stun: {
     textura: "Stun_Effect",
     animacao: "stun_effect",
@@ -36,6 +57,7 @@ export default class GerenciadorVFX {
 
     // Permite alterar alguma propriedade apenas naquela chamada.
     const config = {
+      ...VFX_GLOBAIS[nome],
       ...configBase,
       ...opcoes,
     };
@@ -87,6 +109,10 @@ export default class GerenciadorVFX {
 
     if (config.alpha !== undefined) {
       efeito.setAlpha(config.alpha);
+    }
+
+    if (config.blendMode !== undefined) {
+      efeito.setBlendMode(config.blendMode);
     }
 
     if (config.angulo !== undefined) {
@@ -400,6 +426,20 @@ export default class GerenciadorVFX {
   }
 
   criarAnimacoesGlobais() {
+  for (const { key, end, frameRate } of [
+    { key: "dash-effect", end: 11, frameRate: 48 },
+    // A ultima linha possui somente dois frames desenhados.
+    { key: "jump-effect", end: 25, frameRate: 60 },
+  ]) {
+    if (this.scene.textures.exists(key) && !this.scene.anims.exists(key)) {
+      this.scene.anims.create({
+        key,
+        frames: this.scene.anims.generateFrameNumbers(key, { start: 0, end }),
+        frameRate,
+        repeat: 0,
+      });
+    }
+  }
   if (
     this.scene.textures.exists("Stun_Effect") &&
     !this.scene.anims.exists("stun_effect")

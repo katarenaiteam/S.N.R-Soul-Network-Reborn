@@ -18,6 +18,7 @@ export default class BotController {
     };
 
     this.teclasParaZerar = [];
+    this.timersPulso = new Map();
   }
 
   // Define qual cérebro vai controlar este hardware virtual
@@ -54,19 +55,24 @@ export default class BotController {
     }
   }
 
-  pulsar(nomeTecla) {
+  pulsar(nomeTecla, duracao = 40) {
     if (!this.teclas[nomeTecla]) return;
 
     this.teclas[nomeTecla].isDown = true;
     this.teclas[nomeTecla].justDown = true;
     this.teclasParaZerar.push({ tecla: nomeTecla, prop: "justDown" });
 
-    this.scene.time.delayedCall(40, () => {
+    this.timersPulso.get(nomeTecla)?.remove(false);
+    const timer = this.scene.time.delayedCall(duracao, () => {
+      this.timersPulso.delete(nomeTecla);
       this.soltar(nomeTecla);
     });
+    this.timersPulso.set(nomeTecla, timer);
   }
 
   soltarTudo() {
+    for (const timer of this.timersPulso.values()) timer.remove(false);
+    this.timersPulso.clear();
     for (let t in this.teclas) {
       if (this.teclas[t].isDown) {
         this.teclas[t].justUp = true;

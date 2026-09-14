@@ -5,7 +5,7 @@ export default class SkyTowers {
         this.scene = scene;
 
         if (scene.sound) {
-            this.musica = tocarMusicaSegura(scene, 'Gathers_Under_Night', { loop: true, volume: 0.1 });
+            this.musica = tocarMusicaSegura(scene, 'Gathers_Under_Night', { loop: true, volume: 0.0 });
         }
 
         // 1. TAMANHO REDUZIDO DO MUNDO (Fica menor e mais proporcional)

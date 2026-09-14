@@ -406,6 +406,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     
     //--Sound effects
     //-pulos
+    this.load.spritesheet("jump-effect", "assets/personagens/efeitos/jump-effect.png", { frameWidth: 480, frameHeight: 181 });
     this.load.audio("jump1", "assets/personagens/SoundEffects_geral/dash-jump/jump/jump1.wav");
     //-pouso
     this.load.audio("generic-landing1", "assets/personagens/SoundEffects_geral/step/generic-landing1.wav");
@@ -423,6 +424,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.audio("genericstep9", "assets/personagens/SoundEffects_geral/step/genericstep9.wav");
 
     //-dash
+    this.load.spritesheet("dash-effect", "assets/personagens/efeitos/dash-effect.png", { frameWidth: 500, frameHeight: 500 });
     this.load.audio("dash1", "assets/personagens/SoundEffects_geral/dash-jump/dash/dash1.wav");
     this.load.audio("dash2", "assets/personagens/SoundEffects_geral/dash-jump/dash/dash2.wav");
 

@@ -1,3 +1,4 @@
+import { criarHudPartida, atualizarBarraUlt } from "../Objetos/HudPartida.js";
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import Madotsuki from "../Personagensjs/Madotsuki.js";
 import SkyTowers from "../Mapasjs/SkyTowers.js";
@@ -15,9 +16,15 @@ export default class CenaHistoria extends Phaser.Scene {
     super("CenaHistoria");
   }
 
-  init(dados) {
+  init(dados = {}) {
+    this.jogador1 = null;
+    this.jogador2 = null;
+    this.boss = null;
+    this.partidaEncerrada = false;
+    this.ultEmAndamento = null;
+    delete this.atualizarCamera;
     this.escolhaP1 = dados.p1 || "Frederick";
-    this.escolhaP2 = dados.p2 || null;
+    this.escolhaP2 = dados.p2 || (dados.numPlayers === 2 ? "Ken" : null);
     this.numPlayers = dados.numPlayers || 1;
     this.inimigoNome = "SpiderMan"; // Primeiro Boss da Fase 1
   }
@@ -107,29 +114,29 @@ export default class CenaHistoria extends Phaser.Scene {
     // 5. Vincula a entidade do Boss no Controlador de Bot e na IA
     this.botIA.bot = this.boss;
 
-    // --- CRIAÇÃO DA HUD ---
-    this.hudP1_Nome = this.add.text(80, 950, this.jogador1.nomePersonagem || this.escolhaP1, { fontSize: "45px", fill: "#27F5F5", fontStyle: "bold" }).setScrollFactor(0);
-    this.jogador1.textoDano = this.add.text(80, 870, "0%", { fontSize: "100px", fill: "#ffffff", fontStyle: "bold" }).setScrollFactor(0);
-    this.hudP1_Vidas = this.add.text(80, 820, `VIDAS: ${this.vidasP1}`, { fontSize: "32px", fill: "#00ff00", fontStyle: "bold" }).setScrollFactor(0);
-
-    this.hudBoss_Nome = this.add.text(1500, 950, "SPIDER-MAN (BOSS)", { fontSize: "45px", fill: "#FF0000", fontStyle: "bold" }).setScrollFactor(0);
-    this.boss.textoDano = this.add.text(1500, 870, "0%", { fontSize: "100px", fill: "#ffffff", fontStyle: "bold" }).setScrollFactor(0);
-    this.hudBoss_Vidas = this.add.text(1500, 820, `VIDAS: ${this.vidasBoss}`, { fontSize: "32px", fill: "#ff0000", fontStyle: "bold" }).setScrollFactor(0);
-
-    const elementosHUD = [
-      this.hudP1_Nome, this.jogador1.textoDano, this.hudP1_Vidas,
-      this.hudBoss_Nome, this.boss.textoDano, this.hudBoss_Vidas
+    this.participantes = [
+      { jogador: this.jogador1, escolha: this.escolhaP1, vidas: 'vidasP1', spawn: this.pontoRespawnP1, rotulo: 'P1' },
+      ...(this.jogador2 ? [{ jogador: this.jogador2, escolha: this.escolhaP2, vidas: 'vidasP2',
+        spawn: { x: this.pontoRespawnP1.x + 100, y: this.pontoRespawnP1.y }, rotulo: 'P2' }] : []),
+      { jogador: this.boss, escolha: this.inimigoNome, vidas: 'vidasBoss', spawn: this.pontoRespawnP2, rotulo: 'BOSS' },
     ];
-
-    if (this.numPlayers === 2 && this.jogador2) {
-      this.hudP2_Nome = this.add.text(500, 950, this.jogador2.nomePersonagem || this.escolhaP2, { fontSize: "45px", fill: "#F527F5", fontStyle: "bold" }).setScrollFactor(0);
-      this.jogador2.textoDano = this.add.text(500, 870, "0%", { fontSize: "100px", fill: "#ffffff", fontStyle: "bold" }).setScrollFactor(0);
-      this.hudP2_Vidas = this.add.text(500, 820, `VIDAS: ${this.vidasP2}`, { fontSize: "32px", fill: "#00ff00", fontStyle: "bold" }).setScrollFactor(0);
-      elementosHUD.push(this.hudP2_Nome, this.jogador2.textoDano, this.hudP2_Vidas);
-    }
-
-    // AGRUPA TODA A HUD EM UM CONTAINER
-    this.containerHUD = this.add.container(0, 0, elementosHUD);
+    this.containerHUD = this.add.container(0, 0).setScrollFactor(0).setDepth(1000);
+    const escalaHUD = this.jogador2 ? 0.75 : 0.9;
+    this.participantes.forEach((entrada, indice) => {
+      const jogador = entrada.jogador;
+      jogador.vidas = this[entrada.vidas];
+      jogador.eliminado = false;
+      const direita = jogador === this.boss;
+      const x = direita ? this.scale.width - 30 : 30 + indice * 500;
+      const y = this.scale.height - 358 * escalaHUD - 20;
+      entrada.hud = criarHudPartida.call(this, jogador, entrada.escolha, x, y, direita);
+      entrada.hud.setScale(escalaHUD);
+      entrada.textoVidas = this.add.text(direita ? -420 : 10, 155,
+        entrada.rotulo + ' - VIDAS: ' + jogador.vidas,
+        { fontSize: '28px', color: direita ? '#ff6666' : '#ffffff', fontStyle: 'bold' });
+      entrada.hud.add(entrada.textoVidas);
+      this.containerHUD.add(entrada.hud);
+    });
 
     // --- COLISÃO COM CENÁRIO ---
     this.physics.add.collider(this.jogador1.sprite, this.mapaAtual.plataformas);
@@ -139,8 +146,8 @@ export default class CenaHistoria extends Phaser.Scene {
     // --- CÂMERAS ---
     this.camJogo = this.cameras.main;
     if (this.mapaAtual.configCamera && this.mapaAtual.configCamera.limites) {
-      const limCam = this.mapaAtual.configCamera.limites;
-      this.camJogo.setBounds(limCam.x, limCam.y, limCam.largura, limCam.altura);
+      // O enquadramento abaixo trata tambem visoes maiores que o mapa.
+      this.camJogo.removeBounds();
     }
 
     if (!this.anims.exists("TVefect")) {
@@ -157,6 +164,8 @@ export default class CenaHistoria extends Phaser.Scene {
       .setScrollFactor(0)
       .setDisplaySize(this.scale.width, this.scale.height)
       .setVisible(false);
+    this.overlayMorte.setDepth(2000);
+    this.overlayMorte.on('animationcomplete-TVefect', () => this.overlayMorte.setVisible(false));
     this.camJogo.ignore([this.overlayMorte]);
 
     // Câmera secundária desenha APENAS a HUD e limpa todo o resto da tela
@@ -181,40 +190,9 @@ export default class CenaHistoria extends Phaser.Scene {
     }
   }
 
-  // Método auxiliar para processar dano garantindo que aliados não se acertem
-  // Método auxiliar para processar dano apenas em caso de contato real
-  aplicarGolpe(atacante, vitima) {
-    if (!atacante || !vitima || !atacante.sprite?.active || !vitima.sprite?.active) return;
-
-    // Se a vítima JÁ ESTÁ no estado apanhando, ignora novos acertos para não reiniciar o hitstun
-    const estadoVitima = vitima.maquinaEstados?.estadoAtual?.nome;
-    if (estadoVitima === "hurt") return;
-
-    const estadoAtaque = atacante.maquinaEstados?.estados["atack"];
-    const hitbox = estadoAtaque?.hitboxAtual;
-
-    if (estadoAtaque && hitbox && hitbox.active) {
-      const idAtaqueAtual = estadoAtaque.idAtaqueUnico || estadoAtaque.tempoInicio;
-
-      if (vitima.ultimoAtaqueRecebidoId === idAtaqueAtual) return;
-
-      const sobreposicao = Phaser.Geom.Intersects.RectangleToRectangle(
-        hitbox.getBounds(),
-        vitima.sprite.getBounds()
-      );
-
-      if (sobreposicao) {
-        const golpe = estadoAtaque.golpeAtual;
-        const dano = golpe?.dano || 10;
-        const props = golpe?.propriedades || {};
-
-        vitima.ultimoAtaqueRecebidoId = idAtaqueAtual;
-        vitima.receberDano(dano, props, atacante.sprite.x);
-      }
-    }
-  }
   criarPersonagem(nome, x, y, teclas, minDano, maxDano, controle) {
     switch (nome) {
+      case "FJ":
       case "Frederick": return new Frederick(this, x, y, teclas, minDano, maxDano, controle);
       case "Madotsuki": return new Madotsuki(this, x, y, teclas, minDano, maxDano, controle);
       case "Dio": return new Dio(this, x, y, teclas, minDano, maxDano, controle);
@@ -225,117 +203,139 @@ export default class CenaHistoria extends Phaser.Scene {
     }
   }
 
- update(time, delta) {
-    if (this.botIA) this.botIA.update(time, delta);
-
-    if (this.jogador1) this.jogador1.update();
-    if (this.jogador2) this.jogador2.update();
-    if (this.boss) this.boss.update();
-
-    // --- PROCESSAMENTO DE COLISÃO DE ATAQUES ---
-    if (this.boss) {
-      // P1 e P2 atacam o Boss de forma independente
-      if (this.jogador1) this.aplicarGolpe(this.jogador1, this.boss);
-      if (this.jogador2) this.aplicarGolpe(this.jogador2, this.boss);
-
-      // Boss ataca P1 e P2 sem misturar as instâncias
-      if (this.jogador1) this.aplicarGolpe(this.boss, this.jogador1);
-      if (this.jogador2) this.aplicarGolpe(this.boss, this.jogador2);
+  update(time, delta) {
+    if (this.partidaEncerrada) return;
+    // Processa a saida antes de executar comandos ou enquadrar a camera.
+    for (const entrada of this.participantes) {
+      this.verificarMorte(entrada.jogador, entrada.spawn);
+      if (this.partidaEncerrada) return;
     }
-
+    if (this.boss?.sprite.active && !this.boss.eliminado) this.botIA.update(time, delta);
+    for (const entrada of this.participantes) {
+      const jogador = entrada.jogador;
+      if (!jogador.eliminado && jogador.sprite.active) {
+        jogador.atualizarCargaUlt(delta);
+        jogador.update();
+      }
+      atualizarBarraUlt.call(this, jogador, entrada.hud);
+    }
+    // Usa o mesmo sistema de hitboxes da batalha normal, sem dano duplicado.
+    for (const { jogador } of this.participantes) {
+      if (jogador.eliminado) continue;
+      const ataque = jogador.maquinaEstados.estados.atack;
+      if (ataque && jogador.maquinaEstados.estadoAtual === ataque) ataque.verificarAcertoManual?.();
+    }
+    for (const entrada of this.participantes) {
+      this.verificarMorte(entrada.jogador, entrada.spawn);
+      if (this.partidaEncerrada) return;
+    }
     this.atualizarCamera();
-
-    this.verificarMorte(this.jogador1, this.pontoRespawnP1, 1);
-    if (this.jogador2) this.verificarMorte(this.jogador2, this.pontoRespawnP1, 2);
-    this.verificarMorte(this.boss, this.pontoRespawnP2, 3);
   }
 
-  verificarMorte(jogador, pontoRespawn, entTipo) {
-    if (!jogador || !jogador.sprite) return;
-
-    const x = jogador.sprite.x;
-    const y = jogador.sprite.y;
+  verificarMorte(jogador, spawn) {
+    if (this.partidaEncerrada || !jogador?.sprite?.active || jogador.eliminado) return;
+    const { x, y } = jogador.sprite;
     const lim = this.limitesArena;
-
-    if (!lim) return;
-
     if (x < lim.minX || x > lim.maxX || y < lim.minY || y > lim.maxY) {
-      this.processarQueda(jogador, pontoRespawn, entTipo);
+      this.processarQueda(jogador, spawn);
     }
   }
 
-  processarQueda(jogador, pontoRespawn, entTipo) {
-    if (entTipo === 1) {
-      this.vidasP1--;
-      this.hudP1_Vidas.setText(`VIDAS: ${this.vidasP1}`);
-    } else if (entTipo === 2) {
-      this.vidasP2--;
-      this.hudP2_Vidas.setText(`VIDAS: ${this.vidasP2}`);
-    } else if (entTipo === 3) {
-      this.vidasBoss--;
-      this.hudBoss_Vidas.setText(`VIDAS: ${this.vidasBoss}`);
+  processarQueda(jogador, spawn) {
+    if (this.partidaEncerrada || jogador.eliminado || jogador.processandoQueda) return;
+    const entrada = this.participantes.find(item => item.jogador === jogador);
+    if (!entrada || this[entrada.vidas] <= 0) return;
+    jogador.processandoQueda = true;
+    this[entrada.vidas] = Math.max(0, this[entrada.vidas] - 1);
+    jogador.vidas = this[entrada.vidas];
+    entrada.textoVidas.setText(entrada.rotulo + (jogador.vidas ? ' - VIDAS: ' + jogador.vidas : ' - ELIMINADO'));
+    this.limparAcao(jogador);
+    if (jogador.vidas === 0) {
+      jogador.eliminado = true;
+      jogador.invulneravel = true;
+      jogador.sprite.disableBody(true, true);
+      jogador.grupoHurtbox.getChildren().forEach(box => { if (box.body) box.body.enable = false; });
+      entrada.hud.setAlpha(0.4);
+    } else {
+      this.respawnar(jogador, spawn ?? entrada.spawn);
     }
-
-    // Condição de Derrota
-    const timePerdeu = (this.numPlayers === 1 && this.vidasP1 <= 0) || (this.numPlayers === 2 && this.vidasP1 <= 0 && this.vidasP2 <= 0);
-    
-    // Condição de Vitória
-    const bossMorreu = this.vidasBoss <= 0;
-
-    if (timePerdeu || bossMorreu) {
+    jogador.processandoQueda = false;
+    const jogadoresVivos = this.participantes.some(item => item.jogador !== this.boss && item.jogador.vidas > 0);
+    if (!jogadoresVivos || this.vidasBoss === 0) {
+      this.partidaEncerrada = true;
+      this.botIA.soltarTudo();
       this.sound.stopAll();
-      this.scene.start("CenaGameOver");
-      return;
+      this.scene.start('CenaGameOver');
     }
-
-    this.respawnar(jogador, pontoRespawn);
   }
 
-  respawnar(jogador, pontoRespawn) {
+  limparAcao(jogador) {
+    // Sair do estado cancela hitboxes, grabs, dash e a cinematica da ult.
+    jogador.maquinaEstados.mudarEstado('idle');
+    for (const logica of [...jogador.logicasEspeciaisAtivas]) logica.cancelar?.();
+    for (const ataque of [...(this.registroCombateEspecial ?? [])]) {
+      if (ataque.dono !== jogador) continue;
+      ataque.remover();
+      ataque.objeto?.destroy();
+    }
+    jogador.vfx.efeitosSeguindo.slice().forEach(item => jogador.vfx.destruirEfeito(item.objeto));
+    jogador.sprite.anims.resume();
+    jogador.sprite.anims.timeScale = 1;
+    jogador.sprite.body.moves = true;
+    jogador.sprite.body.setAllowGravity(true);
     jogador.sprite.body.setVelocity(0, 0);
-    jogador.sprite.setPosition(pontoRespawn.x, pontoRespawn.y);
+    jogador.sprite.body.setAcceleration(0, 0);
+    jogador.isTumbling = false;
+    jogador.invulneravel = false;
+    jogador.hiperArmaduraHits = 0;
+    jogador.hiperArmaduraFonte = null;
+    jogador.podeMover = true;
+    jogador.podeAtacar = true;
+    jogador.podeDash = true;
+    jogador.pulos = 0;
+    jogador.dashs = 0;
+    jogador.resetarCooldownsAereos();
+  }
 
-    // Limpa a memória de acertos para o jogador poder voltar a ser atingido/atacar normalmente
-    jogador.ultimoAtaqueRecebidoId = null;
+  respawnar(jogador, spawn) {
+    if (jogador.eliminado || jogador.vidas <= 0) return;
+    jogador.sprite.body.reset(spawn.x, spawn.y);
+    jogador.sprite.setVisible(true).setActive(true);
     jogador.comboHitsRecebidos = 0;
     jogador.tempoUltimoHit = -Infinity;
-
-    if (jogador.porcentagemDano !== undefined) {
-      jogador.porcentagemDano = 0;
-      if (jogador.textoDano) jogador.textoDano.setText("0%");
-    }
-
+    jogador.ultimoAtaqueRecebidoId = null;
+    jogador.ultimoImpacto = null;
+    jogador.porcentagemDano = 0;
+    jogador.textoDano?.setText(0);
+    jogador.sincronizarHurtbox();
     if (this.overlayMorte) {
-      this.overlayMorte.setVisible(true);
-      this.overlayMorte.play("TVefect");
-      this.overlayMorte.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-        this.overlayMorte.setVisible(false);
-      });
+      this.overlayMorte.setVisible(true).play('TVefect');
     }
   }
 
   atualizarCamera() {
-    if (!this.jogador1 || !this.boss) return;
-
-    const p1 = this.jogador1.sprite;
-    const p2 = this.boss.sprite;
-    const cam = this.cameras.main;
-
-    const configCam = this.mapaAtual.configCamera || {};
-    const lim = configCam.limites || { x: 0, y: 0, largura: 2600, altura: 1400 };
-
-    const centroAlvoX = (p1.x + p2.x) / 2;
-    const centroAlvoY = (p1.y + p2.y) / 2;
-
-    const metadeMetragemVisivelX = (cam.width / cam.zoom) / 2;
-    const metadeMetragemVisivelY = (cam.height / cam.zoom) / 2;
-
-    const centroXTravado = Phaser.Math.Clamp(centroAlvoX, lim.x + metadeMetragemVisivelX, lim.x + lim.largura - metadeMetragemVisivelX);
-    const centroYTravado = Phaser.Math.Clamp(centroAlvoY, lim.y + metadeMetragemVisivelY, lim.y + lim.altura - metadeMetragemVisivelY);
-
-    cam.centerOn(
-      Phaser.Math.Linear(cam.midPoint.x, centroXTravado, 0.1),
-      Phaser.Math.Linear(cam.midPoint.y, centroYTravado, 0.1)
-    );
+    const sprites = this.participantes
+      .filter(({ jogador }) => !jogador.eliminado && jogador.sprite.active)
+      .map(({ jogador }) => jogador.sprite);
+    if (!sprites.length) return;
+    const cam = this.camJogo;
+    const config = this.mapaAtual.configCamera;
+    const lim = config.limites;
+    const minX = Math.min(...sprites.map(p => p.x)) - 130;
+    const maxX = Math.max(...sprites.map(p => p.x)) + 130;
+    const minY = Math.min(...sprites.map(p => p.y)) - 190;
+    const maxY = Math.max(...sprites.map(p => p.y)) + 90;
+    // O zoom pode abrir alem do minimo preferido para incluir os tres lutadores.
+    const zoomAlvo = Math.min(config.maxZoom ?? 2, cam.width / (maxX - minX), (cam.height * 0.76) / (maxY - minY));
+    const zoom = zoomAlvo < cam.zoom ? zoomAlvo : Phaser.Math.Linear(cam.zoom, zoomAlvo, 0.05);
+    cam.setZoom(zoom);
+    const metadeX = cam.width / zoom / 2;
+    const metadeY = cam.height / zoom / 2;
+    // Quando a visao e maior que o mapa, nao faz Clamp com limites invertidos.
+    const centroX = metadeX * 2 >= lim.largura ? lim.x + lim.largura / 2
+      : Phaser.Math.Clamp((minX + maxX) / 2, lim.x + metadeX, lim.x + lim.largura - metadeX);
+    const centroY = metadeY * 2 >= lim.altura ? lim.y + lim.altura / 2
+      : Phaser.Math.Clamp((minY + maxY) / 2, lim.y + metadeY, lim.y + lim.altura - metadeY);
+    cam.centerOn(centroX, centroY);
   }
 }

@@ -528,7 +528,7 @@ export default class EstadoAtack extends EstadoBase {
       const souPlayer = (this.personagem === cena.jogador1 || this.personagem === cena.jogador2);
       alvos = souPlayer 
         ? [cena.boss] 
-        : [cena.jogador1].filter(Boolean);
+        : [cena.jogador1, cena.jogador2].filter(Boolean);
     } 
     // DEMAIS MODOS (Versus / Luta normal): Ataca qualquer outro personagem da cena
     else {
@@ -541,7 +541,7 @@ export default class EstadoAtack extends EstadoBase {
     const alvosExtras = (cena.alvosAtaqueExtras ?? []).filter(
       (alvo) => alvo?.ativo && alvo.dono !== this.personagem
     );
-    alvos = [...new Set([...alvos, ...alvosExtras])];
+    alvos = [...new Set([...alvos, ...alvosExtras])].filter(alvo => alvo?.sprite?.active && !alvo.eliminado);
     this.alvosAtaque = alvos;
 
     alvos.forEach((alvo) => {

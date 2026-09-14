@@ -1,3 +1,4 @@
+import { obterAlvosCombate } from "../../Objetos/SistemaCombateEspecial.js";
 const INTRO = {
   duracao: 9300,
 
@@ -1041,31 +1042,7 @@ if (agora < bloqueadoAte) {
 
 
   obterAlvos() {
-    const lista =
-      this.scene.scene.key ===
-      "CenaHistoria"
-
-        ? [
-            this.personagem ===
-            this.scene.boss
-              ? this.scene.jogador1
-              : this.scene.boss
-          ]
-
-        : [
-            this.scene.jogador1,
-            this.scene.jogador2,
-            this.scene.jogador3,
-            this.scene.jogador4
-          ];
-
-    return [...new Set(lista)].filter(
-      alvo =>
-        alvo &&
-        alvo !== this.personagem &&
-        alvo.sprite?.active &&
-        alvo.grupoHurtbox
-    );
+    return obterAlvosCombate(this.personagem);
   }
 
 
