@@ -1,6 +1,9 @@
 import Personagem from "./Personagem.js";
 import NeSpecial from "./Specials/FJ/NeSpecial.js";
 import SiSpecial from "./Specials/FJ/SiSpecial.js";
+import AsiSpecial from "./Specials/FJ/AsiSpecial.js";
+import AdoSpecial from "./Specials/FJ/AdoSpecial.js";
+import DoSpecial from "./Specials/FJ/DoSpecial.js";
 
 
 export default class FJ extends Personagem {
@@ -376,11 +379,11 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
       doSpecial: {
-        largura: 85,
-        altura: 120,
-        offsetX: 5,
-        offsetY: 44,
-        escala: 1,
+        largura: 250,
+        altura: 400,
+        offsetX: 80,
+        offsetY: 30,
+        escala: 0.33,
         hurtboxes: [
           { largura: 55, altura: 60, offsetX: 0, offsetY: -70 },
           { largura: 60, altura: 35, offsetX: -3, offsetY: -18 },
@@ -437,23 +440,47 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
       AsiSpecial: {
-        largura: 80,
-        altura: 110,
-        offsetX: 39.5,
-        offsetY: 14,
-        escala: 1,
+        largura: 250,
+        altura: 400,
+        offsetX: 86,
+        offsetY: 153,
+        escala: 0.33,
         hurtboxes: [
           { largura: 55, altura: 75, offsetX: 0, offsetY: -65 },
           { largura: 35, altura: 35, offsetX: 0, offsetY: -18 },
         ],
       },
 
+      Agrab: {
+        largura: 250,
+        altura: 400,
+        offsetX: 73,
+        offsetY: 81,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 55, altura: 75, offsetX: 0, offsetY: -65 },
+          { largura: 35, altura: 35, offsetX: 0, offsetY: -18 },
+        ],
+      },
+
+      ground: {
+        largura: 210,
+        altura: 245,
+        offsetX: 45,
+        offsetY: 80,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 40, altura: 40, offsetX: 16, offsetY: -60 },
+          { largura: 65, altura: 40, offsetX: 4, offsetY: -20 },
+        ],
+      },
+
       AdoSpecial: {
-        largura: 90,
-        altura: 115,
-        offsetX: 38,
-        offsetY: 17,
-        escala: 1,
+        largura: 250,
+        altura: 300,
+        offsetX: 60,
+        offsetY: 74,
+        escala: 0.33,
         hurtboxes: [
           { largura: 65, altura: 75, offsetX: 0, offsetY: -68 },
           { largura: 70, altura: 40, offsetX: 5, offsetY: -22 },
@@ -462,8 +489,6 @@ this.nomePersonagem = "Frederick Johnson";
    
    };
     
-  
-
     // ============================ tabela de golpes =====================================
    this.configAnimacoes.comboRapido1 = {
      ...this.configAnimacoes.atack2,
@@ -610,18 +635,18 @@ this.nomePersonagem = "Frederick Johnson";
           tipo: "automatico",
           hits: [
             { inicio: 140, duracao: 55, offsetY: -65,
-              propriedades: { dano: 3, knockbackX: 250, knockbackY: 0,
+              propriedades: { dano: 3, knockbackX: 400, knockbackY: 0,
                 knockbackFixo: true, tumbling: false, hitstunFrames: 18 } },
-            { inicio: 240, duracao: 55, offsetX: 45,
+            { inicio: 240, duracao: 55, offsetX: 40,
               propriedades: { dano: 3, knockbackX: 250, knockbackY: -10,
                 knockbackFixo: true, tumbling: false, hitstunFrames: 18 } },
-            { inicio: 340, duracao: 55, offsetX: 50,
+            { inicio: 340, duracao: 55, offsetX: 45,
               propriedades: { dano: 6 } }, // Herda o arremesso forte do golpe.
           ],
         },
         offsetX: 40,
         offsetY: -77,
-        largura: 60,
+        largura: 70,
         altura: 25,
         cooldown: 900,
         duracao: 500,
@@ -733,6 +758,24 @@ this.nomePersonagem = "Frederick Johnson";
 
     // specials ==========================
     this.specials = {
+      air_agachado: {
+        animacao: "fj_AdoSpecial",
+        logica: AdoSpecial,
+        cooldown: 900,
+        propriedades: { travarMovimentoAir: true },
+      },
+      air_lado: {
+        animacao: "fj_AsiSpecial",
+        logica: AsiSpecial,
+        cooldown: 900,
+        propriedades: { travarMovimentoAir: true },
+      },
+      agachado: {
+        animacao: "fj_doSpecial",
+        logica: DoSpecial,
+        cooldown: 800,
+        propriedades: { travarMovimentoAir: true },
+      },
       lado: {
         animacao: "fj_siSpecial",
         logica: SiSpecial,
@@ -810,6 +853,45 @@ if (!scene.anims.exists("punch_effect3")) {
         duration: [1000 / 15, 62, 58, 54, 50, 50, 46, 42, 1000 / 16, 250][indice],
       })),
       frameRate: 15,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "fj_doSpecial",
+      frames: scene.anims.generateFrameNumbers("FJ_doSpecial", { start: 0, end: 12 }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "fj_AsiSpecial",
+      frames: scene.anims.generateFrameNumbers("FJ_AsiSpecial", { start: 0, end: 10 }),
+      frameRate: 14,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "fj_Agrab",
+      frames: scene.anims.generateFrameNumbers("FJ_Agrab", { start: 0, end: 6 }),
+      frameRate: 18,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "fj_AdoSpecial",
+      frames: scene.anims.generateFrameNumbers("FJ_AdoSpecial", { start: 0, end: 5 }),
+      frameRate: 18,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "fj_ground",
+      frames: scene.anims.generateFrameNumbers("FJ_ground", { start: 0, end: 4 }),
+      frameRate: 12,
+      repeat: 0,
+    });
+    scene.anims.create({
+      key: "fj_ground_effect",
+      frames: scene.anims.generateFrameNumbers("ground_effect", { start: 0, end: 26 }),
+      frameRate: 48,
       repeat: 0,
     });
 
