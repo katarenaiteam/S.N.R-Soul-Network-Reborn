@@ -3,7 +3,7 @@ import { registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial
 const TEMPO_MAXIMO_CARGA = 2500;
 const TEMPO_POSE_FINAL = 250;
 const DANO_BASE = 20;
-// Mesmo impulso fisico do Shoryuken, reduzido para um salto curto para frente.
+// Salto curto para frente durante o golpe.
 const IMPULSO_X = 345;
 const IMPULSO_Y = -180;
 const DURACAO_AVANCO = 320;

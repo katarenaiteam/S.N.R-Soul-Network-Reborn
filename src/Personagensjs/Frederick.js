@@ -109,7 +109,7 @@ this.nomePersonagem = "Frederick Johnson";
       crouch: {
         largura: 250,
         altura: 240,
-        offsetX: 95,
+        offsetX: 98,
         offsetY: 80,
         escala: 0.33,
         hurtboxes: [
@@ -119,7 +119,7 @@ this.nomePersonagem = "Frederick Johnson";
       crouch3: {
         largura: 250,
         altura: 240,
-        offsetX: 95,
+        offsetX: 98,
         offsetY: 80,
         escala: 0.33,
         hurtboxes: [
@@ -131,7 +131,7 @@ this.nomePersonagem = "Frederick Johnson";
       dash: {
         largura: 250,
         altura: 400,
-        offsetX: 140,
+        offsetX: 142,
         offsetY: -80,
         escala: 0.33,
         hurtboxes: [],
@@ -140,7 +140,7 @@ this.nomePersonagem = "Frederick Johnson";
       guard: {
         largura: 250,
         altura: 400,
-        offsetX: 135,
+        offsetX: 138,
         offsetY: -50,
         escala: 0.33,
         hurtboxes: [
@@ -298,7 +298,7 @@ this.nomePersonagem = "Frederick Johnson";
         offsetVisualX: 16,
          largura: 250,
         altura: 400,
-        offsetX: 193,
+        offsetX: 190,
         offsetY: 120,
         escala: 0.33,
         hurtboxes: [
@@ -327,7 +327,7 @@ this.nomePersonagem = "Frederick Johnson";
         offsetVisualY: 32,
            largura: 250,
         altura: 240,
-        offsetX: 195,
+        offsetX: 198,
         offsetY: 425,
         escala: 0.33,
         hurtboxes: [
@@ -356,7 +356,7 @@ this.nomePersonagem = "Frederick Johnson";
         offsetVisualX: 18,
          largura: 250,
         altura: 400,
-        offsetX: 190,
+        offsetX: 193,
         offsetY: 140,
         escala: 0.33,
         hurtboxes: [
@@ -370,7 +370,7 @@ this.nomePersonagem = "Frederick Johnson";
         offsetVisualX: 18,
         largura: 250,
         altura: 400,
-        offsetX: 130,
+        offsetX: 144,
         offsetY: 62,
         escala: 0.33,
         hurtboxes: [
@@ -380,10 +380,11 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
       doSpecial: {
+        offsetVisualX: 22,
         largura: 250,
         altura: 400,
-        offsetX: 80,
-        offsetY: 30,
+        offsetX: 140,
+        offsetY: 23,
         escala: 0.33,
         hurtboxes: [
           { largura: 55, altura: 60, offsetX: 0, offsetY: -70 },
@@ -684,8 +685,8 @@ this.nomePersonagem = "Frederick Johnson";
         offsetY: -20,
         largura: 50,
         altura: 45,
-        cooldown: 900,
-        duracao: 500,
+        cooldown: 700,
+        duracao: 350,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -694,10 +695,10 @@ this.nomePersonagem = "Frederick Johnson";
         ],
         propriedades: {
           tipoSomImpacto: "heavy",
-          dano: 12,
+          dano: 9,
           knockbackX: 40,
-          knockbackY: -400,
-          tumbling: true,
+          knockbackY: -300,
+          tumbling: false,
           knockbackFixo: true,
         },
       },
@@ -720,7 +721,7 @@ this.nomePersonagem = "Frederick Johnson";
         ],
         propriedades: {
           tipoSomImpacto: "light",
-          dano: 12,
+          dano: 9,
           knockbackX: 120,
           knockbackY: -470,
           tumbling: false,
@@ -736,8 +737,8 @@ this.nomePersonagem = "Frederick Johnson";
         offsetY: -70,
         largura: 55,
         altura: 40,
-        cooldown: 900,
-        duracao: 600,
+        cooldown: 600,
+        duracao: 400,
          finalizarAoTocarChao: true,
         atrasoFinalizacaoChao: 30,
         cancelavel: true,
@@ -748,7 +749,7 @@ this.nomePersonagem = "Frederick Johnson";
         ],
         propriedades: {
           tipoSomImpacto: "heavy",
-          dano: 12,
+          dano: 10,
           knockbackX: 450,
           knockbackY: -350,
           tumbling: true,
@@ -796,6 +797,7 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: { travarMovimentoAir: true },
       },
     };
+
    
   }
 

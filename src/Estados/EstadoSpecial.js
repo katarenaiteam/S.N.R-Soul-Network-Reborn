@@ -75,6 +75,7 @@ export default class EstadoSpecial extends EstadoBase {
 
     if (animChave && this.personagem.scene.anims.exists(animChave)) {
       this.personagem.sprite.anims.play(animChave, true);
+      this.personagem.aplicarConfiguracao(animChave.replace(this.personagem.prefixoAnim, ""));
     } else {
       console.warn(`Animação ${animChave} não existe!`);
     }
