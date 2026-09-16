@@ -160,16 +160,11 @@ export default class Personagem {
 
     const somSorteado = Phaser.Utils.Array.GetRandom(lista);
 
-    // Proteção: Só toca se a chave realmente existir no cache do Phaser
-    if (this.scene.cache.audio.exists(somSorteado)) {
-      tocarSomSeguro(this.scene, somSorteado, {
-            volume: config.volume ?? 0.5,
-            detune: Phaser.Math.Between(-50, 50),
-            ...config
-        });
-    } else {
-        console.warn(`Aviso: O som com a chave "${somSorteado}" não existe no cache do Preload.`);
-    }
+    tocarSomSeguro(this.scene, somSorteado, {
+      volume: config.volume ?? 0.5,
+      detune: Phaser.Math.Between(-50, 50),
+      ...config
+    });
 }
 
 

@@ -208,7 +208,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("SpiderMan_getup", "assets/personagens/SpiderMan/Sprites/SpiderMan_getup.png", { frameWidth: 145, frameHeight: 96 });
     this.load.spritesheet("SpiderMan_guard", "assets/personagens/SpiderMan/Sprites/SpiderMan_guard.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_taunt1", "assets/personagens/SpiderMan/Sprites/SpiderMan_taunt1.png", { frameWidth: 200, frameHeight: 200 });
-    this.load.spritesheet("SpiderMan_stun", "assets/personagens/SpiderMan/Sprites/SpiderMan_stun.png", { frameWidth: 96, frameHeight: 72 });
+    this.load.spritesheet("SpiderMan_Stun", "assets/personagens/SpiderMan/Sprites/SpiderMan_Stun.png", { frameWidth: 96, frameHeight: 72 });
     this.load.audio("sp-hurt", "assets/personagens/SpiderMan/Audio/sp-hurt.wav");
     this.load.audio("sp-hurt2", "assets/personagens/SpiderMan/Audio/sp-hurt2.wav");
     this.load.audio("sp-hurt3", "assets/personagens/SpiderMan/Audio/sp-hurt3.wav");

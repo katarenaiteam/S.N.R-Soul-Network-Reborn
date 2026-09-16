@@ -66,11 +66,6 @@ export default class GerenciadorVFX {
 
     const textura = config.textura;
 
-    if (!textura || !this.scene.textures.exists(textura)) {
-      console.warn(`VFX "${nome}": textura "${textura}" não encontrada.`);
-      return null;
-    }
-
     const pos = this.calcularPosicao(config);
 
     const efeito = this.scene.add.sprite(
@@ -134,10 +129,7 @@ export default class GerenciadorVFX {
     // ANIMAÇÃO
     // ============================================================
 
-    if (
-      config.animacao &&
-      this.scene.anims.exists(config.animacao)
-    ) {
+    if (config.animacao) {
       efeito.anims.play(config.animacao, true);
 
       if (!config.loop) {
@@ -343,10 +335,7 @@ export default class GerenciadorVFX {
 
     this.ignorarNoHUD(efeito);
 
-    if (
-      config.animacao &&
-      this.scene.anims.exists(config.animacao)
-    ) {
+    if (config.animacao) {
       efeito.play(config.animacao);
 
       if (!config.loop) {
@@ -431,7 +420,7 @@ export default class GerenciadorVFX {
     // A ultima linha possui somente dois frames desenhados.
     { key: "jump-effect", end: 25, frameRate: 60 },
   ]) {
-    if (this.scene.textures.exists(key) && !this.scene.anims.exists(key)) {
+    if (!this.scene.anims.exists(key)) {
       this.scene.anims.create({
         key,
         frames: this.scene.anims.generateFrameNumbers(key, { start: 0, end }),
@@ -441,7 +430,6 @@ export default class GerenciadorVFX {
     }
   }
   if (
-    this.scene.textures.exists("Stun_Effect") &&
     !this.scene.anims.exists("stun_effect")
   ) {
     this.scene.anims.create({

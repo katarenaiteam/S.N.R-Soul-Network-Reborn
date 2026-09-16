@@ -3,6 +3,7 @@ import NeSpecial from "./Specials/FJ/NeSpecial.js";
 import SiSpecial from "./Specials/FJ/SiSpecial.js";
 import AsiSpecial from "./Specials/FJ/AsiSpecial.js";
 import AdoSpecial from "./Specials/FJ/AdoSpecial.js";
+import AupSpecial from "./Specials/FJ/AupSpecial.js";
 import DoSpecial from "./Specials/FJ/DoSpecial.js";
 
 
@@ -403,11 +404,11 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
       AupSpecial: {
-        largura: 85,
-        altura: 120,
-        offsetX: 5,
-        offsetY: 44,
-        escala: 1,
+        largura: 250,
+        altura: 400,
+        offsetX: 98,
+        offsetY: 153,
+        escala: 0.33,
         hurtboxes: [
           { largura: 55, altura: 60, offsetX: 0, offsetY: -70 },
           { largura: 60, altura: 35, offsetX: -3, offsetY: -18 },
@@ -575,7 +576,7 @@ this.nomePersonagem = "Frederick Johnson";
         comboProximo: "neutro4",
         propriedades: {
           dano: 1,
-          knockbackX: 6,
+          knockbackX: 1,
           knockbackY: 0,
           knockbackFixo: true,
           hitstunFrames: 22,
@@ -758,6 +759,12 @@ this.nomePersonagem = "Frederick Johnson";
 
     // specials ==========================
     this.specials = {
+      air_cima: {
+        animacao: "fj_AupSpecial",
+        logica: AupSpecial,
+        cooldown: 2200,
+        propriedades: { travarMovimentoAir: true },
+      },
       air_agachado: {
         animacao: "fj_AdoSpecial",
         logica: AdoSpecial,
@@ -892,6 +899,13 @@ if (!scene.anims.exists("punch_effect3")) {
       key: "fj_ground_effect",
       frames: scene.anims.generateFrameNumbers("ground_effect", { start: 0, end: 26 }),
       frameRate: 48,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "fj_AupSpecial",
+      frames: scene.anims.generateFrameNumbers("FJ_AupSpecial", { start: 0, end: 16 }),
+      frameRate: 24,
       repeat: 0,
     });
 

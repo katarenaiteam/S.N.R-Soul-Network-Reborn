@@ -445,20 +445,16 @@ export default class EstadoAtack extends EstadoBase {
       golpe.altura
     );
 
-    try {
-      if (primeiraHitbox) {
-        this.personagem.tocarSomSorteado(
-          golpe.vozAtaque ?? this.personagem.sons.vozAtaque,
-          { volume: this.personagem.sons.volumeVoz }
-        );
-      }
+    if (primeiraHitbox) {
+      this.personagem.tocarSomSorteado(
+        golpe.vozAtaque ?? this.personagem.sons.vozAtaque,
+        { volume: this.personagem.sons.volumeVoz }
+      );
+    }
 
-      const somVento = golpe.somVento || this.personagem.sons?.wind;
-      if (somVento) {
-        this.personagem.tocarSomSorteado(somVento, { volume: 0.1 });
-      }
-    } catch (erroAudio) {
-      console.warn("Falha ao tocar o som do ataque; hitbox mantida.", erroAudio);
+    const somVento = golpe.somVento || this.personagem.sons?.wind;
+    if (somVento) {
+      this.personagem.tocarSomSorteado(somVento, { volume: 0.1 });
     }
     // VFX opcional criado junto da hitbox de ataques normais.
     // Specials usam EstadoSpecial e nÃ£o passam por este bloco.
@@ -606,9 +602,6 @@ export default class EstadoAtack extends EstadoBase {
     this.alvosAtingidosHitbox.add(alvo);
     const golpe = this.dadosHitboxAtual;
 
-    // A colisao e o dano sao regra de jogo; audio e VFX sao apresentacao.
-    // Falhas de decodificacao de audio ou de renderizacao variam por navegador
-    // e nunca podem consumir o acerto antes de o dano ser aplicado.
     const valorDano = golpe.propriedades?.dano ?? 0;
     const origem = {
       direcao: this.personagem.sprite.flipX ? -1 : 1,
@@ -616,25 +609,17 @@ export default class EstadoAtack extends EstadoBase {
 
     alvo.receberDano(valorDano, golpe.propriedades, origem);
 
-    try {
-      const tipoImpacto = golpe.tipoSomImpacto || "light";
-      const somImpacto = golpe.somImpacto || this.personagem.sons?.[tipoImpacto];
-      if (somImpacto) {
-        this.personagem.tocarSomSorteado(somImpacto, { volume: 0.15 });
-      }
-    } catch (erroAudio) {
-      console.warn("Falha no som de impacto; dano mantido.", erroAudio);
+    const tipoImpacto = golpe.tipoSomImpacto || "light";
+    const somImpacto = golpe.somImpacto || this.personagem.sons?.[tipoImpacto];
+    if (somImpacto) {
+      this.personagem.tocarSomSorteado(somImpacto, { volume: 0.15 });
     }
 
-    try {
-      this.personagem.vfx?.tocarListaImpacto(
-        golpe.vfxAcerto,
-        alvo,
-        hitbox,
-      );
-    } catch (erroVFX) {
-      console.warn("Falha no VFX de impacto; dano mantido.", erroVFX);
-    }
+    this.personagem.vfx?.tocarListaImpacto(
+      golpe.vfxAcerto,
+      alvo,
+      hitbox,
+    );
 
     if (this.golpeAtual.finalizarAoAcertarOponente && !this.finalizandoPorAcerto) {
       this.finalizandoPorAcerto = true;

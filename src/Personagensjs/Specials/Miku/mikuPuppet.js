@@ -535,7 +535,7 @@ export default class MikuPuppet {
 }
 
 MikuPuppet.COOLDOWN_REINVOCACAO = 30000;
-MikuPuppet.TEMPO_DE_VIDA = 30000;
+MikuPuppet.TEMPO_DE_VIDA = 40000;
 MikuPuppet.VIDA_MAXIMA = 15;
 MikuPuppet.VELOCIDADE_ATAQUE = 190;
 MikuPuppet.VELOCIDADE_DURANTE_ATAQUE = 150;
@@ -550,7 +550,7 @@ MikuPuppet.DISTANCIA_ATAQUE_X = 62;
 MikuPuppet.DISTANCIA_ATAQUE_Y = 85;
 MikuPuppet.HITSTUN = 600;
 MikuPuppet.CURA = 5;
-MikuPuppet.INTERVALO_CURA = 5000;
+MikuPuppet.INTERVALO_CURA = 2500;
 MikuPuppet.DISTANCIA_CURA = 200;
 
 MikuPuppet.MARGEM_AREA_SEGURA = 18;

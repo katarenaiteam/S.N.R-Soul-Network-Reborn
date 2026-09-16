@@ -1,6 +1,4 @@
 export function tocarSomSeguro(scene, chave, config = {}) {
-  if (!scene?.sound || !chave || !scene.cache.audio.exists(chave)) return null;
-
   const cancelar = () => scene.sound.off("unlocked", tocar);
   const tocar = () => {
     scene.events.off("shutdown", cancelar);
@@ -14,8 +12,6 @@ export function tocarSomSeguro(scene, chave, config = {}) {
 }
 
 export function tocarMusicaSegura(scene, chave, config = {}) {
-  if (!scene?.sound || !chave || !scene.cache.audio.exists(chave)) return null;
-
   const musica = scene.sound.add(chave, config);
   const tocar = () => musica.play();
   const desvincular = () => {

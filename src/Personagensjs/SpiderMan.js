@@ -1069,7 +1069,7 @@ if (!scene.anims.exists("punch_effect3")) {
 
     scene.anims.create({
     key: "spy_stun",
-    frames: scene.anims.generateFrameNumbers("SpiderMan_stun", { start: 0, end: 5 }),
+    frames: scene.anims.generateFrameNumbers("SpiderMan_Stun", { start: 0, end: 5 }),
     frameRate: 12,
     repeat: -1
    });
@@ -1196,16 +1196,6 @@ scene.anims.create({
       frameRate: 28,
       repeat: 0,
     });
-
-    scene.anims.create({
-  key: "spy_webShot",
-  frames: scene.anims.generateFrameNumbers("webshot", {
-    start: 4,
-    end: 9,
-  }),
-  frameRate: 12,
-  repeat: -1,
-});
 
 scene.anims.create({
       key: "spy_AdoSpecial",
