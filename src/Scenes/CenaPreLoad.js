@@ -1,3 +1,4 @@
+import { carregarGradeMenu } from "../Objetos/CarregarGradeMenu.js";
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import { tocarMusicaSegura } from "../Objetos/AudioSeguro.js";
 
@@ -82,7 +83,7 @@ export default class CenaPreload extends Phaser.Scene {
 
     // --- new charmenu ---
     // - grade
-    this.load.spritesheet("grade", "/assets/Menus/Char_menu/Sprites/grade.png", { frameWidth: 1920, frameHeight: 1080 });
+    carregarGradeMenu(this);
     // - ficha
     this.load.image("P1maoCficha", "/assets/Menus/Char_menu/Sprites/ficha/P1maoCficha.png");
     this.load.image("P1maoSficha", "/assets/Menus/Char_menu/Sprites/ficha/P1maoSficha.png");
