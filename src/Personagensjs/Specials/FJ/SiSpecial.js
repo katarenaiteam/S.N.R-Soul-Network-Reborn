@@ -3,7 +3,9 @@ import { registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial
 
 const PAUSA_CAPTURA = 600;
 const PAUSA_ERRO = 200;
-const VELOCIDADE_AVANCO = 620;
+const VELOCIDADE_AVANCO = 550;
+const DURACAO_AVANCO = 400;
+const TEMPO_ACELERACAO = 120;
 const HITBOX = { largura: 60, altura: 75, offsetX: 60, offsetY: -75 };
 
 // Um estado sem leitura de comandos encerra tambem o ataque/special anterior.
@@ -58,7 +60,7 @@ export default class SiSpecial {
     const sprite = this.personagem.sprite;
     this.direcao = sprite.flipX ? -1 : 1;
     this.inicio = this.scene.time.now;
-    sprite.setVelocityX(VELOCIDADE_AVANCO * this.direcao);
+    sprite.setVelocityX(0);
     sprite.on("animationupdate", this.aoFrame);
     sprite.on("animationcomplete", this.aoFim);
     sprite.once("destroy", this.cancelar);
@@ -75,7 +77,6 @@ export default class SiSpecial {
       if (indice === 2) {
         this.fase = "erro";
         this.inicioErro = this.scene.time.now;
-        this.personagem.sprite.setVelocityX(0);
         this.personagem.sprite.anims.pause();
       }
     }
@@ -113,6 +114,7 @@ export default class SiSpecial {
     if (!fsm.estados.agarradoFJ) fsm.adicionarEstado("agarradoFJ", new EstadoAgarradoFJ(alvo));
     this.estadoAlvo = fsm.estados.agarradoFJ;
     fsm.mudarEstado("agarradoFJ", { dono: this });
+    this.personagem.tocarSomSorteado("grab", { volume: 0.8 });
   }
 
   posicionarHitbox() {
@@ -137,6 +139,16 @@ export default class SiSpecial {
       this.finalizar();
       return;
     }
+    if (["avanco", "erro", "recuperacao"].includes(this.fase)) {
+      const tempo = Math.max(0, this.scene.time.now - this.inicio);
+      const acelerando = tempo < TEMPO_ACELERACAO;
+      const progresso = Math.min(1, acelerando
+        ? tempo / TEMPO_ACELERACAO
+        : (tempo - TEMPO_ACELERACAO) / (DURACAO_AVANCO - TEMPO_ACELERACAO));
+      const curva = progresso * progresso * (3 - 2 * progresso);
+      // Mesma aceleracao do aereo; no solo a frenagem termina em repouso.
+      this.personagem.sprite.setVelocityX(VELOCIDADE_AVANCO * (acelerando ? curva : 1 - curva) * this.direcao);
+    }
     if (this.fase === "erro") {
       this.posicionarHitbox();
       if (this.scene.time.now - this.inicioErro >= PAUSA_ERRO) {
@@ -147,10 +159,8 @@ export default class SiSpecial {
       return;
     }
     if (this.fase === "avanco") {
-      const progresso = Math.min(1, (this.scene.time.now - this.inicio) / (6 * 1000 / 18));
-      this.personagem.sprite.setVelocityX(VELOCIDADE_AVANCO * (1 - progresso) * this.direcao);
       this.posicionarHitbox();
-    } else {
+    } else if (this.fase !== "recuperacao") {
       this.personagem.sprite.setVelocityX(0);
       this.posicionarAlvo();
       if (this.fase === "pausa" && this.scene.time.now - this.inicioPausa >= PAUSA_CAPTURA) {
@@ -171,6 +181,7 @@ export default class SiSpecial {
 
   lancarAlvo() {
     if (this.fase !== "grab" || !this.alvo || this.alvoLancado) return;
+    this.personagem.tocarSomSorteado("c-mon", { volume: 0.8 });
     const alvo = this.soltarAlvo();
     // A fisica e o estado de dano seguem normalmente durante o voo,
     // mas os comandos continuam bloqueados ate o fim da animacao do FJ.
@@ -180,6 +191,11 @@ export default class SiSpecial {
       this.comandosOriginais.set(nome, Object.getOwnPropertyDescriptor(alvo, nome));
       alvo[nome] = () => false;
     }
+    this.personagem.vfx?.tocarListaImpacto(
+      [{ escolherUm: ["punch1", "punch2", "punch3"] }], alvo, this.hitbox,
+    );
+    const somImpacto = this.personagem.sons?.heavy;
+    if (somImpacto) this.personagem.tocarSomSorteado(somImpacto, { volume: 0.15 });
     alvo.receberDano(18, {
       dano: 18, knockbackX: 700, knockbackY: -350, tumbling: true,
       tipoSomImpacto: "heavy",

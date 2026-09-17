@@ -35,6 +35,15 @@ export default class FJ extends Personagem {
 
        this.configVFX = {
   ...this.configVFX,
+  npose: {
+    textura: "npose",
+    animacao: "fj_npose",
+    escala: 0.45,
+    offsetY: -75,
+    seguir: true,
+    blendMode: "ADD",
+    depthOffset: 2,
+  },
 
    punch1: {
     textura: "punch_effect",
@@ -466,10 +475,11 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
       ground: {
+        offsetVisualY: 12,
         largura: 210,
         altura: 245,
         offsetX: 45,
-        offsetY: 80,
+        offsetY: 75,
         escala: 0.33,
         hurtboxes: [
           { largura: 40, altura: 40, offsetX: 16, offsetY: -60 },
@@ -804,6 +814,14 @@ this.nomePersonagem = "Frederick Johnson";
   //animaçoes====================================================
   
   static criarAnimacoes(scene) {
+    if (!scene.anims.exists("fj_npose")) {
+      scene.anims.create({
+        key: "fj_npose",
+        frames: scene.anims.generateFrameNumbers("npose", { start: 0, end: 28 }),
+        frameRate: 48,
+        repeat: 0,
+      });
+    }
 
    // efeitos anim
   if (!scene.anims.exists("punch_effect")) {

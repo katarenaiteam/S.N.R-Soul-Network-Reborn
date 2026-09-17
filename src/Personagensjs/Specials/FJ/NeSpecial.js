@@ -4,10 +4,10 @@ const TEMPO_MAXIMO_CARGA = 2500;
 const TEMPO_POSE_FINAL = 250;
 const DANO_BASE = 20;
 // Salto curto para frente durante o golpe.
-const IMPULSO_X = 345;
+const IMPULSO_X = 305;
 const IMPULSO_Y = -180;
 const DURACAO_AVANCO = 320;
-const HITBOX = { largura: 65, altura: 80, offsetX: 48, offsetY: -65 };
+const HITBOX = { largura: 80, altura: 60, offsetX: 38, offsetY: -65 };
 
 export default class NeSpecial {
   constructor(personagem, special, estado) {
@@ -34,7 +34,10 @@ export default class NeSpecial {
     sprite.setVelocityX(0);
     sprite.on("animationupdate", this.aoAtualizarAnimacao);
     sprite.once(`animationcomplete-${this.special.animacao}`, this.aoCompletarAnimacao);
-    if (!this.personagem.inputDown("special")) this.liberado = true;
+    if (!this.personagem.inputDown("special")) {
+      this.liberado = true;
+      this.efeitosLiberacao();
+    }
     if (sprite.anims.currentFrame) {
       this.aoAtualizarAnimacao(sprite.anims.currentAnim, sprite.anims.currentFrame);
     }
@@ -45,6 +48,8 @@ export default class NeSpecial {
     const indice = Number(frame.textureFrame);
     if (indice === 1 && !this.liberado && this.personagem.inputDown("special")) {
       this.inicioCarga = this.scene.time.now;
+      this.efeitoCarga = this.personagem.vfx?.tocar("npose", { loop: true });
+      this.efeitoCarga?.play({ key: "fj_npose", repeat: -1 });
       this.personagem.sprite.anims.pause();
     }
     if (indice === 3 && this.inicioImpulso === null) {
@@ -76,12 +81,19 @@ export default class NeSpecial {
       const tempo = this.inicioCarga === null ? 0 : this.scene.time.now - this.inicioCarga;
       if (!this.personagem.inputDown("special") || tempo >= TEMPO_MAXIMO_CARGA) {
         this.liberado = true;
+        this.efeitosLiberacao();
         this.multiplicadorCarga = 1 + Math.min(1, tempo / TEMPO_MAXIMO_CARGA);
         this.dano = DANO_BASE * this.multiplicadorCarga;
         if (this.inicioCarga !== null) this.personagem.sprite.anims.resume();
       }
     }
     this.atualizarHitbox();
+  }
+
+  efeitosLiberacao() {
+    this.efeitoCarga?.destroy();
+    this.efeitoCarga = null;
+    this.personagem.tocarSomSorteado("take-this", { volume: 0.8 });
   }
 
   atualizarImpulso() {
@@ -119,6 +131,9 @@ export default class NeSpecial {
   acertar(alvo) {
     if (this.finalizado || !this.hitbox?.active || this.alvosAtingidos.has(alvo)) return;
     this.alvosAtingidos.add(alvo);
+    this.personagem.vfx?.tocarListaImpacto(
+      [{ escolherUm: ["punch1", "punch2", "punch3"] }], alvo, this.hitbox,
+    );
     alvo.receberDano(this.dano, {
       dano: this.dano,
       tipoSomImpacto: "heavy",
@@ -146,6 +161,8 @@ export default class NeSpecial {
   cancelar() {
     if (this.finalizado) return;
     this.finalizado = true;
+    this.efeitoCarga?.destroy();
+    this.efeitoCarga = null;
     const sprite = this.personagem.sprite;
     sprite.off("animationupdate", this.aoAtualizarAnimacao);
     sprite.off(`animationcomplete-${this.special.animacao}`, this.aoCompletarAnimacao);

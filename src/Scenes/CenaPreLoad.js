@@ -166,10 +166,17 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("FJ_dead", "assets/personagens/FJ/Sprites/FJ_dead.png", { frameWidth: 510, frameHeight: 259 });
     this.load.spritesheet("FJ_getup", "assets/personagens/FJ/Sprites/FJ_getup.png", { frameWidth: 406, frameHeight: 343 });
     this.load.spritesheet("FJ_stun", "assets/personagens/FJ/Sprites/FJ_stun.png", { frameWidth: 322, frameHeight: 340 });
+    this.load.audio("fj-hurt1", "assets/personagens/FJ/Audio/fj-hurt1.wav");
+    this.load.audio("fj-hurt2", "assets/personagens/FJ/Audio/fj-hurt2.wav");
+    this.load.audio("fj-hurt3", "assets/personagens/FJ/Audio/fj-hurt3.wav");
+    this.load.audio("fj-hurt4", "assets/personagens/FJ/Audio/fj-hurt4.wav");
+    this.load.audio("fj-hurt5", "assets/personagens/FJ/Audio/fj-hurt5.wav");
+    this.load.audio("fj-hurt6", "assets/personagens/FJ/Audio/fj-hurt6.wav");
     //atack
     this.load.spritesheet("FJ_neu1", "assets/personagens/FJ/Sprites/FJ_neu1.png", { frameWidth: 470, frameHeight: 380 });
     this.load.spritesheet("FJ_neu2", "assets/personagens/FJ/Sprites/FJ_neu2.png", { frameWidth: 882, frameHeight: 363 });
     this.load.spritesheet("FJ_neu3", "assets/personagens/FJ/Sprites/FJ_neu3.png", { frameWidth: 468, frameHeight: 448 });
+    this.load.spritesheet("FJ_combo", "assets/personagens/FJ/Sprites/FJ_combo.png", { frameWidth: 686, frameHeight: 456 });
     this.load.spritesheet("FJ_speedNeu", "assets/personagens/FJ/Sprites/FJ_speedNeu.png", { frameWidth: 882, frameHeight: 448 });
     this.load.spritesheet("FJ_SideAtack", "assets/personagens/FJ/Sprites/FJ_SideAtack.png", { frameWidth: 452, frameHeight: 385 });
     this.load.spritesheet("FJ_downAtack", "assets/personagens/FJ/Sprites/FJ_downAtack.png", { frameWidth: 514, frameHeight: 687 });
@@ -177,16 +184,26 @@ export default class CenaPreload extends Phaser.Scene {
     //airSide
     //airUP
     this.load.spritesheet("FJ_airDown", "assets/personagens/FJ/Sprites/FJ_airDown.png", { frameWidth: 508, frameHeight: 553 });
+    this.load.audio("fj-atack1", "assets/personagens/FJ/Audio/fj-atack1.wav");
+    this.load.audio("fj-atack2", "assets/personagens/FJ/Audio/fj-atack2.wav");
+    this.load.audio("fj-atack3", "assets/personagens/FJ/Audio/fj-atack3.wav");
+    this.load.audio("fj-atack4", "assets/personagens/FJ/Audio/fj-atack4.wav");
     //specials
     this.load.spritesheet("FJ_neSpecial", "assets/personagens/FJ/Sprites/FJ_neSpecial.png", { frameWidth: 416, frameHeight: 481 });
+    this.load.audio("take-this", "assets/personagens/FJ/Audio/take-this.wav");
+    this.load.spritesheet("npose", "assets/personagens/FJ/Sprites/npose.png", { frameWidth: 544, frameHeight: 630 });
     this.load.spritesheet("FJ_siSpecial", "assets/personagens/FJ/Sprites/FJ_siSpecial.png", { frameWidth: 526, frameHeight: 530 });
     this.load.spritesheet("FJ_grab", "assets/personagens/FJ/Sprites/FJ_grab.png", { frameWidth: 461, frameHeight: 400 });
+    this.load.audio("c-mon", "assets/personagens/FJ/Audio/c-mon.wav");
+    this.load.audio("grab", "assets/personagens/FJ/Audio/grab.wav");
     this.load.spritesheet("FJ_doSpecial", "assets/personagens/FJ/Sprites/FJ_doSpecial.png", { frameWidth: 417, frameHeight: 442 });
+    this.load.audio("upercut", "assets/personagens/FJ/Audio/upercut.wav");
     this.load.spritesheet("FJ_AupSpecial", "assets/personagens/FJ/Sprites/FJ_AupSpecial.png", { frameWidth: 446, frameHeight: 553 });
     this.load.spritesheet("FJ_AsiSpecial", "assets/personagens/FJ/Sprites/FJ_AsiSpecial.png", { frameWidth: 422, frameHeight: 553 });
     this.load.spritesheet("FJ_Agrab", "assets/personagens/FJ/Sprites/FJ_Agrab.png", { frameWidth: 396, frameHeight: 481 });
     this.load.spritesheet("FJ_AdoSpecial", "assets/personagens/FJ/Sprites/FJ_AdoSpecial.png", { frameWidth: 370, frameHeight: 374 });
     this.load.spritesheet("FJ_ground", "assets/personagens/FJ/Sprites/FJ_ground.png", { frameWidth: 280, frameHeight: 327 });
+    this.load.audio("ground", "assets/personagens/FJ/Audio/ground.wav");
     this.load.spritesheet("ground_effect", "assets/personagens/FJ/Sprites/ground_effect.png", { frameWidth: 628, frameHeight: 348 });
 
     // --- TH30 ---
@@ -502,9 +519,14 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     
     // --- EFEITOS ---
      this.load.spritesheet("TVefect", "assets/efeitos/TVefect.png", { frameWidth: 800, frameHeight: 400 });
+     this.load.image("quebradoL2", "assets/efeitos/out-effect/quebradoL2.png");
+     this.load.image("quebradoR2", "assets/efeitos/out-effect/quebradoR2.png");
+     this.load.image("quebradoU2", "assets/efeitos/out-effect/quebradoU2.png");
+     this.load.image("quebradoD2", "assets/efeitos/out-effect/quebradoD2.png");
      this.load.spritesheet("punch_effect", "assets/efeitos/atack_effects/punch_effect.png", { frameWidth: 109, frameHeight: 107, });
      this.load.spritesheet("punch_effect2", "assets/efeitos/atack_effects/punch_effect2.png", { frameWidth: 200, frameHeight: 250, });
      this.load.spritesheet("punch_effect3", "assets/efeitos/atack_effects/punch_effect3.png", { frameWidth: 200, frameHeight: 250, });
+
      
      //- stun
      this.load.spritesheet("Stun_Effect", "assets/efeitos/Stun_Effect.png", { frameWidth: 128, frameHeight: 128, });

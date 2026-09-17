@@ -1,3 +1,4 @@
+import MorteVS from "../Objetos/MorteVS.js";
 import { criarIndicador, atualizarIndicador } from "../Objetos/IndicadorPersonagem.js";
 import { criarHudPartida, atualizarBarraUlt } from "../Objetos/HudPartida.js";
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
@@ -217,6 +218,8 @@ this.indicadorP2 = this.criarIndicador(
       this.jogador2.sprite,
     ]);
 
+    this.mortesVS = new MorteVS(this);
+
     if (this.physics.config.debug || this.physics.world.drawDebug) {
       this.camHUD.ignore(this.physics.world.debugGraphic);
     }
@@ -250,17 +253,18 @@ this.indicadorP2 = this.criarIndicador(
   // 3. LOOP DE ATUALIZAÇÃO
   update(time, delta) {
 
-      if (this.jogador1) {
+      if (this.jogador1 && !this.jogador1.emMorteVS) {
     this.jogador1.atualizarCargaUlt(delta);
     this.jogador1.update();
   }
 
-  if (this.jogador2) {
+  if (this.jogador2 && !this.jogador2.emMorteVS) {
     this.jogador2.atualizarCargaUlt(delta);
     this.jogador2.update();
   }
 
     this.sistemaPlataformasAtravessaveis.atualizar();
+    this.mortesVS.atualizar(delta);
 
   this.atualizarBarraUlt(
     this.jogador1,
@@ -294,7 +298,7 @@ this.indicadorP2 = this.criarIndicador(
   }
 
   verificarMorte(jogador, pontoRespawn, numJogador) {
-  if (!jogador || !jogador.sprite) return;
+  if (!jogador || !jogador.sprite || jogador.emMorteVS || jogador.eliminado) return;
 
   const x = jogador.sprite.x;
   const y = jogador.sprite.y;
@@ -314,6 +318,7 @@ this.indicadorP2 = this.criarIndicador(
 }
 
   processarQueda(jogador, pontoRespawn, numJogador) {
+    if (!this.mortesVS.iniciar(jogador, pontoRespawn, numJogador)) return;
     // Desconta a vida do jogador correspondente
     if (numJogador === 1) {
       this.vidasP1--;
@@ -323,15 +328,6 @@ this.indicadorP2 = this.criarIndicador(
       this.hudP2_Vidas.setText(`VIDAS: ${this.vidasP2}`);
     }
 
-    // Se as vidas acabarem, encerra a partida
-    if (this.vidasP1 <= 0 || this.vidasP2 <= 0) {
-      this.sound.stopAll();
-      this.scene.start("CenaGameOver");
-      return;
-    }
-
-    // Caso ainda tenha vidas, respawna normalmente
-    this.respawnar(jogador, pontoRespawn);
   }
 
   respawnar(jogador, pontoRespawn) {
@@ -349,17 +345,6 @@ this.indicadorP2 = this.criarIndicador(
       if (jogador.textoDano) jogador.textoDano.setText("0%");
     }
 
-    if (this.overlayMorte) {
-      this.overlayMorte.setVisible(true);
-      this.overlayMorte.play("TVefect");
-
-      this.overlayMorte.once(
-        Phaser.Animations.Events.ANIMATION_COMPLETE,
-        () => {
-          this.overlayMorte.setVisible(false);
-        }
-      );
-    }
   }
 
   criarIndicador(...args) {
@@ -371,10 +356,13 @@ this.indicadorP2 = this.criarIndicador(
   }
 
   atualizarCamera() {
+    if (this.mortesVS?.pendentes.size || this.mortesVS?.tvAtiva) return;
     if (!this.jogador1 || !this.jogador2) return;
 
-    const p1 = this.jogador1.sprite;
-    const p2 = this.jogador2.sprite;
+    const vivos = [this.jogador1, this.jogador2].filter(p => !p.emMorteVS);
+    if (!vivos.length) return;
+    const p1 = vivos[0].sprite;
+    const p2 = (vivos[1] ?? vivos[0]).sprite;
     const cam = this.cameras.main;
 
     // 1. Lê as configurações do mapa

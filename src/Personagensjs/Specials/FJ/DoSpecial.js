@@ -18,6 +18,9 @@ export default class DoSpecial {
   }
 
   executar() {
+    if (this.special.animacao === "fj_doSpecial") {
+      this.personagem.tocarSomSorteado("upercut", { volume: 0.8 });
+    }
     const sprite = this.personagem.sprite;
     this.direcao = sprite.flipX ? -1 : 1;
     sprite.setVelocityX(0);
@@ -70,6 +73,9 @@ export default class DoSpecial {
   acertar(alvo) {
     if (this.finalizado || !this.hitbox?.active || this.alvosAtingidos.has(alvo)) return;
     this.alvosAtingidos.add(alvo);
+    this.personagem.vfx?.tocarListaImpacto(
+      [{ escolherUm: ["punch1", "punch2", "punch3"] }], alvo, this.hitbox,
+    );
     alvo.receberDano(this.dano, {
       dano: this.dano,
       tipoSomImpacto: "heavy",
