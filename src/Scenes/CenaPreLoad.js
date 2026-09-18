@@ -168,7 +168,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("FJ_dead", "assets/personagens/FJ/Sprites/FJ_dead.png", { frameWidth: 510, frameHeight: 259 });
     this.load.spritesheet("FJ_getup", "assets/personagens/FJ/Sprites/FJ_getup.png", { frameWidth: 406, frameHeight: 343 });
     this.load.spritesheet("FJ_stun", "assets/personagens/FJ/Sprites/FJ_stun.png", { frameWidth: 322, frameHeight: 340 });
-    this.load.audio("fj-hurt1", "assets/personagens/FJ/Audio/fj-Hurt1.wav");
+    this.load.audio("fj-hurt1", "assets/personagens/FJ/Audio/fj-hurt1.wav");
     this.load.audio("fj-hurt2", "assets/personagens/FJ/Audio/fj-hurt2.wav");
     this.load.audio("fj-hurt3", "assets/personagens/FJ/Audio/fj-hurt3.wav");
     this.load.audio("fj-hurt4", "assets/personagens/FJ/Audio/fj-hurt4.wav");
