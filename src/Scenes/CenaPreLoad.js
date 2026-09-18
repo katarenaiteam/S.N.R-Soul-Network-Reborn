@@ -162,13 +162,13 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("FJ_dash", "assets/personagens/FJ/Sprites/FJ_dash.png", { frameWidth: 380, frameHeight: 333 });
     this.load.spritesheet("FJ_guard", "assets/personagens/FJ/Sprites/FJ_guard.png", { frameWidth: 391, frameHeight: 370 });
     this.load.spritesheet("FJ_taunt", "assets/personagens/FJ/Sprites/FJ_taunt.png", { frameWidth: 420, frameHeight: 413 });
-    this.load.spritesheet("FJ_hurt", "assets/personagens/FJ/Sprites/FJ_hurt.png", { frameWidth: 423, frameHeight: 342 });
+    this.load.spritesheet("FJ_Hurt", "assets/personagens/FJ/Sprites/FJ_Hurt.png", { frameWidth: 423, frameHeight: 342 });
     this.load.spritesheet("FJ_hurt1", "assets/personagens/FJ/Sprites/FJ_hurt1.png", { frameWidth: 433, frameHeight: 462 });
     this.load.spritesheet("FJ_hurt2", "assets/personagens/FJ/Sprites/FJ_hurt2.png", { frameWidth: 318, frameHeight: 449 });
     this.load.spritesheet("FJ_dead", "assets/personagens/FJ/Sprites/FJ_dead.png", { frameWidth: 510, frameHeight: 259 });
     this.load.spritesheet("FJ_getup", "assets/personagens/FJ/Sprites/FJ_getup.png", { frameWidth: 406, frameHeight: 343 });
     this.load.spritesheet("FJ_stun", "assets/personagens/FJ/Sprites/FJ_stun.png", { frameWidth: 322, frameHeight: 340 });
-    this.load.audio("fj-hurt1", "assets/personagens/FJ/Audio/fj-hurt1.wav");
+    this.load.audio("fj-hurt1", "assets/personagens/FJ/Audio/fj-Hurt1.wav");
     this.load.audio("fj-hurt2", "assets/personagens/FJ/Audio/fj-hurt2.wav");
     this.load.audio("fj-hurt3", "assets/personagens/FJ/Audio/fj-hurt3.wav");
     this.load.audio("fj-hurt4", "assets/personagens/FJ/Audio/fj-hurt4.wav");
