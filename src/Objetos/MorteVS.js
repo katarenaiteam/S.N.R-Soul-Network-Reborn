@@ -133,6 +133,7 @@ export default class MorteVS {
 
   iniciar(jogador, pontoRespawn, numero) {
     if (this.pendentes.has(jogador) || jogador.eliminado) return false;
+    jogador.estadoInvencible.sair(false);
     this.scene.camJogo.shake(140, 0.007);
     const efeito = new VidroMatrix(this.scene, jogador,
       ladoDaQueda(jogador.sprite.x, jogador.sprite.y, this.scene.limitesArena), ++this.sequencia);

@@ -607,6 +607,7 @@ export default class EstadoAtack extends EstadoBase {
       direcao: this.personagem.sprite.flipX ? -1 : 1,
     };
 
+    this.personagem.estadoInvencible?.aoAcertarAtaque();
     alvo.receberDano(valorDano, golpe.propriedades, origem);
 
     const tipoImpacto = golpe.tipoSomImpacto || "light";

@@ -1,4 +1,5 @@
 import { conduzirAlvoShoryuken } from "../Specials/Ken/shoryuken.js";
+import { tocarMusicaSegura } from "../../Objetos/AudioSeguro.js";
 import {
   obterAlvosCombate,
   registrarAtaqueEspecial
@@ -347,6 +348,11 @@ export default class KenUlt {
       { key: "ken_ult", frameRate: SHORYUKEN.frameRate },
       true
     );
+
+    this.somUlt = tocarMusicaSegura(this.scene, "ken-ult", {
+      volume: 0.7,
+      loop: false
+    });
 
 
     this.puloIniciado = false;
@@ -1655,6 +1661,8 @@ export default class KenUlt {
 
 
     this.finalizada = true;
+    this.somUlt?.destroy();
+    this.somUlt = null;
 
 
     this.destruirHitbox();
@@ -1694,6 +1702,8 @@ export default class KenUlt {
 
   cancelar() {
     this.cancelada = true;
+    this.somUlt?.destroy();
+    this.somUlt = null;
     if (this.timerFinal) clearTimeout(this.timerFinal);
     this.timerFinal = null;
     this.pararTremorFinal();

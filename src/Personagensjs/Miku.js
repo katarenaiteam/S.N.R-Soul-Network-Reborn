@@ -690,7 +690,7 @@ this.vfxAtaqueNormal = {
       tempoPoseLancamento: 560,
       tempoMinimoCarga: 560,
       tempoEntreNotas: 600,
-      volumeSom: 0.8,
+      volumeSom: 0.64,
       propriedades: {
         tipoSomImpacto: "light",
         dano: 8,
@@ -712,7 +712,7 @@ this.vfxAtaqueNormal = {
       tempoNota: 4000,
       tempoPoseLancamento: 560,
       tempoPausaAerea: 560,
-      volumeSom: 0.8,
+      volumeSom: 0.64,
       propriedades: {
         tipoSomImpacto: "light",
         dano: 8,

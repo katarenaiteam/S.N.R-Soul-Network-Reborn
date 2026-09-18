@@ -15,6 +15,7 @@ import EstadoUlt from "../Estados/EstadoUlt.js";
 import GerenciadorVFX from "../Objetos/GerenciadorVFX.js";
 import { tocarSomSeguro } from "../Objetos/AudioSeguro.js";
 import EstadoAtordoado from "../Estados/EstadoAtordoado.js";
+import EstadoInvencible from "../Estados/EstadoInvencible.js";
 
 
 export default class Personagem {
@@ -46,6 +47,7 @@ export default class Personagem {
     this.specials = {};
     this.logicasEspeciaisAtivas = [];
     this.invulneravel = false;
+    this.estadoInvencible = new EstadoInvencible(this);
     this.hiperArmaduraHits = 0;
     this.hiperArmaduraFonte = null;
     this.comboHitsRecebidos = 0;
@@ -506,6 +508,13 @@ aplicarBoostUltPorDano(dano) {
 // ULT CHEIA
 // ============================================================
 
+ganharCargaUltPorMorte() {
+  this.ultCarga = Math.min(
+    this.ultCargaMax,
+    this.ultCarga + this.ultCargaMax / 3
+  );
+}
+
 ultEstaCarregada() {
   return (
     this.ultCarga >=
@@ -634,6 +643,10 @@ consumirUlt() {
   }
 
   sincronizarHurtbox() {
+    if (this.estadoInvencible.ativo) {
+      this.destruirHurtboxes();
+      return;
+    }
     const cfg = this.obterConfigAtual();
     const listaConfigs = cfg.hurtboxes || [];
     const direcaoOlhar = this.sprite.flipX ? -1 : 1;
@@ -978,12 +991,14 @@ consumirUlt() {
 
     if (!special) return;
 
-    this.cooldownsSpecial[tipoSpecial] =
+    const chaveCooldown = special.chaveCooldown ?? tipoSpecial;
+    this.cooldownsSpecial[chaveCooldown] =
       this.scene.time.now + (special.cooldown || 0);
   }
 
   podeUsarSpecial(tipoSpecial) {
     const agora = this.scene.time.now;
+    const chaveCooldown = this.specials?.[tipoSpecial]?.chaveCooldown ?? tipoSpecial;
     const specialAereo = tipoSpecial?.startsWith("air_");
 
     if (
@@ -994,8 +1009,8 @@ consumirUlt() {
     }
 
     return (
-      !this.cooldownsSpecial?.[tipoSpecial] ||
-      agora >= this.cooldownsSpecial[tipoSpecial]
+      !this.cooldownsSpecial?.[chaveCooldown] ||
+      agora >= this.cooldownsSpecial[chaveCooldown]
     );
   }
 

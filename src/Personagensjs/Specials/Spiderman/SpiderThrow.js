@@ -253,12 +253,13 @@ export default class SpiderThrow {
       { x: 140 * direcao, y: -10 },
       { x: 230 * direcao, y: -10 },
       { x: 240 * direcao, y: -10 },
-      { x: 270 * direcao, y: -10 },
-      { x: -250 * direcao, y: -10 },
-      { x: -180 * direcao, y: -10 },
-      { x: -180 * direcao, y: -10 },
-      { x: -120 * direcao, y: -10 },
+      // Ultimos pontos acompanham a ponta da teia nos frames 27, 28 e 29.
+      { x: 110 * direcao, y: -10 },
+      { x: 20 * direcao, y: -10 },
+      { x: -75 * direcao, y: -10 },
     ];
+
+    const frameSoltura = trajetoriaManual.length;
 
     let jaLancouOponente = false;
     let tocouGiro1 = false;
@@ -270,7 +271,7 @@ export default class SpiderThrow {
       const index = frame.index - 1;
 
       // A 16 fps: disparo ate 0,49 s, giros em 0,50 s e 1,19 s,
-      // terminando antes do lancamento no frame 29 (1,81 s).
+      // terminando antes da soltura no primeiro frame sem teia (30).
       if (index >= 8 && index < 19 && !tocouGiro1) {
         tocouGiro1 = true;
         tocarSomSeguro(this.scene, "sp-web-throw1", { rate: 1.2, volume: 0.2 });
@@ -280,14 +281,14 @@ export default class SpiderThrow {
         tocarSomSeguro(this.scene, "sp-web-throw2", { rate: 1.1, volume: 0.2 });
       }
 
-      if (index < 29 && !jaLancouOponente) {
+      if (index < frameSoltura && !jaLancouOponente) {
         const ponto =
           trajetoriaManual[index] ||
           trajetoriaManual[trajetoriaManual.length - 1];
         if (ponto) {
           alvo.sprite.setPosition(sprite.x + ponto.x, sprite.y + ponto.y);
         }
-      } else if (index >= 29 && !jaLancouOponente) {
+      } else if (index >= frameSoltura && !jaLancouOponente) {
         jaLancouOponente = true;
         tocarSomSeguro(this.scene, "jogar", { volume: 0.2 });
 
@@ -296,23 +297,32 @@ export default class SpiderThrow {
         if (this.podeUsarSpecialOriginal) alvo.podeUsarSpecial = this.podeUsarSpecialOriginal;
         alvo.podeAtacar = true;
 
-        if (alvo.sprite && alvo.sprite.body) {
-          alvo.sprite.body.setAllowGravity(true);
-          alvo.sprite.body.moves = true;
-        }
-
         if (alvo.grupoHurtbox) {
           alvo.grupoHurtbox.getChildren().forEach((child) => {
             if (child.body) child.body.enable = true;
           });
         }
 
+        const posicaoLancamento = { x: alvo.sprite.x, y: alvo.sprite.y };
         const props = this.special?.propriedades || {};
         alvo.receberDano(props.dano || 18, {
           knockbackX: 700 * direcao,
           knockbackY: -350,
           tumbling: true,
         });
+
+        // A animacao de dano muda o tamanho/offset do corpo. Sincroniza depois
+        // dessa troca, sem reaplicar o deslocamento manual no postUpdate fisico.
+        alvo.sprite.setPosition(posicaoLancamento.x, posicaoLancamento.y);
+        const body = alvo.sprite.body;
+        if (body) {
+          body.updateFromGameObject();
+          body.prev.copy(body.position);
+          body.prevFrame.copy(body.position);
+          body.autoFrame.copy(body.position);
+          body.setAllowGravity(true);
+          body.moves = true;
+        }
       }
     };
 

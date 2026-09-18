@@ -700,7 +700,7 @@ this.nomePersonagem = "Ken";
         cooldown: 2000,
         logica: Hadouken,
          som: "hadouken",
-         volumeSom: 0.6,
+         volumeSom: 0.42,
         atrasoProjetil: 300,
         tempoProjetil: 5000,
         velocidadeProjetil: 500,
@@ -724,7 +724,7 @@ this.nomePersonagem = "Ken";
         cooldown: 1800,
         logica: Tatsumaki,
          som: "tatsumaki",
-         volumeSom: 0.4,
+         volumeSom: 0.28,
         propriedades: {
           travarMovimentoAir: true,
           tipoSomImpacto: "heavy",
@@ -740,7 +740,7 @@ this.nomePersonagem = "Ken";
         cooldown: 1800,
         logica: Shoryuken,
         som: "shoryuken",
-        volumeSom: 0.4,
+        volumeSom: 0.28,
         propriedades: {
           travarMovimentoAir: true,
           tipoSomImpacto: "heavy",
@@ -757,7 +757,7 @@ this.nomePersonagem = "Ken";
         cooldown: 2000,
         logica: Hadouken,
         som: "hadouken",
-        volumeSom: 0.4,
+        volumeSom: 0.28,
         propriedades: {
           travarMovimentoAir: true,
           tipoSomImpacto: "heavy",
@@ -773,7 +773,7 @@ this.nomePersonagem = "Ken";
         cooldown: 2200,
         logica: Shoryuken,
         som: "shoryuken",
-        volumeSom: 0.4,
+        volumeSom: 0.28,
         propriedades: {
           travarMovimentoAir: true,
           tipoSomImpacto: "heavy",
@@ -789,7 +789,7 @@ this.nomePersonagem = "Ken";
         cooldown: 1800,
         logica: Tatsumaki,
         som: "tatsumaki",
-        volumeSom: 0.4,
+        volumeSom: 0.28,
         propriedades: {
           travarMovimentoAir: true,
           tipoSomImpacto: "heavy",

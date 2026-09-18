@@ -1,21 +1,18 @@
 export function criarHudPartida(jogador, personagem, x, y, ladoDireito) {
-    // Todos os retratos ocupam a mesma largura e ficam alinhados pela base.
-    // A altura vem da proporção original para não esticar imagens diferentes.
+    // Os retratos usam a mesma arte-base de 800x650 da barra de ult.
     const larguraRetrato = 440;
-    const alturaBaseRetrato = 358;
+    const alturaRetrato = larguraRetrato * (650 / 800);
     const retratoPorPersonagem = {
       SpiderMan: "Sp_portrait",
       Miku: "Miku_portrait",
       Ken: "Ken_portrait",
+      FJ: "FJ_portrait"
     };
     const hud = this.add.container(x, y).setScrollFactor(0).setDepth(1000);
     const chaveRetrato = retratoPorPersonagem[personagem];
 
     if (chaveRetrato) {
-      const frameRetrato = this.textures.get(chaveRetrato).getSourceImage();
-      const alturaRetrato = larguraRetrato * (frameRetrato.height / frameRetrato.width);
-      const ajusteY = alturaBaseRetrato - alturaRetrato;
-      const retrato = this.add.image(0, ajusteY, chaveRetrato)
+      const retrato = this.add.image(0, 0, chaveRetrato)
         .setOrigin(ladoDireito ? 1 : 0, 0)
         .setDisplaySize(larguraRetrato, alturaRetrato);
       hud.add(retrato);

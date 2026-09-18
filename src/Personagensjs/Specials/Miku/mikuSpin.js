@@ -61,7 +61,7 @@ export default class MikuSpin {
   iniciarSom() {
     if (!this.scene.cache.audio.exists("RollingGirl")) return;
     this.somRolagem = this.scene.sound.add("RollingGirl", {
-      volume: 0.55,
+      volume: 0.33,
       loop: true,
     });
     this.somRolagem.play();

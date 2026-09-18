@@ -78,6 +78,11 @@ export default class WebShot {
     }
   }
 
+  cancelar() {
+    // Interrompe apenas a preparacao; teias ja disparadas continuam em jogo.
+    if (!this.projetil) this.finalizarProjetil();
+  }
+
   finalizarProjetil() {
     if (this.encerrado) return;
     this.encerrado = true;

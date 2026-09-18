@@ -26,6 +26,7 @@ export default class AirWebShot extends WebShot {
   }
 
   cancelar() {
+    super.cancelar();
     // O disparo continua vivo depois da pose; somente a inclinacao e restaurada.
     if (this.anguloOriginal !== null && this.personagem.sprite?.active) {
       this.personagem.sprite.setAngle(this.anguloOriginal);

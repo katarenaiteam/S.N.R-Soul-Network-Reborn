@@ -57,9 +57,7 @@ export default class cenaPrincipal extends Phaser.Scene {
     // --- CONTROLE DE VIDAS ---
     this.vidasP1 = 3;
     this.vidasP2 = 3;
-    //musiquinha e vida nerrr
-    //this.musica = this.sound.add('ClockTower', { loop: true, volume: 0.1 });
-    //this.musica.play();
+
 
     // --- PLATAFORMAS ESTÁTICAS ---
     this.plataformas = this.physics.add.staticGroup();
@@ -319,6 +317,7 @@ this.indicadorP2 = this.criarIndicador(
 
   processarQueda(jogador, pontoRespawn, numJogador) {
     if (!this.mortesVS.iniciar(jogador, pontoRespawn, numJogador)) return;
+    jogador.ganharCargaUltPorMorte();
     // Desconta a vida do jogador correspondente
     if (numJogador === 1) {
       this.vidasP1--;
@@ -338,6 +337,7 @@ this.indicadorP2 = this.criarIndicador(
     jogador.comboHitsRecebidos = 0;
     jogador.tempoUltimoHit = -Infinity;
     jogador.maquinaEstados.mudarEstado("idle");
+    jogador.estadoInvencible.entrar(5000);
     jogador.sincronizarHurtbox();
 
     if (jogador.porcentagemDano !== undefined) {

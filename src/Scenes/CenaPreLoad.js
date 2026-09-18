@@ -114,7 +114,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("th-icon", "/assets/Menus/Char_menu/Sprites/icons/th-icon.png");
     this.load.image("pingu-icon", "/assets/Menus/Char_menu/Sprites/icons/pingu-icon.png");
 
-
+    this.load.image("space-to", "/assets/Menus/Char_menu/Sprites/space-to.png");
 
     // --- hud ---
     //ind
@@ -128,6 +128,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("Sp_portrait", "assets/Hud/Portrait/Sp_portrait.png");
     this.load.image("Miku_portrait", "assets/Hud/Portrait/Miku_portrait.png");
     this.load.image("Ken_portrait", "assets/Hud/Portrait/Ken_portrait.png");
+    this.load.image("FJ_portrait", "assets/Hud/Portrait/FJ_portrait.png");
     //porcentagem
     this.load.image("0.png", "assets/Hud/DamagePercentage/0-19_/0.png");
     this.load.image("1.png", "assets/Hud/DamagePercentage/0-19_/1.png");
@@ -409,6 +410,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.audio("ken-damaged1", "assets/personagens/Ken/Audio/ken-damaged1.mp3");
     this.load.audio("ken-damaged2", "assets/personagens/Ken/Audio/ken-damaged2.mp3");
     this.load.audio("ken-damaged3", "assets/personagens/Ken/Audio/ken-damaged3.mp3");
+    this.load.audio("ken-ult", "assets/personagens/Ken/Audio/ken-ult.mp3");
     //specials
     this.load.spritesheet("Ken_neSpecial", "assets/personagens/Ken/Sprites/Ken_neSpecial.png", { frameWidth: 135, frameHeight: 108 });
     this.load.spritesheet("hadouken1", "assets/personagens/Ken/Sprites/hadouken1.png", { frameWidth: 88, frameHeight: 54 });

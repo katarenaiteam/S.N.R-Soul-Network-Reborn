@@ -163,6 +163,7 @@ export default class SpiderUlt {
       const distY = Math.abs(this.personagem.sprite.y - this.oponente.sprite.y);
 
       if (distX < 50 && distY < 60) {
+        this.personagem.estadoInvencible?.aoAcertarAtaque();
         this.conectou = true;
         this.emAvanço = false;
         this.iniciarComboCinematico();

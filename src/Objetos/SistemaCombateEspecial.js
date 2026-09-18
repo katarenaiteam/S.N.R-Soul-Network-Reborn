@@ -94,7 +94,10 @@ export function registrarAtaqueEspecial(logica, objeto, opcoes = {}) {
             limitesHurtbox,
           );
         });
-        if (atingiu && !entrada.encerrado) entrada.aoAtingirAlvo(alvo, objeto);
+        if (atingiu && !entrada.encerrado) {
+          entrada.dono.estadoInvencible?.aoAcertarAtaque();
+          entrada.aoAtingirAlvo(alvo, objeto);
+        }
       });
     };
     scene.events.on("postupdate", entrada.verificarAlvos);

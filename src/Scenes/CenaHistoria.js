@@ -294,6 +294,7 @@ this.indicadorCPU = this.criarIndicador(
     jogador.processandoQueda = true;
     this[entrada.vidas] = Math.max(0, this[entrada.vidas] - 1);
     jogador.vidas = this[entrada.vidas];
+    jogador.ganharCargaUltPorMorte();
     entrada.textoVidas.setText(entrada.rotulo + (jogador.vidas ? ' - VIDAS: ' + jogador.vidas : ' - ELIMINADO'));
     this.limparAcao(jogador);
     if (jogador.vidas === 0) {
@@ -316,6 +317,7 @@ this.indicadorCPU = this.criarIndicador(
   }
 
   limparAcao(jogador) {
+    jogador.estadoInvencible.sair(false);
     // Sair do estado cancela hitboxes, grabs, dash e a cinematica da ult.
     jogador.maquinaEstados.mudarEstado('idle');
     for (const logica of [...jogador.logicasEspeciaisAtivas]) logica.cancelar?.();
@@ -353,6 +355,7 @@ this.indicadorCPU = this.criarIndicador(
     jogador.ultimoImpacto = null;
     jogador.porcentagemDano = 0;
     jogador.textoDano?.setText(0);
+    jogador.estadoInvencible.entrar(5000);
     jogador.sincronizarHurtbox();
     if (this.overlayMorte) {
       this.overlayMorte.setVisible(true).play('TVefect');

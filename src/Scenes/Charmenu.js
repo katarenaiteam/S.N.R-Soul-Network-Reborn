@@ -206,7 +206,7 @@ const PERSONAGENS = [
 
 const VELOCIDADE_MAO = 900;
 const ESCALA_MAO = 0.22;
-const ESCALA_FICHA = 0.14;
+const ESCALA_FICHA = 0.17;
 
 export default class Charmenu extends Phaser.Scene {
   constructor() {
@@ -238,6 +238,12 @@ export default class Charmenu extends Phaser.Scene {
     this.criarIcons();
     this.criarControles();
     this.criarJogadores();
+
+    this.avisoAvancar = this.add
+      .image(this.scale.width / 2, this.scale.height / 2, "space-to")
+      .setDisplaySize(this.scale.width, this.scale.height)
+      .setDepth(70)
+      .setVisible(false);
 
     this.teclaAvancar = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
@@ -433,7 +439,10 @@ export default class Charmenu extends Phaser.Scene {
       this.atualizarJogador(this.p2, this.teclasP2, this.controleP2, delta);
     }
 
-    if (this.todosSelecionados() && this.apertouAvancar()) {
+    const todosSelecionados = this.todosSelecionados();
+    this.atualizarAvisoAvancar(todosSelecionados);
+
+    if (todosSelecionados && this.apertouAvancar()) {
       this.avancar();
     }
 
@@ -512,12 +521,18 @@ export default class Charmenu extends Phaser.Scene {
   // ============================================================
 
   atualizarHover(jogador) {
+    if (jogador.selecionado) return;
+
     const personagem = this.obterPersonagem(
       jogador.mao.x,
       jogador.mao.y
     );
 
-    if (!personagem) return;
+    if (!personagem) {
+      jogador.hover = null;
+      this.destruirBanner(jogador);
+      return;
+    }
 
     if (jogador.hover?.id === personagem.id) return;
 
@@ -741,11 +756,36 @@ export default class Charmenu extends Phaser.Scene {
       .setTexture(jogador.comFicha)
       .setScale(ESCALA_MAO)
       .setOrigin(0.18, 0.14);
+
+    this.atualizarHover(jogador);
   }
 
   // ============================================================
   // AVANÇAR
   // ============================================================
+
+  atualizarAvisoAvancar(visivel) {
+    const aviso = this.avisoAvancar;
+    if (aviso.visible === visivel) return;
+
+    this.tweens.killTweensOf(aviso);
+    aviso.setVisible(visivel);
+
+    if (!visivel) return;
+
+    aviso
+      .setAlpha(0)
+      .setDisplaySize(this.scale.width * 0.94, this.scale.height * 0.94);
+
+    this.tweens.add({
+      targets: aviso,
+      alpha: 1,
+      scaleX: this.scale.width / aviso.width,
+      scaleY: this.scale.height / aviso.height,
+      duration: 180,
+      ease: "Cubic.easeOut"
+    });
+  }
 
   todosSelecionados() {
     if (!this.p1?.selecionado) return false;

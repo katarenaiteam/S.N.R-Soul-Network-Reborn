@@ -13,10 +13,11 @@ export default class Hadouken {
     this.colisorCenario = null;
     this.overlaps = [];
     this.finalizando = false;
+    this.cancelado = false;
   }
 
   executar() {
-  if (this.projetil || this.timerCriacao) return;
+  if (this.cancelado || this.projetil || this.timerCriacao) return;
 
   if (
     this.special?.animacao === "ken_AneSpecial" &&
@@ -39,6 +40,7 @@ export default class Hadouken {
 }
 
   criarProjetil() {
+    if (this.cancelado || this.finalizando || this.projetil) return;
     const lutador = this.personagem?.sprite;
     if (!lutador?.active) return;
     const direcao = lutador.flipX ? -1 : 1;
@@ -157,6 +159,15 @@ export default class Hadouken {
     if (!lista) return;
     const indice = lista.indexOf(this);
     if (indice >= 0) lista.splice(indice, 1);
+  }
+
+  cancelar() {
+    // Depois do disparo, o projetil segue independente do estado do lutador.
+    if (this.projetil) return;
+    this.cancelado = true;
+    this.timerCriacao?.remove(false);
+    this.timerCriacao = null;
+    this.removerDaListaAtiva();
   }
 
   atualizar() {

@@ -747,9 +747,10 @@ export default class SpiderMan extends Personagem {
     this.specials = {
       neutro: {
         animacao: "spy_neSpecial",
+        chaveCooldown: "webshot_neutro",
         duracao: 700,
        // cancelavel: true,
-        cooldown: 2000,
+        cooldown: 1700,
         logica: WebShot,
 
          tempoProjetil: 5000,
@@ -791,9 +792,10 @@ export default class SpiderMan extends Personagem {
 
        air_neutro: {
         animacao: "spy_AneSpecial",
+        chaveCooldown: "webshot_neutro",
         disparoHorizontal: true,
         duracao: 300,
-        cooldown: 2000,
+        cooldown: 1700,
         logica: AirWebShot,
          tempoProjetil: 5000,
         // finalizarAoTocarChao: true,       
@@ -813,7 +815,7 @@ export default class SpiderMan extends Personagem {
        air_agachado: {
         animacao: "spy_AdoSpecial",
         duracao: 300,
-        cooldown: 2000,
+        cooldown: 1600,
         logica: AirWebShot,
          tempoProjetil: 5000,
         // finalizarAoTocarChao: true,       

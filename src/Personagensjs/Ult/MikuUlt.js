@@ -324,7 +324,7 @@ restaurarMusicaFase() {
   this.somBeam = this.scene.sound.add(
     "miku-beam",
     {
-      volume: 0.85,
+      volume: 1.19,
       loop: false
     }
   );
@@ -829,6 +829,8 @@ if (agora < bloqueadoAte) {
 
 
   hitPequeno(alvo) {
+    if (alvo.invulneravel) return;
+    this.personagem.estadoInvencible?.aoAcertarAtaque();
     this.criarSparklesNoAlvo(alvo);
     const ang = this.rotacaoRaio();
 
@@ -924,7 +926,7 @@ if (agora < bloqueadoAte) {
 
     for (const alvo of this.obterAlvos()) {
 
-      if (!this.alvoNoRaio(alvo, 1.7)) {
+      if (alvo.invulneravel || !this.alvoNoRaio(alvo, 1.7)) {
         continue;
       }
 
@@ -945,6 +947,7 @@ if (agora < bloqueadoAte) {
     this.scene.time.now + 700
   );
 
+      this.personagem.estadoInvencible?.aoAcertarAtaque();
       alvo.receberDano(
         RAIO.danoFinal,
 
@@ -1063,7 +1066,7 @@ if (agora < bloqueadoAte) {
       this.scene.sound.add(
         "miku-beam",
         {
-          volume: 0.85,
+          volume: 1.19,
           loop: true
         }
       );

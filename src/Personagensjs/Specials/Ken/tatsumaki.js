@@ -88,12 +88,11 @@ export default class Tatsumaki {
       frameAtual >= frameInicioMovimento &&
       frameAtual <= FRAME_FIM_MOVIMENTO;
 
-    if (this.ehAereo && this.movimentoAtivo && !this.gravidadeAnulada) {
+    if (this.movimentoAtivo && !this.gravidadeAnulada) {
       this.gravidadeAnulada = true;
       this.personagem.sprite.body.setAllowGravity(false);
       this.personagem.sprite.body.setVelocityY(0);
     } else if (
-      this.ehAereo &&
       !this.movimentoAtivo &&
       this.gravidadeAnulada
     ) {
