@@ -1097,7 +1097,7 @@ if (!scene.anims.exists("punch_effect3")) {
 
     scene.anims.create({
       key: "fj_dano",
-      frames: scene.anims.generateFrameNumbers("FJ_hurt", {
+      frames: scene.anims.generateFrameNumbers("FJ_Hurt", {
         start: 0,
         end: 1,
       }),

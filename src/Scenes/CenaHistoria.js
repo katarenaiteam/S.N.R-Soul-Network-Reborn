@@ -74,14 +74,15 @@ export default class CenaHistoria extends Phaser.Scene {
     // Teclas P2
     if (this.numPlayers === 2 && this.escolhaP2) {
       const teclasP2 = this.input.keyboard.addKeys({
-        esquerda: Phaser.Input.Keyboard.KeyCodes.J,
-        direita: Phaser.Input.Keyboard.KeyCodes.L,
-        cima: Phaser.Input.Keyboard.KeyCodes.I,
-        baixo: Phaser.Input.Keyboard.KeyCodes.K,
-        dash: Phaser.Input.Keyboard.KeyCodes.SHIFT,
-        atack: Phaser.Input.Keyboard.KeyCodes.H,
-        special: Phaser.Input.Keyboard.KeyCodes.P,
-        guard: Phaser.Input.Keyboard.KeyCodes.O,
+        esquerda: Phaser.Input.Keyboard.KeyCodes.LEFT,
+      direita: Phaser.Input.Keyboard.KeyCodes.RIGHT,
+      cima: Phaser.Input.Keyboard.KeyCodes.UP,
+      baixo: Phaser.Input.Keyboard.KeyCodes.DOWN,
+      dash: Phaser.Input.Keyboard.KeyCodes.NUMPAD_ZERO,
+      atack: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FOUR,
+      special: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FIVE,
+      guard: Phaser.Input.Keyboard.KeyCodes.NUMPAD_SIX,
+      taunt: Phaser.Input.Keyboard.KeyCodes.NUMPAD_EIGHT,
       });
       const controleP2 = new ControleEntrada(this, teclasP2, 1);
 
