@@ -623,16 +623,6 @@ this.vfxAtaqueNormal = {
           },
         ],
 
-        movimento: {
-         inicio: 10,
-         fim: 500,
-       y: {
-         de: -400,
-         para: -150,
-        },
-
-        curva: "easeIn",
-       },
 
         propriedades: {
           tipoSomImpacto: "heavy",

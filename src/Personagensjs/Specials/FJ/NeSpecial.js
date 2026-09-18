@@ -49,6 +49,12 @@ export default class NeSpecial {
     if (indice === 1 && !this.liberado && this.personagem.inputDown("special")) {
       this.inicioCarga = this.scene.time.now;
       this.efeitoCarga = this.personagem.vfx?.tocar("npose", { loop: true });
+      this.efeitoCarga?.preFX?.addColorMatrix().set([
+        4, 0, 0, 0, 0,
+        0, 4, 0, 0, 0,
+        0, 0, 4, 0, 0,
+        0, 0, 0, 3, 0,
+      ]);
       this.efeitoCarga?.play({ key: "fj_npose", repeat: -1 });
       this.personagem.sprite.anims.pause();
     }

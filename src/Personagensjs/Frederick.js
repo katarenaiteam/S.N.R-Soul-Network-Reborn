@@ -38,8 +38,10 @@ export default class FJ extends Personagem {
   npose: {
     textura: "npose",
     animacao: "fj_npose",
-    escala: 0.45,
-    offsetY: -75,
+    escalaX: 0.45,
+    escalaY: 0.30,
+    offsetX: -40,
+    offsetY: -63,
     seguir: true,
     blendMode: "ADD",
     depthOffset: 2,
@@ -344,21 +346,29 @@ this.nomePersonagem = "Frederick Johnson";
       },
 
       sideAir: {
-        largura: 85,
-        altura: 120,
-        offsetX: 25,
-        offsetY: -11,
-        escala: 1,
-        hurtboxes: [{ largura: 55, altura: 80, offsetX: -20, offsetY: -65 }],
+        largura: 250,
+        altura: 400,
+        offsetX: 145,
+        offsetY: -30,
+        escala: 0.33,
+        hurtboxes: [
+           { largura: 40, altura: 43, offsetX: 26, offsetY: -105 },
+          { largura: 46, altura: 25, offsetX: 32, offsetY: -72 },
+          { largura: 18, altura: 40, offsetX: 20, offsetY: -30 },
+        ],
       },
 
       upAir: {  
-        largura: 85,
-        altura: 120,
-        offsetX: 19,
-        offsetY: -5,
-        escala: 1,
-        hurtboxes: [{ largura: 45, altura: 80, offsetX: -20, offsetY: -70 }],
+        largura: 250,
+        altura: 400,
+        offsetX: 113,
+        offsetY: 134,
+        escala: 0.33,
+        hurtboxes: [
+           { largura: 40, altura: 43, offsetX: 26, offsetY: -105 },
+          { largura: 46, altura: 25, offsetX: 32, offsetY: -72 },
+          { largura: 18, altura: 40, offsetX: 20, offsetY: -30 },
+        ],
       },
 
       downAir: {
@@ -736,6 +746,71 @@ this.nomePersonagem = "Frederick Johnson";
           knockbackY: -470,
           tumbling: false,
           knockbackFixo: true,
+        },
+      },
+
+      air_cima: {
+        animacao: "fj_upAir",
+        frameHitbox: 3,
+        offsetX: 58,
+        offsetY: -97,
+        largura: 65,
+        altura: 25,
+        cooldown: 400,
+        duracao: 500,
+         finalizarAoTocarChao: true,
+        atrasoFinalizacaoChao: 30,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+        propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 9,
+          knockbackX: 120,
+          knockbackY: -470,
+          tumbling: true,
+          knockbackFixo: false,
+        },
+      },
+
+      air_side: {
+        animacao: "fj_sideAir",
+        frameHitbox: 4,
+        offsetX: 50,
+        offsetY: -57,
+        largura: 55,
+        altura: 25,
+        cooldown: 650,
+        duracao: 450,
+         finalizarAoTocarChao: true,
+        atrasoFinalizacaoChao: 30,
+
+         vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
+           ],
+          },
+        ],
+
+        movimento: {
+        inicio: 30,
+        fim: 400,
+         x: {
+         de: 500,
+         para: 350,
+        },
+
+        curva: "easeOut",
+       },
+
+        propriedades: {
+          anularGravidade: true,
+          tipoSomImpacto: "heavy",
+          dano: 9,
+          knockbackX: 120,
+          knockbackY: -470,
+          tumbling: true,
+          knockbackFixo: false,
         },
       },
 
@@ -1151,19 +1226,19 @@ scene.anims.create({
       repeat: 0,
     });
      scene.anims.create({
-      key: "ken_upAir",
-      frames: scene.anims.generateFrameNumbers("Ken_upAir", {
+      key: "fj_upAir",
+      frames: scene.anims.generateFrameNumbers("FJ_airup", {
         start: 0,
-        end: 5,
+        end: 9,
       }),
-      frameRate: 12,
+      frameRate: 16,
       repeat: 0,
     });
      scene.anims.create({
-      key: "ken_sideAir",
-      frames: scene.anims.generateFrameNumbers("Ken_sideAir", {
+      key: "fj_sideAir",
+      frames: scene.anims.generateFrameNumbers("FJ_airside", {
         start: 0,
-        end: 7,
+        end: 9,
       }),
       frameRate: 12,
       repeat: 0,

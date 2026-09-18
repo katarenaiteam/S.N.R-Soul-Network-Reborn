@@ -731,17 +731,6 @@ export default class SpiderMan extends Personagem {
         atrasoFinalizacaoChao: 100,
         finalizarAoAcertarOponente: false,
 
-        movimento: {
-    inicio: 0,
-    fim: 300,
-
-    y: {
-      de: -350,
-      para: -200,
-    },
-
-    curva: "easeOut",
-  },
 
         propriedades: {
           tipoSomImpacto: "heavy",
