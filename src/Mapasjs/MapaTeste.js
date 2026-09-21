@@ -27,8 +27,8 @@ export default class MapaTeste {
         };
 
         this.spawnsIniciais = {
-            p1: { x: 900, y: 850 },
-            p2: { x: 1450, y: 850 }
+            p1: { x: 900, y: 1024 },
+            p2: { x: 1450, y: 1024 }
         };
 
         this.spawnsRespawn = {
@@ -38,6 +38,16 @@ export default class MapaTeste {
 
         this.plataformas = scene.physics.add.staticGroup();
         this.criarPlataformas();
+        this.areasLedge = [
+            { x: 66, y: 270, largura: 40, altura: 60, direcao: 1 },
+            { x: 218, y: 270, largura: 40, altura: 60, direcao: -1 },
+            { x: 66, y: 950, largura: 40, altura: 60, direcao: 1 },
+            { x: 1744, y: 1034, largura: 40, altura: 60, direcao: -1 },
+            { x: 1818, y: 641, largura: 40, altura: 60, direcao: 1 },
+            { x: 2438, y: 641, largura: 40, altura: 60, direcao: -1 },
+            { x: 1799, y: 114, largura: 40, altura: 60, direcao: 1 },
+            { x: 2431, y: 114, largura: 40, altura: 60, direcao: -1 }
+        ];
 
         if (!scene.anims.exists("tocarFundoTeste")) {
             scene.anims.create({

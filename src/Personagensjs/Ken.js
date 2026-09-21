@@ -402,6 +402,11 @@ this.nomePersonagem = "Ken";
       },
     };
 
+    // Frame de intro 92x108; idle 78x111, ambos ancorados pelos pes.
+    this.configAnimacoes.intro = {
+      ...this.configAnimacoes.idle, offsetX: 7, offsetY: -13,
+    };
+
     this.sons = {
       ...this.sons,
       vozAtaque: ["ken-punch1", "ken-punch1", "ken-punch2", "ken-punch3", "ken-punch4"],
@@ -876,6 +881,17 @@ if (!scene.anims.exists("punch_effect3")) {
       }),
       frameRate: 12,
       repeat: -1,
+    });
+
+
+     scene.anims.create({
+      key: "ken_intro",
+      frames: scene.anims.generateFrameNumbers("Ken_intro", {
+        start: 0,
+        end: 11,
+      }),
+      frameRate: 12,
+      repeat: 0,
     });
 
     scene.anims.create({

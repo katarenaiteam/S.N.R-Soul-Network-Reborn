@@ -35,8 +35,8 @@ export default class SkyTowers {
 
         // 3. SPAWNS INICIAIS (Em cima das plataformas centralizadas)
         this.spawnsIniciais = {
-            p1: { x: 1000, y: 750 },
-            p2: { x: 1600, y: 750 }
+            p1: { x: 1000, y: 900 },
+            p2: { x: 1600, y: 900 }
         };
 
         this.spawnsRespawn = {
@@ -46,6 +46,14 @@ export default class SkyTowers {
 
         this.plataformas = scene.physics.add.staticGroup();
         this.criarPlataformas();
+        this.areasLedge = [
+            { x: 867, y: 920, largura: 40, altura: 20, direcao: 1 },
+            { x: 1733, y: 920, largura: 40, altura: 20, direcao: -1 },
+            
+            { x: 2360, y: 670, largura: 40, altura: 20, direcao: -1 },
+            { x: 290, y: 670, largura: 40, altura: 20, direcao: 1 },
+           
+        ];
 
         
 

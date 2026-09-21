@@ -144,7 +144,7 @@ const PERSONAGENS = [
   },
 
   {
-    id: "Slender",
+    id: "Slenderman",
     icon: "slender-icon",
     banner: "Slen_baner",
 

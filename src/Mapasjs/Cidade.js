@@ -35,8 +35,8 @@ export default class Cidade {
 
         // 3. SPAWNS INICIAIS E RESPAWNS
         this.spawnsIniciais = {
-            p1: { x: 1000, y: 750 },
-            p2: { x: 1600, y: 750 }
+            p1: { x: 1000, y: 870 },
+            p2: { x: 1600, y: 870 }
         };
 
         this.spawnsRespawn = {
@@ -46,6 +46,13 @@ export default class Cidade {
 
         this.plataformas = scene.physics.add.staticGroup();
         this.criarPlataformas();
+        // Areas de recuperacao: centro x/y, largura e altura em pixels.
+        this.areasLedge = [
+            { x: 860, y: 915, largura: 30, altura: 35, direcao: 1 },
+            { x: 1740, y: 910, largura: 30, altura: 35, direcao: -1 },
+            { x: 2045, y: 640, largura: 40, altura: 50, direcao: -1 },
+            { x: 555, y: 500, largura: 40, altura: 50, direcao: 1 },
+        ];
 
         // 4. ANIMAÇÃO DE FUNDO
         if (!this.scene.anims.exists("tocarFundoCidade")) {

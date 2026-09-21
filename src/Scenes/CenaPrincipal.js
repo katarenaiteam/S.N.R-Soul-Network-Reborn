@@ -9,8 +9,11 @@ import FJ from "../Personagensjs/Frederick.js";
 import SpiderMan from "../Personagensjs/SpiderMan.js";
 import Miku from "../Personagensjs/Miku.js";
 import Ken from "../Personagensjs/Ken.js";
+import Slenderman from "../Personagensjs/Slender.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import SistemaPlataformasAtravessaveis from "../Objetos/SistemaPlataformasAtravessaveis.js";
+import SistemaLedge from "../Objetos/SistemaLedge.js";
+import IntroPartida from "../Objetos/IntroPartida.js";
 
 export default class cenaPrincipal extends Phaser.Scene {
   constructor() {
@@ -35,6 +38,8 @@ export default class cenaPrincipal extends Phaser.Scene {
     //criar o mapa que vou estar
     // 1. Instancia o mapa dinâmico trazido do init
    this.mapaAtual = new this.ClasseMapa(this);
+   this.sistemaLedge = new SistemaLedge(this.mapaAtual.areasLedge);
+   this.sistemaLedge.criarVisualizacao(this);
 
    // 2. Lê os limites e pontos de respawn do mapa instanciado
    this.limitesArena = this.mapaAtual.limitesArena;
@@ -209,6 +214,7 @@ this.indicadorP2 = this.criarIndicador(
 
     // Diga para a câmera de HUD mostrar SOMENTE o HUD e ignorar o jogo/cenário/personagens:
     this.camHUD.ignore([
+      this.sistemaLedge.visualizacao,
       this.mapaAtual.plataformas,
       ...this.sistemaPlataformasAtravessaveis.grupo.getChildren(),
       this.mapaAtual.imagemFundo,
@@ -221,6 +227,7 @@ this.indicadorP2 = this.criarIndicador(
     if (this.physics.config.debug || this.physics.world.drawDebug) {
       this.camHUD.ignore(this.physics.world.debugGraphic);
     }
+    this.introPartida = new IntroPartida(this);
   }
 
   criarHudPartida(...args) {
@@ -239,6 +246,8 @@ this.indicadorP2 = this.criarIndicador(
         return new Miku(this, x, y, teclas, minDano, maxDano, controle);
         case "Ken":
         return new Ken(this, x, y, teclas, minDano, maxDano, controle);
+        case "Slenderman":
+        return new Slenderman(this, x, y, teclas, minDano, maxDano, controle);
       default:
         return new Ken(this, x, y, teclas, minDano, maxDano, controle);
     }
@@ -250,6 +259,13 @@ this.indicadorP2 = this.criarIndicador(
 
   // 3. LOOP DE ATUALIZAÇÃO
   update(time, delta) {
+    if (this.introPartida?.ativa) {
+      this.introPartida.atualizar(delta);
+      return;
+    }
+    this.sistemaLedge.atualizarVisualizacao(this);
+    this.sistemaLedge.atualizar(this.jogador1);
+    this.sistemaLedge.atualizar(this.jogador2);
 
       if (this.jogador1 && !this.jogador1.emMorteVS) {
     this.jogador1.atualizarCargaUlt(delta);

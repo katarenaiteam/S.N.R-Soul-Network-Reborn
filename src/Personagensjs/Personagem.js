@@ -604,7 +604,7 @@ consumirUlt() {
   // --- MÉTODOS DE SUPORTE AO UPDATE ---
 
   // Pega a config atual baseada na animação tocando
-  aplicarSquashPouso() {
+  aplicarSquashPouso(intensidade = 1) {
     const sprite = this.sprite;
     if (!sprite?.active || this.maquinaEstados?.estadoAtual?.nome === "dead") return;
 
@@ -618,8 +618,8 @@ consumirUlt() {
 
     this.tweenSquashPouso = this.scene.tweens.add({
       targets: sprite,
-      scaleX: escalaXOriginal * 1.035,
-      scaleY: escalaYOriginal * 0.94,
+      scaleX: escalaXOriginal * (1 + 0.035 * intensidade),
+      scaleY: escalaYOriginal * (1 - 0.06 * intensidade),
       duration: 65,
       ease: "Quad.easeOut",
       yoyo: true,

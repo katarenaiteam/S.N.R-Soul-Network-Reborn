@@ -8,6 +8,11 @@ import {
 import { tocarSomSeguro } from "../../../Objetos/AudioSeguro.js";
 
 export default class MikuPuppet {
+  static obterCarga(personagem) {
+    const restante = (cooldownsPuppet.get(personagem) ?? 0) - personagem.scene.time.now;
+    return Math.max(0, Math.min(1, 1 - restante / MikuPuppet.COOLDOWN_REINVOCACAO));
+  }
+
   constructor(personagem, special, estado) {
     this.personagem = personagem;
     this.scene = personagem.scene;
@@ -534,9 +539,9 @@ export default class MikuPuppet {
   }
 }
 
-MikuPuppet.COOLDOWN_REINVOCACAO = 30000;
+MikuPuppet.COOLDOWN_REINVOCACAO = 20000;
 MikuPuppet.TEMPO_DE_VIDA = 40000;
-MikuPuppet.VIDA_MAXIMA = 15;
+MikuPuppet.VIDA_MAXIMA = 25;
 MikuPuppet.VELOCIDADE_ATAQUE = 190;
 MikuPuppet.VELOCIDADE_DURANTE_ATAQUE = 150;
 MikuPuppet.VELOCIDADE_SUPORTE = 175;

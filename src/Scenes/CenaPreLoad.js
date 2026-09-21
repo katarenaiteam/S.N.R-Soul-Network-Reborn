@@ -115,6 +115,12 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("pingu-icon", "/assets/Menus/Char_menu/Sprites/icons/pingu-icon.png");
 
     this.load.image("space-to", "/assets/Menus/Char_menu/Sprites/space-to.png");
+    
+    // --- start fight ---
+    this.load.audio("narrador-3-2-1", "assets/cenarios/Intro/narrador-3-2-1.mp3");
+    this.load.audio("narrador-fight", "assets/cenarios/Intro/narrador-fight.mp3");
+    this.load.spritesheet("Fight", "assets/cenarios/Intro/Fight.png", { frameWidth: 105, frameHeight: 33 });
+
 
     // --- hud ---
     //ind
@@ -212,6 +218,7 @@ export default class CenaPreload extends Phaser.Scene {
    
     // --- Homem Aranha ---
     //base
+    this.load.spritesheet("SpiderMan_intro", "assets/personagens/SpiderMan/Sprites/SpiderMan_intro.png", { frameWidth: 126, frameHeight: 134 });
     this.load.spritesheet("SpiderMan_idle", "assets/personagens/SpiderMan/Sprites/SpiderMan_idle.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_walk", "assets/personagens/SpiderMan/Sprites/SpiderMan_walk.png", { frameWidth: 200, frameHeight: 200 });
     this.load.spritesheet("SpiderMan_jump", "assets/personagens/SpiderMan/Sprites/SpiderMan_jump.png", { frameWidth: 200, frameHeight: 200 });
@@ -378,6 +385,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     
     // --- Ken ---
     //base
+    this.load.spritesheet("Ken_intro", "assets/personagens/Ken/Sprites/Ken_intro.png", { frameWidth: 92, frameHeight: 108 });
     this.load.spritesheet("Ken_idle", "assets/personagens/Ken/Sprites/Ken_idle.png", { frameWidth: 78, frameHeight: 111 });
     this.load.spritesheet("Ken_jump", "assets/personagens/Ken/Sprites/Ken_jump.png", { frameWidth: 77, frameHeight: 131 });
     this.load.spritesheet("Ken_walk", "assets/personagens/Ken/Sprites/Ken_walk.png", { frameWidth: 112, frameHeight: 112 });
@@ -434,6 +442,30 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
      this.load.spritesheet("ken-pose3", "assets/personagens/Ken/Sprites/ult/ken-pose3.png", { frameWidth: 488, frameHeight: 95 });
      this.load.spritesheet("ken-launch", "assets/personagens/Ken/Sprites/ult/ken-launch.png", { frameWidth: 144, frameHeight: 60 });
 
+      // --- Slen ---
+    //base
+    this.load.spritesheet("Slan_intro", "assets/personagens/Slenderman/Sprites/Slan_intro.png", { frameWidth: 97, frameHeight: 263 });
+    this.load.spritesheet("Slan_idle", "assets/personagens/Slenderman/Sprites/Slan_idle.png", { frameWidth: 91, frameHeight: 124 });
+    this.load.spritesheet("Slan_jump", "assets/personagens/Slenderman/Sprites/Slan_jump.png", { frameWidth: 51, frameHeight: 124 });
+    this.load.spritesheet("Slan_walk", "assets/personagens/Slenderman/Sprites/Slan_walk.png", { frameWidth: 88, frameHeight: 118 });
+    this.load.spritesheet("Slan_crouch", "assets/personagens/Slenderman/Sprites/Slan_crouch.png", { frameWidth: 53, frameHeight: 78 });
+    this.load.spritesheet("Slan_dash", "assets/personagens/Slenderman/Sprites/Slan_dash.png", { frameWidth: 85, frameHeight: 124 });
+    this.load.spritesheet("Slan_guard", "assets/personagens/Slenderman/Sprites/Slan_guard.png", { frameWidth: 91, frameHeight: 124 });
+    this.load.spritesheet("Slan_taunt", "assets/personagens/Slenderman/Sprites/Slan_taunt.png", { frameWidth: 103, frameHeight: 122 });
+    this.load.spritesheet("Slan_stun", "assets/personagens/Slenderman/Sprites/Slan_stun.png", { frameWidth: 81, frameHeight: 111 });
+    this.load.spritesheet("Slan_hurt1", "assets/personagens/Slenderman/Sprites/Slan_hurt1.png", { frameWidth: 114, frameHeight: 109 });
+    this.load.spritesheet("Slan_hurt2", "assets/personagens/Slenderman/Sprites/Slan_hurt2.png", { frameWidth: 115, frameHeight: 114 });
+    this.load.spritesheet("Slan_dead", "assets/personagens/Slenderman/Sprites/Slan_dead.png", { frameWidth: 131, frameHeight: 52 });
+    this.load.spritesheet("Slan_getup", "assets/personagens/Slenderman/Sprites/Slan_getup.png", { frameWidth: 132, frameHeight: 108 });
+    //golpes
+    this.load.spritesheet("Slan_attack1", "assets/personagens/Slenderman/Sprites/Slan_attack1.png", { frameWidth: 125, frameHeight: 108 });
+    this.load.spritesheet("Slan_attack2", "assets/personagens/Slenderman/Sprites/Slan_attack2.png", { frameWidth: 109, frameHeight: 134 });
+    this.load.spritesheet("Slan_sideAtack", "assets/personagens/Slenderman/Sprites/Slan_sideAtack.png", { frameWidth: 128, frameHeight: 126 });
+    this.load.spritesheet("Slan_downAtack", "assets/personagens/Slenderman/Sprites/Slan_downAtack.png", { frameWidth: 100, frameHeight: 79 });
+    this.load.spritesheet("Slan_neutralAir", "assets/personagens/Slenderman/Sprites/Slan_neutralAir.png", { frameWidth: 111, frameHeight: 148 });
+    this.load.spritesheet("Slan_sideAir", "assets/personagens/Slenderman/Sprites/Slan_sideAir.png", { frameWidth: 96, frameHeight: 134 });
+    this.load.spritesheet("Slan_upAir", "assets/personagens/Slenderman/Sprites/Slan_upAir.png", { frameWidth: 84, frameHeight: 137 });
+    this.load.spritesheet("Slan_downAir", "assets/personagens/Slenderman/Sprites/Slan_downAir.png", { frameWidth: 129, frameHeight: 136 });
     // --- visual effects ---
     //
     

@@ -28,6 +28,28 @@ export function criarHudPartida(jogador, personagem, x, y, ladoDireito) {
     hud.barraUlt = barraUlt;
     hud.frameUltAtual = 0;
 
+    const habilidade = jogador.obterIndicadorHabilidade?.();
+    if (habilidade) {
+      // Sobrepoe o canto superior direito da porcentagem, atras dos numeros.
+      // As duas HUDs usam a mesma disposicao local, deslocada em 435 pixels.
+      const indicador = this.add.container(ladoDireito ? -35 : 400, 190)
+        .setScale(1.5);
+      const circulo = this.add.graphics();
+      const { x: rx, y: ry, largura, altura } = habilidade.recorte;
+      const icone = this.add.image(0, 0, habilidade.textura, 0);
+      const escala = 68 / largura;
+      // Centraliza somente o rosto recortado, sem redimensionar o sprite do jogo.
+      icone.setCrop(rx, ry, largura, altura).setScale(escala);
+      icone.setPosition(
+        (icone.width / 2 - rx - largura / 2) * escala,
+        (icone.height / 2 - ry - altura / 2) * escala,
+      );
+      indicador.add([circulo, icone]);
+      hud.add(indicador);
+      hud.indicadorHabilidade = { circulo, icone, carga: -1 };
+      atualizarIndicadorHabilidade(jogador, hud);
+    }
+
     hud.setText = (valor) => {
       const porcentagem = Math.max(0, Math.floor(Number.parseFloat(valor) || 0));
       if (hud.numero) hud.remove(hud.numero, true);
@@ -61,6 +83,7 @@ export function criarHudPartida(jogador, personagem, x, y, ladoDireito) {
 
 
 export function atualizarBarraUlt(jogador, hud) {
+  atualizarIndicadorHabilidade(jogador, hud);
   if (!jogador || !hud?.barraUlt) {
     return;
   }
@@ -86,5 +109,18 @@ export function atualizarBarraUlt(jogador, hud) {
   hud.frameUltAtual = frame;
 
   hud.barraUlt.setFrame(frame);
+}
+
+export function atualizarIndicadorHabilidade(jogador, hud) {
+  const indicador = hud?.indicadorHabilidade;
+  if (!indicador) return;
+  const habilidade = jogador.obterIndicadorHabilidade();
+  const carga = Math.max(0, Math.min(1, habilidade.carga));
+  if (indicador.carga === carga) return;
+  indicador.carga = carga;
+  const { circulo, icone } = indicador;
+  circulo.clear();
+  circulo.fillStyle(0x808080, 1).fillCircle(0, 0, 40);
+  icone.setAlpha(0.3 + 0.7 * carga);
 }
 

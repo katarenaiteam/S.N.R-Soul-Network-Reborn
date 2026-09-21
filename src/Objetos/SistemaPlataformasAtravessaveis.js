@@ -44,11 +44,20 @@ export default class SistemaPlataformasAtravessaveis {
         personagem.sprite.body.blocked.down &&
         this.estaSobrePlataforma(personagem)
       ) {
-        dados.ignorarAte = this.scene.time.now + 200;
-        personagem.sprite.setVelocityY(100);
-        personagem.maquinaEstados.mudarEstado("jump");
+        this.descer(personagem);
       }
     }
+  }
+
+  // A IA usa a mesma descida dos controles, sem simular um teclado fisico.
+  descer(personagem) {
+    const dados = this.jogadores.get(personagem);
+    if (!dados?.podeDescer || !personagem.sprite.body.blocked.down ||
+        !this.estaSobrePlataforma(personagem)) return false;
+    if (personagem.maquinaEstados.mudarEstado("jump") === false) return false;
+    dados.ignorarAte = this.scene.time.now + 200;
+    personagem.sprite.setVelocityY(100);
+    return true;
   }
 
   estaSobrePlataforma(personagem) {

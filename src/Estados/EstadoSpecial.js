@@ -82,6 +82,7 @@ export default class EstadoSpecial extends EstadoBase {
   }
 
   execute() {
+    if (this.logicaSpecial?.tentarCancelar?.()) return;
     const noChao = this.personagem.sprite.body.blocked.down;
     const agora = this.personagem.scene.time.now;
     const tempoDecorrido = agora - this.tempoInicio;

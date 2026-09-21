@@ -29,12 +29,14 @@ export default class EstadoInvencible {
   }
 
   aoAcertarAtaque() {
+    if (this.personagem.scene.time.now < (this.protecaoLedgeAte ?? 0)) return;
     this.sair();
   }
 
   sair(restaurarHurtboxes = true) {
     if (!this.ativo) return;
     this.ativo = false;
+    this.protecaoLedgeAte = 0;
     this.expiracao?.remove(false);
     this.expiracao = null;
     const { scene, sprite } = this.personagem;

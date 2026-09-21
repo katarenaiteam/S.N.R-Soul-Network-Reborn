@@ -4,6 +4,16 @@ export default class EstadoCrouch extends EstadoBase {
   enter(dados = {}) {
     this.personagem.sprite.setVelocityX(0);
     this.saindo = false;
+    this.ledgeAte = dados.ledge ? this.personagem.scene.time.now + 350 : 0;
+    this.ledgeVelocidadeX = dados.impulsoX ?? 0;
+
+    if (dados.ledge) {
+      // Usa a pose pronta: a transicao de abaixar pode durar mais que o ledge.
+      this.personagem.tocarAnimacao("crouch", true);
+      const anims = this.personagem.sprite.anims;
+      if (anims.currentAnim) anims.pause(anims.currentAnim.getLastFrame());
+      return;
+    }
 
     // Se veio do ataque agachado, vai direto pro último frame (agachado)
     if (dados?.vindoDeAtaque) {
@@ -22,7 +32,7 @@ export default class EstadoCrouch extends EstadoBase {
       this.personagem.sprite.once("animationcomplete", () => {
         if (
           this.personagem.maquinaEstados.estadoAtual === this &&
-          this.personagem.inputDown("baixo")
+          (this.personagem.inputDown("baixo") || this.ledgeAte > this.personagem.scene.time.now)
         ) {
           this.personagem.tocarAnimacao("crouch2");
         }
@@ -31,6 +41,17 @@ export default class EstadoCrouch extends EstadoBase {
   }
 
   execute() {
+    if (this.ledgeAte) {
+      if (this.personagem.scene.time.now < this.ledgeAte) {
+        // Reaplica o avanco se a parede bloquear X antes de superar o topo.
+        this.personagem.sprite.setVelocityX(this.ledgeVelocidadeX);
+        return;
+      }
+      this.personagem.maquinaEstados.mudarEstado(
+        this.personagem.sprite.body.blocked.down ? "idle" : "jump"
+      );
+      return;
+    }
     if (this.personagem.inputDown("esquerda")) {
       this.personagem.sprite.setFlipX(true);
     } else if (this.personagem.inputDown("direita")) {
@@ -113,6 +134,9 @@ export default class EstadoCrouch extends EstadoBase {
   }
 
   exit() {
+    if (this.ledgeAte) this.personagem.sprite.anims.resume();
+    this.ledgeAte = 0;
+    this.ledgeVelocidadeX = 0;
     this.saindo = false;
     this.personagem.sprite.off("animationcomplete");
   }

@@ -6,6 +6,14 @@ import AupSpecial from "./Specials/Miku/AupSpecial.js";
 import MikuUlt from "./Ult/MikuUlt.js";
 
 export default class Miku extends Personagem {
+  obterIndicadorHabilidade() {
+    return {
+      textura: "Miku_puppet",
+      recorte: { x: 20, y: 4, largura: 98, altura: 65 },
+      carga: MikuPuppet.obterCarga(this),
+    };
+  }
+
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
     // Garante que as animaÃ§Ãµes existam no Phaser ANTES de criar o Personagem e a FSM
 
@@ -345,6 +353,10 @@ this.vfxAtaqueNormal = {
       },
     };
    
+    this.configAnimacoes.intro = {
+      ...this.configAnimacoes.idle, offsetX: 155, offsetY: 34,
+    };
+
    this.sons = {
       ...this.sons,
       vozAtaque: ["sing1", "sing2", "sing3", "sing4", "sing5", "sing6", "sing7"],
@@ -922,6 +934,13 @@ if (!scene.anims.exists("punch_effect3")) {
         end: 1,
       }),
       frameRate: 4,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "miku_intro",
+      frames: scene.anims.generateFrameNumbers("Miku_taunt1", { start: 0, end: 28 }),
+      frameRate: 8,
       repeat: 0,
     });
 

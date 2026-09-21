@@ -22,6 +22,7 @@ export default class SpiderAupSpecial {
     this.timerFim = null;
     this.fase = "pose";
     this.finalizado = false;
+    this.comandosCancelamento = new Set();
   }
 
   executar() {
@@ -186,6 +187,7 @@ export default class SpiderAupSpecial {
           spriteAlvo.body.setVelocity(0, 0);
         }
         this.alvoPuxado = null;
+        this.fase = "puxou";
         this.tocarQuebra();
         this.agendarFinalizacao();
       },
@@ -233,6 +235,35 @@ export default class SpiderAupSpecial {
     }
   }
 
+  tentarCancelar() {
+    if (this.fase !== "puxando" && this.fase !== "puxou") return false;
+    const p = this.personagem;
+    for (const comando of ["atack", "cima", "special", "dash"]) {
+      if (p.inputJustDown(comando)) this.comandosCancelamento.add(comando);
+      else if (!p.inputDown(comando)) this.comandosCancelamento.delete(comando);
+    }
+    // Conclui o puxao antes de liberar a proxima acao.
+    if (this.fase !== "puxou") return false;
+
+    if (this.comandosCancelamento.has("dash") && p.podeDash && p.dashs < p.maxDash) {
+      return p.maquinaEstados.mudarEstado("dash");
+    }
+    // Special direcional tem prioridade sobre o pulo ao apertar cima + special.
+    if (this.comandosCancelamento.has("special")) {
+      const tipo = p.obterTipoSpecial();
+      if (p.podeUsarSpecial(tipo)) return p.maquinaEstados.mudarEstado("special", { tipo });
+    }
+    if (this.comandosCancelamento.has("atack")) {
+      const tipo = p.obterTipoAtaque();
+      if (p.podeUsarAtaque(tipo)) return p.maquinaEstados.mudarEstado("atack", { tipo });
+    }
+    if (this.comandosCancelamento.has("cima") && p.pulos < p.maxPulos) {
+      p.pular();
+      return true;
+    }
+    return false;
+  }
+
   ignorarNoHud(objeto) {
     const hud = this.scene.camHUD || this.scene.cameraHUD || this.scene.hudCamera;
     hud?.ignore?.(objeto);
@@ -256,6 +287,8 @@ export default class SpiderAupSpecial {
   }
 
   cancelar() {
+    this.fase = "cancelado";
+    this.comandosCancelamento.clear();
     this.timerDisparo?.remove(false);
     this.timerFim?.remove(false);
     this.timerDisparo = null;

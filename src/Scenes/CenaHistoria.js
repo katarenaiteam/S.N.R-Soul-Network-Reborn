@@ -10,7 +10,8 @@ import Ken from "../Personagensjs/Ken.js";
 import Miku from "../Personagensjs/Miku.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import BotController from "../Objetos/BotController.js";
-import Spider_IA from "../Objetos/Spider_IA.js";
+import Miku_IA from "../Objetos/Miku_IA.js";
+import SistemaLedge from "../Objetos/SistemaLedge.js";
 import SistemaPlataformasAtravessaveis from "../Objetos/SistemaPlataformasAtravessaveis.js";
 
 export default class CenaHistoria extends Phaser.Scene {
@@ -28,7 +29,7 @@ export default class CenaHistoria extends Phaser.Scene {
     this.escolhaP1 = dados.p1 || "Frederick";
     this.escolhaP2 = dados.p2 || (dados.numPlayers === 2 ? "Ken" : null);
     this.numPlayers = dados.numPlayers || 1;
-    this.inimigoNome = "SpiderMan"; // Primeiro Boss da Fase 1
+    this.inimigoNome = "Miku"; // Primeiro Boss da Fase 1
   }
 
   create() {
@@ -40,6 +41,8 @@ export default class CenaHistoria extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, 2600, 1400);
 
     this.mapaAtual = new SkyTowers(this);
+    this.sistemaLedge = new SistemaLedge(this.mapaAtual.areasLedge);
+    this.sistemaLedge.criarVisualizacao(this);
     this.limitesArena = this.mapaAtual.limitesArena;
     this.pontoRespawnP1 = this.mapaAtual.spawnsRespawn.p1;
     this.pontoRespawnP2 = this.mapaAtual.spawnsRespawn.p2;
@@ -101,11 +104,11 @@ export default class CenaHistoria extends Phaser.Scene {
 // // 1. Instancia o Controlador de Hardware da IA
     this.botIA = new BotController(this);
 
-    // 2. Cria a IA do Homem-Aranha passando o controller
-    this.spiderIA = new Spider_IA(this.botIA);
+    // 2. Cria a IA da Miku passando o controller
+    this.mikuIA = new Miku_IA(this.botIA);
 
     // 3. Conecta a IA (cérebro) ao Controlador
-    this.botIA.setCerebro(this.spiderIA);
+    this.botIA.setCerebro(this.mikuIA);
 
     // 4. Instancia o Boss passando as teclas virtuais do BotController
     this.boss = this.criarPersonagem(
@@ -127,7 +130,7 @@ export default class CenaHistoria extends Phaser.Scene {
      this.sistemaPlataformasAtravessaveis.registrar(this.jogador2);
     }
 
-   this.sistemaPlataformasAtravessaveis.registrar(this.boss, false);
+   this.sistemaPlataformasAtravessaveis.registrar(this.boss);
 
     this.participantes = [
       { jogador: this.jogador1, escolha: this.escolhaP1, vidas: 'vidasP1', spawn: this.pontoRespawnP1, rotulo: 'P1' },
@@ -189,6 +192,7 @@ export default class CenaHistoria extends Phaser.Scene {
     // Regra de Ouro: camJogo esconde a HUD, camHUD esconde o Jogo
     this.camJogo.ignore([this.containerHUD]);
     this.camHUD.ignore([
+      this.sistemaLedge.visualizacao,
       this.mapaAtual.plataformas, 
       ...this.sistemaPlataformasAtravessaveis.grupo.getChildren(),
       this.mapaAtual.imagemFundo, 
@@ -242,6 +246,8 @@ this.indicadorCPU = this.criarIndicador(
 
   update(time, delta) {
     if (this.partidaEncerrada) return;
+    this.sistemaLedge.atualizarVisualizacao(this);
+    for (const { jogador } of this.participantes) this.sistemaLedge.atualizar(jogador);
     // Processa a saida antes de executar comandos ou enquadrar a camera.
     for (const entrada of this.participantes) {
       this.verificarMorte(entrada.jogador, entrada.spawn);
