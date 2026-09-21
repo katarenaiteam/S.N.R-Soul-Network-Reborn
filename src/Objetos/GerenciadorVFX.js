@@ -2,30 +2,33 @@
 const VFX_GLOBAIS = {
   guard: {
     blendMode: "ADD",
+    camadas: 3,
     textura: "guard-efect",
     animacao: "guard-efect",
     escala: 130 / 499,
-    alpha: 0.65,
+    alpha: 1,
     seguir: true,
     offsetY: -60,
     depthOffset: 2,
   },
   midguard: {
     blendMode: "ADD",
+    camadas: 3,
     textura: "mid-guard",
     animacao: "mid-guard",
     escala: 130 / 632,
-    alpha: 0.65,
+    alpha: 1,
     seguir: true,
     offsetY: -60,
     depthOffset: 2,
   },
   brokeguard: {
     blendMode: "ADD",
+    camadas: 3,
     textura: "brokeguard-efect",
     animacao: "brokeguard-efect",
     escala: 130 / 616,
-    alpha: 0.65,
+    alpha: 1,
     seguir: true,
     offsetY: -60,
     depthOffset: 2,
@@ -188,6 +191,12 @@ export default class GerenciadorVFX {
       this.scene.time.delayedCall(config.duracao, () => {
         this.destruirEfeito(efeito);
       });
+    }
+
+    // Sobrepor as camadas aditivas reforca a luz mesmo com alpha no maximo.
+    for (let i = 1; i < (config.camadas ?? 1); i++) {
+      const camada = this.tocar(nome, { ...config, camadas: 1 });
+      efeito.once("destroy", () => this.destruirEfeito(camada));
     }
 
     return efeito;
