@@ -1,11 +1,6 @@
 import EstadoBase from "./EstadoBase.js";
 
 export default class EstadoGuard extends EstadoBase {
-  constructor(personagem) {
-    super(personagem);
-    this.esferaVisual = null;
-  }
-
   enter() {
     const agora = this.personagem.scene.time.now;
 
@@ -20,8 +15,6 @@ export default class EstadoGuard extends EstadoBase {
     this.personagem.tocarAnimacao("guard");
     this.personagem.sprite.setVelocityX(0);
 
-    // 3. Desenha o escudo visual
-    this.criarEsferaVisual();
   }
 
   execute() {
@@ -45,12 +38,6 @@ export default class EstadoGuard extends EstadoBase {
       );
     }
 
-    // D) Atualiza o tamanho e posição da esfera visual
-    this.atualizarEsferaVisual();
-  }
-
-  exit() {
-    this.destruirEsferaVisual();
   }
 
   sairParaEstadoPadrao() {
@@ -61,49 +48,4 @@ export default class EstadoGuard extends EstadoBase {
     }
   }
 
-  // --- ESFERA VISUAL QUE ENCOLHE COM DANO ---
-
-  criarEsferaVisual() {
-    this.destruirEsferaVisual();
-
-    const cena = this.personagem.scene;
-    this.esferaVisual = cena.add.graphics();
-
-    if (cena.camHUD) {
-      cena.camHUD.ignore(this.esferaVisual);
-    }
-
-    this.atualizarEsferaVisual();
-  }
-
-  atualizarEsferaVisual() {
-    if (!this.esferaVisual) return;
-
-    this.esferaVisual.clear();
-
-    // O raio encolhe dinamicamente conforme a vida restante da guarda
-    const proporcaoVida = Math.max(
-      0.15,
-      this.personagem.vidaGuard / this.personagem.guardMaximo
-    );
-    const raio = 45 * proporcaoVida;
-
-    this.esferaVisual.fillStyle(0x00ffff, 0.35); // Ciano semi-transparente
-    this.esferaVisual.lineStyle(2, 0xffffff, 0.8); // Borda branca
-    this.esferaVisual.fillCircle(0, 0, raio);
-    this.esferaVisual.strokeCircle(0, 0, raio);
-
-    this.esferaVisual.setPosition(
-      this.personagem.sprite.x,
-      this.personagem.sprite.y - 40
-    );
-    this.esferaVisual.setDepth(this.personagem.sprite.depth + 1);
-  }
-
-  destruirEsferaVisual() {
-    if (this.esferaVisual) {
-      this.esferaVisual.destroy();
-      this.esferaVisual = null;
-    }
-  }
 }

@@ -1,3 +1,4 @@
+import IntroPartida from "../Objetos/IntroPartida.js";
 import { criarIndicador, atualizarIndicador } from "../Objetos/IndicadorPersonagem.js";
 import { criarHudPartida, atualizarBarraUlt } from "../Objetos/HudPartida.js";
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
@@ -24,6 +25,7 @@ export default class CenaHistoria extends Phaser.Scene {
     this.jogador2 = null;
     this.boss = null;
     this.partidaEncerrada = false;
+    this.introPartida = null;
     this.ultEmAndamento = null;
     delete this.atualizarCamera;
     this.escolhaP1 = dados.p1 || "Frederick";
@@ -229,6 +231,12 @@ this.indicadorCPU = this.criarIndicador(
   "CPU-indV"
 );
 
+    this.introPartida = new IntroPartida(this, {
+      jogadores: [this.jogador1, this.boss],
+      participantes: this.participantes.map(({ jogador }) => jogador),
+      nomes: [this.escolhaP1, this.inimigoNome],
+      alvoLuta: () => this.calcularAlvoCamera(),
+    });
   }
 
   criarPersonagem(nome, x, y, teclas, minDano, maxDano, controle) {
@@ -246,6 +254,10 @@ this.indicadorCPU = this.criarIndicador(
 
   update(time, delta) {
     if (this.partidaEncerrada) return;
+    if (this.introPartida?.ativa) {
+      this.introPartida.atualizar(delta);
+      return;
+    }
     this.sistemaLedge.atualizarVisualizacao(this);
     for (const { jogador } of this.participantes) this.sistemaLedge.atualizar(jogador);
     // Processa a saida antes de executar comandos ou enquadrar a camera.
@@ -275,7 +287,7 @@ this.indicadorCPU = this.criarIndicador(
       this.verificarMorte(entrada.jogador, entrada.spawn);
       if (this.partidaEncerrada) return;
     }
-    this.atualizarCamera();
+    this.atualizarCamera(delta);
 
     this.atualizarIndicador(this.indicadorP1);
 
@@ -377,29 +389,52 @@ this.indicadorCPU = this.criarIndicador(
     return atualizarIndicador.call(this, indicador);
   }
 
-  atualizarCamera() {
+  calcularAlvoCamera() {
     const sprites = this.participantes
       .filter(({ jogador }) => !jogador.eliminado && jogador.sprite.active)
       .map(({ jogador }) => jogador.sprite);
-    if (!sprites.length) return;
+    if (!sprites.length) return null;
     const cam = this.camJogo;
     const config = this.mapaAtual.configCamera;
-    const lim = config.limites;
-    const minX = Math.min(...sprites.map(p => p.x)) - 130;
-    const maxX = Math.max(...sprites.map(p => p.x)) + 130;
-    const minY = Math.min(...sprites.map(p => p.y)) - 190;
-    const maxY = Math.max(...sprites.map(p => p.y)) + 90;
-    // O zoom pode abrir alem do minimo preferido para incluir os tres lutadores.
-    const zoomAlvo = Math.min(config.maxZoom ?? 2, cam.width / (maxX - minX), (cam.height * 0.76) / (maxY - minY));
-    const zoom = zoomAlvo < cam.zoom ? zoomAlvo : Phaser.Math.Linear(cam.zoom, zoomAlvo, 0.05);
-    cam.setZoom(zoom);
-    const metadeX = cam.width / zoom / 2;
-    const metadeY = cam.height / zoom / 2;
-    // Quando a visao e maior que o mapa, nao faz Clamp com limites invertidos.
-    const centroX = metadeX * 2 >= lim.largura ? lim.x + lim.largura / 2
-      : Phaser.Math.Clamp((minX + maxX) / 2, lim.x + metadeX, lim.x + lim.largura - metadeX);
-    const centroY = metadeY * 2 >= lim.altura ? lim.y + lim.altura / 2
-      : Phaser.Math.Clamp((minY + maxY) / 2, lim.y + metadeY, lim.y + lim.altura - metadeY);
-    cam.centerOn(centroX, centroY);
+    const minX = Math.min(...sprites.map(p => p.x));
+    const maxX = Math.max(...sprites.map(p => p.x));
+    const minY = Math.min(...sprites.map(p => p.y));
+    const maxY = Math.max(...sprites.map(p => p.y));
+    const distancia = Math.hypot(maxX - minX, maxY - minY);
+    const distMin = config.distMinima ?? 100;
+    const distMax = config.distMaxima ?? 1200;
+    const fator = Phaser.Math.Clamp((distancia - distMin) / Math.max(1, distMax - distMin), 0, 1);
+    const zoomDistancia = Phaser.Math.Linear(config.maxZoom ?? 2, config.minZoom ?? 1, fator);
+    // Mantem a curva do versus, abrindo mais quando necessario para o cooperativo.
+    const zoom = Math.min(zoomDistancia, cam.width / (maxX - minX + 260),
+      cam.height * 0.76 / (maxY - minY + 280));
+    return { ...this.limitarCentroCamera((minX + maxX) / 2, (minY + maxY) / 2, zoom), zoom };
+  }
+
+  limitarCentroCamera(x, y, zoom) {
+    const lim = this.mapaAtual.configCamera.limites;
+    const metadeX = this.camJogo.width / zoom / 2;
+    const metadeY = this.camJogo.height / zoom / 2;
+    return {
+      x: metadeX * 2 >= lim.largura ? lim.x + lim.largura / 2
+        : Phaser.Math.Clamp(x, lim.x + metadeX, lim.x + lim.largura - metadeX),
+      y: metadeY * 2 >= lim.altura ? lim.y + lim.altura / 2
+        : Phaser.Math.Clamp(y, lim.y + metadeY, lim.y + lim.altura - metadeY),
+    };
+  }
+
+  atualizarCamera(delta = 1000 / 60) {
+    const alvo = this.calcularAlvoCamera();
+    if (!alvo) return;
+    const cam = this.camJogo;
+    // Mesma suavidade do versus a 60 FPS, independente da taxa de quadros.
+    const quadros = Math.min(delta, 100) / (1000 / 60);
+    const suavidadeZoom = 1 - Math.pow(0.95, quadros);
+    const suavidadePosicao = 1 - Math.pow(0.9, quadros);
+    const zoom = Phaser.Math.Linear(cam.zoom, alvo.zoom, suavidadeZoom);
+    const centro = this.limitarCentroCamera(
+      Phaser.Math.Linear(cam.midPoint.x, alvo.x, suavidadePosicao),
+      Phaser.Math.Linear(cam.midPoint.y, alvo.y, suavidadePosicao), zoom);
+    cam.setZoom(zoom).centerOn(centro.x, centro.y);
   }
 }

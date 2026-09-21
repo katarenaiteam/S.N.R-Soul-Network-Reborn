@@ -7,14 +7,16 @@ const FIM_RETORNO = 0.84;
 
 // O retorno acontece no "1"; o Fight ja usa o enquadramento da luta.
 export default class IntroPartida {
-  constructor(scene) {
+  constructor(scene, opcoes = {}) {
     this.scene = scene;
     this.ativa = true;
     this.tempo = 0;
     this.etapa = -1;
     this.finaisAnimacao = new Map();
-    this.jogadores = [scene.jogador1, scene.jogador2];
-    this.nomes = [scene.escolhaP1, scene.escolhaP2];
+    this.jogadores = opcoes.jogadores ?? [scene.jogador1, scene.jogador2];
+    this.participantes = opcoes.participantes ?? this.jogadores;
+    this.nomes = opcoes.nomes ?? [scene.escolhaP1, scene.escolhaP2];
+    this.enquadramentoLuta = opcoes.alvoLuta;
     this.sons = ["narrador-3-2-1", "narrador-fight"].map(chave =>
       scene.cache.audio.exists(chave) ? scene.sound.add(chave) : null);
     this.duracaoContagem = (this.sons[0]?.duration || 3) * 1000;
@@ -29,9 +31,9 @@ export default class IntroPartida {
     this.limitarCamera = scene.camJogo.useBounds;
     scene.camJogo.useBounds = false;
     scene.physics.world.pause();
-    this.jogadores.forEach((jogador, i) => {
+    this.participantes.forEach((jogador) => {
       jogador.sprite.setVelocity(0, 0);
-      jogador.sprite.setFlipX(i === 1);
+      jogador.sprite.setFlipX(jogador === this.jogadores[1]);
       // O construtor base entra em idle antes de receber as configs da subclasse.
       // Aplicar explicitamente tambem inicializa quem ainda espera sua vez.
       jogador.aplicarConfiguracao("idle");
@@ -60,6 +62,7 @@ export default class IntroPartida {
   }
 
   alvoLuta() {
+    if (this.enquadramentoLuta) return this.enquadramentoLuta();
     const [a, b] = this.jogadores.map(j => j.sprite);
     const cfg = this.scene.mapaAtual.configCamera || {};
     const min = cfg.distMinima ?? 100;
@@ -149,7 +152,7 @@ export default class IntroPartida {
       if (this.tempo >= this.duracaoContagem && !som?.isPlaying) {
         this.fight = true;
         this.tempo = 0;
-        this.jogadores.forEach(j => this.voltarIdle(j));
+        this.participantes.forEach(j => this.voltarIdle(j));
         this.sons[1]?.play();
         this.visual.setTexture("Fight", 0).setDisplaySize(630, 198);
       }
@@ -160,13 +163,13 @@ export default class IntroPartida {
       if (progresso >= 1 && !som?.isPlaying) this.finalizar();
     }
     // A fisica esta pausada, mas os frames das animacoes continuam trocando.
-    if (this.ativa) this.jogadores.forEach(j => this.sincronizarCorpo(j));
+    if (this.ativa) this.participantes.forEach(j => this.sincronizarCorpo(j));
   }
 
   finalizar() {
     if (!this.ativa) return;
     this.focar(this.alvoLuta());
-    this.jogadores.forEach(j => {
+    this.participantes.forEach(j => {
       this.voltarIdle(j);
       j.controle?.atualizar();
       j.controle?.salvarAnterior();

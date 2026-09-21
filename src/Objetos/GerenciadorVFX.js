@@ -1,5 +1,35 @@
 
 const VFX_GLOBAIS = {
+  guard: {
+    blendMode: "ADD",
+    textura: "guard-efect",
+    animacao: "guard-efect",
+    escala: 130 / 499,
+    alpha: 0.65,
+    seguir: true,
+    offsetY: -60,
+    depthOffset: 2,
+  },
+  midguard: {
+    blendMode: "ADD",
+    textura: "mid-guard",
+    animacao: "mid-guard",
+    escala: 130 / 632,
+    alpha: 0.65,
+    seguir: true,
+    offsetY: -60,
+    depthOffset: 2,
+  },
+  brokeguard: {
+    blendMode: "ADD",
+    textura: "brokeguard-efect",
+    animacao: "brokeguard-efect",
+    escala: 130 / 616,
+    alpha: 0.65,
+    seguir: true,
+    offsetY: -60,
+    depthOffset: 2,
+  },
   fumacaDash: {
     blendMode: "ADD",
     textura: "dash-effect",
@@ -416,6 +446,9 @@ export default class GerenciadorVFX {
 
   criarAnimacoesGlobais() {
   for (const { key, end, frameRate } of [
+    { key: "guard-efect", end: 30, frameRate: 60 },
+    { key: "mid-guard", end: 24, frameRate: 60 },
+    { key: "brokeguard-efect", end: 22, frameRate: 60 },
     { key: "dash-effect", end: 11, frameRate: 48 },
     // A ultima linha possui somente dois frames desenhados.
     { key: "jump-effect", end: 25, frameRate: 60 },

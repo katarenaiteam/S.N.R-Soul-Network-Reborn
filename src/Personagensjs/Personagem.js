@@ -188,6 +188,13 @@ export default class Personagem {
     if (this.maquinaEstados.estadoAtual?.nome === "guard") {
       this.vidaGuard -= quantidade;
 
+      // Cada impacto substitui a barreira anterior, inclusive na quebra.
+      const efeitoGuard = this.vidaGuard <= 0
+        ? "brokeguard"
+        : this.vidaGuard <= this.guardMaximo / 2 ? "midguard" : "guard";
+      this.vfx.destruirEfeito(this.efeitoGuard);
+      this.efeitoGuard = this.vfx.tocar(efeitoGuard);
+
       // QUEBRA DE GUARDA:
       if (this.vidaGuard <= 0) {
         this.vidaGuard = 0; // Trava a vida em 0

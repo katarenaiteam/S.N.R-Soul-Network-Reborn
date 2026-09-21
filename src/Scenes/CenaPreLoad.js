@@ -547,22 +547,26 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
 
     // --- AUDIOS ---
     //--OST
-    this.load.audio("DiosAmendment", "assets/cenarios/DiosAmendment.mp3");
+    
 
 
 
     
     // --- EFEITOS ---
+    //mapa
      this.load.spritesheet("TVefect", "assets/efeitos/TVefect.png", { frameWidth: 800, frameHeight: 400 });
      this.load.image("quebradoL2", "assets/efeitos/out-effect/quebradoL2.png");
      this.load.image("quebradoR2", "assets/efeitos/out-effect/quebradoR2.png");
      this.load.image("quebradoU2", "assets/efeitos/out-effect/quebradoU2.png");
      this.load.image("quebradoD2", "assets/efeitos/out-effect/quebradoD2.png");
+     //golpes
      this.load.spritesheet("punch_effect", "assets/efeitos/atack_effects/punch_effect.png", { frameWidth: 109, frameHeight: 107, });
      this.load.spritesheet("punch_effect2", "assets/efeitos/atack_effects/punch_effect2.png", { frameWidth: 200, frameHeight: 250, });
      this.load.spritesheet("punch_effect3", "assets/efeitos/atack_effects/punch_effect3.png", { frameWidth: 200, frameHeight: 250, });
-
-     
+     //guard
+     this.load.spritesheet("guard-efect", "assets/efeitos/guard/guard-efect.png", { frameWidth: 338, frameHeight: 499, });
+     this.load.spritesheet("mid-guard", "assets/efeitos/guard/midguard-efect.png", { frameWidth: 638, frameHeight: 632, });
+     this.load.spritesheet("brokeguard-efect", "assets/efeitos/guard/brokeguard-efect.png", { frameWidth: 615, frameHeight: 616, });
      //- stun
      this.load.spritesheet("Stun_Effect", "assets/efeitos/Stun_Effect.png", { frameWidth: 128, frameHeight: 128, });
 
