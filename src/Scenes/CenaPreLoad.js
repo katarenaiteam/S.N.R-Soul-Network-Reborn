@@ -448,7 +448,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.spritesheet("Slan_idle", "assets/personagens/Slenderman/Sprites/Slan_idle.png", { frameWidth: 91, frameHeight: 124 });
     this.load.spritesheet("Slan_jump", "assets/personagens/Slenderman/Sprites/Slan_jump.png", { frameWidth: 51, frameHeight: 124 });
     this.load.spritesheet("Slan_walk", "assets/personagens/Slenderman/Sprites/Slan_walk.png", { frameWidth: 88, frameHeight: 118 });
-    this.load.spritesheet("Slan_crouch", "assets/personagens/Slenderman/Sprites/Slan_crouch.png", { frameWidth: 53, frameHeight: 78 });
+    this.load.spritesheet("slan_crouch", "assets/personagens/Slenderman/Sprites/slan_crouch.png", { frameWidth: 53, frameHeight: 78 });
     this.load.spritesheet("Slan_dash", "assets/personagens/Slenderman/Sprites/Slan_dash.png", { frameWidth: 85, frameHeight: 124 });
     this.load.spritesheet("Slan_guard", "assets/personagens/Slenderman/Sprites/Slan_guard.png", { frameWidth: 91, frameHeight: 124 });
     this.load.spritesheet("Slan_taunt", "assets/personagens/Slenderman/Sprites/Slan_taunt.png", { frameWidth: 103, frameHeight: 122 });
