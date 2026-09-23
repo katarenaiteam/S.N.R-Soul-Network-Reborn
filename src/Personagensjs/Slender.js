@@ -434,8 +434,8 @@ export default class Slenderman extends Personagem {
       neutro1: {
         animacao: "slan_atack1",
         frameHitbox: 3,
-        offsetX: 60,
-        offsetY: -60,
+        offsetX: 30,
+        offsetY: -90,
         largura: 60,
         altura: 20,
         cooldown: 700,
@@ -471,10 +471,10 @@ export default class Slenderman extends Personagem {
         frameHitbox: 2,
 
         offsetX: 50,
-        offsetY: -68,
+        offsetY: -90,
         largura: 50,
         altura: 35,
-        duracao: 350,
+        duracao: 550,
        // cancelavel: true,
 
         vfxAcerto: [
@@ -490,9 +490,9 @@ export default class Slenderman extends Personagem {
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
-          knockbackX: 30,
-          knockbackY: -30,
-          knockbackFixo: true,
+          knockbackX: 80,
+          knockbackY: -400,
+          knockbackFixo: false,
         },
 
       },
@@ -500,13 +500,13 @@ export default class Slenderman extends Personagem {
       
       agachado: {
         animacao: "slan_downAtack",
-        frameHitbox: 4,
+        frameHitbox: 3,
         offsetX: 60,
         offsetY: -25,
         largura: 75,
         altura: 30,
         cooldown: 500,
-        duracao: 560,
+        duracao: 300,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -542,10 +542,10 @@ export default class Slenderman extends Personagem {
 
         movimento: {
          inicio: 50,
-         fim: 400,
+         fim: 300,
       x: {
-         de: 350,
-         para: 150,
+         de: 80,
+         para: 60,
         },
 
         curva: "easeIn",
@@ -793,7 +793,7 @@ if (!scene.anims.exists("punch_effect3")) {
 
     scene.anims.create({
       key: "slan_crouch",
-      frames: scene.anims.generateFrameNumbers("Slan_crouch", {
+      frames: scene.anims.generateFrameNumbers("slan_crouch", {
         start: 0,
         end: 5,
       }),
@@ -803,7 +803,7 @@ if (!scene.anims.exists("punch_effect3")) {
 
     scene.anims.create({
       key: "slan_crouch2",
-      frames: scene.anims.generateFrameNumbers("Slan_crouch", {
+      frames: scene.anims.generateFrameNumbers("slan_crouch", {
         start: 0,
         end: 5,
       }),
@@ -813,7 +813,7 @@ if (!scene.anims.exists("punch_effect3")) {
 
     scene.anims.create({
       key: "slan_crouch3",
-      frames: scene.anims.generateFrameNumbers("Slan_crouch", {
+      frames: scene.anims.generateFrameNumbers("slan_crouch", {
         start: 0,
         end: 5,
       }),
@@ -921,7 +921,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 8,
       }),
-      frameRate: 16,
+      frameRate: 12,
       repeat: 0,
     });
 

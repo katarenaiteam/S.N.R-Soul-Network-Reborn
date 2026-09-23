@@ -442,7 +442,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
      this.load.spritesheet("ken-pose3", "assets/personagens/Ken/Sprites/ult/ken-pose3.png", { frameWidth: 488, frameHeight: 95 });
      this.load.spritesheet("ken-launch", "assets/personagens/Ken/Sprites/ult/ken-launch.png", { frameWidth: 144, frameHeight: 60 });
 
-      // --- Slen ---
+      // --- Slender ---
     //base
     this.load.spritesheet("Slan_intro", "assets/personagens/Slenderman/Sprites/Slan_intro.png", { frameWidth: 97, frameHeight: 263 });
     this.load.spritesheet("Slan_idle", "assets/personagens/Slenderman/Sprites/Slan_idle.png", { frameWidth: 91, frameHeight: 124 });
