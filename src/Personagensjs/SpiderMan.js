@@ -385,36 +385,104 @@ export default class SpiderMan extends Personagem {
       teia_side: {
         largura: 85,
         altura: 95,
-        offsetX: 47,
+        offsetX: 45,
         offsetY: -25,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 45, offsetX: -70, offsetY: -60 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -70, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 55, altura: 45, offsetX: -80, offsetY: -60 }, // Tronco/cabeça
+          { largura: 60, altura: 35, offsetX: -80, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
 
       spider_throw: {
         largura: 85,
         altura: 95,
-        offsetX: 350,
-        offsetY: 30,
+        offsetX: 315,
+        offsetY: 36,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 45, offsetX: 67, offsetY: -60 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: 67, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 55, altura: 45, offsetX: 30, offsetY: -60 }, // Tronco/cabeça
+          { largura: 60, altura: 35, offsetX: 30, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
 
-      siSpecial_miss: {
-        largura: 85,
-        altura: 95,
-        offsetX: 50,
-        offsetY: -10,
-        escala: 1,
+      spiderflip: {
+        largura: 85, altura: 95, offsetX: -6, offsetY: 5, escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 75, altura: 45, offsetX: -20, offsetY: -60 },
+        ],
+      },
+
+      // Offsets por folha: mesmo corpo de 85x95 e mesma base em todas as etapas.
+      ult0: {
+        largura: 85, altura: 95, offsetX: 50, offsetY: 96, escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 30, offsetX: 20, offsetY: -75 },
+          { largura: 50, altura: 20, offsetX: 22, offsetY: -48 },
+          { largura: 80, altura: 35, offsetX: 0, offsetY: -18 },
+        ],
+      },
+
+      ult00: {
+        largura: 85, altura: 95, offsetX: 50, offsetY: 96, escala: 1,
+        hurtboxes: [],
+      },
+
+      ult1: {
+        largura: 85, altura: 95, offsetX: 200, offsetY: 96, escala: 1,
+        hurtboxes: [],
+      },
+
+      ult2: {
+        largura: 85, altura: 95, offsetX: 200, offsetY: 96, escala: 1,
+        hurtboxes: [],
+      },
+
+      ult3: {
+        largura: 85, altura: 95, offsetX: 200, offsetY: 96, escala: 1,
+        hurtboxes: [],
+      },
+
+      ult35: {
+        largura: 85, altura: 95, offsetX: 200, offsetY: 96, escala: 1,
+        hurtboxes: [],
+      },
+
+      ult4: {
+        largura: 85, altura: 95, offsetX: 200, offsetY: 96, escala: 1,
+        hurtboxes: [],
+      },
+
+      ult5: {
+        largura: 85, altura: 95, offsetX: 15.5, offsetY: 5, escala: 1,
+        hurtboxes: [],
+      },
+
+      ult55: {
+        largura: 85, altura: 95, offsetX: 15.5, offsetY: 5, escala: 1,
+        hurtboxes: [],
+      },
+
+      ult6: {
+        largura: 85, altura: 95, offsetX: 107.5, offsetY: 75, escala: 1,
+        hurtboxes: [],
+      },
+
+      ult7: {
+        largura: 85, altura: 95, offsetX: 130, offsetY: 64, escala: 1,
+        hurtboxes: [],
+      },
+
+      ult8: {
+        largura: 85, altura: 95, offsetX: 11, offsetY: -5, escala: 1,
+        hurtboxes: [],
+      },
+
+      siSpecial_miss: {
+        largura: 85, altura: 95, offsetX: 42, offsetY: -10, escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 45, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 35, offsetX: 0, offsetY: -18 },
         ],
       },
    };
@@ -444,7 +512,7 @@ export default class SpiderMan extends Personagem {
         largura: 60,
         altura: 20,
         cooldown: 700,
-        duracao: 270,
+        duracao: 300,
         cancelavel: true,
 
          vfxAcerto: [
@@ -463,6 +531,7 @@ export default class SpiderMan extends Personagem {
           knockbackX: 40,
           knockbackY: -20,
           knockbackFixo: true,
+          hitstunBaseFrames: 25
         },
 
         comboProximo: "neutro2",
@@ -498,6 +567,7 @@ export default class SpiderMan extends Personagem {
           knockbackX: 30,
           knockbackY: -30,
           knockbackFixo: true,
+          hitstunBaseFrames: 25
         },
 
         comboProximo: "neutro3",
@@ -533,8 +603,8 @@ export default class SpiderMan extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 8,
-          knockbackX: 50,
-          knockbackY: -500,
+          knockbackX: 100,
+          knockbackY: -450,
           tumbling: true
         },
       },
@@ -569,7 +639,7 @@ export default class SpiderMan extends Personagem {
         frameHitbox: 3,
         offsetX: 40,
         offsetY: -60,
-        largura: 80,
+        largura: 74,
         altura: 30,
         cooldown: 900,
         duracao: 400,
@@ -621,10 +691,11 @@ export default class SpiderMan extends Personagem {
         propriedades: {
           tipoSomImpacto: "light",
           dano: 11,
-          knockbackX: 90,
-          knockbackY: -350,
+          knockbackX: 120,
+          knockbackY: -400,
           tumbling: false,
           knockbackFixo: true,
+          hitstunBaseFrames: 25
         },
       },
 
@@ -721,9 +792,9 @@ export default class SpiderMan extends Personagem {
         animacao: "spy_upAir",
         frameHitbox: 2,
         offsetX: 17,
-        offsetY: -116,
+        offsetY: -110,
         largura: 55,
-        altura: 50,
+        altura: 45,
         cooldown: 900,
         duracao: 300,
 
@@ -752,6 +823,7 @@ export default class SpiderMan extends Personagem {
     this.specials = {
       neutro: {
         animacao: "spy_neSpecial",
+        multiplicadorVelocidadeProjetil: 1.1,
         chaveCooldown: "webshot_neutro",
         duracao: 700,
        // cancelavel: true,
@@ -797,6 +869,7 @@ export default class SpiderMan extends Personagem {
 
        air_neutro: {
         animacao: "spy_AneSpecial",
+        multiplicadorVelocidadeProjetil: 1.1,
         chaveCooldown: "webshot_neutro",
         disparoHorizontal: true,
         duracao: 300,
@@ -1090,7 +1163,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 4,
       }),
-      frameRate: 22,
+      frameRate: 26,
       repeat: 0,
     });
 

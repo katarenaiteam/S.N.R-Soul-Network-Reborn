@@ -29,11 +29,8 @@ export default class EstadoTeia extends EstadoBase {
 
     exit() {
         tocarSomSeguro(this.personagem.scene, "solto", { volume: 0.04 });
-        const body = this.personagem.sprite.body;
-
-        if (body) {
-            body.setVelocityX(0);
-        }
+        // receberDano já aplicou o impulso do ataque antes da troca de estado.
+        // Preserve os dois eixos ao soltar a teia.
 
         // Restaura a visibilidade do personagem ao sair do estado preso
         if (this.personagem.sprite) {

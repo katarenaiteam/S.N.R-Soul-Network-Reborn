@@ -20,10 +20,15 @@ const RAIO = {
   // Bem mais comprido
   comprimento: 1900,
   espessura: 210,
+  espessuraAumentada: 480,
+  espessuraHitbox: 60,
+  espessuraHitboxAumentada: 180,
+  tempoExpansao: 700,
 
   anguloMin: -35,
   anguloMax: 35,
-  velocidadeAngulo: 55,
+  velocidadeAngulo: 18,
+  aceleracaoAngulo: 28,
 
   // multihit
   intervaloHit: 180,
@@ -77,6 +82,12 @@ export default class MikuUlt {
     this.beam2Iniciado = false;
 
     this.angulo = 0;
+    this.velocidadeAngular = 0;
+    this.hitboxRaio = null;
+    this.hitboxesRaio = [];
+    this.raioAumentado = false;
+    this.inicioRaio = 0;
+    this.comprimentoAtual = 0;
     this.ultimoUpdate = 0;
 
     this.ultimoHit = new Map();
@@ -420,12 +431,26 @@ this.pose2?.setFlipX(
 
   iniciarRaio() {
     this.fase = "raio";
+    this.inicioRaio = this.scene.time.now;
+    this.comprimentoAtual = 0;
+    // Retângulo de ataque independente da arte; a colisão considera sua rotação.
+    this.hitboxesRaio = [RAIO.espessuraHitbox, RAIO.espessuraHitboxAumentada].map(altura => {
+      const hitbox = this.scene.add.rectangle(0, 0, 1, altura);
+      hitbox.setOrigin(0, 0.5);
+      hitbox.setStrokeStyle(1, 0xff0000);
+      hitbox.setDepth((this.personagem.sprite.depth ?? 0) + 6);
+      hitbox.setVisible(false);
+      this.scene.camHUD?.ignore(hitbox);
+      return hitbox;
+    });
+    this.hitboxRaio = this.hitboxesRaio[0];
 
     this.ultimoUpdate =
       this.scene.time.now;
 
 
     this.raio1 = this.criarBeam1();
+    this.atualizarRaio();
 
     
 
@@ -590,6 +615,9 @@ this.pose2?.setFlipX(
 
   configurarVisualRaio(raio) {
     raio.setOrigin(0, 0.5);
+    const origem = this.origemRaio();
+    raio.setPosition(origem.x, origem.y);
+    raio.setRotation(this.rotacaoRaio());
 
     raio.setDepth(
       (this.personagem.sprite.depth ?? 0) + 3
@@ -605,8 +633,8 @@ this.pose2?.setFlipX(
 
     // MUITO MAIS COMPRIDO
     raio.setDisplaySize(
-      RAIO.comprimento,
-      RAIO.espessura
+      Math.max(1, this.comprimentoAtual),
+      this.raioAumentado ? RAIO.espessuraAumentada : RAIO.espessura
     );
 
     this.scene.camHUD?.ignore(
@@ -670,28 +698,31 @@ this.pose2?.setFlipX(
   // ============================================================
 
   atualizarAngulo(delta) {
-    const velocidade =
-      RAIO.velocidadeAngulo *
-      delta / 1000;
-
-    if (this.personagem.inputDown("cima")) {
-      this.angulo -= velocidade;
-    }
-
-    if (this.personagem.inputDown("baixo")) {
-      this.angulo += velocidade;
-    }
+    const comando = Number(this.personagem.inputDown("baixo")) -
+      Number(this.personagem.inputDown("cima"));
+    const alvo = comando * RAIO.velocidadeAngulo;
+    const passo = RAIO.aceleracaoAngulo * delta / 1000;
+    this.velocidadeAngular += Phaser.Math.Clamp(alvo - this.velocidadeAngular, -passo, passo);
+    this.angulo += this.velocidadeAngular * delta / 1000;
 
     this.angulo = Phaser.Math.Clamp(
       this.angulo,
       RAIO.anguloMin,
       RAIO.anguloMax
     );
+    if ((this.angulo === RAIO.anguloMin && this.velocidadeAngular < 0) ||
+        (this.angulo === RAIO.anguloMax && this.velocidadeAngular > 0)) {
+      this.velocidadeAngular = 0;
+    }
   }
 
 
   atualizarRaio() {
     const origem = this.origemRaio();
+    const progresso = Phaser.Math.Clamp(
+      (this.scene.time.now - this.inicioRaio) / RAIO.tempoExpansao, 0, 1
+    );
+    this.comprimentoAtual = RAIO.comprimento * progresso;
 
     const rotacao =
       this.rotacaoRaio();
@@ -704,7 +735,10 @@ this.pose2?.setFlipX(
       ]
     ) {
       if (!efeito?.active) continue;
-
+      // Após a expansão, preserva o pulso visual do grande hit.
+      if (progresso < 1 || !this.expansaoConcluida) {
+        efeito.setDisplaySize(Math.max(1, this.comprimentoAtual), RAIO.espessura);
+      }
       efeito.setPosition(
         origem.x,
         origem.y
@@ -713,6 +747,14 @@ this.pose2?.setFlipX(
       efeito.setRotation(
         rotacao
       );
+    }
+    this.expansaoConcluida = progresso === 1;
+    for (const hitbox of this.hitboxesRaio) {
+      if (!hitbox.active) continue;
+      hitbox.setPosition(origem.x, origem.y);
+      hitbox.setRotation(rotacao);
+      hitbox.setSize(Math.max(1, this.comprimentoAtual), hitbox.height);
+      hitbox.setVisible(hitbox === this.hitboxRaio && !!this.scene.physics.world.drawDebug);
     }
 
     
@@ -873,12 +915,15 @@ if (agora < bloqueadoAte) {
   // ============================================================
 
   grandeHit() {
-    if (this.cancelada) return;
+    if (this.cancelada || this.finalizando || this.raioAumentado) return;
+    this.raioAumentado = true;
+    this.hitboxRaio = this.hitboxesRaio[1];
+    this.atualizarRaio();
  
 
 
     // ========================================================
-    // RAIO ENGROSSA POR UM INSTANTE
+    // O raio permanece mais grosso durante toda a segunda fase.
     // ========================================================
 
     for (
@@ -887,20 +932,14 @@ if (agora < bloqueadoAte) {
     ) {
       if (!raio?.active) continue;
 
-      const sx = raio.scaleX;
       const sy = raio.scaleY;
 
       this.scene.tweens.add({
         targets: raio,
 
-        scaleX: sx * 1.08,
-        scaleY: sy * 1.7,
+        scaleY: sy * (RAIO.espessuraAumentada / RAIO.espessura),
 
-        duration: 120,
-
-        hold: 100,
-
-        yoyo: true,
+        duration: 250,
 
         ease: "Quad.Out"
       });
@@ -926,7 +965,7 @@ if (agora < bloqueadoAte) {
 
     for (const alvo of this.obterAlvos()) {
 
-      if (alvo.invulneravel || !this.alvoNoRaio(alvo, 1.7)) {
+      if (alvo.invulneravel || !this.alvoNoRaio(alvo)) {
         continue;
       }
 
@@ -980,12 +1019,14 @@ if (agora < bloqueadoAte) {
   // COLISÃO DO RAIO
   // ============================================================
 
-  alvoNoRaio(alvo, grosso = 1) {
+  alvoNoRaio(alvo) {
+    if (!this.hitboxRaio?.active || this.comprimentoAtual <= 0 ||
+        !(this.raio1?.active || this.raio2?.active)) return false;
     const origem =
-      this.origemRaio();
+      this.hitboxRaio;
 
     const ang =
-      this.rotacaoRaio();
+      this.hitboxRaio.rotation;
 
     const ux = Math.cos(ang);
     const uy = Math.sin(ang);
@@ -994,8 +1035,7 @@ if (agora < bloqueadoAte) {
     const ny = ux;
 
     const espessura =
-      RAIO.espessura *
-      grosso;
+      this.hitboxRaio.height;
 
     const hurtboxes =
       alvo.grupoHurtbox
@@ -1027,18 +1067,22 @@ if (agora < bloqueadoAte) {
           dx * nx + dy * ny
         );
 
-      const raioAlvo =
-        Math.max(
-          b.width,
-          b.height
-        ) / 2;
+      const metadeX = b.width / 2;
+      const metadeY = b.height / 2;
+      const projecaoFrente = Math.abs(ux) * metadeX + Math.abs(uy) * metadeY;
+      const projecaoLado = Math.abs(nx) * metadeX + Math.abs(ny) * metadeY;
+      const meio = this.hitboxRaio.width / 2;
+      const centroRaioX = origem.x + ux * meio;
+      const centroRaioY = origem.y + uy * meio;
 
       return (
-        frente >= -raioAlvo &&
+        frente >= -projecaoFrente &&
         frente <=
-          RAIO.comprimento + raioAlvo &&
+          this.hitboxRaio.width + projecaoFrente &&
         lado <=
-          espessura / 2 + raioAlvo
+          espessura / 2 + projecaoLado &&
+        Math.abs(cx - centroRaioX) <= metadeX + Math.abs(ux) * meio + Math.abs(nx) * espessura / 2 &&
+        Math.abs(cy - centroRaioY) <= metadeY + Math.abs(uy) * meio + Math.abs(ny) * espessura / 2
       );
     });
   }
@@ -1094,6 +1138,9 @@ if (agora < bloqueadoAte) {
 
   finalizarComFade() {
     if (this.finalizando) return;
+    this.hitboxesRaio.forEach(hitbox => hitbox.destroy());
+    this.hitboxesRaio = [];
+    this.hitboxRaio = null;
 
     this.finalizando = true;
 
@@ -1522,6 +1569,9 @@ if (agora < bloqueadoAte) {
   // ============================================================
 
   limpar() {
+    this.hitboxesRaio.forEach(hitbox => hitbox.destroy());
+    this.hitboxesRaio = [];
+    this.hitboxRaio = null;
     
     for (const timer of this.timers) {
       timer.remove(false);

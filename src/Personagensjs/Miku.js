@@ -136,7 +136,7 @@ this.vfxAtaqueNormal = {
     },
     air_cima: {
       efeito: "notaAtaque1", quantidade: 3,
-      offsetX: -12, offsetY: 30, movimentoX: 0, movimentoY: -72,
+      offsetX: -12, offsetY: 30, movimentoX: 0, movimentoY: -52,
       compensarMovimento: true,
       fatorCompensacaoMovimento: 0.4,
     },
@@ -421,7 +421,7 @@ this.vfxAtaqueNormal = {
         largura: 45,
         altura: 30,
         duracao: 400,
-        cancelavel: true,
+       // cancelavel: true,
         propriedades: {
            tipoSomImpacto: "heavy",
           dano: 8,
@@ -576,7 +576,7 @@ this.vfxAtaqueNormal = {
         duracao: 350,
          finalizarAoTocarChao: true,
         atrasoFinalizacaoChao: 30,
-        //cancelavel: true,
+        cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
@@ -605,7 +605,7 @@ this.vfxAtaqueNormal = {
         duracao: 600,
          finalizarAoTocarChao: true,
         atrasoFinalizacaoChao: 30,
-        cancelavel: true,
+        
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
@@ -630,7 +630,7 @@ this.vfxAtaqueNormal = {
         duracao: 600,
          finalizarAoTocarChao: true,
         atrasoFinalizacaoChao: 30,
-        cancelavel: true,
+       
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
@@ -698,13 +698,13 @@ this.vfxAtaqueNormal = {
       escalaNota: 0.8,
       larguraNota: 70,
       alturaNota: 70,
-      velocidadeNota: 900,
+      velocidadeNota: 800,
       quedaNota: 0,
       tempoNota: 4000,
       tempoPoseLancamento: 560,
       tempoMinimoCarga: 560,
-      tempoEntreNotas: 600,
-      volumeSom: 0.64,
+      tempoEntreNotas: 1200,
+      volumeSom: 0.54,
       propriedades: {
         tipoSomImpacto: "light",
         dano: 8,
@@ -721,12 +721,12 @@ this.vfxAtaqueNormal = {
       escalaNota: 0.8,
       larguraNota: 70,
       alturaNota: 70,
-      velocidadeNota: 900,
+      velocidadeNota: 800,
       quedaNota: 0,
       tempoNota: 4000,
       tempoPoseLancamento: 560,
       tempoPausaAerea: 560,
-      volumeSom: 0.64,
+      volumeSom: 0.54,
       propriedades: {
         tipoSomImpacto: "light",
         dano: 8,
@@ -1113,7 +1113,7 @@ scene.anims.create({
     scene.anims.create({
       key: "miku_spin",
       frames: scene.anims.generateFrameNumbers("Miku_spin", { start: 0, end: 20 }),
-      frameRate: 24,
+      frameRate: 27,
       repeat: 0,
     });
     scene.anims.create({

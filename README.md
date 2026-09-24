@@ -41,15 +41,16 @@ Pessoas poderão entrar na arena de batalha como espectadores e escolherem o lut
 
 ## Personagens:
 
-- Frederick (Johnson)
-- th30
-- homem aranha (versão marvel vs capcom 2 new age of heroes)
-- goku (the super saiyan)
-- sonic ( the hedgehog)
-- K(king of fighter 2001)
-- yume nikki (from yume nikki the game)
-- chun (li)
-- hatsune miku
+- Frederick Johnson
+- TH30
+- Homem Aranha
+- Goku
+- Aigis
+- Slenderman
+- Pingu
+- Tempestade
+- Hatsune Miku
+- Ken
 
 ## Artefatos:
 itens de restauração que podem: diminuir a porcentagem de dano acumulada, aumentar o dano que o jogador infringe, aumentar a velocidade.

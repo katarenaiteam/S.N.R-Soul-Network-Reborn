@@ -32,12 +32,16 @@ export default class NotaCarregada {
 
     const cargaGuardada = cargasCompletas.get(this.personagem);
     if (cargaGuardada && cargaGuardada !== this) {
-      this.notas = cargaGuardada.notas;
-      cargaGuardada.notas = [];
-      cargaGuardada.armazenada = false;
-      cargaGuardada.cancelado = true;
-      cargaGuardada.removerDaListaAtiva();
-      cargasCompletas.delete(this.personagem);
+      // No ar consome uma nota; as demais continuam guardadas.
+      this.notas = cargaGuardada.notas.splice(
+        0, this.special.aereo ? 1 : cargaGuardada.notas.length
+      );
+      if (cargaGuardada.notas.length === 0) {
+        cargaGuardada.armazenada = false;
+        cargaGuardada.cancelado = true;
+        cargaGuardada.removerDaListaAtiva();
+        cargasCompletas.delete(this.personagem);
+      }
 
       this.carregando = true;
       if (this.special.aereo) this.aplicarPausaAerea();
@@ -47,7 +51,6 @@ export default class NotaCarregada {
 
     if (this.special.aereo) {
       this.carregando = true;
-      this.criarNotaCarregada();
       this.criarNotaCarregada();
       this.atualizarNotasCarregadas();
       this.aplicarPausaAerea();

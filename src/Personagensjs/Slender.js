@@ -14,9 +14,9 @@ export default class Slenderman extends Personagem {
       "Slan_idle",
       "0",
       {
-        velocidade: 240,
+        velocidade: 200,
         forcaPulo: -600,
-        maxPulos: 3,
+        maxPulos: 2,
         maxDash: 2,
         maxComboIndex: 2,
       },

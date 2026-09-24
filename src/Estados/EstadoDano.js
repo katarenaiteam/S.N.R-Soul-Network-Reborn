@@ -1,4 +1,5 @@
 import EstadoBase from "./EstadoBase.js";
+import { encontrarChaoCruzado } from "../Objetos/QuiqueImpacto.js";
 
 export default class EstadoDano extends EstadoBase {
   enter() {
@@ -8,6 +9,7 @@ export default class EstadoDano extends EstadoBase {
     this.quiqueChaoAplicado = false;
 
     const body = this.personagem.sprite.body;
+    this.limitesAnteriores = body && { left: body.left, bottom: body.bottom, width: body.width };
     const FRAME_MS = 1000 / 60;
 
 // O impacto já traz o hitstun calculado. O fallback cobre chamadas antigas
@@ -16,6 +18,9 @@ export default class EstadoDano extends EstadoBase {
     this.duracaoStun = Number.isFinite(hitstunCalculado)
       ? Math.max(0, hitstunCalculado)
       : (this.personagem.isTumbling ? 22 : 14) * FRAME_MS;
+    this.curvaKnockback = this.personagem.ultimoImpacto?.curvaKnockback;
+    this.deslocamentoCurva = { x: 0, y: 0 };
+    this.duracaoCurva = Math.min(420, this.duracaoStun * 0.8);
 
     //controle para transição vertical sem passar pelo neutro
     this.trocaVerticalAtiva = false;
@@ -53,12 +58,38 @@ export default class EstadoDano extends EstadoBase {
     }
     // Aplica o quique
     if (body) {
-      body.setBounce(0.5, 0.4);
+      // O quique configurado é aplicado uma vez com a força calculada no hit.
+      // Desliga a restituição automática para ela não consumir esse contato.
+      body.setBounce(0.5, this.personagem.ultimoImpacto?.quiqueChaoY > 0 ? 0 : 0.4);
     }
 
     // Inicializa a animação
     this.atualizarAnimacaoDano();
 
+  }
+
+  atualizarCurvaKnockback(tempoPassado) {
+    const body = this.personagem.sprite.body;
+    if (!this.curvaKnockback || !body?.position || this.duracaoCurva <= 0) return;
+    // Uma colisão ou outro golpe passa a determinar o percurso a partir dali.
+    // Não reposiciona o personagem através do chão/parede para compensá-la.
+    if (body.blocked.left || body.blocked.right || body.blocked.up ||
+        (body.blocked.down && body.velocity.y >= 0) || this.quiqueChaoAplicado) {
+      this.curvaKnockback = null;
+      return;
+    }
+    const t = Math.max(0, Math.min(1, tempoPassado / this.duracaoCurva));
+    // O desvio e sua derivada começam e terminam em zero. A soma dos
+    // deslocamentos é zero ao completar a curva: o alcance em voo livre
+    // continua o original, com as mesmas velocidades, gravidade e freio.
+    const peso = 16 * t * t * (1 - t) * (1 - t);
+    const x = this.curvaKnockback.x * peso;
+    const y = this.curvaKnockback.y * peso;
+    body.position.x += x - this.deslocamentoCurva.x;
+    body.position.y += y - this.deslocamentoCurva.y;
+    body.updateCenter();
+    this.deslocamentoCurva = { x, y };
+    if (t === 1) this.curvaKnockback = null;
   }
 
   atualizarAnimacaoDano() {
@@ -196,14 +227,38 @@ export default class EstadoDano extends EstadoBase {
     this.puloBufferAte = agora + this.janelaBufferPulo;
   }
 
-  const forcaQuiqueChao = this.personagem.ultimoImpacto?.quiqueChaoY;
+  const forcaQuiqueChao = this.personagem.ultimoImpacto?.quiqueChaoCalculadoY
+    ?? this.personagem.ultimoImpacto?.quiqueChaoY;
+  let contato = null;
+  const limitesAtuais = body && { left: body.left, bottom: body.bottom, width: body.width };
+  if (body && forcaQuiqueChao > 0 && !this.quiqueChaoAplicado && this.limitesAnteriores) {
+    const scene = this.personagem.scene;
+    const sistema = scene.sistemaPlataformasAtravessaveis;
+    const ignorarAte = sistema?.jogadores.get(this.personagem)?.ignorarAte ?? 0;
+    const plataformas = [
+      ...(scene.mapaAtual?.plataformas?.getChildren() ?? []),
+      ...(agora >= ignorarAte ? sistema?.grupo.getChildren() ?? [] : []),
+    ];
+    contato = encontrarChaoCruzado(this.limitesAnteriores, limitesAtuais, plataformas.map(p => p.body));
+  }
+  this.limitesAnteriores = limitesAtuais;
   if (
-    body?.blocked.down &&
+    body && (body.blocked.down || contato) && body.velocity.y >= 0 &&
     forcaQuiqueChao > 0 &&
     !this.quiqueChaoAplicado
   ) {
     this.quiqueChaoAplicado = true;
+    if (contato && !body.blocked.down) {
+      const vx = body.velocity.x;
+      body.reset(this.personagem.sprite.x + contato.left - body.left,
+        this.personagem.sprite.y + contato.top - body.bottom);
+      body.setVelocityX(vx);
+      this.personagem.sincronizarHurtbox();
+    }
     body.setVelocityY(-forcaQuiqueChao);
+    this.atualizarAnimacaoDano();
+    // blocked.down ainda pertence à colisão deste frame: não entrar em dead.
+    return;
   }
 
   // DESACELERAÇÃO DO KNOCKBACK
@@ -215,6 +270,7 @@ export default class EstadoDano extends EstadoBase {
     body.setVelocityX(body.velocity.x * freioPorFrame);
   }
 
+  this.atualizarCurvaKnockback(tempoPassado);
   this.atualizarAnimacaoDano();
 
     // Enquanto o tempo mínimo não terminou,
@@ -300,5 +356,7 @@ export default class EstadoDano extends EstadoBase {
   this.modoHorizontalAtivo = false;
   this.puloBufferAte = 0;
   this.quiqueChaoAplicado = false;
+  this.curvaKnockback = null;
+  this.deslocamentoCurva = { x: 0, y: 0 };
 }
 }

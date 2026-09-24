@@ -52,7 +52,11 @@ export default class WebShot {
     this.projetil.body.setAllowGravity(false);
     this.projetil.body.debugBodyColor = 0xff0000;
     this.projetil.body.setSize(30, 30);
-    this.projetil.body.setVelocity((this.aereo ? 500 : 600) * direcao, this.aereo && !this.disparoHorizontal ? 400 : 0);
+    const multiplicadorVelocidade = this.special.multiplicadorVelocidadeProjetil ?? 1;
+    this.projetil.body.setVelocity(
+      (this.aereo ? 500 : 600) * direcao * multiplicadorVelocidade,
+      (this.aereo && !this.disparoHorizontal ? 400 : 0) * multiplicadorVelocidade
+    );
 
     registrarAtaqueEspecial(this, this.projetil, {
       categoria: "projetil",

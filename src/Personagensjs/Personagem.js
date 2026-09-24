@@ -16,6 +16,7 @@ import GerenciadorVFX from "../Objetos/GerenciadorVFX.js";
 import { tocarSomSeguro } from "../Objetos/AudioSeguro.js";
 import EstadoAtordoado from "../Estados/EstadoAtordoado.js";
 import EstadoInvencible from "../Estados/EstadoInvencible.js";
+import { calcularQuiqueChao, calcularCurvaKnockback } from "../Objetos/Knockback.js";
 
 
 export default class Personagem {
@@ -298,6 +299,17 @@ export default class Personagem {
       multiplicadorY = multiplicadorBaseY * reforcoKnockback;
     }
 
+    // Captura o contato e o movimento anterior, sem modificar o impulso.
+    const curvaKnockback = calcularCurvaKnockback(
+      direcaoX * Math.abs(kbX) * multiplicadorX,
+      kbY * multiplicadorY,
+      this.sprite.body,
+      origem ?? {
+        x: oponente?.sprite?.body?.center?.x ?? oponente?.sprite?.x,
+        y: oponente?.sprite?.body?.center?.y ?? oponente?.sprite?.y,
+      },
+      propriedades
+    );
     this.sprite.body.setVelocity(
       direcaoX * Math.abs(kbX) * multiplicadorX,
       kbY * multiplicadorY
@@ -371,6 +383,8 @@ export default class Personagem {
 
     this.ultimoImpacto = {
       ...propriedades,
+      quiqueChaoCalculadoY: calcularQuiqueChao(propriedades.quiqueChaoY, multiplicadorY, knockbackFixo),
+      curvaKnockback,
       hitstunCalculadoMs: hitstunFrames * (1000 / 60),
       hitstunCalculadoFrames: hitstunFrames,
       comboHits: this.comboHitsRecebidos,

@@ -462,13 +462,13 @@ this.nomePersonagem = "Ken";
           knockbackX: 30,
           knockbackY: -20,
           knockbackFixo: true,
-          hitstunFrames: 18,
-          hitsSemDecay: 2
+          hitstunFrames: 25,
+          hitsSemDecay: 3
         },
 
         comboProximo: "neutro2",
-        comboJanelaInicio: 200,
-        comboJanelaFim: 300,
+        comboJanelaInicio: 100,
+        comboJanelaFim: 350,
       },
 
       neutro2: {
@@ -488,7 +488,7 @@ this.nomePersonagem = "Ken";
           knockbackX: 40,
           knockbackY: -30,
           knockbackFixo: true,
-          hitstunFrames: 18,
+          hitstunFrames: 25,
         },
 
         comboProximo: "neutro3",
@@ -522,7 +522,7 @@ this.nomePersonagem = "Ken";
           knockbackX: 350,
           knockbackY: -310,
           tumbling: true,
-          hitstunBaseFrames: 18
+          
         },
       },
 
@@ -595,7 +595,7 @@ this.nomePersonagem = "Ken";
           tipoSomImpacto: "light",
           dano: 12,
           knockbackX: 120,
-          knockbackY: -470,
+          knockbackY: -450,
           tumbling: false,
           knockbackFixo: true,
         },
@@ -649,7 +649,7 @@ this.nomePersonagem = "Ken";
           tipoSomImpacto: "heavy",
           dano: 12,
           knockbackX: 130,
-          knockbackY: -350,
+          knockbackY: -370,
           tumbling: true,
         },
       },
@@ -677,12 +677,12 @@ this.nomePersonagem = "Ken";
     inicio: 80,
     fim: 900,
     x: {
-      de: 400,
-      para: 500,
+      de: 500,
+      para: 600,
     },
     y: {
-      de: 500,
-      para: 900,
+      de: 550,
+      para: 1000,
     },
 
     curva: "easeOut",
@@ -701,14 +701,14 @@ this.nomePersonagem = "Ken";
     this.specials = {
       neutro: {
         animacao: "ken_neSpecial",
-        duracao: 1000,
+        duracao: 909,
         cooldown: 2000,
         logica: Hadouken,
          som: "hadouken",
          volumeSom: 0.42,
-        atrasoProjetil: 300,
+        atrasoProjetil: 273,
         tempoProjetil: 5000,
-        velocidadeProjetil: 500,
+        velocidadeProjetil: 600,
         escalaProjetil: 1.5,
         profundidadeImpacto: 50,
         offsetProjetilX: 65,
@@ -758,9 +758,11 @@ this.nomePersonagem = "Ken";
 
       air_neutro: {
         animacao: "ken_AneSpecial",
-        duracao: 800,
+        duracao: 727,
         cooldown: 2000,
         logica: Hadouken,
+        velocidadeProjetil: 660,
+        atrasoProjetil: 318,
         som: "hadouken",
         volumeSom: 0.28,
         propriedades: {
@@ -1113,7 +1115,7 @@ scene.anims.create({
         start: 0,
         end: 15,
       }),
-      frameRate: 16,
+      frameRate: 17.6,
       repeat: 0,
     });
 
@@ -1193,7 +1195,7 @@ scene.anims.create({
         start: 0,
         end: 12,
       }),
-      frameRate: 18,
+      frameRate: 19.8,
       repeat: 0,
     });
 

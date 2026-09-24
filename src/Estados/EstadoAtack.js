@@ -605,6 +605,10 @@ export default class EstadoAtack extends EstadoBase {
     const valorDano = golpe.propriedades?.dano ?? 0;
     const origem = {
       direcao: this.personagem.sprite.flipX ? -1 : 1,
+      x: hitbox.body?.center?.x ?? hitbox.x,
+      y: hitbox.body?.center?.y ?? hitbox.y,
+      velocidadeX: this.personagem.sprite.body?.velocity.x ?? 0,
+      velocidadeY: this.personagem.sprite.body?.velocity.y ?? 0,
     };
 
     this.personagem.estadoInvencible?.aoAcertarAtaque();

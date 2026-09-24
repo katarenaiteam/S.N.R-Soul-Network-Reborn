@@ -69,10 +69,11 @@ export default class MikuSpin {
 
   criarHitbox() {
     const sprite = this.personagem.sprite;
-    this.hitbox = this.scene.add.zone(sprite.x, sprite.y - 80, 130, 60);
+    this.hitbox = this.scene.add.zone(sprite.x + 12 * this.direcao, sprite.y - 80, 6, 60);
     this.scene.physics.add.existing(this.hitbox);
     this.hitbox.body.setAllowGravity(false);
     this.hitbox.body.setImmovable(true);
+    this.hitbox.body.setSize(6, 60);
     this.hitbox.body.debugBodyColor = 0xff0000;
     this.scene.camHUD?.ignore(this.hitbox);
 
@@ -122,6 +123,13 @@ export default class MikuSpin {
     }
 
     this.personagem.sprite.setVelocityX(this.velocidadeAtual * this.direcao);
+  }
+
+  progressoExpansao() {
+    const t = Math.max(0, Math.min(1,
+      (this.scene.time.now - this.inicio) / MikuSpin.TEMPO_EXPANSAO
+    ));
+    return 1 - (1 - t) ** 2;
   }
 
   aplicarQuedaLenta() {
@@ -219,6 +227,11 @@ export default class MikuSpin {
     this.atualizarDirecao(delta);
     this.aplicarQuedaLenta();
     if (this.hitbox?.active) {
+      const progresso = this.progressoExpansao();
+      const largura = 6 + (130 - 6) * progresso;
+      const altura = 60;
+      this.hitbox.setSize(largura, altura);
+      this.hitbox.body?.setSize(largura, altura);
       this.hitbox.setPosition(
         this.personagem.sprite.x + 12 * this.direcao,
         this.personagem.sprite.y - 80
@@ -287,6 +300,7 @@ export default class MikuSpin {
 
 MikuSpin.VELOCIDADE_INICIAL = 150;
 MikuSpin.VELOCIDADE_MAXIMA = 645;
+MikuSpin.TEMPO_EXPANSAO = 650;
 MikuSpin.ACELERACAO = 520;
 MikuSpin.DESACELERACAO_REVERSAO = 760;
 MikuSpin.DURACAO_MINIMA = 800;

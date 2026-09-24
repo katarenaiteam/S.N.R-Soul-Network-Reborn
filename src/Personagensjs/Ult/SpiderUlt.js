@@ -253,6 +253,7 @@ export default class SpiderUlt {
   }
 
   iniciarComboCinematico() {
+    this.personagem.destruirHurtboxes();
     const dir = this.personagem.sprite.flipX ? -1 : 1;
     const hitX = this.personagem.sprite.x;
     const hitY = this.personagem.sprite.y;

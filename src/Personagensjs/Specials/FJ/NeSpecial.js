@@ -60,11 +60,14 @@ export default class NeSpecial {
     }
     if (indice === 3 && this.inicioImpulso === null) {
       this.inicioImpulso = this.scene.time.now;
+      this.personagem.hiperArmaduraHits = 1;
+      this.personagem.hiperArmaduraFonte = this;
       this.personagem.sprite.body.setVelocity(IMPULSO_X * this.direcao, IMPULSO_Y);
     }
     if (indice === 7) this.criarHitbox();
     if (indice === 8) {
       this.destruirHitbox();
+      this.removerHiperArmadura();
       if (this.inicioPoseFinal === null) this.inicioPoseFinal = this.scene.time.now;
       this.personagem.sprite.anims.pause();
     }
@@ -164,9 +167,17 @@ export default class NeSpecial {
     if (this.personagem.maquinaEstados.estadoAtual === this.estado) this.estado.finalizarSpecial();
   }
 
+  removerHiperArmadura() {
+    if (this.personagem.hiperArmaduraFonte === this) {
+      this.personagem.hiperArmaduraHits = 0;
+      this.personagem.hiperArmaduraFonte = null;
+    }
+  }
+
   cancelar() {
     if (this.finalizado) return;
     this.finalizado = true;
+    this.removerHiperArmadura();
     this.efeitoCarga?.destroy();
     this.efeitoCarga = null;
     const sprite = this.personagem.sprite;
