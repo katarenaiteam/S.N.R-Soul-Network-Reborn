@@ -6,7 +6,9 @@ export function criarHudPartida(jogador, personagem, x, y, ladoDireito) {
       SpiderMan: "Sp_portrait",
       Miku: "Miku_portrait",
       Ken: "Ken_portrait",
-      FJ: "FJ_portrait"
+      FJ: "FJ_portrait",
+      Slenderman: "Slan_portrait",
+      Pingu: "Pingu_portrait"
     };
     const hud = this.add.container(x, y).setScrollFactor(0).setDepth(1000);
     const chaveRetrato = retratoPorPersonagem[personagem];

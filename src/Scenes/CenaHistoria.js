@@ -8,6 +8,8 @@ import Frederick from "../Personagensjs/Frederick.js";
 import Dio from "../Personagensjs/Dio.js";
 import SpiderMan from "../Personagensjs/SpiderMan.js";
 import Ken from "../Personagensjs/Ken.js";
+import Pingu from "../Personagensjs/Pingu.js";
+import Slenderman from "../Personagensjs/Slender.js";
 import Miku from "../Personagensjs/Miku.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import BotController from "../Objetos/BotController.js";
@@ -241,14 +243,22 @@ this.indicadorCPU = this.criarIndicador(
 
   criarPersonagem(nome, x, y, teclas, minDano, maxDano, controle) {
     switch (nome) {
-      case "FJ":
-      case "Frederick": return new Frederick(this, x, y, teclas, minDano, maxDano, controle);
-      case "Madotsuki": return new Madotsuki(this, x, y, teclas, minDano, maxDano, controle);
-      case "Dio": return new Dio(this, x, y, teclas, minDano, maxDano, controle);
-      case "SpiderMan": return new SpiderMan(this, x, y, teclas, minDano, maxDano, controle);
-      case "Miku": return new Miku(this, x, y, teclas, minDano, maxDano, controle);
-      case "Ken": return new Ken(this, x, y, teclas, minDano, maxDano, controle);
-      default: return new Frederick(this, x, y, teclas, minDano, maxDano, controle);
+       case "FJ":
+              return new FJ(this, x, y, teclas, minDano, maxDano, controle);
+            case "Madotsuki":
+              return new Madotsuki(this, x, y, teclas, minDano, maxDano, controle);
+            case "SpiderMan":
+              return new SpiderMan(this, x, y, teclas, minDano, maxDano, controle);
+            case "Miku":
+              return new Miku(this, x, y, teclas, minDano, maxDano, controle);
+              case "Ken":
+              return new Ken(this, x, y, teclas, minDano, maxDano, controle);
+              case "Slenderman":
+              return new Slenderman(this, x, y, teclas, minDano, maxDano, controle);
+              case "Pingu":
+              return new Pingu(this, x, y, teclas, minDano, maxDano, controle);
+            default:
+              return new Ken(this, x, y, teclas, minDano, maxDano, controle);
     }
   }
 

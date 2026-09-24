@@ -135,6 +135,8 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("Miku_portrait", "assets/Hud/Portrait/Miku_portrait.png");
     this.load.image("Ken_portrait", "assets/Hud/Portrait/Ken_portrait.png");
     this.load.image("FJ_portrait", "assets/Hud/Portrait/FJ_portrait.png");
+    this.load.image("Pingu_portrait", "assets/Hud/Portrait/Pingu_portrait.png");
+    this.load.image("Slan_portrait", "assets/Hud/Portrait/Slan_portrait.png");
     //porcentagem
     this.load.image("0.png", "assets/Hud/DamagePercentage/0-19_/0.png");
     this.load.image("1.png", "assets/Hud/DamagePercentage/0-19_/1.png");
@@ -466,6 +468,23 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.spritesheet("Slan_sideAir", "assets/personagens/Slenderman/Sprites/Slan_sideAir.png", { frameWidth: 96, frameHeight: 134 });
     this.load.spritesheet("Slan_upAir", "assets/personagens/Slenderman/Sprites/Slan_upAir.png", { frameWidth: 84, frameHeight: 137 });
     this.load.spritesheet("Slan_downAir", "assets/personagens/Slenderman/Sprites/Slan_downAir.png", { frameWidth: 129, frameHeight: 136 });
+
+    // -- Pingu 
+    this.load.spritesheet("Pingu_intro", "assets/personagens/Pingu/Sprites/Pingu_intro.png", { frameWidth: 81, frameHeight: 90 });
+    this.load.spritesheet("Pingu_idle", "assets/personagens/Pingu/Sprites/Pingu_idle.png", { frameWidth: 39, frameHeight: 72 });
+    this.load.spritesheet("Pingu_jump", "assets/personagens/Pingu/Sprites/Pingu_jump.png", { frameWidth: 59, frameHeight: 101 });
+    this.load.spritesheet("Pingu_walk", "assets/personagens/Pingu/Sprites/Pingu_walk.png", { frameWidth: 40, frameHeight: 61 });
+    this.load.spritesheet("Pingu_crouch1", "assets/personagens/Pingu/Sprites/Pingu_crouch1.png", { frameWidth: 43, frameHeight: 60 });
+    this.load.spritesheet("Pingu_crouch", "assets/personagens/Pingu/Sprites/Pingu_crouch.png", { frameWidth: 43, frameHeight: 60 });
+    this.load.spritesheet("Pingu_dash", "assets/personagens/Pingu/Sprites/Pingu_dash.png", { frameWidth: 41, frameHeight: 40 });
+    this.load.spritesheet("Pingu_taunt2", "assets/personagens/Pingu/Sprites/Pingu_taunt2.png", { frameWidth: 41, frameHeight: 69 });
+    this.load.spritesheet("Pingu_guard", "assets/personagens/Pingu/Sprites/Pingu_guard.png", { frameWidth: 46, frameHeight: 48 });
+    this.load.spritesheet("Pingu_stun", "assets/personagens/Pingu/Sprites/Pingu_stun.png", { frameWidth: 32, frameHeight: 62 });
+    this.load.spritesheet("Pingu_hurt", "assets/personagens/Pingu/Sprites/Pingu_hurt.png", { frameWidth: 181, frameHeight: 190 });
+    this.load.spritesheet("Pingu_fly", "assets/personagens/Pingu/Sprites/Pingu_fly.png", { frameWidth: 160, frameHeight: 160 });
+    this.load.spritesheet("Pingu_dead", "assets/personagens/Pingu/Sprites/Pingu_dead.png", { frameWidth: 204, frameHeight: 130 });
+    this.load.spritesheet("Pingu_getup", "assets/personagens/Pingu/Sprites/Pingu_getup.png", { frameWidth: 105, frameHeight: 91 });
+
     // --- visual effects ---
     //
     

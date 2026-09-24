@@ -10,6 +10,7 @@ import SpiderMan from "../Personagensjs/SpiderMan.js";
 import Miku from "../Personagensjs/Miku.js";
 import Ken from "../Personagensjs/Ken.js";
 import Slenderman from "../Personagensjs/Slender.js";
+import Pingu from "../Personagensjs/Pingu.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import SistemaPlataformasAtravessaveis from "../Objetos/SistemaPlataformasAtravessaveis.js";
 import SistemaLedge from "../Objetos/SistemaLedge.js";
@@ -248,6 +249,8 @@ this.indicadorP2 = this.criarIndicador(
         return new Ken(this, x, y, teclas, minDano, maxDano, controle);
         case "Slenderman":
         return new Slenderman(this, x, y, teclas, minDano, maxDano, controle);
+        case "Pingu":
+        return new Pingu(this, x, y, teclas, minDano, maxDano, controle);
       default:
         return new Ken(this, x, y, teclas, minDano, maxDano, controle);
     }
