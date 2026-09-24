@@ -166,9 +166,8 @@ export default class SpiderThrow {
     if (this.acertou || !alvo) return;
 
     // Se estiver defendendo, a teia é bloqueada
-    const estadoAlvo = alvo.maquinaEstados?.estadoAtual?.nome;
-
-     if (estadoAlvo === "guard") {
+     if (alvo.podeDefender?.({ x: this.personagem.sprite.x })) {
+     alvo.maquinaEstados.estadoAtual.tentarParry(this.personagem);
      this.limparHitbox();
      return;
    }

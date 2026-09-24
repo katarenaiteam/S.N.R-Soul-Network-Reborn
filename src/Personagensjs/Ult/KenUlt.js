@@ -625,7 +625,10 @@ export default class KenUlt {
     if (indice < 0 || (this.ultimoHit.get(alvo) ?? -1) >= indice) return;
     this.ultimoHit.set(alvo, indice);
     if (this.numeroShoryuken === 2 && this.frameUltAtual >= FRAME_FINAL) {
-      if (!alvo.invulneravel && alvo.maquinaEstados?.estadoAtual?.nome !== 'guard') {
+      if (alvo.invulneravel) return;
+      if (alvo.podeDefender?.({ x: this.personagem.sprite.x })) {
+        alvo.maquinaEstados.estadoAtual.tentarParry(this.personagem);
+      } else {
         this.executarImpactoFinal(alvo);
       }
       return;

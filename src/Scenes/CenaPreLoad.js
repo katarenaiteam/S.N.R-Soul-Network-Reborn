@@ -471,7 +471,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
 
     // -- Pingu 
     this.load.spritesheet("Pingu_intro", "assets/personagens/Pingu/Sprites/Pingu_intro.png", { frameWidth: 81, frameHeight: 90 });
-    this.load.spritesheet("Pingu_idle", "assets/personagens/Pingu/Sprites/Pingu_idle.png", { frameWidth: 39, frameHeight: 72 });
+    this.load.spritesheet("Pingu_idle", "assets/personagens/Pingu/Sprites/Pingu_idle.png", { frameWidth: 39, frameHeight: 62 });
     this.load.spritesheet("Pingu_jump", "assets/personagens/Pingu/Sprites/Pingu_jump.png", { frameWidth: 59, frameHeight: 101 });
     this.load.spritesheet("Pingu_walk", "assets/personagens/Pingu/Sprites/Pingu_walk.png", { frameWidth: 40, frameHeight: 61 });
     this.load.spritesheet("Pingu_crouch1", "assets/personagens/Pingu/Sprites/Pingu_crouch1.png", { frameWidth: 43, frameHeight: 60 });

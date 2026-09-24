@@ -171,6 +171,69 @@ export default class Personagem {
 }
 
 
+  bloquearMovimentoParry(duracao) {
+    const sprite = this.sprite;
+    const body = sprite?.body;
+    if (!sprite?.active || !body || this.maquinaEstados.estadoAtual?.nome === "dead") return;
+
+    // Mantem estado e animacao; apenas o deslocamento fica bloqueado.
+    if (this.bloqueioMovimentoParry) {
+      this.bloqueioMovimentoParry.timer.reset({ delay: duracao, callback: this.bloqueioMovimentoParry.liberar });
+      return;
+    }
+    const bloqueio = { x: sprite.x, y: sprite.y, moves: body.moves };
+    const manterPosicao = () => {
+      if (!sprite.active || this.maquinaEstados.estadoAtual?.nome === "dead") {
+        bloqueio.liberar();
+        return;
+      }
+      sprite.setPosition(bloqueio.x, bloqueio.y);
+      body.setVelocity(0, 0);
+      body.updateFromGameObject();
+      this.sincronizarHurtbox();
+      this.vfx?.atualizar();
+    };
+    bloqueio.liberar = () => {
+      this.scene.events.off("postupdate", manterPosicao);
+      this.scene.events.off("shutdown", bloqueio.liberar);
+      bloqueio.timer?.remove(false);
+      if (sprite.body === body) {
+        body.moves = bloqueio.moves;
+        body.setVelocity(0, 0);
+      }
+      this.bloqueioMovimentoParry = null;
+    };
+    this.bloqueioMovimentoParry = bloqueio;
+    body.moves = false;
+    body.setVelocity(0, 0);
+    this.scene.events.on("postupdate", manterPosicao);
+    this.scene.events.once("shutdown", bloqueio.liberar);
+    bloqueio.timer = this.scene.time.delayedCall(duracao, bloqueio.liberar);
+  }
+
+  podeDefender(origem = null) {
+    if (this.maquinaEstados.estadoAtual?.nome !== "guard" || this.vidaGuard <= 0) return false;
+    if (!this.maquinaEstados.estadoAtual.defesaAtiva()) return false;
+    const frente = this.sprite.flipX ? -1 : 1;
+    // A direcao de chegada continua valida quando a hitbox atravessa o centro.
+    if (Number.isFinite(origem?.direcao) && origem.direcao !== 0) {
+      return Math.sign(origem.direcao) === -frente;
+    }
+    const oponente = this.scene.jogador1 === this ? this.scene.jogador2 : this.scene.jogador1;
+    const x = origem?.x ?? oponente?.sprite?.x;
+    return Number.isFinite(x) && (x - this.sprite.x) * frente > 0;
+  }
+
+  atualizarEfeitoGuard() {
+    const quebrou = this.vidaGuard <= 0;
+    this.vfx.destruirEfeito(this.efeitoGuard);
+    this.efeitoGuard = this.vfx.tocar(quebrou ? "brokeguard" : "guard", {
+      animacao: quebrou ? "brokeguard-efect" : "guard-sustentada",
+      loop: !quebrou,
+      desgasteGuard: 1 - Math.max(0, Math.min(1, this.vidaGuard / this.guardMaximo)),
+    });
+  }
+
   // --- RECEBIMENTO DE DANO ---
   receberDano(quantidade, propriedades = {}, origem = null) {
     if (this.invulneravel) return true;
@@ -186,15 +249,11 @@ export default class Personagem {
   }
 
     //  SE ESTIVER EM ESTADO DE GUARD:
-    if (this.maquinaEstados.estadoAtual?.nome === "guard") {
+    if (this.podeDefender(origem)) {
+      if (this.maquinaEstados.estadoAtual.tentarParry(origem?.atacante ?? atacante)) return true;
       this.vidaGuard -= quantidade;
 
-      // Cada impacto substitui a barreira anterior, inclusive na quebra.
-      const efeitoGuard = this.vidaGuard <= 0
-        ? "brokeguard"
-        : this.vidaGuard <= this.guardMaximo / 2 ? "midguard" : "guard";
-      this.vfx.destruirEfeito(this.efeitoGuard);
-      this.efeitoGuard = this.vfx.tocar(efeitoGuard);
+      this.atualizarEfeitoGuard();
 
       // QUEBRA DE GUARDA:
       if (this.vidaGuard <= 0) {

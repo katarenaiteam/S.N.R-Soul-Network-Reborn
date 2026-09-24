@@ -10,6 +10,12 @@ export default class EstadoJump extends EstadoBase {
   }
 
   execute() {
+    // Uma tentativa por pressionamento; segurar nao renova a janela no ar.
+    if (this.personagem.inputJustDown("guard")) {
+      this.personagem.maquinaEstados.mudarEstado("guard");
+      return;
+    }
+
     // 1. Dash no ar
   if (
   this.personagem.inputJustDown("dash") &&

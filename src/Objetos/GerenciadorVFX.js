@@ -1,4 +1,6 @@
 
+let proximoIdGuard = 0;
+
 const VFX_GLOBAIS = {
   guard: {
     blendMode: "ADD",
@@ -71,6 +73,12 @@ export default class GerenciadorVFX {
   constructor(personagem) {
     this.personagem = personagem;
     this.scene = personagem.scene;
+    this.idGuard = proximoIdGuard++;
+    this.texturasGuard = new Set();
+    this.scene.events.once("shutdown", () => {
+      for (const chave of this.texturasGuard) this.scene.textures.remove(chave);
+      this.texturasGuard.clear();
+    });
 
     // Efeitos que precisam acompanhar o personagem.
     this.efeitosSeguindo = [];
@@ -172,6 +180,15 @@ export default class GerenciadorVFX {
       }
     }
 
+    if (config.desgasteGuard > 0) {
+      const texturaGuard = this.obterTexturaGuardDesgastada(textura, config.desgasteGuard);
+      const colorir = () => {
+        efeito.setTexture(texturaGuard, efeito.frame.name);
+      };
+      efeito.on("animationupdate", colorir);
+      colorir();
+    }
+
     // ============================================================
     // EFEITO SEGUINDO PERSONAGEM
     // ============================================================
@@ -205,6 +222,43 @@ export default class GerenciadorVFX {
   // ============================================================
   // POSIÇÃO
   // ============================================================
+
+  obterTexturaGuardDesgastada(chave, desgaste) {
+    const nivel = Math.round(Math.max(0, Math.min(1, desgaste)) * 20);
+    if (nivel === 0) return chave;
+    const variante = `${chave}-desgaste-${this.idGuard}`;
+    const existente = this.scene.textures.exists(variante)
+      ? this.scene.textures.get(variante) : null;
+    if (existente?.nivelGuard === nivel) return variante;
+    const progresso = nivel / 20;
+    const original = this.scene.textures.get(chave);
+    const imagem = original.getSourceImage();
+    const textura = existente ?? this.scene.textures.createCanvas(variante, imagem.width, imagem.height);
+    this.texturasGuard.add(variante);
+    const contexto = textura.getContext();
+    contexto.clearRect(0, 0, imagem.width, imagem.height);
+    contexto.drawImage(imagem, 0, 0);
+    const pixels = contexto.getImageData(0, 0, imagem.width, imagem.height);
+    // Parte dos pixels originais: nunca converte o efeito em branco/cinza.
+    // Troca gradualmente azul por vermelho preservando detalhes e transparencia.
+    for (let i = 0; i < pixels.data.length; i += 4) {
+      const r = pixels.data[i];
+      const b = pixels.data[i + 2];
+      pixels.data[i] = Math.round(r + (b - r) * progresso);
+      pixels.data[i + 1] = Math.round(pixels.data[i + 1] * (1 - 0.65 * progresso));
+      pixels.data[i + 2] = Math.round(b + (r - b) * progresso);
+    }
+    contexto.putImageData(pixels, 0, 0);
+    if (!existente) {
+      for (const nome of original.getFrameNames()) {
+        const frame = original.get(nome);
+        textura.add(nome, 0, frame.cutX, frame.cutY, frame.cutWidth, frame.cutHeight);
+      }
+    }
+    textura.nivelGuard = nivel;
+    textura.refresh();
+    return variante;
+  }
 
   calcularPosicao(config, alvo = this.personagem) {
     const sprite = alvo.sprite;
@@ -454,6 +508,16 @@ export default class GerenciadorVFX {
   }
 
   criarAnimacoesGlobais() {
+  // Repete apenas a barreira formada, sem os frames em que ela desaparece.
+  if (!this.scene.anims.exists("guard-sustentada")) {
+    this.scene.anims.create({
+      key: "guard-sustentada",
+      frames: this.scene.anims.generateFrameNumbers("guard-efect", { start: 6, end: 12 }),
+      frameRate: 18,
+      yoyo: true,
+      repeat: -1,
+    });
+  }
   for (const { key, end, frameRate } of [
     { key: "guard-efect", end: 30, frameRate: 60 },
     { key: "mid-guard", end: 24, frameRate: 60 },

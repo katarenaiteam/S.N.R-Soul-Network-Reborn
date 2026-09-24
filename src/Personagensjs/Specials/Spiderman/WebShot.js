@@ -73,10 +73,14 @@ export default class WebShot {
 
   processarAcerto(alvo) {
     if (this.encerrado) return;
+    const origem = {
+      x: this.projetil.x,
+      direcao: Math.sign(this.projetil.body.velocity.x),
+    };
     // A logica e dona das colisoes: encerra todas antes de descartar o projetil.
     this.finalizarProjetil();
     const props = this.special?.propriedades || {};
-    const defendeu = alvo.receberDano(props.dano || 8, props);
+    const defendeu = alvo.receberDano(props.dano || 8, props, origem);
     if (!defendeu && alvo.maquinaEstados && !alvo.estaPresoNaTeia && !alvo.imuneTeia) {
       this.prenderOponente(alvo);
     }

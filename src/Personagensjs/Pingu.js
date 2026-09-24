@@ -17,7 +17,7 @@ export default class Pingu extends Personagem {
         velocidade: 200,
         forcaPulo: -600,
         maxPulos: 2,
-        maxDash: 2,
+        maxDash: 1,
         maxComboIndex: 2,
       },
 
@@ -55,9 +55,9 @@ export default class Pingu extends Personagem {
     this.configAnimacoes = {
       idle: {
         largura: 50,
-        altura: 120,
+        altura: 70,
         offsetX: 20,
-        offsetY: 0,
+        offsetY: -10,
         escala: 1,
         hurtboxes: [
           { largura: 30, altura: 30, offsetX: 20, offsetY: -75 },
@@ -68,9 +68,9 @@ export default class Pingu extends Personagem {
 
       walk: {
         largura: 50,
-        altura: 120,
+        altura: 70,
         offsetX: 20,
-        offsetY: -5,
+        offsetY: -16,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
@@ -79,10 +79,11 @@ export default class Pingu extends Personagem {
       },
 
       jump: {
+        offsetVisualY: 5 ,
         largura: 50,
-        altura: 120,
+        altura: 70,
         offsetX: 0,
-        offsetY: 0,
+        offsetY: 25,
         escala: 1,
         hurtboxes: [
           { largura: 60, altura: 70, offsetX: 0, offsetY: -90 }, // Tronco/cabeça
@@ -195,7 +196,7 @@ export default class Pingu extends Personagem {
         ],
       },
       dead: {
-        offsetVisualY: 0,
+      
         largura: 70,
         altura: 40,
         offsetX: 35,
@@ -844,7 +845,7 @@ if (!scene.anims.exists("punch_effect3")) {
 
      scene.anims.create({
       key: "pingu_taunt",
-      frames: scene.anims.generateFrameNumbers("Pingu_taunt", {
+      frames: scene.anims.generateFrameNumbers("Pingu_taunt2", {
         start: 0,
         end: 24,
       }),
@@ -885,7 +886,7 @@ if (!scene.anims.exists("punch_effect3")) {
 
      scene.anims.create({
      key: "pingu_dead",
-     frames: scene.anims.generateFrameNumbers("Pingu_dead", { start: 0, end: 9 }),
+     frames: scene.anims.generateFrameNumbers("Pingu_dead", { start: 0, end: 2 }),
      frameRate: 12,
      repeat: 0,
    });
