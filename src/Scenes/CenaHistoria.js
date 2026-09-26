@@ -1,9 +1,10 @@
 import IntroPartida from "../Objetos/IntroPartida.js";
+import MorteVS from "../Objetos/MorteVS.js";
 import { criarIndicador, atualizarIndicador } from "../Objetos/IndicadorPersonagem.js";
 import { criarHudPartida, atualizarBarraUlt } from "../Objetos/HudPartida.js";
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import Madotsuki from "../Personagensjs/Madotsuki.js";
-import SkyTowers from "../Mapasjs/SkyTowers.js";
+import MikuMap from "../Mapasjs/MikuMap.js";
 import Frederick from "../Personagensjs/Frederick.js";
 import Dio from "../Personagensjs/Dio.js";
 import SpiderMan from "../Personagensjs/SpiderMan.js";
@@ -44,7 +45,7 @@ export default class CenaHistoria extends Phaser.Scene {
 
     this.physics.world.setBounds(0, 0, 2600, 1400);
 
-    this.mapaAtual = new SkyTowers(this);
+    this.mapaAtual = new MikuMap(this);
     this.sistemaLedge = new SistemaLedge(this.mapaAtual.areasLedge);
     this.sistemaLedge.criarVisualizacao(this);
     this.limitesArena = this.mapaAtual.limitesArena;
@@ -233,6 +234,7 @@ this.indicadorCPU = this.criarIndicador(
   "CPU-indV"
 );
 
+    this.mortesVS = new MorteVS(this, lote => this.concluirMortes(lote));
     this.introPartida = new IntroPartida(this, {
       jogadores: [this.jogador1, this.boss],
       participantes: this.participantes.map(({ jogador }) => jogador),
@@ -268,6 +270,8 @@ this.indicadorCPU = this.criarIndicador(
       this.introPartida.atualizar(delta);
       return;
     }
+    this.mortesVS.atualizar(delta);
+    if (this.partidaEncerrada) return;
     this.sistemaLedge.atualizarVisualizacao(this);
     for (const { jogador } of this.participantes) this.sistemaLedge.atualizar(jogador);
     // Processa a saida antes de executar comandos ou enquadrar a camera.
@@ -326,18 +330,25 @@ this.indicadorCPU = this.criarIndicador(
     jogador.ganharCargaUltPorMorte();
     entrada.textoVidas.setText(entrada.rotulo + (jogador.vidas ? ' - VIDAS: ' + jogador.vidas : ' - ELIMINADO'));
     this.limparAcao(jogador);
+    this.mortesVS.iniciar(jogador, spawn ?? entrada.spawn, entrada.vidas);
     if (jogador.vidas === 0) {
-      jogador.eliminado = true;
-      jogador.invulneravel = true;
-      jogador.sprite.disableBody(true, true);
-      jogador.grupoHurtbox.getChildren().forEach(box => { if (box.body) box.body.enable = false; });
       entrada.hud.setAlpha(0.4);
-    } else {
-      this.respawnar(jogador, spawn ?? entrada.spawn);
     }
     jogador.processandoQueda = false;
+  }
+
+  concluirMortes(lote) {
+    for (const { jogador, pontoRespawn, invulneravel } of lote) {
+      jogador.emMorteVS = false;
+      if (jogador.vidas <= 0) continue;
+      jogador.eliminado = false;
+      jogador.invulneravel = invulneravel;
+      jogador.sprite.body.enable = true;
+      jogador.sprite.body.setAllowGravity(true);
+      this.respawnar(jogador, pontoRespawn);
+    }
     const jogadoresVivos = this.participantes.some(item => item.jogador !== this.boss && item.jogador.vidas > 0);
-    if (!jogadoresVivos || this.vidasBoss === 0) {
+    if ((!jogadoresVivos || this.vidasBoss === 0) && !this.mortesVS.pendentes.size) {
       this.partidaEncerrada = true;
       this.botIA.soltarTudo();
       this.sound.stopAll();
@@ -378,6 +389,7 @@ this.indicadorCPU = this.criarIndicador(
     if (jogador.eliminado || jogador.vidas <= 0) return;
     jogador.sprite.body.reset(spawn.x, spawn.y);
     jogador.sprite.setVisible(true).setActive(true);
+    jogador.maquinaEstados.mudarEstado('idle');
     jogador.comboHitsRecebidos = 0;
     jogador.tempoUltimoHit = -Infinity;
     jogador.ultimoAtaqueRecebidoId = null;
@@ -386,9 +398,6 @@ this.indicadorCPU = this.criarIndicador(
     jogador.textoDano?.setText(0);
     jogador.estadoInvencible.entrar(5000);
     jogador.sincronizarHurtbox();
-    if (this.overlayMorte) {
-      this.overlayMorte.setVisible(true).play('TVefect');
-    }
   }
 
   criarIndicador(...args) {

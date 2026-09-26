@@ -215,6 +215,13 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.spritesheet("FJ_ground", "assets/personagens/FJ/Sprites/FJ_ground.png", { frameWidth: 280, frameHeight: 327 });
     this.load.audio("ground", "assets/personagens/FJ/Audio/ground.wav");
     this.load.spritesheet("ground_effect", "assets/personagens/FJ/Sprites/ground_effect.png", { frameWidth: 628, frameHeight: 348 });
+    //ult
+    this.load.spritesheet("FJ_prepare", "assets/personagens/FJ/Sprites/ult/FJ_prepare.png", { frameWidth: 451, frameHeight: 461 });
+    this.load.spritesheet("FJ_ult", "assets/personagens/FJ/Sprites/ult/FJ_ult.png", { frameWidth: 250, frameHeight: 600 });
+    this.load.image("FJ-red", "assets/personagens/FJ/Sprites/ult/FJ-red.png");
+    this.load.spritesheet("FJ_ultN", "assets/personagens/FJ/Sprites/ult/FJ_ultN.png", { frameWidth: 615, frameHeight: 616 });
+    this.load.spritesheet("FJ-ultExplosion", "assets/personagens/FJ/Sprites/ult/FJ-ultExplosion.png", { frameWidth: 720, frameHeight: 480 });
+    this.load.spritesheet("FJ-eyes", "assets/personagens/FJ/Sprites/ult/FJ-eyes.png", { frameWidth: 1410, frameHeight: 450 });
 
     // --- TH30 ---
    
@@ -561,8 +568,11 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.spritesheet("backtest", "assets/cenarios/MapaTest/backtest.png", { frameWidth: 1200, frameHeight: 600 });
     this.load.audio("No_More", "assets/cenarios/MapaTest/No_More.mp3");
     this.load.image("thumb_teste", "assets/cenarios/MapaTest/thumb_teste.png");
-
-
+  // ---  miku ---
+    this.load.spritesheet("show-back", "assets/cenarios/MikuShow/show-back.png", { frameWidth: 1920, frameHeight: 1080 });
+    this.load.image("miku-plat", "assets/cenarios/MikuShow/miku-plat.png");
+    this.load.image("suport", "assets/cenarios/MikuShow/suport.png");
+    this.load.spritesheet("efeito-baner", "assets/cenarios/MikuShow/efeito-baner.png", { frameWidth: 320, frameHeight: 240 });
 
     // --- AUDIOS ---
     //--OST

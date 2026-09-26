@@ -41,7 +41,7 @@ export default class Miku_IA {
     if (avancando) pressao += dt / 18000;
     pressao = clamp(pressao, 0, 1);
     this.observacoes.set(alvo, { estado: estado?.nome, anim, inicio: estado?.tempoInicio, pressao });
-    this.agressividade += (clamp(pressao, 0.18, 0.95) - this.agressividade) * (1 - Math.exp(-dt / 1800));
+    this.agressividade += (clamp(pressao, 0.18, 0.8) - this.agressividade) * (1 - Math.exp(-dt / 1800));
   }
 
   update(time, delta) {
@@ -99,7 +99,7 @@ export default class Miku_IA {
       if (this.recuperar(bot, this.plataformas(), time)) return;
     } else if (!bot.sprite.body.blocked.down && this.recuperando) return;
     if (time < this.proximaDecisao) return;
-    this.proximaDecisao = time + 260 - this.agressividade * 130;
+    this.proximaDecisao = time + 320 - this.agressividade * 120;
     for (const tecla of ['esquerda', 'direita', 'baixo', 'guard']) this.ctrl.soltar(tecla);
     if (estado?.nome === 'dead') {
       this.mover(bot.sprite.x + (alvo.sprite.x < bot.sprite.x ? -30 : 30)); return;
@@ -354,7 +354,7 @@ export default class Miku_IA {
     this.usos.set(tipo, time);
     // Uma nota por abertura; nao fica carregando indefinidamente.
     this.ctrl.pulsar(especial ? 'special' : 'atack', especial && tipo.includes('neutro') ? 580 : 50);
-    this.proximoAtaque = time + (especial ? 1100 : 850) - 450 * this.agressividade;
+    this.proximoAtaque = time + (especial ? 1250 : 1000) - 350 * this.agressividade;
   }
 
   combo(bot, time) {
@@ -364,7 +364,7 @@ export default class Miku_IA {
         time - e.tempoInicio >= golpe.comboJanelaInicio && time - e.tempoInicio <= golpe.comboJanelaFim) {
       this.comboEnviado = chave;
       this.ctrl.pulsar('atack');
-      this.proximoAtaque = time + 850 - 450 * this.agressividade;
+      this.proximoAtaque = time + 1000 - 350 * this.agressividade;
     }
   }
 
@@ -400,6 +400,13 @@ export default class Miku_IA {
     if (ameaca && chao && (bot.vidaGuard ?? 50) > 15) { this.ctrl.segurar('guard'); return true; }
     const suporte = this.apoio(bot);
     const direcao = Math.sign(dx) || 1;
+    const ultPronta = bot.ult && bot.ultEstaCarregada?.() &&
+      (bot.podeUsarUlt?.() ?? true) && chao && !this.ctrl.scene.ultEmAndamento;
+    if (ultPronta && dist < 320 && Math.abs(dy) < 75 &&
+        this.corredorSeguro(bot, -direcao, 90)) {
+      this.mover(bot.sprite.x - direcao * 90);
+      return true;
+    }
     const spinSeguro = this.corredorSeguro(bot, direcao, 290, !chao);
     const sideSeguro = this.corredorSeguro(bot, direcao, 130, !chao);
     const abertura = time < (this.punirAte ?? 0) || ['dano', 'dead', 'atordoado'].includes(estadoAlvo) ||
@@ -433,7 +440,7 @@ export default class Miku_IA {
         if (piso && dist > 210 && dist < 600 && Math.abs(dy) < 50 && this.linhaLivre(bot, alvo)) adicionar('air_neutro', 80, true);
         if (piso && dy > 90 && dist < 200 && time >= (bot.proximaInvocacaoMiniPuppets ?? 0) && bot.pulos < bot.maxPulos) adicionar('air_cima', 70, true);
       }
-      if (bot.ult && bot.ultEstaCarregada?.() && (bot.podeUsarUlt?.() ?? true) && chao && dist < 220 && Math.abs(dy) < 75 && this.agressividade > 0.5 && !this.ctrl.scene.ultEmAndamento) {
+      if (ultPronta && dist >= 300 && dist < 650 && Math.abs(dy) < 75 && this.agressividade > 0.35) {
         this.preparar('neutro');
         if (bot.maquinaEstados.estadoAtual.nome === 'idle') {
           this.ctrl.pulsar('atack'); this.ctrl.pulsar('special');
@@ -446,7 +453,7 @@ export default class Miku_IA {
     }
     if (somenteAtaque) return false;
     const semTiro = !this.podeSpecial(chao ? 'neutro' : 'air_neutro') || !this.linhaLivre(bot, alvo);
-    const ideal = abertura || semTiro ? 85 : 280 - 110 * this.agressividade;
+    const ideal = ultPronta ? 420 : abertura || semTiro ? 85 : 280 - 110 * this.agressividade;
     const moverSeguro = destino => this.mover(chao && suporte ?
       clamp(destino, suporte.left + 65, suporte.right - 65) : destino);
     if (Math.abs(dy) > 95) {

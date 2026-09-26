@@ -15,12 +15,13 @@ export default class NeSpecial {
     this.scene = personagem.scene;
     this.special = special;
     this.estado = estado;
+    this.aereo = special.aereo === true;
     this.finalizado = false;
     this.liberado = false;
     this.inicioCarga = null;
     this.inicioPoseFinal = null;
     this.inicioImpulso = null;
-    this.dano = DANO_BASE;
+    this.dano = this.aereo ? 24 : DANO_BASE;
     this.multiplicadorCarga = 1;
     this.hitbox = null;
     this.alvosAtingidos = new Set();
@@ -34,7 +35,7 @@ export default class NeSpecial {
     sprite.setVelocityX(0);
     sprite.on("animationupdate", this.aoAtualizarAnimacao);
     sprite.once(`animationcomplete-${this.special.animacao}`, this.aoCompletarAnimacao);
-    if (!this.personagem.inputDown("special")) {
+    if (this.aereo || !this.personagem.inputDown("special")) {
       this.liberado = true;
       this.efeitosLiberacao();
     }
@@ -62,7 +63,8 @@ export default class NeSpecial {
       this.inicioImpulso = this.scene.time.now;
       this.personagem.hiperArmaduraHits = 1;
       this.personagem.hiperArmaduraFonte = this;
-      this.personagem.sprite.body.setVelocity(IMPULSO_X * this.direcao, IMPULSO_Y);
+      this.personagem.sprite.body.setVelocity(IMPULSO_X * this.direcao,
+        this.aereo ? this.personagem.sprite.body.velocity.y : IMPULSO_Y);
     }
     if (indice === 7) this.criarHitbox();
     if (indice === 8) {
@@ -109,7 +111,7 @@ export default class NeSpecial {
     if (this.inicioImpulso === null) return;
     const progresso = Math.min(1, (this.scene.time.now - this.inicioImpulso) / DURACAO_AVANCO);
     // Desacelera sem cortar o movimento na entrada da pose final.
-    // O eixo vertical fica sob a gravidade, como no Shoryuken.
+    // No chao, o eixo vertical fica sob a gravidade, como no Shoryuken.
     const suavizacao = progresso * progresso * (3 - 2 * progresso);
     this.personagem.sprite.setVelocityX(IMPULSO_X * this.direcao * (1 - suavizacao));
   }
@@ -146,8 +148,8 @@ export default class NeSpecial {
     alvo.receberDano(this.dano, {
       dano: this.dano,
       tipoSomImpacto: "heavy",
-      knockbackX: 350 * this.multiplicadorCarga,
-      knockbackY: -250 * this.multiplicadorCarga,
+      knockbackX: (this.aereo ? 150 : 350) * this.multiplicadorCarga,
+      knockbackY: (this.aereo ? 450 : -250) * this.multiplicadorCarga,
       tumbling: true,
     }, { direcao: this.direcao, x: this.personagem.sprite.x });
     const som = this.personagem.sons?.heavy;

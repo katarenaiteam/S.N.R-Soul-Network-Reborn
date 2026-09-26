@@ -44,6 +44,7 @@ export default class FJ extends Personagem {
     offsetY: -63,
     seguir: true,
     blendMode: "ADD",
+    camadas: 4,
     depthOffset: 2,
   },
 
@@ -453,11 +454,7 @@ this.nomePersonagem = "Frederick Johnson";
         offsetX: 150,
         offsetY: -19,
         escala: 0.33,
-        hurtboxes: [
-          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
-          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
-          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
-        ],
+        hurtboxes: [],
       },
 
       AsiSpecial: {
@@ -478,10 +475,7 @@ this.nomePersonagem = "Frederick Johnson";
         offsetX: 73,
         offsetY: 81,
         escala: 0.33,
-        hurtboxes: [
-          { largura: 55, altura: 75, offsetX: 0, offsetY: -65 },
-          { largura: 35, altura: 35, offsetX: 0, offsetY: -18 },
-        ],
+        hurtboxes: [],
       },
 
       ground: {
@@ -539,7 +533,7 @@ this.nomePersonagem = "Frederick Johnson";
         largura: 65,
         altura: 17,
         cooldown: 700,
-        duracao: 350,
+        duracao: 320,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -558,7 +552,7 @@ this.nomePersonagem = "Frederick Johnson";
         },
 
         comboProximo: "neutro2",
-        comboJanelaInicio: 200,
+        comboJanelaInicio: 170,
         comboJanelaFim: 300,
       },
 
@@ -571,7 +565,7 @@ this.nomePersonagem = "Frederick Johnson";
         offsetY: -80,
         largura: 33,
         altura: 45,
-        duracao: 550,
+        duracao: 500,
         cancelavel: true,
         propriedades: {
            tipoSomImpacto: "heavy",
@@ -583,8 +577,8 @@ this.nomePersonagem = "Frederick Johnson";
         },
 
         comboProximo: "neutro3",
-        comboJanelaInicio: 400,
-        comboJanelaFim: 500,
+        comboJanelaInicio: 330,
+        comboJanelaFim: 460,
       },
 
       neutro3: {
@@ -656,20 +650,20 @@ this.nomePersonagem = "Frederick Johnson";
         multiHit: {
           tipo: "automatico",
           hits: [
-            { inicio: 140, duracao: 55, offsetY: -65,
-              propriedades: { dano: 3, knockbackX: 400, knockbackY: 0,
+            { inicio: 140, duracao: 70, offsetY: -65,
+              propriedades: { dano: 3, knockbackX: 280, knockbackY: 0,
                 knockbackFixo: true, tumbling: false, hitstunFrames: 18 } },
-            { inicio: 240, duracao: 55, offsetX: 40,
-              propriedades: { dano: 3, knockbackX: 250, knockbackY: -10,
+            { inicio: 240, duracao: 70, offsetX: 40,
+              propriedades: { dano: 3, knockbackX: 200, knockbackY: -10,
                 knockbackFixo: true, tumbling: false, hitstunFrames: 18 } },
-            { inicio: 340, duracao: 55, offsetX: 45,
+            { inicio: 340, duracao: 70, offsetX: 45,
               propriedades: { dano: 6 } }, // Herda o arremesso forte do golpe.
           ],
         },
         offsetX: 40,
-        offsetY: -77,
-        largura: 70,
-        altura: 25,
+        offsetY: -70,
+        largura: 78,
+        altura: 34,
         cooldown: 900,
         duracao: 500,
         cancelavel: true,
@@ -683,7 +677,7 @@ this.nomePersonagem = "Frederick Johnson";
          inicio: 50,
          fim: 400,
       x: {
-         de: 500,
+         de: 420,
          para: 150,
         },
 
@@ -693,17 +687,18 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 200,
-          knockbackY: -100,
+          knockbackX: 130,
+          knockbackY: -110,
           tumbling: false,
+          knockbackFixo: true,
         },
       },
      agachado: {
         animacao: "fj_downAtack",
         frameHitbox: 3,
-        offsetX: 66,
+        offsetX: 56,
         offsetY: -20,
-        largura: 50,
+        largura: 70,
         altura: 45,
         cooldown: 700,
         duracao: 350,
@@ -716,8 +711,8 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 9,
-          knockbackX: 40,
-          knockbackY: -300,
+          knockbackX: 60,
+          knockbackY: -350,
           tumbling: false,
           knockbackFixo: true,
         },
@@ -777,11 +772,11 @@ this.nomePersonagem = "Frederick Johnson";
 
       air_side: {
         animacao: "fj_sideAir",
-        frameHitbox: 4,
-        offsetX: 50,
+        frameHitbox: 3,
+        offsetX: 45,
         offsetY: -57,
-        largura: 55,
-        altura: 25,
+        largura: 65,
+        altura: 40,
         cooldown: 650,
         duracao: 450,
          finalizarAoTocarChao: true,
@@ -794,21 +789,21 @@ this.nomePersonagem = "Frederick Johnson";
 
         movimento: {
         inicio: 30,
-        fim: 400,
+        fim:200,
          x: {
-         de: 500,
-         para: 350,
+         de: 800,
+         para: 650,
         },
 
         curva: "easeOut",
        },
 
         propriedades: {
-          anularGravidade: true,
+         // anularGravidade: true,
           tipoSomImpacto: "heavy",
           dano: 9,
-          knockbackX: 120,
-          knockbackY: -470,
+          knockbackX: 400,
+          knockbackY: -150,
           tumbling: true,
           knockbackFixo: false,
         },
@@ -826,12 +821,24 @@ this.nomePersonagem = "Frederick Johnson";
         duracao: 400,
          finalizarAoTocarChao: true,
         atrasoFinalizacaoChao: 30,
-        cancelavel: true,
+      
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
           },
         ],
+
+        movimento: {
+        inicio: 30,
+        fim:80,
+         y: {
+         de: 600,
+         para: 500,
+        },
+
+        curva: "easeOut",
+       },
+
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 10,
@@ -845,6 +852,13 @@ this.nomePersonagem = "Frederick Johnson";
 
     // specials ==========================
     this.specials = {
+      air_neutro: {
+        animacao: "fj_neSpecial",
+        logica: NeSpecial,
+        aereo: true,
+        cooldown: 600,
+        propriedades: { travarMovimentoAir: true, anularGravidade: true },
+      },
       air_cima: {
         animacao: "fj_AupSpecial",
         logica: AupSpecial,
@@ -888,13 +902,44 @@ this.nomePersonagem = "Frederick Johnson";
 
   //animaçoes====================================================
   
+  corrigirContatoChaoAposDash() {
+    const body = this.sprite.body;
+    if (body.blocked.down || body.velocity.y < 0) return;
+    const sistema = this.scene.sistemaPlataformasAtravessaveis;
+    const ignorarAte = sistema?.jogadores.get(this)?.ignorarAte ?? 0;
+    const solidas = this.scene.mapaAtual?.plataformas?.getChildren() ?? [];
+    const atravessaveis = this.scene.time.now >= ignorarAte
+      ? sistema?.grupo.getChildren() ?? [] : [];
+    // Sem gravidade, blocked.down pode sumir durante o dash horizontal.
+    const apoio = [...solidas, ...atravessaveis].find(plataforma => {
+      const piso = plataforma.body;
+      return plataforma.active !== false && piso?.enable &&
+        piso.checkCollision.up !== false &&
+        body.right > piso.left && body.left < piso.right &&
+        Math.abs(body.bottom - piso.top) <= 8;
+    });
+    if (apoio) {
+      const velocidadeX = body.velocity.x;
+      body.reset(this.sprite.x, this.sprite.y + apoio.body.top - body.bottom);
+      body.setVelocityX(velocidadeX);
+      body.blocked.down = true;
+    }
+  }
+
+  obterTipoSpecial() {
+    if (this.inputDown("baixo") && this.scene.time.now - this.tempoUltimoDash <= 350) {
+      this.corrigirContatoChaoAposDash();
+    }
+    return super.obterTipoSpecial();
+  }
+
   static criarAnimacoes(scene) {
     if (!scene.anims.exists("fj_npose")) {
       scene.anims.create({
         key: "fj_npose",
         frames: scene.anims.generateFrameNumbers("npose", { start: 0, end: 28 }),
         frameRate: 48,
-        repeat: 0,
+        repeat: -1,
       });
     }
 
@@ -960,7 +1005,7 @@ if (!scene.anims.exists("punch_effect3")) {
 
     scene.anims.create({
       key: "fj_doSpecial",
-      frames: scene.anims.generateFrameNumbers("FJ_doSpecial", { start: 0, end: 12 }),
+      frames: scene.anims.generateFrameNumbers("FJ_doSpecial", { start: 0, end: 7 }),
       frameRate: 12,
       repeat: 0,
     });
@@ -1153,7 +1198,7 @@ scene.anims.create({
         start: 0,
         end: 4,
       }),
-      frameRate: 16,
+      frameRate: 18,
       repeat: 0,
     });
     scene.anims.create({
@@ -1162,7 +1207,7 @@ scene.anims.create({
         start: 0,
         end: 14,
       }),
-      frameRate: 22,
+      frameRate: 26,
       repeat: 0,
     });
     scene.anims.create({

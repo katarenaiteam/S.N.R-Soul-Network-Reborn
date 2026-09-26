@@ -6,7 +6,7 @@ const PAUSA_ERRO = 200;
 const VELOCIDADE_AVANCO = 550;
 const DURACAO_AVANCO = 400;
 const TEMPO_ACELERACAO = 120;
-const HITBOX = { largura: 60, altura: 75, offsetX: 60, offsetY: -75 };
+const HITBOX = { largura: 50, altura: 40, offsetX: 45, offsetY: -90 };
 
 // Um estado sem leitura de comandos encerra tambem o ataque/special anterior.
 class EstadoAgarradoFJ extends EstadoBase {

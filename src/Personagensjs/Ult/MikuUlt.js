@@ -1321,10 +1321,12 @@ if (agora < bloqueadoAte) {
 
     fundo?.setVisible(false);
 
-    const plataformas =
-      this.scene.mapaAtual
-        ?.plataformas
-        ?.getChildren?.() ?? [];
+    const mapa = this.scene.mapaAtual;
+    const plataformas = [
+      ...(mapa?.plataformas?.getChildren?.() ?? []),
+      ...(mapa?.objetosTeloes ?? []),
+      mapa?.suportePlataforma,
+    ].filter(Boolean);
 
     this.plataformas =
       plataformas.map(p => ({

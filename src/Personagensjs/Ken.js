@@ -261,6 +261,7 @@ this.nomePersonagem = "Ken";
       },
 
       sideAtack: {
+        offsetVisualX: 20,
         largura: 85,
         altura: 120,
         offsetX: 30,

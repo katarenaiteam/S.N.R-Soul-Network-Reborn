@@ -36,6 +36,7 @@ export default class EstadoDash extends EstadoBase {
       if (this.personagem.maquinaEstados.estadoAtual !== this) return;
       this.personagem.estaEmDash = false;
       this.personagem.sprite.body.setAllowGravity(true);
+      this.personagem.corrigirContatoChaoAposDash?.();
 
       if (!this.personagem.sprite.body.blocked.down) {
         this.personagem.maquinaEstados.mudarEstado("jump");

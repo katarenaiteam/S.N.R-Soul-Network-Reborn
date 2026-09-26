@@ -388,8 +388,8 @@ this.vfxAtaqueNormal = {
         offsetY: -80,
         largura: 45,
         altura: 30,
-        cooldown: 700,
-        duracao: 400,
+        cooldown: 800,
+        duracao: 440,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -403,12 +403,12 @@ this.vfxAtaqueNormal = {
           knockbackX: 30,
           knockbackY: 0,
           knockbackFixo: true,
-          hitstunFrames: 17,
+          hitstunFrames: 25,
         },
 
         comboProximo: "neutro2",
-        comboJanelaInicio: 200,
-        comboJanelaFim: 300,
+        comboJanelaInicio: 250,
+        comboJanelaFim: 350,
       },
 
       neutro2: {
@@ -420,7 +420,7 @@ this.vfxAtaqueNormal = {
         offsetY: -80,
         largura: 45,
         altura: 30,
-        duracao: 400,
+        duracao: 440,
        // cancelavel: true,
         propriedades: {
            tipoSomImpacto: "heavy",
@@ -428,11 +428,11 @@ this.vfxAtaqueNormal = {
           knockbackX: 40,
           knockbackY: 0,
           knockbackFixo: true,
-          hitstunFrames: 18,
+          hitstunFrames: 25,
         },
 
         comboProximo: "neutro3",
-        comboJanelaInicio: 200,
+        comboJanelaInicio: 250,
         comboJanelaFim: 400,
       },
       neutro3: {
@@ -442,8 +442,8 @@ this.vfxAtaqueNormal = {
         offsetY: -80,
         largura: 45,
         altura: 30,
-        cooldown: 700,
-        duracao: 350,
+        cooldown: 800,
+        duracao: 440,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -457,24 +457,24 @@ this.vfxAtaqueNormal = {
           knockbackX: 30,
           knockbackY: 0,
           knockbackFixo: true,
-          hitstunFrames: 17,
+          hitstunFrames: 25,
         },
 
         comboProximo: "neutro4",
-        comboJanelaInicio: 200,
-        comboJanelaFim: 300,
+        comboJanelaInicio: 250,
+        comboJanelaFim: 350,
       },
 
       neutro4: {
         animacao: "miku_sideAtack",
 
-        frameHitbox: 2,
+        frameHitbox: 3,
 
         offsetX: 50,
         offsetY: -80,
         largura: 45,
         altura: 30,
-        duracao: 500,
+        duracao: 540,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -507,13 +507,13 @@ this.vfxAtaqueNormal = {
 
       side: {
         animacao: "miku_sideAtack",
-        frameHitbox: 2,
-        offsetX: 52,
+        frameHitbox: 3,
+        offsetX: 47,
         offsetY: -60,
-        largura: 55,
+        largura: 53,
         altura: 50,
         cooldown: 900,
-        duracao: 500,
+        duracao: 540,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -548,7 +548,7 @@ this.vfxAtaqueNormal = {
         largura: 45,
         altura: 25,
         cooldown: 900,
-        duracao: 400,
+        duracao: 480,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -568,15 +568,15 @@ this.vfxAtaqueNormal = {
         air_neutro: {
         animacao: "miku_neutralAir",
         frameHitbox: 2,
-        offsetX: 50,
+        offsetX: 30,
         offsetY: -70,
-        largura: 55,
-        altura: 35,
+        largura: 45,
+        altura: 45,
         cooldown: 700,
-        duracao: 350,
+        duracao: 380,
          finalizarAoTocarChao: true,
-        atrasoFinalizacaoChao: 30,
-        cancelavel: true,
+        atrasoFinalizacaoChao: 90,
+        //cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
@@ -590,6 +590,7 @@ this.vfxAtaqueNormal = {
           knockbackY: -350,
           tumbling: false,
           knockbackFixo: true,
+          hitstunFrames: 25,
         },
       },
 
@@ -604,7 +605,7 @@ this.vfxAtaqueNormal = {
         cooldown: 800,
         duracao: 600,
          finalizarAoTocarChao: true,
-        atrasoFinalizacaoChao: 30,
+        atrasoFinalizacaoChao: 110,
         
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -623,13 +624,13 @@ this.vfxAtaqueNormal = {
         animacao: "miku_upAir",
         frameHitbox: 3,
         offsetX: 8,
-        offsetY: -130,
+        offsetY: -127,
         largura: 32,
-        altura: 44,
+        altura: 40,
         cooldown: 900,
         duracao: 600,
          finalizarAoTocarChao: true,
-        atrasoFinalizacaoChao: 30,
+        atrasoFinalizacaoChao: 100,
        
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -658,7 +659,7 @@ this.vfxAtaqueNormal = {
         cooldown: 900,
         duracao: 400,
         finalizarAoTocarChao: true,
-        atrasoFinalizacaoChao: 0,
+        atrasoFinalizacaoChao: 120,
         finalizarAoAcertarOponente: true,
         atrasoFinalizacaoAcerto: 50,
         cancelavel: false,
@@ -696,8 +697,8 @@ this.vfxAtaqueNormal = {
       cooldown: 1800,
       logica: NotaCarregada,
       escalaNota: 0.8,
-      larguraNota: 70,
-      alturaNota: 70,
+      larguraNota: 35,
+      alturaNota: 35,
       velocidadeNota: 800,
       quedaNota: 0,
       tempoNota: 4000,
@@ -719,8 +720,8 @@ this.vfxAtaqueNormal = {
       logica: NotaCarregada,
       aereo: true,
       escalaNota: 0.8,
-      larguraNota: 70,
-      alturaNota: 70,
+      larguraNota: 35,
+      alturaNota: 35,
       velocidadeNota: 800,
       quedaNota: 0,
       tempoNota: 4000,
@@ -1014,7 +1015,7 @@ scene.anims.create({
         start: 0,
         end: 3,
       }),
-      frameRate: 12,
+      frameRate: 9,
       repeat: 0,
     });
     scene.anims.create({
@@ -1023,7 +1024,7 @@ scene.anims.create({
         start: 4,
         end: 8,
       }),
-      frameRate: 12,
+      frameRate: 9,
       repeat: 0,
     });
     
@@ -1052,7 +1053,7 @@ scene.anims.create({
         start: 0,
         end: 5,
       }),
-      frameRate: 12,
+      frameRate: 10,
       repeat: 0,
     });
      scene.anims.create({
@@ -1070,7 +1071,7 @@ scene.anims.create({
         start: 0,
         end: 5,
       }),
-      frameRate: 16,
+      frameRate: 14,
       repeat: 0,
     });
      scene.anims.create({

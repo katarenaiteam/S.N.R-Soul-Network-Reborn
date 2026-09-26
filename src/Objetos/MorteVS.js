@@ -1,6 +1,6 @@
 import EstadoBase from "../Estados/EstadoBase.js";
 
-const TEMPO_CODIGOS = 3000;
+const TEMPO_CODIGOS = 2000;
 const LETRAS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコ";
 const ABERTURAS = {
   R: [[1,.36],[.98,.39],[.98,.46],[.94,.48],[.91,.52],[.96,.55],[.90,.58],[.86,.62],[.93,.64],[.90,.69],[.96,.72],[1,.69]],
@@ -122,8 +122,9 @@ class VidroMatrix {
 }
 
 export default class MorteVS {
-  constructor(scene) {
+  constructor(scene, aoConcluirMortes = null) {
     this.scene = scene;
+    this.aoConcluirMortes = aoConcluirMortes;
     this.pendentes = new Map();
     this.sequencia = 0;
     this.tvAtiva = false;
@@ -155,8 +156,8 @@ export default class MorteVS {
 
   atualizar(delta) {
     for (const entrada of this.pendentes.values()) entrada.efeito?.atualizar(delta);
-    if (this.tvAtiva || !this.pendentes.size) return;
-    // Cada morte recebe seus tres segundos, inclusive mortes simultaneas.
+    if (!this.pendentes.size) return;
+    // Cada personagem renasce apos dois segundos, inclusive em mortes simultaneas.
     const prontas = [...this.pendentes.values()].filter(e => this.scene.time.now - e.inicio >= TEMPO_CODIGOS);
     if (!prontas.length) return;
     this.loteTV = prontas;
@@ -166,11 +167,24 @@ export default class MorteVS {
       entrada.efeito = null;
     }
     this.scene.overlayMorte.setVisible(true).play("TVefect");
+    this.scene.overlayMorte.off("animationcomplete", this.aoFimTV);
     this.scene.overlayMorte.once("animationcomplete", this.aoFimTV);
+    this.concluirMortes();
   }
 
   concluirTV() {
     this.scene.overlayMorte.setVisible(false);
+    this.tvAtiva = false;
+  }
+
+  concluirMortes() {
+    if (this.aoConcluirMortes) {
+      const lote = this.loteTV;
+      for (const e of lote) this.pendentes.delete(e.jogador);
+      this.loteTV = [];
+      this.aoConcluirMortes(lote);
+      return;
+    }
     const fim = this.loteTV.some(e => (e.numero === 1 ? this.scene.vidasP1 : this.scene.vidasP2) <= 0);
     if (fim) {
       this.scene.sound.stopAll();
@@ -188,7 +202,6 @@ export default class MorteVS {
       this.scene.respawnar(e.jogador, e.pontoRespawn);
     }
     this.loteTV = [];
-    this.tvAtiva = false;
   }
 
   destruir() {
