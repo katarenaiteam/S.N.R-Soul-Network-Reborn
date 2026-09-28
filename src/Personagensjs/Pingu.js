@@ -60,9 +60,7 @@ export default class Pingu extends Personagem {
         offsetY: -10,
         escala: 1,
         hurtboxes: [
-          { largura: 30, altura: 30, offsetX: 20, offsetY: -75 },
-          { largura: 50, altura: 20, offsetX: 22, offsetY: -48 }, // Tronco/cabeça
-          { largura: 80, altura: 35, offsetX: 0, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 35, altura: 70, offsetX: 0, offsetY: -18 }, 
         ],
       },
 
@@ -70,7 +68,7 @@ export default class Pingu extends Personagem {
         largura: 50,
         altura: 70,
         offsetX: 20,
-        offsetY: -16,
+        offsetY: -11,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
@@ -93,9 +91,9 @@ export default class Pingu extends Personagem {
 
       dash: {
         largura: 50,
-        altura: 120,
+        altura: 50,
         offsetX: 15,
-        offsetY: 0,
+        offsetY: -5,
         escala: 1,
         hurtboxes: [
           { largura: 60, altura: 70, offsetX: 0, offsetY: -60 },
@@ -104,10 +102,12 @@ export default class Pingu extends Personagem {
       },
 
       crouch: {
+        offsetVisualX: -1,
+        offsetVisualY: 5,
         largura: 50,
         altura: 65,
         offsetX: 0,
-        offsetY: 10,
+        offsetY: -7,
         escala: 1,
         hurtboxes: [
           { largura: 60, altura: 25, offsetX: 0, offsetY: -35 }, // fechadinho
@@ -117,9 +117,9 @@ export default class Pingu extends Personagem {
 
       guard: {
       largura: 50,
-      altura: 120,
+      altura: 70,
       offsetX: 20,
-      offsetY: 0,
+      offsetY: -24,
       escala: 1,
       hurtboxes: [
           { largura: 55, altura: 55, offsetX: -15, offsetY: -65 }, // Tronco/cabeça
@@ -130,9 +130,9 @@ export default class Pingu extends Personagem {
 
        taunt: {
       largura: 50,
-      altura: 120,
+      altura: 70,
       offsetX: 25,
-      offsetY: 0,
+      offsetY: -2,
       escala: 1,
       hurtboxes: [
           { largura: 55, altura: 60, offsetX: -5, offsetY: -70 }, // Tronco/cabeça

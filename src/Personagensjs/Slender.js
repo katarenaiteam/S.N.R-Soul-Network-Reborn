@@ -139,8 +139,7 @@ export default class Slenderman extends Personagem {
         offsetY: 10,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 25, offsetX: 0, offsetY: -35 }, // fechadinho
-          { largura: 75, altura: 25, offsetX: 0, offsetY: -20 },
+          { largura: 50, altura: 60, offsetX: 0, offsetY: -35 },
         ],
       },
 
@@ -151,9 +150,9 @@ export default class Slenderman extends Personagem {
       offsetY: 0,
       escala: 1,
       hurtboxes: [
-          { largura: 55, altura: 55, offsetX: -15, offsetY: -65 }, // Tronco/cabeça
+          { largura: 55, altura: 55, offsetX: -15, offsetY: -65 }, 
           { largura: 60, altura: 10, offsetX: -15, offsetY: -32 },
-          { largura: 85, altura: 15, offsetX: -5, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 85, altura: 15, offsetX: -5, offsetY: -18 }, 
      ]
       },
 
