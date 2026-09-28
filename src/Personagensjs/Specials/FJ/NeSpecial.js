@@ -145,7 +145,7 @@ export default class NeSpecial {
     this.personagem.vfx?.tocarListaImpacto(
       [{ escolherUm: ["punch1", "punch2", "punch3"] }], alvo, this.hitbox,
     );
-    alvo.receberDano(this.dano, {
+    this.personagem.aplicarDanoSpecialStun(this, alvo, this.dano, {
       dano: this.dano,
       tipoSomImpacto: "heavy",
       knockbackX: (this.aereo ? 150 : 350) * this.multiplicadorCarga,

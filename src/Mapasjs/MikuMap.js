@@ -36,23 +36,22 @@ export default class MikuMap {
 
         // 3. SPAWNS INICIAIS (Em cima das plataformas centralizadas)
         this.spawnsIniciais = {
-            p1: { x: 1000, y: 500 },
-            p2: { x: 1600, y: 500 }
+            p1: { x: 990, y: 801 },
+            p2: { x: 1600, y: 801 }
         };
 
         this.spawnsRespawn = {
-            p1: { x: 1000, y: 600 },
-            p2: { x: 1600, y: 600 }
+            p1: { x: 990, y: 801 },
+            p2: { x: 1600, y: 601 }
         };
 
         this.plataformas = scene.physics.add.staticGroup();
         this.criarPlataformas();
         this.areasLedge = [
-            { x: 867, y: 920, largura: 40, altura: 20, direcao: 1 },
-            { x: 1733, y: 920, largura: 40, altura: 20, direcao: -1 },
+            { x: 719, y: 820, largura: 40, altura: 30, direcao: 1 },
+            { x: 1882, y: 820, largura: 40, altura: 30, direcao: -1 },
             
-            { x: 2360, y: 670, largura: 40, altura: 20, direcao: -1 },
-            { x: 290, y: 670, largura: 40, altura: 20, direcao: 1 },
+          
            
         ];
 

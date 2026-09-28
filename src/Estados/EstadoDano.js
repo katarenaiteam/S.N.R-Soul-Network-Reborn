@@ -3,6 +3,7 @@ import { encontrarChaoCruzado } from "../Objetos/QuiqueImpacto.js";
 
 export default class EstadoDano extends EstadoBase {
   enter() {
+    this.stunAposKnockback = false;
     this.tempoInicial = this.personagem.scene.time.now;
     this.janelaBufferPulo = 300;
     this.puloBufferAte = 0;
@@ -279,6 +280,17 @@ export default class EstadoDano extends EstadoBase {
     return;
     }
 
+    // O special carregado do FJ preserva o lancamento e aplica o stun
+    // depois do tempo de impacto, quando o alvo volta ao chao.
+    if (this.stunAposKnockback) {
+      if (body?.blocked.down) {
+        this.personagem.isTumbling = false;
+        body.setVelocity(0, 0);
+        this.personagem.maquinaEstados.mudarEstado("atordoado");
+      }
+      return;
+    }
+
     // -------------------------------------------------------------
     // A PARTIR DAQUI, O STUN JÁ ACABOU (tempoPassado >= duracaoStun)
     // -------------------------------------------------------------
@@ -344,6 +356,7 @@ export default class EstadoDano extends EstadoBase {
   }
 
   exit() {
+  this.stunAposKnockback = false;
   const body = this.personagem.sprite.body;
 
   if (body) {

@@ -128,7 +128,7 @@ export default class AdoSpecial extends DoSpecial {
     );
     const somImpacto = this.personagem.sons?.heavy;
     if (somImpacto) this.personagem.tocarSomSorteado(somImpacto, { volume: 0.15 });
-    alvo.receberDano(dano, {
+    this.personagem.aplicarDanoSpecialStun(this, alvo, dano, {
       dano, tipoSomImpacto: "heavy", tumbling: true,
       knockbackX: ground ? 360 : 180,
       knockbackY: ground ? -300 : 180,

@@ -87,6 +87,12 @@ export default class EstadoSpecial extends EstadoBase {
     const agora = this.personagem.scene.time.now;
     const tempoDecorrido = agora - this.tempoInicio;
 
+    const velocidadeMaxQueda = this.specialAtual?.propriedades?.velocidadeMaxQueda;
+    if (!noChao && velocidadeMaxQueda !== undefined &&
+        this.personagem.sprite.body.velocity.y > velocidadeMaxQueda) {
+      this.personagem.sprite.setVelocityY(velocidadeMaxQueda);
+    }
+
     // CANCELAMENTO INSTANTÂNEO PÓS-HIT
     // ==========================================
     if (this.specialAtual?.cancelavel) {

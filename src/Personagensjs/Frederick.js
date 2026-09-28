@@ -5,9 +5,44 @@ import AsiSpecial from "./Specials/FJ/AsiSpecial.js";
 import AdoSpecial from "./Specials/FJ/AdoSpecial.js";
 import AupSpecial from "./Specials/FJ/AupSpecial.js";
 import DoSpecial from "./Specials/FJ/DoSpecial.js";
+import FJUlt from "./Ult/FJUlt.js";
 
+const ACERTOS_PARA_STUN = 6;
 
 export default class FJ extends Personagem {
+  obterIndicadorHabilidade() {
+    return {
+      textura: "Stun_Effect",
+      recorte: { x: 30, y: 44, largura: 68, altura: 40 },
+      carga: (this.acertosSpecialStun ?? 0) >= ACERTOS_PARA_STUN ? 1 : 0,
+    };
+  }
+
+  aplicarDanoSpecialStun(logica, alvo, dano, propriedades, origem) {
+    const danoAntes = alvo.porcentagemDano;
+    const bloqueado = alvo.receberDano(dano, propriedades, origem);
+    // Defesa, invulnerabilidade e objetos auxiliares nao carregam o indicador.
+    if (bloqueado || !(alvo.porcentagemDano > danoAntes) ||
+        !alvo.maquinaEstados?.estados.atordoado) return bloqueado;
+
+    // Um special com varias etapas conta uma vez e nao gasta a carga
+    // que ele mesmo acabou de completar.
+    if (!logica.contabilizouCargaStun) {
+      logica.contabilizouCargaStun = true;
+      logica.aplicaStunFJ = this.acertosSpecialStun >= ACERTOS_PARA_STUN;
+      this.acertosSpecialStun = logica.aplicaStunFJ ? 0 : this.acertosSpecialStun + 1;
+    }
+    if (logica.aplicaStunFJ) {
+      const estadoDano = alvo.maquinaEstados.estadoAtual;
+      if (estadoDano?.nome === "dano") {
+        estadoDano.stunAposKnockback = true;
+      } else {
+        alvo.maquinaEstados.mudarEstado("atordoado");
+      }
+    }
+    return bloqueado;
+  }
+
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
     // Garante que as animações existam no Phaser ANTES de criar o Personagem e a FSM
 
@@ -32,6 +67,8 @@ export default class FJ extends Personagem {
       "fj_",
       controle,
     );
+
+    this.acertosSpecialStun = 0;
 
        this.configVFX = {
   ...this.configVFX,
@@ -153,7 +190,7 @@ this.nomePersonagem = "Frederick Johnson";
         largura: 250,
         altura: 400,
         offsetX: 138,
-        offsetY: -50,
+        offsetY: -49, // Mantem a base do corpo na mesma altura do idle.
         escala: 0.33,
         hurtboxes: [
           { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
@@ -169,6 +206,20 @@ this.nomePersonagem = "Frederick Johnson";
         escala: 0.33,
         hurtboxes: [
           { largura: 45, altura: 70, offsetX: 23, offsetY: -38 },
+        ],
+      },
+
+      taunt: {
+        offsetVisualX: 19,
+        largura: 250,
+        altura: 400,
+        offsetX: 150,
+        offsetY: -10,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
         ],
       },
 
@@ -747,10 +798,10 @@ this.nomePersonagem = "Frederick Johnson";
       air_cima: {
         animacao: "fj_upAir",
         frameHitbox: 3,
-        offsetX: 58,
-        offsetY: -97,
-        largura: 65,
-        altura: 25,
+        offsetX: 38,
+        offsetY: -130,
+        largura: 35,
+        altura: 55,
         cooldown: 400,
         duracao: 500,
          finalizarAoTocarChao: true,
@@ -772,10 +823,10 @@ this.nomePersonagem = "Frederick Johnson";
 
       air_side: {
         animacao: "fj_sideAir",
-        frameHitbox: 3,
-        offsetX: 45,
+        frameHitbox: 2,
+        offsetX: 40,
         offsetY: -57,
-        largura: 65,
+        largura: 75,
         altura: 40,
         cooldown: 650,
         duracao: 450,
@@ -842,9 +893,9 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 10,
-          knockbackX: 450,
-          knockbackY: -350,
-          tumbling: true,
+          knockbackX: 80,
+          knockbackY: 400,
+          quiqueChaoY: 400,
         },
       },
 
@@ -895,6 +946,12 @@ this.nomePersonagem = "Frederick Johnson";
         cooldown: 600,
         propriedades: { travarMovimentoAir: true },
       },
+    };
+
+    this.ult = {
+      animacao: "fj_prepare",
+      logica: FJUlt,
+      propriedades: { anularGravidade: true },
     };
 
    
@@ -972,6 +1029,45 @@ if (!scene.anims.exists("punch_effect3")) {
 }
 
 // personagem
+
+    if (!scene.anims.exists("fj_prepare")) {
+      scene.anims.create({
+        key: "fj_prepare",
+        frames: scene.anims.generateFrameNumbers("FJ_prepare", { start: 0, end: 19 }),
+        frameRate: 16,
+        repeat: 0,
+      });
+      scene.anims.create({
+        key: "fj_ult_dive",
+        frames: scene.anims.generateFrameNumbers("FJ_ult", { start: 0, end: 8 }),
+        frameRate: 24,
+        repeat: 0,
+      });
+      scene.anims.create({
+        key: "fj_ult_land",
+        frames: scene.anims.generateFrameNumbers("FJ_ult", { start: 9, end: 17 }),
+        frameRate: 10,
+        repeat: 0,
+      });
+      scene.anims.create({
+        key: "fj_ultN",
+        frames: scene.anims.generateFrameNumbers("FJ_ultN", { start: 0, end: 24 }),
+        frameRate: 30,
+        repeat: 0,
+      });
+      scene.anims.create({
+        key: "fj_ult_eyes",
+        frames: scene.anims.generateFrameNumbers("FJ-eyes", { start: 0, end: 8 }),
+        frameRate: 12,
+        repeat: 0,
+      });
+      scene.anims.create({
+        key: "fj_ult_explosion",
+        frames: scene.anims.generateFrameNumbers("FJ-ultExplosion", { start: 0, end: 59 }),
+        frameRate: 30,
+        repeat: 0,
+      });
+    }
 
     if (scene.anims.exists("fj_idle")) return;
 
@@ -1079,6 +1175,15 @@ if (!scene.anims.exists("punch_effect3")) {
       frameRate: 12,
       repeat: 0,
     });
+
+    if (!scene.anims.exists("fj_jump_float")) {
+      scene.anims.create({
+        key: "fj_jump_float",
+        frames: scene.anims.generateFrameNumbers("FJ_jump", { start: 0, end: 3 }),
+        frameRate: 8,
+        repeat: -1,
+      });
+    }
 
     scene.anims.create({
       key: "fj_crouch",
@@ -1276,7 +1381,7 @@ scene.anims.create({
         start: 0,
         end: 9,
       }),
-      frameRate: 16,
+      frameRate: 18,
       repeat: 0,
     });
      scene.anims.create({

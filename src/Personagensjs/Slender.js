@@ -1,4 +1,6 @@
 import Personagem from "./Personagem.js";
+import NeSpecial from "./Specials/Slenderman/NeSpecial.js";
+import DoSpecial from "./Specials/Slenderman/DoSpecial.js";
 
 export default class Slenderman extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -48,7 +50,37 @@ export default class Slenderman extends Personagem {
     animacao: "punch_effect3",
     escala: 1,
   },
+
+  arNefect: {
+    textura: "Slan_arNefect",
+    animacao: "slan_arNefect",
+    escala: 1,
+    seguir: true,
+  },
+
+  arSIefect: {
+    textura: "Slan_arSIefect",
+    animacao: "slan_arSIefect",
+    escala: 1.2,
+    seguir: true,
+  },
 };
+
+    this.vfxAtaqueNormal = {
+      porAtaque: {
+        // Os offsets partem do centro da hitbox e alinham o corte ao sprite.
+        air_neutro: {
+          efeito: "arNefect",
+          offsetX: -42,
+          offsetY: -7.5,
+        },
+        air_side: {
+          efeito: "arSIefect",
+          offsetX: -20.5,
+          offsetY: -37,
+        },
+      },
+    };
 
     //============================= hitboxes ========================================
     this.nomePersonagem = "Slanderman";
@@ -60,9 +92,8 @@ export default class Slenderman extends Personagem {
         offsetY: 0,
         escala: 1,
         hurtboxes: [
-          { largura: 30, altura: 30, offsetX: 20, offsetY: -75 },
-          { largura: 50, altura: 20, offsetX: 22, offsetY: -48 }, // Tronco/cabeça
-          { largura: 80, altura: 35, offsetX: 0, offsetY: -18 }, // Agachado / pernas abertas
+          
+          { largura: 45, altura: 110, offsetX: 5, offsetY: -57 }, // Agachado / pernas abertas
         ],
       },
 
@@ -73,8 +104,8 @@ export default class Slenderman extends Personagem {
         offsetY: -5,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 35, altura: 70, offsetX: 0, offsetY: -75 }, // Tronco/cabeça
+          { largura: 55, altura: 35, offsetX: -5, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
 
@@ -85,8 +116,8 @@ export default class Slenderman extends Personagem {
         offsetY: 0,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 }, // Tronco/cabeça
-          { largura: 30, altura: 50, offsetX: -20, offsetY: -25 }, // parte de baixo parecida
+          { largura: 35, altura: 65, offsetX: 0, offsetY: -90 }, // Tronco/cabeça
+          { largura: 25, altura: 50, offsetX: 10, offsetY: -26 }, // parte de baixo parecida
         ],
       },
 
@@ -97,8 +128,7 @@ export default class Slenderman extends Personagem {
         offsetY: 0,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -60 },
-          { largura: 50, altura: 25, offsetX: -10, offsetY: -18 },
+      
         ],
       },
 
@@ -292,10 +322,10 @@ export default class Slenderman extends Personagem {
       },
 
       neSpecial: {
-       largura: 110,
-        altura: 96,
-        offsetX: 45,
-        offsetY: 95,
+        largura: 50,
+        altura: 120,
+        offsetX: 17,
+        offsetY: 33,
         escala: 1,
     hurtboxes: [
           { largura: 30, altura: 20, offsetX: -5, offsetY: -70 },
@@ -305,12 +335,14 @@ export default class Slenderman extends Personagem {
     },
 
     doSpecial: {
-        largura: 85,
-        altura: 95,
-        offsetX: 50,
-        offsetY: 96,
+        largura: 50,
+        altura: 90,
+        offsetX: 33,
+        offsetY: 8,
         escala: 1,
         hurtboxes: [
+          { largura: 60, altura: 45, offsetX: 0, offsetY: -60 },
+          { largura: 80, altura: 30, offsetX: 0, offsetY: -18 },
         ],
       },
       counter: {
@@ -322,10 +354,10 @@ export default class Slenderman extends Personagem {
      hurtboxes: []
       },
     siSpecial: {
-        largura: 85,
-        altura: 95,
-        offsetX: 32,
-        offsetY: -10,
+        largura: 50,
+        altura: 120,
+        offsetX: 31,
+        offsetY: 4,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
@@ -334,10 +366,10 @@ export default class Slenderman extends Personagem {
       },
 
       AsiSpecial: {
-        largura: 85,
-        altura: 95,
-        offsetX: 64,
-        offsetY: 90,
+        largura: 50,
+        altura: 120,
+        offsetX: 10,
+        offsetY: 38,
         escala: 1,
         hurtboxes: [
           { largura: 75, altura: 45, offsetX: -20, offsetY: -60 }, // Tronco/cabeça
@@ -345,10 +377,10 @@ export default class Slenderman extends Personagem {
       },
 
       AupSpecial: {
-        largura: 85,
-        altura: 95,
-        offsetX: 0,
-        offsetY: 10,
+        largura: 50,
+        altura: 120,
+        offsetX: 70,
+        offsetY: 25,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
@@ -357,11 +389,10 @@ export default class Slenderman extends Personagem {
       },
 
       AneSpecial: {
-        offsetVisualX: 19,
-        largura: 85,
-        altura: 95,
-        offsetX: 50,
-        offsetY: 96,
+        largura: 50,
+        altura: 110,
+        offsetX: 34,
+        offsetY: 2,
         escala: 1,
         hurtboxes: [
           { largura: 77, altura: 55, offsetX: -33, offsetY: -50 }, // Tronco/cabeça
@@ -370,10 +401,10 @@ export default class Slenderman extends Personagem {
       },
 
       AdoSpecial: {
-        largura: 85,
-        altura: 95,
-        offsetX: 50,
-        offsetY: 96,
+        largura: 50,
+        altura: 120,
+        offsetX: 9,
+        offsetY: 32,
         escala: 1,
         hurtboxes: [
           { largura: 70, altura: 55, offsetX: -30, offsetY: -65 }, // Tronco/cabeça
@@ -505,8 +536,8 @@ export default class Slenderman extends Personagem {
         offsetY: -25,
         largura: 75,
         altura: 30,
-        cooldown: 500,
-        duracao: 300,
+        cooldown: 800,
+        duracao: 400,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -554,8 +585,8 @@ export default class Slenderman extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 600,
-          knockbackY: -400,
+          knockbackX: 350,
+          knockbackY: -200,
           tumbling: true,
           impulsoX: 0,
         },
@@ -569,7 +600,7 @@ export default class Slenderman extends Personagem {
         largura: 62,
         altura: 70,
         cooldown: 500,
-        duracao: 450,
+        duracao: 750,
         cancelavel: true,
         
 
@@ -595,33 +626,33 @@ export default class Slenderman extends Personagem {
   offsetY: -30,
   largura: 60,
   altura: 70,
-  cooldown: 500,
+  cooldown: 800,
 
-  duracao: 1000,
+  duracao: 400,
 
   vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
           },
         ],
 
-  finalizarAoTocarChao: true,
-  atrasoFinalizacaoChao: 90,
+ // finalizarAoTocarChao: true,
+  //atrasoFinalizacaoChao: 90,
 
-  finalizarAoAcertarOponente: true,
-  atrasoFinalizacaoAcerto: 30,
+ // finalizarAoAcertarOponente: true,
+  //atrasoFinalizacaoAcerto: 100,
 
   movimento: {
     inicio: 30,
-    fim: 900,
+    fim: 100,
 
     x: {
-      de: 80,
-      para: 80,
+      de: 70,
+      para: 60,
     },
 
     y: {
-      de: 800,
-      para: 1200,
+      de: 600,
+      para: 300,
     },
 
     curva: "easeOut",
@@ -710,13 +741,251 @@ export default class Slenderman extends Personagem {
 
   // --------------------------------- tabela especiais --------------------------
 
+    this.specials = {
+      agachado: {
+        animacao: "slan_doSpecial",
+        logica: DoSpecial,
+        duracao: 875,
+        cooldown: 1100,
+        cortes: [
+          {
+            frameProjetil: 2,
+            propriedades: { dano: 4, knockbackX: 40, knockbackY: -60, knockbackFixo: true },
+          },
+          { frameProjetil: 7, propriedades: { dano: 8 } },
+        ],
+        texturaProjetil: "Slan_doSpecial-efect",
+        animacaoProjetil: "slan_doSpecial-efect",
+        framesCorte: 3,
+        escalaProjetil: 0.75,
+        offsetProjetilX: 20,
+        offsetProjetilY: -50,
+        hitboxesProjetil: [
+          { largura: 110, altura: 50, offsetX: -55, offsetY: -25 },
+          { largura: 110, altura: 50, offsetX: 55, offsetY: 25 },
+        ],
+        propriedades: {
+          travarMovimentoAir: true,
+          dano: 12,
+          tipoSomImpacto: "heavy",
+          knockbackX: 400,
+          knockbackY: -230,
+        },
+      },
+      lado: {
+        animacao: "slan_siSpecial",
+        logica: NeSpecial,
+        duracao: 600,
+        cooldown: 1100,
+        frameProjetil: 2,
+        texturaProjetil: "Slan_siSpecial-efect",
+        animacaoProjetil: "slan_siSpecial-efect",
+        framesCorte: 2,
+        escalaProjetil: 0.75,
+        offsetProjetilX: 20,
+        offsetProjetilY: -70,
+        velocidadeProjetil: 60,
+        distanciaProjetil: 60,
+        hitboxesProjetil: [
+          { largura: 95, altura: 50, offsetX: 45, offsetY: -10 },
+          { largura: 100, altura: 60, offsetX: -25, offsetY: 25 },
+        ],
+        propriedades: {
+          travarMovimentoAir: true,
+          dano: 12,
+          tipoSomImpacto: "heavy",
+          knockbackX: 600,
+          knockbackY: -230,
+        },
+      },
+      neutro: {
+        animacao: "slan_neSpecial",
+        logica: NeSpecial,
+        duracao: 700,
+        cooldown: 1100,
+        frameProjetil: 1,
+        escalaProjetil: 0.75,
+        offsetProjetilX: 20,
+        offsetProjetilY: -96,
+        hitboxesProjetil: [
+          { largura: 100, altura: 80, offsetX: -10, offsetY: -20 },
+          { largura: 90, altura: 70, offsetX: 40, offsetY: 60 },
+        ],
+        propriedades: {
+          dano: 12,
+          tipoSomImpacto: "heavy",
+          knockbackX: 300,
+          knockbackY: -400,
+        },
+      },
+    };
+
     //-------------------------- ult ------------------------------------
+    this.specials.air_cima = {
+      animacao: "slan_AupSpecial",
+      duracao: 1063,
+      cooldown: 2500,
+      propriedades: {
+        impulsoX: 400,
+        impulsoY: -800,
+        travarMovimentoAir: true,
+        velocidadeMaxQueda: 100,
+      },
+    };
+    this.specials.air_lado = {
+      ...this.specials.lado,
+      animacao: "slan_AsiSpecial",
+      duracao: 563,
+      frameProjetil: 10,
+      texturaProjetil: "Slan_AsiSpecial-efect",
+      animacaoProjetil: "slan_AsiSpecial-efect",
+      propriedades: {
+        ...this.specials.lado.propriedades,
+        travarMovimentoAir: false,
+        velocidadeMaxQueda: 100,
+      },
+    };
+
+    this.specials.air_neutro = {
+      ...this.specials.lado,
+      animacao: "slan_AneSpecial",
+      duracao: 500,
+      frameProjetil: 2,
+      texturaProjetil: "Slan_AneSpecial-efect",
+      animacaoProjetil: "slan_AneSpecial-efect",
+      propriedades: {
+        ...this.specials.lado.propriedades,
+        velocidadeMaxQueda: 100,
+      },
+    };
+
+    this.specials.air_agachado = {
+      ...this.specials.lado,
+      animacao: "slan_AdoSpecial",
+      duracao: 688,
+      frameProjetil: 3,
+      texturaProjetil: "Slan_AdoSpecial-efect",
+      animacaoProjetil: "slan_AdoSpecial-efect",
+      framesCorte: 2,
+      offsetProjetilX: 25,
+      offsetProjetilY: -30,
+      velocidadeProjetil: 50,
+      distanciaProjetil: 40,
+      distanciaProjetilY: 40,
+      hitboxesProjetil: [
+        { largura: 75, altura: 90, offsetX: -20, offsetY: -40 },
+        { largura: 85, altura: 80, offsetX: 50, offsetY: 40 },
+      ],
+      propriedades: {
+        ...this.specials.lado.propriedades,
+        knockbackX: 150,
+        knockbackY: 300,
+        velocidadeMaxQueda: 100,
+      },
+    };
+    for (const golpe of Object.values(this.golpes)) {
+      golpe.propriedades.corrupcaoSlender = 5;
+    }
+    for (const special of Object.values(this.specials)) {
+      special.propriedades.corrupcaoSlender = 9;
+    }
   
 
   }
 
   //animaçoes====================================================
   static criarAnimacoes(scene) {
+
+    for (const { key, textura, inicio, fim, fps } of [
+      { key: "slan_AupSpecial", textura: "Slan_AupSpecial", inicio: 0, fim: 16, fps: 16 },
+      { key: "slan_AsiSpecial", textura: "Slan_AsiSpecial", inicio: 9, fim: 17, fps: 16 },
+      { key: "slan_AneSpecial", textura: "Slan_AneSpecial", inicio: 0, fim: 7, fps: 16 },
+      { key: "slan_AdoSpecial", textura: "Slan_AdoSpecial", inicio: 0, fim: 10, fps: 16 },
+      { key: "slan_AsiSpecial-efect", textura: "Slan_AsiSpecial-efect", inicio: 0, fim: 8, fps: 10 },
+      { key: "slan_AneSpecial-efect", textura: "Slan_AneSpecial-efect", inicio: 0, fim: 8, fps: 10 },
+      { key: "slan_AdoSpecial-efect", textura: "Slan_AdoSpecial-efect", inicio: 0, fim: 7, fps: 10 },
+    ]) {
+      if (!scene.anims.exists(key)) {
+        scene.anims.create({
+          key,
+          frames: scene.anims.generateFrameNumbers(textura, { start: inicio, end: fim }),
+          frameRate: fps,
+          repeat: 0,
+        });
+      }
+    }
+
+    if (!scene.anims.exists("slan_doSpecial")) {
+      scene.anims.create({
+        key: "slan_doSpecial",
+        frames: scene.anims.generateFrameNumbers("Slan_doSpecial", { start: 0, end: 13 }),
+        frameRate: 16,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("slan_doSpecial-efect")) {
+      scene.anims.create({
+        key: "slan_doSpecial-efect",
+        frames: scene.anims.generateFrameNumbers("Slan_doSpecial-efect", { start: 0, end: 2 }),
+        frameRate: 14,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("slan_siSpecial")) {
+      scene.anims.create({
+        key: "slan_siSpecial",
+        frames: scene.anims.generateFrameNumbers("Slan_siSpecial", { start: 0, end: 9 }),
+        frameRate: 16,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("slan_siSpecial-efect")) {
+      scene.anims.create({
+        key: "slan_siSpecial-efect",
+        frames: scene.anims.generateFrameNumbers("Slan_siSpecial-efect", { start: 0, end: 8 }),
+        frameRate: 10,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("slan_neSpecial")) {
+      scene.anims.create({
+        key: "slan_neSpecial",
+        frames: scene.anims.generateFrameNumbers("Slan_neSpecial", { start: 0, end: 6 }),
+        frameRate: 14,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("slan_NS-efect")) {
+      scene.anims.create({
+        key: "slan_NS-efect",
+        frames: scene.anims.generateFrameNumbers("Slan_NS-efect", { start: 0, end: 9 }),
+        frameRate: 14,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("slan_arNefect")) {
+      scene.anims.create({
+        key: "slan_arNefect",
+        frames: scene.anims.generateFrameNumbers("Slan_arNefect"),
+        frameRate: 16,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("slan_arSIefect")) {
+      scene.anims.create({
+        key: "slan_arSIefect",
+        frames: scene.anims.generateFrameNumbers("Slan_arSIefect"),
+        frameRate: 12,
+        repeat: 0,
+      });
+    }
 
    // efeitos anim
   if (!scene.anims.exists("punch_effect")) {

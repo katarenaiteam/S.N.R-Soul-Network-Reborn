@@ -18,6 +18,7 @@ export function criarHudPartida(jogador, personagem, x, y, ladoDireito) {
         .setOrigin(ladoDireito ? 1 : 0, 0)
         .setDisplaySize(larguraRetrato, alturaRetrato);
       hud.add(retrato);
+      hud.retrato = retrato;
     }
 
     // A arte fica no rodape do frame de 800x650: use a mesma escala
@@ -40,7 +41,7 @@ export function criarHudPartida(jogador, personagem, x, y, ladoDireito) {
       const { x: rx, y: ry, largura, altura } = habilidade.recorte;
       const icone = this.add.image(0, 0, habilidade.textura, 0);
       const escala = 68 / largura;
-      // Centraliza somente o rosto recortado, sem redimensionar o sprite do jogo.
+      // Centraliza o icone recortado, sem redimensionar o sprite do jogo.
       icone.setCrop(rx, ry, largura, altura).setScale(escala);
       icone.setPosition(
         (icone.width / 2 - rx - largura / 2) * escala,

@@ -221,7 +221,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("FJ-red", "assets/personagens/FJ/Sprites/ult/FJ-red.png");
     this.load.spritesheet("FJ_ultN", "assets/personagens/FJ/Sprites/ult/FJ_ultN.png", { frameWidth: 615, frameHeight: 616 });
     this.load.spritesheet("FJ-ultExplosion", "assets/personagens/FJ/Sprites/ult/FJ-ultExplosion.png", { frameWidth: 720, frameHeight: 480 });
-    this.load.spritesheet("FJ-eyes", "assets/personagens/FJ/Sprites/ult/FJ-eyes.png", { frameWidth: 1410, frameHeight: 450 });
+    this.load.spritesheet("FJ-eyes", "assets/personagens/FJ/Sprites/ult/FJ-eyes-9.png", { frameWidth: 1410, frameHeight: 250 });
 
     // --- TH30 ---
    
@@ -475,6 +475,24 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.spritesheet("Slan_sideAir", "assets/personagens/Slenderman/Sprites/Slan_sideAir.png", { frameWidth: 96, frameHeight: 134 });
     this.load.spritesheet("Slan_upAir", "assets/personagens/Slenderman/Sprites/Slan_upAir.png", { frameWidth: 84, frameHeight: 137 });
     this.load.spritesheet("Slan_downAir", "assets/personagens/Slenderman/Sprites/Slan_downAir.png", { frameWidth: 129, frameHeight: 136 });
+    this.load.spritesheet("Slan_arNefect", "assets/personagens/Slenderman/Sprites/Slan_arNefect.png", { frameWidth: 165, frameHeight: 159 });
+    this.load.spritesheet("Slan_arSIefect", "assets/personagens/Slenderman/Sprites/Slan_arSIefect.png", { frameWidth: 107, frameHeight: 134 });
+    //specials
+    //this.load.spritesheet("Slan_", "assets/personagens/Slenderman/Sprites/Slan_.png", { frameWidth: , frameHeight:  });
+    this.load.spritesheet("Slan_neSpecial", "assets/personagens/Slenderman/Sprites/Slan_neSpecial.png", { frameWidth: 85, frameHeight: 157 });
+    this.load.spritesheet("Slan_NS-efect", "assets/personagens/Slenderman/Sprites/Slan_NS-efect.png", { frameWidth: 227, frameHeight: 192 });
+    this.load.spritesheet("Slan_siSpecial", "assets/personagens/Slenderman/Sprites/Slan_siSpecial.png", { frameWidth: 113, frameHeight: 128 });
+    this.load.spritesheet("Slan_siSpecial-efect", "assets/personagens/Slenderman/Sprites/Slan_siSpecial-efect.png", { frameWidth: 233, frameHeight: 133 });
+    this.load.spritesheet("Slan_doSpecial", "assets/personagens/Slenderman/Sprites/Slan_doSpecial.png", { frameWidth: 116, frameHeight: 102 });
+    this.load.spritesheet("Slan_doSpecial-efect", "assets/personagens/Slenderman/Sprites/Slan_doSpecial-efect.png", { frameWidth: 290, frameHeight: 132 });
+    this.load.spritesheet("Slan_AneSpecial", "assets/personagens/Slenderman/Sprites/Slan_AneSpecial.png", { frameWidth: 118, frameHeight: 116 });
+    this.load.spritesheet("Slan_AneSpecial-efect", "assets/personagens/Slenderman/Sprites/Slan_AneSpecial-efect.png", { frameWidth: 233, frameHeight: 133 });
+    this.load.spritesheet("Slan_AsiSpecial", "assets/personagens/Slenderman/Sprites/Slan_AsiSpecial.png", { frameWidth: 71, frameHeight: 162 });
+    this.load.spritesheet("Slan_AsiSpecial-efect", "assets/personagens/Slenderman/Sprites/Slan_AsiSpecial-efect.png", { frameWidth: 233, frameHeight: 133 });
+    this.load.spritesheet("Slan_AupSpecial", "assets/personagens/Slenderman/Sprites/Slan_AupSpecial.png", { frameWidth: 191, frameHeight: 149 });
+     this.load.spritesheet("Slan_AdoSpecial", "assets/personagens/Slenderman/Sprites/Slan_AdoSpecial.png", { frameWidth: 68, frameHeight: 156 });
+    this.load.spritesheet("Slan_AdoSpecial-efect", "assets/personagens/Slenderman/Sprites/Slan_AdoSpecial-efect.png", { frameWidth: 228, frameHeight: 209 });
+    this.load.spritesheet("Slan_tv", "assets/personagens/Slenderman/Sprites/Slan_tv.png", { frameWidth: 498, frameHeight: 371 });
 
     // -- Pingu 
     this.load.spritesheet("Pingu_intro", "assets/personagens/Pingu/Sprites/Pingu_intro.png", { frameWidth: 81, frameHeight: 90 });
@@ -573,6 +591,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.image("miku-plat", "assets/cenarios/MikuShow/miku-plat.png");
     this.load.image("suport", "assets/cenarios/MikuShow/suport.png");
     this.load.spritesheet("efeito-baner", "assets/cenarios/MikuShow/efeito-baner.png", { frameWidth: 320, frameHeight: 240 });
+    this.load.image("thumb_mikushow", "assets/cenarios/MikuShow/thumb_mikushow.png");
 
     // --- AUDIOS ---
     //--OST

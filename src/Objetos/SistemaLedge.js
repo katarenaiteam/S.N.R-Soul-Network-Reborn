@@ -43,7 +43,7 @@ export default class SistemaLedge {
     this.contatos.set(personagem, atuais);
     const agora = personagem.scene.time.now;
     const estado = personagem.maquinaEstados.estadoAtual?.nome;
-    if (body.blocked.down || ["dead", "ult", "teia"].includes(estado) ||
+    if (body.blocked.down || estado !== "jump" ||
         agora < (this.cooldowns.get(personagem) ?? 0)) return;
 
     const area = [...atuais].find(item => !anteriores.has(item));

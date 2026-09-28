@@ -1,4 +1,5 @@
 import GerenciadorEstados from "../Estados/GerenciadorEstados.js";
+import CorrupcaoSlender from "../Objetos/CorrupcaoSlender.js";
 import EstadoIdle from "../Estados/EstadoIdle.js";
 import EstadoWalk from "../Estados/EstadoWalk.js";
 import EstadoJump from "../Estados/EstadoJump.js";
@@ -119,6 +120,7 @@ export default class Personagem {
     // Sprite e física
     this.sprite = scene.physics.add.sprite(x, y, keyAtlas, frameInicial);
     this.sprite.setOrigin(0.5, 1);
+    this.corrupcaoSlender = new CorrupcaoSlender(this);
 
     //efeitos visuais
     this.configVFX = {};
@@ -226,11 +228,16 @@ export default class Personagem {
 
   atualizarEfeitoGuard() {
     const quebrou = this.vidaGuard <= 0;
+    const desgaste = 1 - Math.max(0, Math.min(1, this.vidaGuard / this.guardMaximo));
+    if (!quebrou && this.efeitoGuard?.active) {
+      this.vfx.atualizarCorGuard(this.efeitoGuard, desgaste);
+      return;
+    }
     this.vfx.destruirEfeito(this.efeitoGuard);
     this.efeitoGuard = this.vfx.tocar(quebrou ? "brokeguard" : "guard", {
       animacao: quebrou ? "brokeguard-efect" : "guard-sustentada",
       loop: !quebrou,
-      desgasteGuard: 1 - Math.max(0, Math.min(1, this.vidaGuard / this.guardMaximo)),
+      desgasteGuard: desgaste,
     });
   }
 
@@ -281,6 +288,10 @@ export default class Personagem {
 
     //. LÓGICA PADRÃO DE DANO (Quando toma golpe sem escudo):
     this.porcentagemDano += quantidade;
+    const danoDeSlenderman = atacante?.nomePersonagem === "Slanderman" || atacante?.nomePersonagem === "Slenderman";
+    if (quantidade > 0 && (propriedades.corrupcaoSlender > 0 || danoDeSlenderman)) {
+      this.corrupcaoSlender.adicionar(propriedades.corrupcaoSlender || 5);
+    }
 
     this.aplicarBoostUltPorDano(
     quantidade
@@ -1016,7 +1027,7 @@ consumirUlt() {
   }
 
   // --- AÇÕES E CONTROLES ---
-  pular() {
+  pular({ mudarEstado = true } = {}) {
     // Permite pular enquanto o contador for menor que o máximo permitido
     if (this.pulos >= this.maxPulos) return;
 
@@ -1030,7 +1041,7 @@ consumirUlt() {
     this.tocarSomSorteado(this.sons.pulo, { volume: 0.4 });
 
     // Força o reinício da animação/estado de pulo para dar feedback visual e sonoro
-    this.maquinaEstados.mudarEstado("jump");
+    if (mudarEstado) this.maquinaEstados.mudarEstado("jump");
   }
 
   podeDarDash() {

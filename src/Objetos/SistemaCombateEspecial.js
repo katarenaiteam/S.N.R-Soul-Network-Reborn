@@ -53,6 +53,7 @@ export function registrarAtaqueEspecial(logica, objeto, opcoes = {}) {
     objeto,
     dono: logica.personagem,
     categoria: opcoes.categoria ?? "corpo",
+    persistirAoColidirProjetil: opcoes.persistirAoColidirProjetil === true,
     contraAtacavel: opcoes.contraAtacavel !== false,
     // So ataques ligados ao lutador podem transferir o contra-ataque ao dono.
     // Invocacoes e projeteis devem apenas acionar o counter.
@@ -115,10 +116,10 @@ export function registrarAtaqueEspecial(logica, objeto, opcoes = {}) {
       if (!objeto.body || !outra.objeto.body) return;
       const colisor = scene.physics.add.overlap(objeto, outra.objeto, () => {
         if (entrada.encerrado || outra.encerrado) return;
-        entrada.aoColidir?.(outra);
-        outra.aoColidir?.(entrada);
-        entrada.remover();
-        outra.remover();
+        if (!entrada.persistirAoColidirProjetil) entrada.aoColidir?.(outra);
+        if (!outra.persistirAoColidirProjetil) outra.aoColidir?.(entrada);
+        if (!entrada.persistirAoColidirProjetil) entrada.remover();
+        if (!outra.persistirAoColidirProjetil) outra.remover();
       });
       entrada.colisores.set(colisor, outra);
       outra.colisores.set(colisor, entrada);

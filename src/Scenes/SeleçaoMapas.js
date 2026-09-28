@@ -42,7 +42,7 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
       { id: "cidade", nome: "Cidade", classe: Cidade, chaveSprite: "thumb_cidade" },
       { id: "SkyTowers", nome: "SkyTowers", classe: SkyTowers, chaveSprite: "thumb_skytowers" },
       { id: "mapaTeste", nome: "Mapa Teste", classe: MapaTeste, chaveSprite: "thumb_teste" },
-      { id: "MikuMap", nome: "MikuMap", classe: MikuMap, chaveSprite: "thumb_teste" },
+      { id: "MikuMap", nome: "MikuMap", classe: MikuMap, chaveSprite: "thumb_mikushow" },
     ];
 
     this.indiceOpcao = 0; // Começa no primeiro mapa

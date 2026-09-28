@@ -1,6 +1,4 @@
 
-let proximoIdGuard = 0;
-
 const VFX_GLOBAIS = {
   guard: {
     blendMode: "ADD",
@@ -73,12 +71,6 @@ export default class GerenciadorVFX {
   constructor(personagem) {
     this.personagem = personagem;
     this.scene = personagem.scene;
-    this.idGuard = proximoIdGuard++;
-    this.texturasGuard = new Set();
-    this.scene.events.once("shutdown", () => {
-      for (const chave of this.texturasGuard) this.scene.textures.remove(chave);
-      this.texturasGuard.clear();
-    });
 
     // Efeitos que precisam acompanhar o personagem.
     this.efeitosSeguindo = [];
@@ -99,7 +91,8 @@ export default class GerenciadorVFX {
     // Permite alterar alguma propriedade apenas naquela chamada.
     const config = {
       ...VFX_GLOBAIS[nome],
-      ...configBase,
+      ...this.obterEnquadramentoDefesa(nome),
+      ...this.personagem.configVFX?.[nome],
       ...opcoes,
     };
 
@@ -180,13 +173,11 @@ export default class GerenciadorVFX {
       }
     }
 
-    if (config.desgasteGuard > 0) {
-      const texturaGuard = this.obterTexturaGuardDesgastada(textura, config.desgasteGuard);
-      const colorir = () => {
-        efeito.setTexture(texturaGuard, efeito.frame.name);
-      };
-      efeito.on("animationupdate", colorir);
-      colorir();
+    if (config.desgasteGuard !== undefined) {
+      // O filtro trabalha somente no frame desenhado, sem copiar a spritesheet.
+      efeito.enableFilters();
+      efeito.filtroGuard = efeito.filters?.internal.addColorMatrix();
+      this.atualizarCorGuard(efeito, config.desgasteGuard);
     }
 
     // ============================================================
@@ -213,6 +204,9 @@ export default class GerenciadorVFX {
     // Sobrepor as camadas aditivas reforca a luz mesmo com alpha no maximo.
     for (let i = 1; i < (config.camadas ?? 1); i++) {
       const camada = this.tocar(nome, { ...config, camadas: 1 });
+      if (config.desgasteGuard !== undefined) {
+        (efeito.camadasGuard ??= []).push(camada);
+      }
       efeito.once("destroy", () => this.destruirEfeito(camada));
     }
 
@@ -223,41 +217,56 @@ export default class GerenciadorVFX {
   // POSIÇÃO
   // ============================================================
 
-  obterTexturaGuardDesgastada(chave, desgaste) {
-    const nivel = Math.round(Math.max(0, Math.min(1, desgaste)) * 20);
-    if (nivel === 0) return chave;
-    const variante = `${chave}-desgaste-${this.idGuard}`;
-    const existente = this.scene.textures.exists(variante)
-      ? this.scene.textures.get(variante) : null;
-    if (existente?.nivelGuard === nivel) return variante;
-    const progresso = nivel / 20;
-    const original = this.scene.textures.get(chave);
-    const imagem = original.getSourceImage();
-    const textura = existente ?? this.scene.textures.createCanvas(variante, imagem.width, imagem.height);
-    this.texturasGuard.add(variante);
-    const contexto = textura.getContext();
-    contexto.clearRect(0, 0, imagem.width, imagem.height);
-    contexto.drawImage(imagem, 0, 0);
-    const pixels = contexto.getImageData(0, 0, imagem.width, imagem.height);
-    // Parte dos pixels originais: nunca converte o efeito em branco/cinza.
-    // Troca gradualmente azul por vermelho preservando detalhes e transparencia.
-    for (let i = 0; i < pixels.data.length; i += 4) {
-      const r = pixels.data[i];
-      const b = pixels.data[i + 2];
-      pixels.data[i] = Math.round(r + (b - r) * progresso);
-      pixels.data[i + 1] = Math.round(pixels.data[i + 1] * (1 - 0.65 * progresso));
-      pixels.data[i + 2] = Math.round(b + (r - b) * progresso);
+  atualizarCorGuard(efeito, desgaste) {
+    if (!efeito?.active) return;
+    const progresso = Math.round(Math.max(0, Math.min(1, desgaste)) * 20) / 20;
+    if (efeito.filtroGuard) {
+      efeito.filtroGuard.colorMatrix.set([
+        1 - progresso, 0, progresso, 0, 0,
+        0, 1 - 0.65 * progresso, 0, 0, 0,
+        progresso, 0, 1 - progresso, 0, 0,
+        0, 0, 0, 1, 0,
+      ]);
     }
-    contexto.putImageData(pixels, 0, 0);
-    if (!existente) {
-      for (const nome of original.getFrameNames()) {
-        const frame = original.get(nome);
-        textura.add(nome, 0, frame.cutX, frame.cutY, frame.cutWidth, frame.cutHeight);
-      }
+    for (const camada of efeito.camadasGuard ?? []) {
+      this.atualizarCorGuard(camada, desgaste);
     }
-    textura.nivelGuard = nivel;
-    textura.refresh();
-    return variante;
+  }
+
+  obterEnquadramentoDefesa(nome) {
+    if (!["guard", "midguard", "brokeguard", "stun"].includes(nome)) return {};
+    const cfg = this.personagem.configAnimacoes?.[nome === "stun" ? "stun" : "guard"];
+    const caixas = cfg?.hurtboxes;
+    if (!caixas?.length) return {};
+
+    // As hurtboxes ja usam medidas de mundo, inclusive nos sprites reduzidos.
+    let esquerda = Infinity, direita = -Infinity, topo = Infinity, base = -Infinity;
+    for (const caixa of caixas) {
+      const x = caixa.offsetX ?? 0;
+      const y = caixa.offsetY ?? 0;
+      esquerda = Math.min(esquerda, x - caixa.largura / 2);
+      direita = Math.max(direita, x + caixa.largura / 2);
+      topo = Math.min(topo, y - caixa.altura / 2);
+      base = Math.max(base, y + caixa.altura / 2);
+    }
+    const frame = this.scene.textures.getFrame(VFX_GLOBAIS[nome].textura, 0);
+    if (nome === "stun") {
+      return {
+        // As estrelas ocupam aproximadamente 64px do frame de 128px.
+        escala: Math.max(40, (direita - esquerda) * 0.9) / 64,
+        offsetX: (esquerda + direita) / 2,
+        offsetY: topo - 12,
+      };
+    }
+    // Desconta a margem vazia ao redor da barreira nos frames sustentados.
+    const larguraVisual = nome === "guard" ? 220 : frame.realWidth;
+    const alturaVisual = nome === "guard" ? 330 : frame.realHeight;
+    return {
+      escalaX: (direita - esquerda + 20) / larguraVisual,
+      escalaY: (base - topo + 16) / alturaVisual,
+      offsetX: (esquerda + direita) / 2,
+      offsetY: (topo + base) / 2,
+    };
   }
 
   calcularPosicao(config, alvo = this.personagem) {

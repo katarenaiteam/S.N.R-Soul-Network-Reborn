@@ -3,7 +3,6 @@ import { criarIndicador, atualizarIndicador } from "../Objetos/IndicadorPersonag
 import { criarHudPartida, atualizarBarraUlt } from "../Objetos/HudPartida.js";
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 //import * as Phaser from "phaser";
-import Madotsuki from "../Personagensjs/Madotsuki.js";
 import MapaCidade from "../Mapasjs/Cidade.js";
 import FJ from "../Personagensjs/Frederick.js";
 import SpiderMan from "../Personagensjs/SpiderMan.js";
@@ -242,8 +241,6 @@ this.indicadorP2 = this.criarIndicador(
     switch (nome) {
       case "FJ":
         return new FJ(this, x, y, teclas, minDano, maxDano, controle);
-      case "Madotsuki":
-        return new Madotsuki(this, x, y, teclas, minDano, maxDano, controle);
       case "SpiderMan":
         return new SpiderMan(this, x, y, teclas, minDano, maxDano, controle);
       case "Miku":
@@ -352,6 +349,7 @@ this.indicadorP2 = this.criarIndicador(
   }
 
   respawnar(jogador, pontoRespawn) {
+    jogador.corrupcaoSlender?.limpar();
     // reset sincroniza Game Object, Body, prev e prevFrame no mesmo instante.
     // setPosition isolado deixava o Body na posicao anterior ate outro passo.
     jogador.sprite.body.reset(pontoRespawn.x, pontoRespawn.y);

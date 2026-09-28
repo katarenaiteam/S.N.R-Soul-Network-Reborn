@@ -3,10 +3,8 @@ import MorteVS from "../Objetos/MorteVS.js";
 import { criarIndicador, atualizarIndicador } from "../Objetos/IndicadorPersonagem.js";
 import { criarHudPartida, atualizarBarraUlt } from "../Objetos/HudPartida.js";
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
-import Madotsuki from "../Personagensjs/Madotsuki.js";
 import MikuMap from "../Mapasjs/MikuMap.js";
-import Frederick from "../Personagensjs/Frederick.js";
-import Dio from "../Personagensjs/Dio.js";
+import FJ from "../Personagensjs/Frederick.js";
 import SpiderMan from "../Personagensjs/SpiderMan.js";
 import Ken from "../Personagensjs/Ken.js";
 import Pingu from "../Personagensjs/Pingu.js";
@@ -247,8 +245,6 @@ this.indicadorCPU = this.criarIndicador(
     switch (nome) {
        case "FJ":
               return new FJ(this, x, y, teclas, minDano, maxDano, controle);
-            case "Madotsuki":
-              return new Madotsuki(this, x, y, teclas, minDano, maxDano, controle);
             case "SpiderMan":
               return new SpiderMan(this, x, y, teclas, minDano, maxDano, controle);
             case "Miku":
@@ -386,6 +382,7 @@ this.indicadorCPU = this.criarIndicador(
   }
 
   respawnar(jogador, spawn) {
+    jogador.corrupcaoSlender?.limpar();
     if (jogador.eliminado || jogador.vidas <= 0) return;
     jogador.sprite.body.reset(spawn.x, spawn.y);
     jogador.sprite.setVisible(true).setActive(true);
