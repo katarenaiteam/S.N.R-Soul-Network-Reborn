@@ -624,6 +624,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
      this.load.image("Mk_N", "assets/Hud/dialogo/Miku/Mk_N.png");
      this.load.image("Mk_rage", "assets/Hud/dialogo/Miku/Mk_rage.png");
      this.load.image("Mk_sad", "assets/Hud/dialogo/Miku/Mk_sad.png");
+     this.load.image("puppet", "assets/Hud/dialogo/Miku/puppet.png");
      this.load.spritesheet("Mk_deaf", "assets/personagens/Miku/Sprites/Mk_deaf.png", { frameWidth: 169, frameHeight: 163 });
 
      this.load.image("FJ_N", "assets/Hud/dialogo/FJ/FJ-N.png");

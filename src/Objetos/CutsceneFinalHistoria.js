@@ -5,12 +5,12 @@ const FALAS_MIKU = [
   { personagem: "Miku", retrato: "Mk_sad", texto: "Você se provou mais forte do que eu. Espero que encontre o que procura no fim de sua jornada." },
 ];
 const FALAS_PUPPET = [
-  { personagem: "Puppet", personagemCamera: "Puppet", zoom: 2.8, retrato: "Miku_puppet", texto: "MAMÃE!!!" },
-  { personagem: "Miku", retrato: "Mk_sad", texto: "Não me olhe assim, pequena, ou vou ficar ainda mais triste por ter abandonado você." },
+  { personagem: "Puppet", personagemCamera: "Puppet", zoom: 2.8, retrato: "puppet", texto: "MAMÃE!!!" },
+  { personagem: "Miku", retrato: "Mk_sad", texto: "Não me olhe dessa forma, pequena, ou vou ficar ainda mais triste por ter abandonado você." },
 ];
 const FALAS_FJ = [
   { personagem: "FJ", retrato: "FJ_N", texto: "Eu juro que encontrarei um jeito de mudar esse mundo para que tragédias como essas não precisem mais ocorrer." },
-  { personagem: "FJ", retrato: "FJ_N", texto: "Adeus. 世界一のプリンセス." },
+  { personagem: "FJ", retrato: "FJ_N", texto: "Adeus, せかいでいちばんおひめさま." },
 ];
 
 export default class CutsceneFinalHistoria {
@@ -145,8 +145,8 @@ export default class CutsceneFinalHistoria {
 
   chamarPuppet() {
     const scene = this.scene;
-    this.puppet = scene.add.sprite(scene.boss.sprite.x + 700, scene.boss.sprite.y - 55, "Miku_puppet", 0)
-      .setScale(0.55).setFlipX(true).setDepth(scene.boss.sprite.depth + 1);
+    this.puppet = scene.add.sprite(1850, 800, "Miku_puppet", 0)
+      .setOrigin(0.5, 1).setScale(0.55).setFlipX(true).setDepth(scene.boss.sprite.depth + 1);
     this.ignorarCamHUD(this.puppet);
     this.dialogo(FALAS_PUPPET, () => this.dissolverMiku(), { Puppet: this.puppet });
   }
