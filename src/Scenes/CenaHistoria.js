@@ -15,6 +15,8 @@ import BotController from "../Objetos/BotController.js";
 import Miku_IA from "../Objetos/Miku_IA.js";
 import SistemaLedge from "../Objetos/SistemaLedge.js";
 import SistemaPlataformasAtravessaveis from "../Objetos/SistemaPlataformasAtravessaveis.js";
+import DialogoHistoria from "../Objetos/DialogoHistoria.js";
+import CutsceneFinalHistoria from "../Objetos/CutsceneFinalHistoria.js";
 
 export default class CenaHistoria extends Phaser.Scene {
   constructor() {
@@ -27,6 +29,7 @@ export default class CenaHistoria extends Phaser.Scene {
     this.boss = null;
     this.partidaEncerrada = false;
     this.introPartida = null;
+    this.dialogoHistoria = null;
     this.ultEmAndamento = null;
     delete this.atualizarCamera;
     this.escolhaP1 = dados.p1 || "Frederick";
@@ -233,6 +236,13 @@ this.indicadorCPU = this.criarIndicador(
 );
 
     this.mortesVS = new MorteVS(this, lote => this.concluirMortes(lote));
+    this.dialogoHistoria = new DialogoHistoria(this, () => {
+      this.dialogoHistoria = null;
+      this.iniciarIntroPartida();
+    });
+  }
+
+  iniciarIntroPartida() {
     this.introPartida = new IntroPartida(this, {
       jogadores: [this.jogador1, this.boss],
       participantes: this.participantes.map(({ jogador }) => jogador),
@@ -261,6 +271,10 @@ this.indicadorCPU = this.criarIndicador(
   }
 
   update(time, delta) {
+    if (this.dialogoHistoria?.ativa) {
+      this.dialogoHistoria.atualizar(delta);
+      return;
+    }
     if (this.partidaEncerrada) return;
     if (this.introPartida?.ativa) {
       this.introPartida.atualizar(delta);
@@ -347,8 +361,14 @@ this.indicadorCPU = this.criarIndicador(
     if ((!jogadoresVivos || this.vidasBoss === 0) && !this.mortesVS.pendentes.size) {
       this.partidaEncerrada = true;
       this.botIA.soltarTudo();
-      this.sound.stopAll();
-      this.scene.start('CenaGameOver');
+      if (jogadoresVivos && this.vidasBoss === 0) {
+        this.time.delayedCall(1000, () => {
+          this.cutsceneFinalHistoria = new CutsceneFinalHistoria(this);
+        });
+      } else {
+        this.sound.stopAll();
+        this.scene.start('CenaGameOver');
+      }
     }
   }
 

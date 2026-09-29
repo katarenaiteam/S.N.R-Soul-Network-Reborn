@@ -308,8 +308,12 @@ export default class FJUlt {
       }
       if (this.estadoAlvoCarregado) {
         const { alvo } = this.estadoAlvoCarregado;
-        alvo.sprite.setPosition(sprite.x, sprite.y - 70);
-        alvo.sincronizarHurtbox?.();
+        if (alvo?.sprite?.active) {
+          alvo.sprite.setPosition(sprite.x, sprite.y - 70);
+          alvo.sincronizarHurtbox?.();
+        } else {
+          this.liberarAlvoCarregado();
+        }
       }
       if (sprite.body.blocked.down) this.iniciarImpacto();
     }
@@ -443,12 +447,12 @@ export default class FJUlt {
     const salvo = this.estadoAlvoCarregado;
     if (!salvo) return;
     const { alvo } = salvo;
-    if (alvo.sprite?.body) {
+    if (alvo?.sprite?.body) {
       alvo.sprite.body.moves = salvo.moves;
       alvo.sprite.body.setAllowGravity(salvo.gravity);
       alvo.sprite.body.setVelocity(0, 0);
       if (!salvo.animacaoPausada) alvo.sprite.anims.resume();
-      alvo.maquinaEstados.update = salvo.updateFSM;
+      if (alvo.maquinaEstados) alvo.maquinaEstados.update = salvo.updateFSM;
       alvo.sincronizarHurtbox?.();
     }
     this.estadoAlvoCarregado = null;

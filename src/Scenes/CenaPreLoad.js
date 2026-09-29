@@ -588,6 +588,7 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.image("thumb_teste", "assets/cenarios/MapaTest/thumb_teste.png");
   // ---  miku ---
     this.load.spritesheet("show-back", "assets/cenarios/MikuShow/show-back.png", { frameWidth: 1920, frameHeight: 1080 });
+    this.load.audio("m-doll", "assets/cenarios/MikuShow/m-doll.wav");
     this.load.image("miku-plat", "assets/cenarios/MikuShow/miku-plat.png");
     this.load.image("suport", "assets/cenarios/MikuShow/suport.png");
     this.load.spritesheet("efeito-baner", "assets/cenarios/MikuShow/efeito-baner.png", { frameWidth: 320, frameHeight: 240 });
@@ -595,10 +596,6 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
 
     // --- AUDIOS ---
     //--OST
-    
-
-
-
     
     // --- EFEITOS ---
     //mapa
@@ -617,6 +614,19 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
      this.load.spritesheet("brokeguard-efect", "assets/efeitos/guard/brokeguard-efect.png", { frameWidth: 615, frameHeight: 616, });
      //- stun
      this.load.spritesheet("Stun_Effect", "assets/efeitos/Stun_Effect.png", { frameWidth: 128, frameHeight: 128, });
+
+
+
+      // --- DIALOGOS E CENAS 
+      //fase1      
+     this.load.audio("Sayonara", "assets/cenarios/MikuShow/Sayonara.wav");
+     this.load.image("txtbox", "assets/Hud/dialogo/txtbox.png");
+     this.load.image("Mk_N", "assets/Hud/dialogo/Miku/Mk_N.png");
+     this.load.image("Mk_rage", "assets/Hud/dialogo/Miku/Mk_rage.png");
+     this.load.image("Mk_sad", "assets/Hud/dialogo/Miku/Mk_sad.png");
+     this.load.spritesheet("Mk_deaf", "assets/personagens/Miku/Sprites/Mk_deaf.png", { frameWidth: 169, frameHeight: 163 });
+
+     this.load.image("FJ_N", "assets/Hud/dialogo/FJ/FJ-N.png");
 
   }
 

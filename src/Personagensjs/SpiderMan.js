@@ -104,8 +104,7 @@ export default class SpiderMan extends Personagem {
         offsetY: 96,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -60 },
-          { largura: 50, altura: 25, offsetX: -10, offsetY: -18 },
+          
         ],
       },
 
@@ -116,7 +115,7 @@ export default class SpiderMan extends Personagem {
         offsetY: 13,
         escala: 1,
         hurtboxes: [
-          { largura: 70, altura: 70, offsetX: 0, offsetY: -55 },
+         
         ],
       },
 

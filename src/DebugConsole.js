@@ -123,6 +123,29 @@ export function instalarComandosDebug(game) {
       return true;
     },
 
+    matarBoss() {
+      const scene = game.scene.getScene("CenaHistoria");
+      if (!scene?.scene.isActive()) {
+        console.error("Entre na fase da historia antes de usar matarBoss().");
+        return false;
+      }
+      if (scene.partidaEncerrada || scene.introPartida?.ativa || scene.dialogoHistoria?.ativa) {
+        console.error("A luta precisa estar ativa para usar matarBoss().");
+        return false;
+      }
+      if (!scene.boss || scene.mortesVS?.pendentes.has(scene.boss)) {
+        console.error("O boss ja esta sendo derrotado.");
+        return false;
+      }
+
+      // Usa a morte normal para atualizar HUD, tocar o efeito e iniciar a cutscene final.
+      scene.vidasBoss = 1;
+      scene.boss.vidas = 1;
+      scene.processarQueda(scene.boss, scene.pontoRespawnP2);
+      console.log("Ultima vida da Miku removida; a cutscene final vai iniciar apos a animacao de morte.");
+      return true;
+    },
+
     diagnosticarSpecials() {
       removerDiagnosticoSpecial?.();
 
@@ -167,6 +190,7 @@ export function instalarComandosDebug(game) {
         "  resetar()               reinicia a tela/fase atual",
         "  carregarUlt()           carrega totalmente a ult do P1",
         "  carregarUlt(2)          carrega totalmente a ult do P2",
+        "  matarBoss()             remove a ultima vida da Miku na fase historia",
         "  SNR.diagnosticarSpecials() registra a leitura de G/K",
         "Aliases: preload, start, personagens, mapas, luta, historia, gameover, creditos",
       ].join("\n"));
@@ -179,6 +203,7 @@ export function instalarComandosDebug(game) {
   window.ir = api.ir.bind(api);
   window.resetar = api.resetar.bind(api);
   window.carregarUlt = api.carregarUlt.bind(api);
+  window.matarBoss = api.matarBoss.bind(api);
 
   console.log("Comandos de teste carregados. Digite SNR.ajuda() no console.");
 }

@@ -18,7 +18,11 @@ export default class SpiderUlt {
     this.scene = personagem.scene;
     this.config = configUlt;
     this.estadoFSM = estadoFSM;
-    this.oponente = obterAlvosCombate(personagem).sort((a, b) =>
+    this.oponente = obterAlvosCombate(personagem)
+      // A ult cinematica controla FSMs e animacoes de lutadores; invocacoes
+      // como a Puppet podem morrer no meio do combo e remover o proprio sprite.
+      .filter((alvo) => alvo.maquinaEstados && alvo.sprite?.anims)
+      .sort((a, b) =>
       Math.abs(a.sprite.x - personagem.sprite.x) - Math.abs(b.sprite.x - personagem.sprite.x)
     )[0] ?? null;
     this.conectou = false;
