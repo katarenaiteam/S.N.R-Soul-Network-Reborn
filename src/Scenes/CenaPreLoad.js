@@ -509,6 +509,35 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
     this.load.spritesheet("Pingu_fly", "assets/personagens/Pingu/Sprites/Pingu_fly.png", { frameWidth: 160, frameHeight: 160 });
     this.load.spritesheet("Pingu_dead", "assets/personagens/Pingu/Sprites/Pingu_dead.png", { frameWidth: 204, frameHeight: 130 });
     this.load.spritesheet("Pingu_getup", "assets/personagens/Pingu/Sprites/Pingu_getup.png", { frameWidth: 105, frameHeight: 91 });
+    //golpes
+    this.load.spritesheet("Pingu_atack1", "assets/personagens/Pingu/Sprites/Pingu_atack1.png", { frameWidth: 77, frameHeight: 62 });
+    this.load.spritesheet("Pingu_atack2", "assets/personagens/Pingu/Sprites/Pingu_atack2.png", { frameWidth: 95, frameHeight: 63 });
+    this.load.spritesheet("Pingu_atack3", "assets/personagens/Pingu/Sprites/Pingu_atack3.png", { frameWidth: 81, frameHeight: 92 });
+    this.load.spritesheet("Pingu_downAir", "assets/personagens/Pingu/Sprites/Pingu_downAir.png", { frameWidth: 88, frameHeight: 103 });
+    this.load.spritesheet("Pingu_downAtack", "assets/personagens/Pingu/Sprites/Pingu_downAtack.png", { frameWidth: 203, frameHeight: 146 });
+    this.load.spritesheet("Pingu_neutralAir", "assets/personagens/Pingu/Sprites/Pingu_neutralAir.png", { frameWidth: 82, frameHeight: 91 });
+    this.load.spritesheet("Pingu_sideAir", "assets/personagens/Pingu/Sprites/Pingu_sideAir.png", { frameWidth: 202, frameHeight: 137 });
+    this.load.spritesheet("Pingu_sideAtack", "assets/personagens/Pingu/Sprites/Pingu_sideAtack.png", { frameWidth: 95, frameHeight: 63 });
+    this.load.spritesheet("Pingu_upAir", "assets/personagens/Pingu/Sprites/Pingu_upAir.png", { frameWidth: 81, frameHeight: 92 });
+
+    //specials
+    this.load.spritesheet("Pingu_aBall", "assets/personagens/Pingu/Sprites/Pingu_aBall.png", { frameWidth: 512, frameHeight: 512 });
+    this.load.spritesheet("Pingu_AdoSpecial", "assets/personagens/Pingu/Sprites/Pingu_AdoSpecial.png", { frameWidth: 82, frameHeight: 93 });
+    this.load.spritesheet("Pingu_aExplosion", "assets/personagens/Pingu/Sprites/Pingu_aExplosion.png", { frameWidth: 49, frameHeight: 48 });
+    this.load.spritesheet("Pingu_AneSpecial", "assets/personagens/Pingu/Sprites/Pingu_AneSpecial.png", { frameWidth: 85, frameHeight: 90 });
+    this.load.spritesheet("Pingu_AsiSpecial", "assets/personagens/Pingu/Sprites/Pingu_AsiSpecial.png", { frameWidth: 357, frameHeight: 208 });
+    this.load.spritesheet("Pingu_AupSpecial", "assets/personagens/Pingu/Sprites/Pingu_AupSpecial.png", { frameWidth: 68, frameHeight: 115 });
+    this.load.spritesheet("Pingu_AupSpecial", "assets/personagens/Pingu/Sprites/Pingu_AupSpecial.png", { frameWidth: 68, frameHeight: 115 });
+    this.load.spritesheet("Pingu_doCharg", "assets/personagens/Pingu/Sprites/Pingu_doCharg.png", { frameWidth: 41, frameHeight: 40 });
+    this.load.spritesheet("Pingu_doLaunch", "assets/personagens/Pingu/Sprites/Pingu_doLaunch.png", { frameWidth: 147, frameHeight: 145 });
+    this.load.spritesheet("Pingu_doSpecial", "assets/personagens/Pingu/Sprites/Pingu_doSpecial.png", { frameWidth: 94, frameHeight: 88 });
+    this.load.spritesheet("Pingu_doStrike", "assets/personagens/Pingu/Sprites/Pingu_doStrike.png", { frameWidth: 60, frameHeight: 76 });
+    this.load.spritesheet("Pingu_neSpecial", "assets/personagens/Pingu/Sprites/Pingu_neSpecial.png", { frameWidth: 73, frameHeight: 59 });
+    this.load.spritesheet("Pingu_siBall", "assets/personagens/Pingu/Sprites/Pingu_siBall.png", { frameWidth: 15, frameHeight: 9 });
+    this.load.spritesheet("Pingu_AupSpecial", "assets/personagens/Pingu/Sprites/Pingu_AupSpecial.png", { frameWidth: 68, frameHeight: 115 });
+    this.load.spritesheet("Pingu_siSpecial", "assets/personagens/Pingu/Sprites/Pingu_siSpecial.png", { frameWidth: 86, frameHeight: 82 });
+    this.load.spritesheet("Pingu_som", "assets/personagens/Pingu/Sprites/Pingu_som.png", { frameWidth: 105, frameHeight: 101 });
+
 
     // --- visual effects ---
     //

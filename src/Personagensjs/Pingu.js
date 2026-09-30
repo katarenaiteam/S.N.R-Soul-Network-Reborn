@@ -1,4 +1,9 @@
 import Personagem from "./Personagem.js";
+import PinguNeSpecial from "./Specials/Pingu/NeSpecial.js";
+import PinguSiSpecial from "./Specials/Pingu/SiSpecial.js";
+import PinguDoSpecial from "./Specials/Pingu/DoSpecial.js";
+import PinguAneSpecial from "./Specials/Pingu/AneSpecial.js";
+import PinguAsiSpecial from "./Specials/Pingu/AsiSpecial.js";
 
 export default class Pingu extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -18,7 +23,7 @@ export default class Pingu extends Personagem {
         forcaPulo: -600,
         maxPulos: 2,
         maxDash: 1,
-        maxComboIndex: 2,
+        maxComboIndex: 3,
       },
 
       teclas,
@@ -53,132 +58,122 @@ export default class Pingu extends Personagem {
     //============================= hitboxes ========================================
     this.nomePersonagem = "Pingu";
     this.configAnimacoes = {
-      idle: {
-        largura: 50,
-        altura: 70,
-        offsetX: 20,
-        offsetY: -10,
-        escala: 1,
+
+      idle: { largura: 30, altura: 70, offsetX: 1, offsetY: -10, escala: 1,
         hurtboxes: [
-          { largura: 35, altura: 70, offsetX: 0, offsetY: -18 }, 
+          { largura: 30, altura: 55, offsetX: -4, offsetY: -30 }, 
         ],
       },
 
       walk: {
-        largura: 50,
+        largura: 30,
         altura: 70,
-        offsetX: 20,
+        offsetX: 1,
         offsetY: -11,
-        escala: 1,
+        escala: 0,
         hurtboxes: [
-          { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 30, altura: 55, offsetX: -2, offsetY: -30 }, 
         ],
       },
 
       jump: {
-        offsetVisualY: 5 ,
-        largura: 50,
+        //offsetVisualY: 5 ,
+        largura: 30,
         altura: 70,
-        offsetX: 0,
+        offsetX: 15,
         offsetY: 25,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 }, // Tronco/cabeça
-          { largura: 30, altura: 50, offsetX: -20, offsetY: -25 }, // parte de baixo parecida
+         { largura: 30, altura: 55, offsetX: 0, offsetY: -50 }, 
         ],
       },
 
       dash: {
-        largura: 50,
-        altura: 50,
-        offsetX: 15,
-        offsetY: -5,
+        largura: 30,
+        altura: 45,
+        offsetX: 5,
+        offsetY: -7,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -60 },
-          { largura: 50, altura: 25, offsetX: -10, offsetY: -18 },
         ],
       },
 
       crouch: {
-        offsetVisualX: -1,
-        offsetVisualY: 5,
-        largura: 50,
-        altura: 65,
-        offsetX: 0,
-        offsetY: -7,
+        offsetVisualX: -2,
+        offsetVisualY: 4,
+        largura: 30,
+        altura: 40,
+        offsetX: 2,
+        offsetY: 17,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 25, offsetX: 0, offsetY: -35 }, // fechadinho
-          { largura: 75, altura: 25, offsetX: 0, offsetY: -20 },
+          { largura: 30, altura: 40, offsetX: -4, offsetY: -25 }, 
         ],
       },
 
       guard: {
-      largura: 50,
+      largura: 30,
       altura: 70,
-      offsetX: 20,
+      offsetX: 5,
       offsetY: -24,
       escala: 1,
       hurtboxes: [
-          { largura: 55, altura: 55, offsetX: -15, offsetY: -65 }, // Tronco/cabeça
-          { largura: 60, altura: 10, offsetX: -15, offsetY: -32 },
-          { largura: 85, altura: 15, offsetX: -5, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 30, altura: 55, offsetX: -4, offsetY: -30 }, 
      ]
       },
 
        taunt: {
-      largura: 50,
+        offsetVisualY: -1,
+      largura: 30,
       altura: 70,
-      offsetX: 25,
-      offsetY: -2,
+      offsetX: 5,
+      offsetY: -4,
       escala: 1,
       hurtboxes: [
-          { largura: 55, altura: 60, offsetX: -5, offsetY: -70 }, // Tronco/cabeça
-          { largura: 55, altura: 35, offsetX: -5, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 30, altura: 55, offsetX: -4, offsetY: -30 }, 
      ]
       },
       stun: {
-        largura: 50,
-        altura: 120,
-        offsetX: 0,
+         largura: 30,
+        altura: 70,
+        offsetX: -1,
         offsetY: -10,
         escala: 1,
         hurtboxes: [
           
-          { largura: 65, altura: 75, offsetX: -10, offsetY: -42 }, // Agachado / pernas abertas
+          { largura: 30, altura: 55, offsetX: -2, offsetY: -30 }, 
         ],
       },
 
       dano: {
-        largura: 50,
-        altura: 120,
-        offsetX: 20,
-        offsetY: -10,
+        offsetVisualY: 40,
+        offsetVisualX: -20,
+         largura: 30,
+        altura: 70,
+        offsetX: 75,
+        offsetY: 117,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 30, altura: 55, offsetX: -4, offsetY: -30 }, 
         ],
       },
 
       danoUp: {
-        largura: 50,
-        altura: 120,
-        offsetX: 32,
-        offsetY: -10,
+         largura: 30,
+        altura: 70,
+        offsetX: 70,
+        offsetY: 90,
         escala: 1,
         hurtboxes: [
-           { largura: 55, altura: 60, offsetX: 0, offsetY: -95 }, // Tronco/cabeça
-          { largura: 55, altura: 35, offsetX: 0, offsetY: -45 },
+           { largura: 50, altura: 57, offsetX: 0, offsetY: -88 }, 
+          { largura: 50, altura: 33, offsetX: 0, offsetY: -46 },
         ],
       },
       danoDown: {
-        largura: 50,
-        altura: 120,
-        offsetX: 32,
-        offsetY: -10,
+         largura: 30,
+        altura: 70,
+        offsetX: 70,
+        offsetY: 90,
         escala: 1,
         hurtboxes: [
            { largura: 55, altura: 60, offsetX: 0, offsetY: -90 }, 
@@ -186,21 +181,22 @@ export default class Pingu extends Personagem {
         ], 
       },
       danoSide: {
-        largura: 50,
-        altura: 120,
-        offsetX: 32,
-        offsetY: -15,
-        escala: 1,
+         largura: 30,
+         altura: 70,
+         offsetX: 65,
+         offsetY: 90,
+         escala: 1,
         hurtboxes: [
            { largura: 60, altura: 55, offsetX: 0, offsetY: -75 },  
         ],
       },
       dead: {
-      
-        largura: 70,
-        altura: 40,
-        offsetX: 35,
-        offsetY: 8, // 52 - 40 - 4: mesma base dos estados de dano e idle.
+         offsetVisualY: 55,
+        offsetVisualX: 0,
+         largura: 30,
+        altura: 70,
+        offsetX: 87,
+        offsetY: 60,
         escala: 1,
         hurtboxes: [
           { largura: 50, altura: 15, offsetX: -10, offsetY: -35 },
@@ -208,216 +204,124 @@ export default class Pingu extends Personagem {
         ],
       },
       getup: {
-        largura: 50,
-        altura: 120,
-        offsetX: 20,
-        offsetY: -15,
+        offsetVisualY: 15,
+        offsetVisualX: 0,
+         largura: 30,
+        altura: 70,
+        offsetX: 38,
+        offsetY: 19,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 25, offsetX: 0, offsetY: -35 }, // fechadinho
-          { largura: 75, altura: 25, offsetX: 0, offsetY: -20 },
+       
+          { largura: 65, altura: 25, offsetX: -3, offsetY: -15 },
         ],
       },
 
-      atack1: { largura: 50, altura: 120, offsetX: 37, offsetY: -17, escala: 1,
+      atack1: {offsetVisualX: 10, largura: 30, altura: 70, offsetX: 20, offsetY: -10, escala: 1,
         hurtboxes: [
-          { largura: 30, altura: 30, offsetX: 20, offsetY: -75 },
-          { largura: 50, altura: 20, offsetX: 22, offsetY: -48 }, // Tronco/cabeça
-          { largura: 80, altura: 35, offsetX: 0, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 30, altura: 55, offsetX: -4, offsetY: -30 }, 
         ],
       },
 
-      atack2: { largura: 50, altura: 120, offsetX: 29, offsetY: 10, escala: 1,
+      atack2: {offsetVisualX: 15, offsetVisualY: -1, largura: 30, altura: 70, offsetX: 29, offsetY: -10, escala: 1,
         hurtboxes: [
-          { largura: 30, altura: 30, offsetX: 20, offsetY: -75 },
-          { largura: 50, altura: 20, offsetX: 22, offsetY: -48 }, // Tronco/cabeça
-          { largura: 80, altura: 35, offsetX: 0, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 30, altura: 55, offsetX: -4, offsetY: -30 }, 
+        ],
+      },
+      atack3: {offsetVisualX: 15, offsetVisualY: -1, largura: 30, altura: 70, offsetX: 21, offsetY: 20, escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 55, offsetX: -4, offsetY: -30 }, 
         ],
       },
 
-      neutralAir: {
-        largura: 50,
-        altura: 120,
-        offsetX: 30,
-        offsetY: 25,
-        escala: 1,
+      neutralAir: {offsetVisualX: 10, largura: 30, altura: 70, offsetX: 27, offsetY: 15, escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 45, offsetX: -20, offsetY: -60 }, // Tronco/cabeça
-          { largura: 70, altura: 45, offsetX: 0, offsetY: -35 }, // perna dano
+          { largura: 30, altura: 55, offsetX: 0, offsetY: -40 }, 
         ],
       },
 
-      sideAtack: {
-        largura: 50,
-        altura: 120,
-        offsetX: 36,
-        offsetY: 2,
-        escala: 1,
-        hurtboxes: [{ largura: 60, altura: 80, offsetX: -20, offsetY: -40 }],
-      },
-
-      downAtack: {
-        largura: 50,
-        altura: 120,
-        offsetX: 20,
-        offsetY: -45,
-        escala: 1,
-        hurtboxes: [{ largura: 80, altura: 45, offsetX: 0, offsetY: -30 }],
-      },
-
-      sideAir: {
-        largura: 50,
-        altura: 120,
-        offsetX: 20,
-        offsetY: 10,
-        escala: 1,
-        hurtboxes: [{ largura: 65, altura: 60, offsetX: -15, offsetY: -40 }],
-      },
-
-      downAir: {
-        largura: 50,
-        altura: 120,
-        offsetX: 20,
-        offsetY: 10,
-        escala: 1,
-        hurtboxes: [{ largura: 65, altura: 60, offsetX: -15, offsetY: -40 }],
-      },
-
-      upAir: {  
-        largura: 50,
-        altura: 120,
-        offsetX: 16,
-        offsetY: 10,
-        escala: 1,
-        hurtboxes: [{ largura: 60, altura: 70, offsetX: -5, offsetY: -50 }],
-      },
-
-      neSpecial: {
-       largura: 110,
-        altura: 96,
-        offsetX: 45,
-        offsetY: 95,
-        escala: 1,
-    hurtboxes: [
-          { largura: 30, altura: 20, offsetX: -5, offsetY: -70 },
-          { largura: 70, altura: 20, offsetX: 12, offsetY: -48 }, // Tronco/cabeça
-          { largura: 75, altura: 35, offsetX: 0, offsetY: -18 }, // Agachado / pernas abertas
-    ], 
-    },
-
-    doSpecial: {
-        largura: 85,
-        altura: 95,
-        offsetX: 50,
-        offsetY: 96,
-        escala: 1,
+      sideAtack: {offsetVisualX: 10, largura: 30, altura: 70, offsetX: 28, offsetY: -10, escala: 1,
         hurtboxes: [
-        ],
-      },
-      counter: {
-      largura: 80,
-     altura: 95,
-     offsetX: 200,
-     offsetY: 96,
-      escala: 1,
-     hurtboxes: []
-      },
-    siSpecial: {
-        largura: 85,
-        altura: 95,
-        offsetX: 32,
-        offsetY: -10,
-        escala: 1,
-        hurtboxes: [
-          { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 30, altura: 55, offsetX: -4, offsetY: -30 }, 
         ],
       },
 
-      AsiSpecial: {
-        largura: 85,
-        altura: 95,
-        offsetX: 64,
-        offsetY: 90,
-        escala: 1,
+      downAtack: {offsetVisualY: 50, largura: 30, altura: 40, offsetX: 80, offsetY: 104, escala: 1,
         hurtboxes: [
-          { largura: 75, altura: 45, offsetX: -20, offsetY: -60 }, // Tronco/cabeça
+          { largura: 60, altura: 30, offsetX: -10, offsetY: -15 }, 
         ],
       },
 
-      AupSpecial: {
-        largura: 85,
-        altura: 95,
-        offsetX: 0,
-        offsetY: 10,
-        escala: 1,
+      sideAir: {offsetVisualY: 5, largura: 30, altura: 70, offsetX: 72, offsetY: 60, escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 50, altura: 45, offsetX: -5, offsetY: -60 }, 
         ],
       },
 
-      AneSpecial: {
-        offsetVisualX: 19,
-        largura: 85,
-        altura: 95,
-        offsetX: 50,
-        offsetY: 96,
-        escala: 1,
+      downAir: { largura: 30, altura: 70, offsetX: 30, offsetY: 30, escala: 1,
         hurtboxes: [
-          { largura: 77, altura: 55, offsetX: -33, offsetY: -50 }, // Tronco/cabeça
-          
+          { largura: 30, altura: 65, offsetX: -4, offsetY: -40 }, 
         ],
       },
 
-      AdoSpecial: {
-        largura: 85,
-        altura: 95,
-        offsetX: 50,
-        offsetY: 96,
-        escala: 1,
+      upAir: { largura: 30, altura: 70, offsetX: 25, offsetY: 15, escala: 1,
         hurtboxes: [
-          { largura: 70, altura: 55, offsetX: -30, offsetY: -65 }, // Tronco/cabeça
-          
+          { largura: 30, altura: 55, offsetX: 0, offsetY: -45 }, 
         ],
       },
 
-     
-      teia_side: {
-        largura: 85,
-        altura: 95,
-        offsetX: 47,
-        offsetY: -25,
-        escala: 1,
+      neSpecial: { largura: 30, altura: 70, offsetX: 20, offsetY: -12, escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 45, offsetX: -70, offsetY: -60 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -70, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 30, altura: 55, offsetX: -4, offsetY: -30 }, 
         ],
       },
 
-      spider_throw: {
-        largura: 85,
-        altura: 95,
-        offsetX: 350,
-        offsetY: 30,
-        escala: 1,
+      siSpecial: { largura: 30, altura: 70, offsetX: 21, offsetY: 10, escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 45, offsetX: 67, offsetY: -60 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: 67, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 30, altura: 55, offsetX: -4, offsetY: -50 }, 
         ],
       },
 
-      siSpecial_miss: {
-        largura: 85,
-        altura: 95,
-        offsetX: 50,
-        offsetY: -10,
-        escala: 1,
+      AneSpecial: { largura: 30, altura: 70, offsetX: 27, offsetY: 20, escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 30, altura: 55, offsetX: 0, offsetY: -30 },
         ],
       },
+
+      AsiSpecial: { largura: 30, altura: 70, offsetX: 130, offsetY: 125, escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 55, offsetX: 0, offsetY: -30 },
+        ],
+      },
+
+      doSpecial: {offsetVisualY: 2, offsetVisualX: 11, largura: 30, altura: 40, offsetX: 28, offsetY: 48, escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 40, offsetX: 0, offsetY: -22 },
+        ],
+      },
+
+      doCharg: {offsetVisualY: 7, offsetVisualX: 3, largura: 30, altura: 40, offsetX: 10, offsetY: 0, escala: 1,
+        hurtboxes: [
+          { largura: 35, altura: 35, offsetX: 2, offsetY: -10 },
+        ],
+      },
+
+      doLaunch: {offsetVisualY: 60, offsetVisualX: 0, largura: 30, altura: 40, offsetX: 40, offsetY: 105, escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 40, offsetX: 0, offsetY: -10 },
+        ],
+      },
+
+      doStrike: {offsetVisualY: -2, offsetVisualX: 5, largura: 30, altura: 40, offsetX: 30, offsetY: 36, escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 40, offsetX: 0, offsetY: -10
+
+           },
+        ],
+      },
+
+
+    
    };
 
     this.sons = {
@@ -433,12 +337,12 @@ export default class Pingu extends Personagem {
     // ============================ tabela de golpes =====================================
     this.golpes = {
       neutro1: {
-        animacao: "slan_atack1",
+        animacao: "pingu_atack1",
         frameHitbox: 3,
-        offsetX: 30,
-        offsetY: -90,
-        largura: 60,
-        altura: 20,
+        offsetX: 20,
+        offsetY: -40,
+        largura: 48,
+        altura: 16,
         cooldown: 700,
         duracao: 270,
         cancelavel: true,
@@ -456,24 +360,25 @@ export default class Pingu extends Personagem {
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
-          knockbackX: 40,
+          knockbackX: 20,
           knockbackY: -20,
           knockbackFixo: true,
+          hitstunFrames: 25,
         },
 
         comboProximo: "neutro2",
         comboJanelaInicio: 150,
-        comboJanelaFim: 350,
+        comboJanelaFim: 270,
       },
 
       neutro2: {
-        animacao: "slan_atack2",
+        animacao: "pingu_atack2",
 
-        frameHitbox: 2,
+        frameHitbox: 3,
 
-        offsetX: 50,
-        offsetY: -90,
-        largura: 50,
+        offsetX: 30,
+        offsetY: -45,
+        largura: 48,
         altura: 35,
         duracao: 550,
        // cancelavel: true,
@@ -491,8 +396,45 @@ export default class Pingu extends Personagem {
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
-          knockbackX: 80,
-          knockbackY: -400,
+          knockbackX: 40,
+          knockbackY: 0,
+          knockbackFixo: true,
+          hitstunFrames: 25,
+        },
+
+        comboProximo: "neutro3",
+        comboJanelaInicio: 350,
+        comboJanelaFim: 550,
+      },
+
+
+      neutro3: {
+        animacao: "pingu_atack3",
+
+        frameHitbox: 2,
+
+        offsetX: 30,
+        offsetY: -55,
+        largura: 40,
+        altura: 40,
+        duracao: 500,
+       // cancelavel: true,
+
+        vfxAcerto: [
+        {
+        escolherUm: [
+        "punch1",
+        "punch2",
+        "punch3",
+          ],
+          },
+        ],
+
+        propriedades: {
+          tipoSomImpacto: "light",
+          dano: 4,
+          knockbackX: 250,
+          knockbackY: -350,
           knockbackFixo: false,
         },
 
@@ -500,11 +442,11 @@ export default class Pingu extends Personagem {
 
       
       agachado: {
-        animacao: "slan_downAtack",
+        animacao: "pingu_downAtack",
         frameHitbox: 3,
-        offsetX: 60,
-        offsetY: -25,
-        largura: 75,
+        offsetX: 25,
+        offsetY: -24,
+        largura: 50,
         altura: 30,
         cooldown: 500,
         duracao: 300,
@@ -515,22 +457,34 @@ export default class Pingu extends Personagem {
           },
         ],
 
+        movimento: {
+         inicio: 50,
+         fim: 320,
+      x: {
+         de: 100,
+         para: 70,
+        },
+
+        curva: "easeIn",
+       },
+
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 6,
           knockbackX: 50,
           knockbackY: -350,
           knockbackFixo: true,
-          tumbling: true
+          tumbling: true,
           //freioKnockback: 700
+          hitstunMinFrames:25,
         },
       },
       side: {
-        animacao: "slan_sideAtack",
+        animacao: "pingu_sideAtack",
         frameHitbox: 3,
-        offsetX: 40,
-        offsetY: -60,
-        largura: 80,
+        offsetX: 30,
+        offsetY: -45,
+        largura: 50,
         altura: 30,
         cooldown: 900,
         duracao: 400,
@@ -563,12 +517,12 @@ export default class Pingu extends Personagem {
       },
 
       air_neutro: {
-        animacao: "slan_neutralAir",
+        animacao: "pingu_neutralAir",
         frameHitbox: 2,
-        offsetX: 42,
-        offsetY: -70,
-        largura: 62,
-        altura: 70,
+        offsetX: 31,
+        offsetY: -65,
+        largura: 45,
+        altura: 20,
         cooldown: 500,
         duracao: 450,
         cancelavel: true,
@@ -586,16 +540,17 @@ export default class Pingu extends Personagem {
           knockbackY: -350,
           tumbling: false,
           knockbackFixo: true,
+          hitstunMinFrames:24,
         },
       },
 
       air_agachado: {
-  animacao: "slan_downAir",
+  animacao: "pingu_downAir",
   frameHitbox: 2,
-  offsetX: 34,
-  offsetY: -30,
-  largura: 60,
-  altura: 70,
+  offsetX: 22,
+  offsetY: -15,
+  largura: 45,
+  altura: 40,
   cooldown: 500,
 
   duracao: 1000,
@@ -613,16 +568,16 @@ export default class Pingu extends Personagem {
 
   movimento: {
     inicio: 30,
-    fim: 900,
+    fim: 300,
 
     x: {
-      de: 80,
-      para: 80,
+      de: 400,
+      para: 350,
     },
 
     y: {
-      de: 800,
-      para: 1200,
+      de: 700,
+      para: 600,
     },
 
     curva: "easeOut",
@@ -634,18 +589,19 @@ export default class Pingu extends Personagem {
     knockbackX: 50,
     knockbackY: 400,
     quiqueChaoY: 350,
+    hitstunMinFrames:25,
   },
 },
 
       air_side: {
-        animacao: "slan_sideAir",
-        frameHitbox: 3,
-        offsetX: 34,
-        offsetY: -30,
-        largura: 65,
-        altura: 55,
+        animacao: "pingu_sideAir",
+        frameHitbox: 5,
+        offsetX: 30,
+        offsetY: -50,
+        largura: 45,
+        altura: 35,
         cooldown: 500,
-        duracao: 350, 
+        duracao: 550, 
         cancelavel: false,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -679,12 +635,12 @@ export default class Pingu extends Personagem {
       },
 
       air_cima: {
-        animacao: "slan_upAir",
+        animacao: "pingu_upAir",
         frameHitbox: 2,
         offsetX: 17,
-        offsetY: -116,
-        largura: 55,
-        altura: 50,
+        offsetY: -65,
+        largura: 35,
+        altura: 45,
         cooldown: 900,
         duracao: 300,
 
@@ -707,6 +663,14 @@ export default class Pingu extends Personagem {
           tumbling: true
         },
       },
+    };
+
+    this.specials = {
+      neutro: PinguNeSpecial.configuracao,
+      lado: PinguSiSpecial.configuracao,
+      agachado: PinguDoSpecial.configuracao,
+      air_neutro: PinguAneSpecial.configuracao,
+      air_lado: PinguAsiSpecial.configuracao,
     };
 
   // --------------------------------- tabela especiais --------------------------
@@ -798,7 +762,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 3,
       }),
-      frameRate: 12,
+      frameRate: 16,
       repeat: 0,
     });
 
@@ -818,7 +782,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 3,
       }),
-      frameRate: 12,
+      frameRate: 16,
       repeat: 0,
     });
 
@@ -907,82 +871,220 @@ if (!scene.anims.exists("punch_effect3")) {
      
 //golpes 
     scene.anims.create({
-      key: "slan_atack1",
-      frames: scene.anims.generateFrameNumbers("Slan_attack1", {
+      key: "pingu_atack1",
+      frames: scene.anims.generateFrameNumbers("Pingu_atack1", {
         start: 0,
-        end: 5,
-      }),
-      frameRate: 16,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "slan_atack2",
-      frames: scene.anims.generateFrameNumbers("Slan_attack2", {
-        start: 0,
-        end: 8,
-      }),
-      frameRate: 12,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "slan_sideAtack",
-      frames: scene.anims.generateFrameNumbers("Slan_sideAtack", {
-        start: 0,
-        end:5,
-      }),
-      frameRate: 12,
-      repeat: 0,
-    });
-
-     scene.anims.create({
-      key: "slan_downAtack",
-      frames: scene.anims.generateFrameNumbers("Slan_downAtack", {
-        start: 0,
-        end: 2,
-      }),
-      frameRate: 12,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "slan_neutralAir",
-      frames: scene.anims.generateFrameNumbers("Slan_neutralAir", {
-        start: 0,
-        end: 11,
-      }),
-      frameRate: 16,
-      repeat: 0,
-    });
-
-
-    
-    scene.anims.create({
-      key: "slan_downAir",
-      frames: scene.anims.generateFrameNumbers("Slan_downAir", {
-        start: 0,
-        end: 11,
-      }),
-      frameRate: 16,
-      repeat: 0,
-    });
-
-    scene.anims.create({
-      key: "slan_upAir",
-      frames: scene.anims.generateFrameNumbers("Slan_upAir", {
-        start: 0,
-        end: 9,
+        end: 3,
       }),
       frameRate: 14,
       repeat: 0,
     });
 
     scene.anims.create({
-      key: "slan_sideAir",
-      frames: scene.anims.generateFrameNumbers("Slan_sideAir", {
+      key: "pingu_atack2",
+      frames: scene.anims.generateFrameNumbers("Pingu_atack2", {
         start: 0,
-        end: 9,
+        end: 4,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_atack3",
+      frames: scene.anims.generateFrameNumbers("Pingu_atack3", {
+        start: 0,
+        end: 6,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_sideAtack",
+      frames: scene.anims.generateFrameNumbers("Pingu_sideAtack", {
+        start: 0,
+        end:4,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
+     scene.anims.create({
+      key: "pingu_downAtack",
+      frames: scene.anims.generateFrameNumbers("Pingu_downAtack", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_neutralAir",
+      frames: scene.anims.generateFrameNumbers("Pingu_neutralAir", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+    
+    scene.anims.create({
+      key: "pingu_downAir",
+      frames: scene.anims.generateFrameNumbers("Pingu_downAir", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_upAir",
+      frames: scene.anims.generateFrameNumbers("Pingu_upAir", {
+        start: 0,
+        end: 6,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_sideAir",
+      frames: scene.anims.generateFrameNumbers("Pingu_sideAir", {
+        start: 0,
+        end: 12,
+      }),
+      frameRate: 20,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_neSpecial",
+      frames: scene.anims.generateFrameNumbers("Pingu_neSpecial", {
+        start: 0,
+        end: 25,
+      }),
+      frameRate: 25,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_som",
+      frames: scene.anims.generateFrameNumbers("Pingu_som", {
+        start: 0,
+        end: 6,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_siSpecial",
+      frames: scene.anims.generateFrameNumbers("Pingu_siSpecial", {
+        start: 0,
+        end: 58,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_siBall",
+      frames: scene.anims.generateFrameNumbers("Pingu_siBall", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 12,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "pingu_AneSpecial",
+      frames: scene.anims.generateFrameNumbers("Pingu_AneSpecial", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_AsiSpecial",
+      frames: scene.anims.generateFrameNumbers("Pingu_AsiSpecial", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 27,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "pingu_aBall_faisca",
+      frames: scene.anims.generateFrameNumbers("Pingu_aBall", {
+        start: 0,
+        end: 6,
+      }),
+      frameRate: 24,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_aBall_loop",
+      frames: scene.anims.generateFrameNumbers("Pingu_aBall", {
+        start: 7,
+        end: 14,
+      }),
+      frameRate: 18,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "pingu_aExplosion",
+      frames: scene.anims.generateFrameNumbers("Pingu_aExplosion", {
+        start: 0,
+        end: 15,
+      }),
+      frameRate: 24,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_doSpecial",
+      frames: scene.anims.generateFrameNumbers("Pingu_doSpecial", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 20,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_doCharg",
+      frames: scene.anims.generateFrameNumbers("Pingu_doCharg", {
+        start: 0,
+        end: 8,
+      }),
+      frameRate: 12,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "pingu_doLaunch",
+      frames: scene.anims.generateFrameNumbers("Pingu_doLaunch", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 24,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_doStrike",
+      frames: scene.anims.generateFrameNumbers("Pingu_doStrike", {
+        start: 0,
+        end: 10,
       }),
       frameRate: 12,
       repeat: 0,

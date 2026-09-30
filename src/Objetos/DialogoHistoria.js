@@ -24,12 +24,14 @@ const FALAS = [
 const TEMPO_MOVIMENTO_CAMERA = 650;
 const COR_CIANO_TXTBOX = 0x72dce8;
 const ZOOM_CAMERA_DIALOGO = 3.2;
+const INTERVALO_DIGITACAO = 32;
 
 export default class DialogoHistoria {
   constructor(scene, aoConcluir, opcoes = {}) {
     this.scene = scene;
     this.aoConcluir = aoConcluir;
     this.falas = opcoes.falas ?? FALAS;
+    this.digitarTexto = opcoes.digitarTexto ?? true;
     this.alvosCamera = opcoes.alvosCamera ?? null;
     this.prepararPersonagens = opcoes.prepararPersonagens ?? true;
     this.restaurarEstado = opcoes.restaurarEstado ?? true;
@@ -144,7 +146,11 @@ export default class DialogoHistoria {
   mostrarFala() {
     const fala = this.falas[this.indice];
     this.retrato.setTexture(fala.retrato);
-    this.texto.setText(fala.texto);
+    this.textoCompleto = fala.texto;
+    this.caracteresTexto = Array.from(this.textoCompleto);
+    this.tempoDigitacao = 0;
+    this.digitando = this.digitarTexto && this.caracteresTexto.length > 0;
+    this.texto.setText(this.digitando ? "" : this.textoCompleto);
     fala.aoMostrar?.();
 
     this.cameraDe = {
@@ -158,6 +164,7 @@ export default class DialogoHistoria {
 
   atualizar(delta) {
     if (!this.ativa) return;
+    this.atualizarDigitacao(delta);
     if (this.transicaoParaIntro) {
       this.tempoMovimento = Math.min(TEMPO_MOVIMENTO_CAMERA, this.tempoMovimento + delta);
       this.moverCamera(this.cameraDe, this.cameraPara, this.tempoMovimento / TEMPO_MOVIMENTO_CAMERA);
@@ -173,6 +180,17 @@ export default class DialogoHistoria {
     this.moverCamera(this.cameraDe, this.cameraPara, this.tempoMovimento / TEMPO_MOVIMENTO_CAMERA);
   }
 
+  atualizarDigitacao(delta) {
+    if (!this.digitando) return;
+    this.tempoDigitacao += delta;
+    const quantidade = Math.min(
+      this.caracteresTexto.length,
+      Math.floor(this.tempoDigitacao / INTERVALO_DIGITACAO),
+    );
+    this.texto.setText(this.caracteresTexto.slice(0, quantidade).join(""));
+    if (quantidade >= this.caracteresTexto.length) this.digitando = false;
+  }
+
   moverCamera(de, para, progresso) {
     const t = Math.max(0, Math.min(1, progresso));
     const suave = t * t * (3 - 2 * t);
@@ -186,6 +204,11 @@ export default class DialogoHistoria {
 
   avancar() {
     if (!this.ativa || this.tempoMovimento < TEMPO_MOVIMENTO_CAMERA) return;
+    if (this.digitando) {
+      this.texto.setText(this.textoCompleto);
+      this.digitando = false;
+      return;
+    }
     this.indice++;
     if (this.indice >= this.falas.length) {
       if (!this.prepararPersonagens) {

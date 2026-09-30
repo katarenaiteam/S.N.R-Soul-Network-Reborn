@@ -55,9 +55,9 @@ export default class ControleEntrada {
     }
 
     const padDash = this._botaoPadPressionado(pad, 4);
-    const padAtack = this._botaoPadPressionado(pad, 3);
-    const padPular = this._botaoPadPressionado(pad, 2);
-    const padSpecial = this._botaoPadPressionado(pad, 1);
+    const padAtack = this._botaoPadPressionado(pad, 2);
+    const padPular = this._botaoPadPressionado(pad, 3);
+    const padSpecial = this._botaoPadPressionado(pad, 9);
     const padGuard = this._botaoPadPressionado(pad, 6);
     const padTaunt = this._botaoPadPressionado(pad, 5);
 
