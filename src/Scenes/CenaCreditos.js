@@ -15,17 +15,17 @@ export default class CenaCreditos extends Phaser.Scene {
 
     this.add.text(this.scale.width / 2, this.scale.height * 0.3, "CRÉDITOS", {
       fontFamily: "RetroFont, monospace",
-      fontSize: "48px",
+      fontSize: `${48 * (this.scale.width / 1920)}px`,
       color: "#b8ffca",
-      letterSpacing: 10,
-    }).setOrigin(0.5).setShadow(0, 0, "#36ff72", 12);
+      letterSpacing: 10 * (this.scale.width / 1920),
+    }).setOrigin(0.5).setShadow(0, 0, "#36ff72", 12 * (this.scale.width / 1920));
 
     this.add.text(this.scale.width / 2, this.scale.height * 0.58, "SOUL NETWORK REBORN\n\nPRESSIONE ENTER OU ESC PARA VOLTAR", {
       fontFamily: "RetroFont, monospace",
-      fontSize: "24px",
+      fontSize: `${24 * (this.scale.width / 1920)}px`,
       color: "#43d96b",
       align: "center",
-      lineSpacing: 14,
+      lineSpacing: 14 * (this.scale.width / 1920),
     }).setOrigin(0.5);
 
     this.input.keyboard.once("keydown-ENTER", () => this.scene.start("CenaStart"));

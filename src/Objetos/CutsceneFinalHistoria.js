@@ -28,7 +28,7 @@ export default class CutsceneFinalHistoria {
     const inicioFJ = scene.mapaAtual.spawnsIniciais.p1;
     const centroMapa = { x: 1300, y: 800 };
     this.centroMiku = centroMapa;
-    scene.camJogo.setZoom(3.3).centerOn(centroMapa.x, centroMapa.y - 150);
+    scene.camJogo.setZoom(3.3 * (scene.scale.width / 1920)).centerOn(centroMapa.x, centroMapa.y - 150);
     fj.sprite.setPosition(inicioFJ.x, inicioFJ.y).setVelocity(0, 0).setFlipX(false);
     fj.aplicarConfiguracao("idle");
     this.tocarAnimacaoSeExistir(fj, "idle");

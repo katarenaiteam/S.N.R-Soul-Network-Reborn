@@ -1,7 +1,6 @@
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import Cidade from "../Mapasjs/Cidade.js";
-import SkyTowers from "../Mapasjs/SkyTowers.js";
 import MapaTeste from "../Mapasjs/MapaTeste.js";
 import MikuMap from "../Mapasjs/MikuMap.js";
 
@@ -40,7 +39,6 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
     // 3. ARRAY DOS MAPAS COM AS SUAS RESPECTIVAS IMAGENS (SPRITES/PREVIEWS)
     this.mapas = [
       { id: "cidade", nome: "Cidade", classe: Cidade, chaveSprite: "thumb_cidade" },
-      { id: "SkyTowers", nome: "SkyTowers", classe: SkyTowers, chaveSprite: "thumb_skytowers" },
       { id: "mapaTeste", nome: "Mapa Teste", classe: MapaTeste, chaveSprite: "thumb_teste" },
       { id: "MikuMap", nome: "MikuMap", classe: MikuMap, chaveSprite: "thumb_mikushow" },
     ];
@@ -106,6 +104,7 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
     const total = this.mapas.length;
     const centroX = this.scale.width / 2;
     const centroY = this.scale.height / 2;
+    const escalaResolucao = this.scale.width / 1920;
 
     this.spritesMapas.forEach((sprite, idx) => {
       let offset = idx - this.indiceOpcao;
@@ -124,28 +123,28 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
         // MAPA SELECIONADO (CENTRAL E MAIOR)
         alvoX = centroX;
         alvoY = centroY;
-        escala = 1.15;
+        escala = 1.15 * escalaResolucao;
         profundidade = 30;
         alpha = 1.0;
       } else if (offset === -1 || (offset === total - 1 && total > 2)) {
         // MAPA À ESQUERDA (MENOR E ATRÁS)
-        alvoX = centroX - 450;
-        alvoY = centroY + 20;
-        escala = 0.65;
+        alvoX = centroX - 450 * escalaResolucao;
+        alvoY = centroY + 20 * escalaResolucao;
+        escala = 0.65 * escalaResolucao;
         profundidade = 20;
         alpha = 0.6;
       } else if (offset === 1 || (offset === -(total - 1) && total > 2)) {
         // MAPA À DIREITA (MENOR E ATRÁS)
-        alvoX = centroX + 450;
-        alvoY = centroY + 20;
-        escala = 0.65;
+        alvoX = centroX + 450 * escalaResolucao;
+        alvoY = centroY + 20 * escalaResolucao;
+        escala = 0.65 * escalaResolucao;
         profundidade = 20;
         alpha = 0.6;
       } else {
         // OUTROS MAPAS ESCONDIDOS
-        alvoX = offset < 0 ? centroX - 800 : centroX + 800;
+        alvoX = offset < 0 ? centroX - 800 * escalaResolucao : centroX + 800 * escalaResolucao;
         alvoY = centroY;
-        escala = 0.3;
+        escala = 0.3 * escalaResolucao;
         profundidade = 10;
         alpha = 0;
       }

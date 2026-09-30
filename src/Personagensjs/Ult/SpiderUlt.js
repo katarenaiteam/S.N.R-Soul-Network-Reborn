@@ -844,7 +844,7 @@ export default class SpiderUlt {
     this.desativarCameraCena();
     cam.stopFollow();
     cam.centerOn(aranhaSprite.x, aranhaSprite.y);
-    cam.setZoom(3.2);
+    cam.setZoom(3.2 * (this.scene.scale.width / 1920));
 
     // 4. PAUSA A FÍSICA E O CLOCK DO PHASER (CONGELA NO FRAME)
     this.scene.physics.pause();
@@ -870,7 +870,7 @@ export default class SpiderUlt {
       }
 
       // RESTAURA O ZOOM NORMAL
-      cam.setZoom(1.0);
+      cam.setZoom(this.scene.scale.width / 1920);
 
       // APLICA O KNOCKBACK E DANO FINAL NO OPONENTE
       if (this.oponente && oponenteSprite && oponenteSprite.body) {

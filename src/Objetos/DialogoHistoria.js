@@ -135,7 +135,7 @@ export default class DialogoHistoria {
       : (this.alvosCamera?.[fala.personagem] ?? this.jogadores[fala.personagem]?.sprite);
     const falante = alvo?.sprite ?? alvo;
     if (!falante) throw new Error(`Alvo de camera ausente para a fala de ${fala.personagem}.`);
-    const zoom = fala.zoom ?? ZOOM_CAMERA_DIALOGO;
+    const zoom = (fala.zoom ?? ZOOM_CAMERA_DIALOGO) * (this.scene.scale.width / 1920);
     return {
       x: falante.x,
       y: falante.y - 55,
@@ -228,7 +228,7 @@ export default class DialogoHistoria {
       this.cameraPara = {
         x: primeiroLutador.x,
         y: primeiroLutador.y - 55,
-        zoom: this.scene.mapaAtual.configCamera?.maxZoom ?? 2,
+        zoom: (this.scene.mapaAtual.configCamera?.maxZoom ?? 2) * (this.scene.scale.width / 1920),
       };
       this.tempoMovimento = 0;
       return;

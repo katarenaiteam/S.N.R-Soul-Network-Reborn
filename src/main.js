@@ -11,6 +11,7 @@ import { instalarComandosDebug } from "./DebugConsole.js";
 
 const config = {
   type: Phaser.AUTO,
+  // Resolucao interna Full HD; o FIT preserva a proporcao na tela.
   width: 1920,
   height: 1080,
   fps: {

@@ -58,7 +58,7 @@ export default class IntroPartida {
   alvoJogador(indice) {
     const sprite = this.jogadores[indice].sprite;
     return { x: sprite.x, y: sprite.y - 55,
-      zoom: this.scene.mapaAtual.configCamera?.maxZoom ?? 2 };
+      zoom: (this.scene.mapaAtual.configCamera?.maxZoom ?? 2) * (this.scene.scale.width / 1920) };
   }
 
   alvoLuta() {
@@ -68,7 +68,8 @@ export default class IntroPartida {
     const min = cfg.distMinima ?? 100;
     const max = cfg.distMaxima ?? 1200;
     const fator = Math.max(0, Math.min(1, (Math.hypot(a.x - b.x, a.y - b.y) - min) / (max - min)));
-    const zoom = (cfg.maxZoom ?? 2) + ((cfg.minZoom ?? 1) - (cfg.maxZoom ?? 2)) * fator;
+    const zoom = ((cfg.maxZoom ?? 2) + ((cfg.minZoom ?? 1) - (cfg.maxZoom ?? 2)) * fator)
+      * (this.scene.scale.width / 1920);
     let x = (a.x + b.x) / 2;
     let y = (a.y + b.y) / 2;
     const lim = cfg.limites;
@@ -138,7 +139,9 @@ export default class IntroPartida {
     else this.tempo += delta;
     if (!this.fight) {
       const progresso = this.tempo / this.duracaoContagem;
-      this.visual.setTexture(`${Math.max(1, 3 - Math.floor(progresso * 3))}.png`).setDisplaySize(148, 176);
+      const escalaResolucao = this.scene.scale.width / 1920;
+      this.visual.setTexture(`${Math.max(1, 3 - Math.floor(progresso * 3))}.png`)
+        .setDisplaySize(148 * escalaResolucao, 176 * escalaResolucao);
       if (progresso >= FIM_POSE_P1 && progresso < INICIO_POSE_P2) {
         this.mover(this.alvoJogador(0), this.alvoJogador(1),
           (progresso - FIM_POSE_P1) / (INICIO_POSE_P2 - FIM_POSE_P1));
@@ -154,7 +157,7 @@ export default class IntroPartida {
         this.tempo = 0;
         this.participantes.forEach(j => this.voltarIdle(j));
         this.sons[1]?.play();
-        this.visual.setTexture("Fight", 0).setDisplaySize(630, 198);
+        this.visual.setTexture("Fight", 0).setDisplaySize(630 * escalaResolucao, 198 * escalaResolucao);
       }
     } else {
       const progresso = this.tempo / this.duracaoFight;

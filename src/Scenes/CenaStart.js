@@ -50,9 +50,9 @@ export default class CenaStart extends Phaser.Scene {
         opcao.rotulo,
         {
           fontFamily: "RetroFont, monospace",
-          fontSize: "34px",
+          fontSize: `${34 * (this.scale.width / 1920)}px`,
           color: "#43d96b",
-          letterSpacing: 10,
+          letterSpacing: 10 * (this.scale.width / 1920),
         }
       ).setOrigin(0.5);
       this.botoesSprites.push(btnSprite);
@@ -61,7 +61,7 @@ export default class CenaStart extends Phaser.Scene {
 
     this.cursorSelecao = this.add.text(0, 0, ">", {
       fontFamily: "RetroFont, monospace",
-      fontSize: "38px",
+      fontSize: `${38 * (this.scale.width / 1920)}px`,
       color: "#d8ffe2",
     }).setOrigin(0.5);
     this.conteudoMenu.add(this.cursorSelecao);
@@ -74,7 +74,7 @@ export default class CenaStart extends Phaser.Scene {
     });
 
     // Submenu para quantidade de jogadores no modo História
-    this.textoNumPlayers = this.add.text(this.scale.width / 2, this.scale.height * 0.76, "1 JOGADOR", { fontFamily: "RetroFont, monospace", fontSize: "28px", fill: "#8cffaa", letterSpacing: 5 }).setOrigin(0.5);
+    this.textoNumPlayers = this.add.text(this.scale.width / 2, this.scale.height * 0.76, "1 JOGADOR", { fontFamily: "RetroFont, monospace", fontSize: `${28 * (this.scale.width / 1920)}px`, fill: "#8cffaa", letterSpacing: 5 * (this.scale.width / 1920) }).setOrigin(0.5);
     this.textoNumPlayers.setVisible(false);
     this.conteudoMenu.add(this.textoNumPlayers);
 
@@ -149,19 +149,20 @@ export default class CenaStart extends Phaser.Scene {
     this.colunasChuva = [];
     this.alfabetoChuva = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコサシスセソタチツテト";
 
-    const larguraColuna = 30;
+    const escalaResolucao = this.scale.width / 1920;
+    const larguraColuna = 30 * escalaResolucao;
     const totalColunas = Math.ceil(this.scale.width / larguraColuna);
 
     for (let coluna = 0; coluna < totalColunas; coluna += 1) {
       if (Phaser.Math.FloatBetween(0, 1) < 0.14) continue;
 
-      const tamanhoFonte = Phaser.Math.Between(14, 23);
+      const tamanhoFonte = Phaser.Math.Between(14, 23) * escalaResolucao;
       const quantidade = Phaser.Math.Between(7, 20);
       const caracteres = Array.from({ length: quantidade }, () => this.obterCaractereChuva());
       const fluxo = {
         x: coluna * larguraColuna + larguraColuna / 2,
         y: Phaser.Math.Between(-this.scale.height, this.scale.height),
-        velocidade: Phaser.Math.Between(65, 185),
+        velocidade: Phaser.Math.Between(65, 185) * escalaResolucao,
         alturaLinha: tamanhoFonte * 1.12,
         caracteres,
         tempoDesdeTroca: Phaser.Math.Between(0, 240),

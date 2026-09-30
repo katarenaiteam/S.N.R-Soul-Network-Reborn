@@ -869,7 +869,7 @@ export default class KenUlt {
     cam.panEffect?.reset();
     cam.zoomEffect?.reset();
     cam.stopFollow();
-    cam.setZoom(3.2);
+    cam.setZoom(3.2 * (this.scene.scale.width / 1920));
     cam.centerOn((ken.x + alvo.sprite.x) / 2, (ken.y + alvo.sprite.y) / 2 - 65);
     this.ajustarFundoNaCamera();
     // Duas passadas aditivas, origem e deslocamentos iguais ao SpiderUlt.

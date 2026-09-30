@@ -144,15 +144,17 @@ export default class CenaHistoria extends Phaser.Scene {
         spawn: { x: this.pontoRespawnP1.x + 100, y: this.pontoRespawnP1.y }, rotulo: 'P2' }] : []),
       { jogador: this.boss, escolha: this.inimigoNome, vidas: 'vidasBoss', spawn: this.pontoRespawnP2, rotulo: 'BOSS' },
     ];
-    this.containerHUD = this.add.container(0, 0).setScrollFactor(0).setDepth(1000);
+    const escalaResolucao = this.scale.width / 1920;
+    this.containerHUD = this.add.container(0, 0).setScrollFactor(0).setDepth(1000)
+      .setScale(escalaResolucao);
     const escalaHUD = this.jogador2 ? 0.75 : 0.9;
     this.participantes.forEach((entrada, indice) => {
       const jogador = entrada.jogador;
       jogador.vidas = this[entrada.vidas];
       jogador.eliminado = false;
       const direita = jogador === this.boss;
-      const x = direita ? this.scale.width - 30 : 30 + indice * 500;
-      const y = this.scale.height - 358 * escalaHUD - 20;
+      const x = direita ? 1920 - 30 : 30 + indice * 500;
+      const y = 1080 - 358 * escalaHUD - 20;
       entrada.hud = criarHudPartida.call(this, jogador, entrada.escolha, x, y, direita);
       entrada.hud.setScale(escalaHUD);
       entrada.textoVidas = this.add.text(direita ? -420 : 10, 155,
@@ -440,7 +442,8 @@ this.indicadorCPU = this.criarIndicador(
     const distMin = config.distMinima ?? 100;
     const distMax = config.distMaxima ?? 1200;
     const fator = Phaser.Math.Clamp((distancia - distMin) / Math.max(1, distMax - distMin), 0, 1);
-    const zoomDistancia = Phaser.Math.Linear(config.maxZoom ?? 2, config.minZoom ?? 1, fator);
+    const escalaResolucao = this.scale.width / 1920;
+    const zoomDistancia = Phaser.Math.Linear(config.maxZoom ?? 2, config.minZoom ?? 1, fator) * escalaResolucao;
     // Mantem a curva do versus, abrindo mais quando necessario para o cooperativo.
     const zoom = Math.min(zoomDistancia, cam.width / (maxX - minX + 260),
       cam.height * 0.76 / (maxY - minY + 280));

@@ -1,6 +1,7 @@
 export function criarIndicador(personagem, texturaNormal, texturaCima) {
   const indicador = this.add.image(0, 0, texturaNormal)
     .setOrigin(0.5, 1)
+    .setScale(this.scale.width / 1920)
     .setScrollFactor(0)
     .setDepth(1500);
   Object.assign(indicador, { personagem, texturaNormal, texturaCima });

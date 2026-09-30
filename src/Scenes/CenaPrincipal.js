@@ -122,16 +122,18 @@ this.jogador2 = this.criarPersonagem(
   
 
     // 2. Cria a HUD do P1 na ESQUERDA
+    const escalaResolucao = this.scale.width / 1920;
     this.hudP1_Nome = this.criarHudPartida(
       this.jogador1,
       this.escolhaP1,
-      40,
-      670,
+      40 * escalaResolucao,
+      670 * escalaResolucao,
       false,
     );
+    this.hudP1_Nome.setScale(escalaResolucao);
 
       // Texto para exibir as Vidas do P1
-    this.hudP1_Vidas = this.add.text(290, 840, `VIDAS: ${this.vidasP1}`, { fontSize: "32px", fill: "#e2d8d9", fontStyle: "bold" })
+    this.hudP1_Vidas = this.add.text(290 * escalaResolucao, 840 * escalaResolucao, `VIDAS: ${this.vidasP1}`, { fontSize: `${32 * escalaResolucao}px`, fill: "#e2d8d9", fontStyle: "bold" })
       .setScrollFactor(0)
       .setDepth(1100);
 
@@ -139,12 +141,13 @@ this.jogador2 = this.criarPersonagem(
     this.hudP2_Nome = this.criarHudPartida(
       this.jogador2,
       this.escolhaP2,
-      this.scale.width - 40,
-      670,
+      this.scale.width - 40 * escalaResolucao,
+      670 * escalaResolucao,
       true,
     );
+    this.hudP2_Nome.setScale(escalaResolucao);
 
-      this.hudP2_Vidas = this.add.text(this.scale.width - 80, 840, `VIDAS: ${this.vidasP2}`, { fontSize: "32px", fill: "#e2d8d9", fontStyle: "bold" })
+      this.hudP2_Vidas = this.add.text(this.scale.width - 80 * escalaResolucao, 840 * escalaResolucao, `VIDAS: ${this.vidasP2}`, { fontSize: `${32 * escalaResolucao}px`, fill: "#e2d8d9", fontStyle: "bold" })
         .setOrigin(1, 0)
         .setScrollFactor(0)
         .setDepth(1100);
@@ -400,7 +403,8 @@ this.indicadorP2 = this.criarIndicador(
         0,
         1
     );
-    const zoomAlvo = Phaser.Math.Linear(maxZoom, minZoom, fatorDistancia);
+    const escalaResolucao = this.scale.width / 1920;
+    const zoomAlvo = Phaser.Math.Linear(maxZoom, minZoom, fatorDistancia) * escalaResolucao;
     cam.zoom = Phaser.Math.Linear(cam.zoom, zoomAlvo, 0.05);
 
     // 3. Calcula o ponto central ideal entre P1 e P2

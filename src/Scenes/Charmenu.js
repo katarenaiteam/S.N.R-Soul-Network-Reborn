@@ -398,7 +398,7 @@ export default class Charmenu extends Phaser.Scene {
     const mao = this.add
       .image(x, y, comFicha)
       .setOrigin(0.18, 0.14)
-      .setScale(ESCALA_MAO)
+    .setScale(ESCALA_MAO * (this.scale.width / 1920))
       .setDepth(60 + numero);
 
     return {
@@ -500,8 +500,9 @@ export default class Charmenu extends Phaser.Scene {
 
     const s = Math.min(delta, 50) / 1000;
 
-    jogador.mao.x += x * VELOCIDADE_MAO * s;
-    jogador.mao.y += y * VELOCIDADE_MAO * s;
+    const escalaResolucao = this.scale.width / 1920;
+    jogador.mao.x += x * VELOCIDADE_MAO * escalaResolucao * s;
+    jogador.mao.y += y * VELOCIDADE_MAO * escalaResolucao * s;
 
     jogador.mao.x = Phaser.Math.Clamp(
       jogador.mao.x,
@@ -578,8 +579,8 @@ export default class Charmenu extends Phaser.Scene {
       ? config.p1 ?? {}
       : config.p2 ?? {};
 
-  const escala =
-    config.escala ?? 1;
+  const escalaResolucao = this.scale.width / 1920;
+  const escala = (config.escala ?? 1) * escalaResolucao;
 
   const banner = this.add
     .image(0, 0, personagem.banner)
@@ -588,16 +589,16 @@ export default class Charmenu extends Phaser.Scene {
 
   if (jogador.numero === 1) {
     const destinoX =
-      configLado.x ?? 0;
+      (configLado.x ?? 0) * escalaResolucao;
 
     const destinoY =
       this.scale.height +
-      (configLado.y ?? 0);
+      (configLado.y ?? 0) * escalaResolucao;
 
     banner
       .setOrigin(0, 1)
       .setPosition(
-        -banner.displayWidth - 80,
+        -banner.displayWidth - 80 * escalaResolucao,
         destinoY
       );
 
@@ -617,11 +618,11 @@ export default class Charmenu extends Phaser.Scene {
   } else {
     const destinoX =
       this.scale.width +
-      (configLado.x ?? 0);
+      (configLado.x ?? 0) * escalaResolucao;
 
     const destinoY =
       this.scale.height +
-      (configLado.y ?? 0);
+      (configLado.y ?? 0) * escalaResolucao;
 
     banner
       .setOrigin(1, 1)
@@ -629,7 +630,7 @@ export default class Charmenu extends Phaser.Scene {
       .setPosition(
         this.scale.width +
           banner.displayWidth +
-          80,
+          80 * escalaResolucao,
         destinoY
       );
 
@@ -737,12 +738,12 @@ export default class Charmenu extends Phaser.Scene {
         jogador.mao.y,
         jogador.fichaKey
       )
-      .setScale(ESCALA_FICHA)
+      .setScale(ESCALA_FICHA * (this.scale.width / 1920))
       .setDepth(50 + jogador.numero);
 
     jogador.mao
       .setTexture(jogador.semFicha)
-      .setScale(ESCALA_MAO)
+      .setScale(ESCALA_MAO * (this.scale.width / 1920))
       .setOrigin(0.18, 0.14);
   }
 
@@ -754,7 +755,7 @@ export default class Charmenu extends Phaser.Scene {
 
     jogador.mao
       .setTexture(jogador.comFicha)
-      .setScale(ESCALA_MAO)
+      .setScale(ESCALA_MAO * (this.scale.width / 1920))
       .setOrigin(0.18, 0.14);
 
     this.atualizarHover(jogador);
@@ -868,7 +869,8 @@ export default class Charmenu extends Phaser.Scene {
     this.alfabetoChuva =
       "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコサシスセソタチツテト";
 
-    const largura = 30;
+    const escalaResolucao = this.scale.width / 1920;
+    const largura = 30 * escalaResolucao;
     const total = Math.ceil(
       this.scale.width / largura
     );
@@ -876,7 +878,7 @@ export default class Charmenu extends Phaser.Scene {
     for (let i = 0; i < total; i++) {
       if (Math.random() < 0.14) continue;
 
-      const fonte = Phaser.Math.Between(14, 23);
+      const fonte = Phaser.Math.Between(14, 23) * escalaResolucao;
       const qtd = Phaser.Math.Between(7, 20);
 
       const chars = Array.from(
@@ -890,7 +892,7 @@ export default class Charmenu extends Phaser.Scene {
           -this.scale.height,
           this.scale.height
         ),
-        velocidade: Phaser.Math.Between(65, 185),
+        velocidade: Phaser.Math.Between(65, 185) * escalaResolucao,
         altura: fonte * 1.12,
         chars,
         tempo: 0,

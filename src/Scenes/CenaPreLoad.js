@@ -16,31 +16,32 @@ export default class CenaPreload extends Phaser.Scene {
     this.footerProgress = null;
     this.cameras.main.setBackgroundColor("#000000");
 
-    const margemX = 240;
-    const margemY = 120;
-    const larguraBarra = 1920 - margemX * 2;
-    const footerY = 940;
+    const escalaResolucao = this.scale.width / 1920;
+    const margemX = 240 * escalaResolucao;
+    const margemY = 120 * escalaResolucao;
+    const larguraBarra = this.scale.width - margemX * 2;
+    const footerY = 940 * escalaResolucao;
 
-    const textStyle = { fontFamily: "RetroFont, monospace", fontSize: "28px", fill: "#00ff00" };
-    const footerTextStyle = { fontFamily: "RetroFont, monospace", fontSize: "22px", fill: "#000000", fontStyle: "bold" };
+    const textStyle = { fontFamily: "RetroFont, monospace", fontSize: `${28 * escalaResolucao}px`, fill: "#00ff00" };
+    const footerTextStyle = { fontFamily: "RetroFont, monospace", fontSize: `${22 * escalaResolucao}px`, fill: "#000000", fontStyle: "bold" };
 
     // --- RODAPÉ ---
-    this.add.rectangle(margemX, footerY, larguraBarra, 45, 0x00ff00).setOrigin(0, 0);
+    this.add.rectangle(margemX, footerY, larguraBarra, 45 * escalaResolucao, 0x00ff00).setOrigin(0, 0);
 
     // Espera a fonte RetroFont carregar no navegador
     document.fonts.ready.then(() => {
       // --- CABEÇALHO ---
       this.add.text(margemX, margemY, "RomSNR HBIOS v3.5.1, 4154-06-07", textStyle);
-      this.add.text(margemX, margemY + 40, "Soul Network Computer [RCZ80_msx2] Z80 @ 3.579MHz", textStyle);
-      this.add.text(margemX, margemY + 70, "0 MEM W/S, 1 I/O W/S, INT MODE 1, MSX MMU", textStyle);
-      this.add.text(margemX, margemY + 100, "0KB ROM, 448KB RAM, HEAP=0x321A\n", textStyle);
+      this.add.text(margemX, margemY + 40 * escalaResolucao, "Soul Network Computer [RCZ80_msx2] Z80 @ 3.579MHz", textStyle);
+      this.add.text(margemX, margemY + 70 * escalaResolucao, "0 MEM W/S, 1 I/O W/S, INT MODE 1, MSX MMU", textStyle);
+      this.add.text(margemX, margemY + 100 * escalaResolucao, "0KB ROM, 448KB RAM, HEAP=0x321A\n", textStyle);
 
       // --- LOG DE CARREGAMENTO ---
-      this.logText = this.add.text(margemX, margemY + 170, "IDE0: LOADING GAME ASSETS...\n", textStyle);
+      this.logText = this.add.text(margemX, margemY + 170 * escalaResolucao, "IDE0: LOADING GAME ASSETS...\n", textStyle);
 
       // --- TEXTOS DO RODAPÉ ---
-      this.footerStatus = this.add.text(margemX + 20, footerY + 10, "CTRL-A Z for help | 115200 8N1 | NOR | Minicom 6.7 | VT102 | Offline", footerTextStyle);
-      this.footerProgress = this.add.text(margemX + larguraBarra - 160, footerY + 10, "BOOT: 0%", footerTextStyle);
+      this.footerStatus = this.add.text(margemX + 20 * escalaResolucao, footerY + 10 * escalaResolucao, "CTRL-A Z for help | 115200 8N1 | NOR | Minicom 6.7 | VT102 | Offline", footerTextStyle);
+      this.footerProgress = this.add.text(margemX + larguraBarra - 160 * escalaResolucao, footerY + 10 * escalaResolucao, "BOOT: 0%", footerTextStyle);
     });
 
     let logLines = ["IDE0: LOADING GAME ASSETS..."];
@@ -661,8 +662,9 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
   }
 
   iniciarSequenciaLogo() {
-    const margemX = 240; 
-    const margemY = 120;
+    const escalaResolucao = this.scale.width / 1920;
+    const margemX = 240 * escalaResolucao;
+    const margemY = 120 * escalaResolucao;
 
     if (this.logText) this.logText.setText('');
 
@@ -674,14 +676,15 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
       "ESTABLISHING SECURE PROTOCOL... OK\n" +
       "INITIALIZING KATARENAI TEAM FRAMEWORK...";
 
-    const textoContratoObj = this.add.text(margemX, margemY + 180, contratoTexto, {
-      fontFamily: 'RetroFont, monospace', fontSize: '28px', fill: '#00ff00', lineSpacing: 6
+    const textoContratoObj = this.add.text(margemX, margemY + 180 * escalaResolucao, contratoTexto, {
+      fontFamily: 'RetroFont, monospace', fontSize: `${28 * escalaResolucao}px`, fill: '#00ff00', lineSpacing: 6 * escalaResolucao
     });
 
     this.time.delayedCall(3000, () => {
       textoContratoObj.destroy();
 
-      const logo = this.add.image(1920 / 2, (1080 / 2) - 20, 'KatarenaiLogo').setOrigin(0.5, 0.5).setAlpha(0);
+      const logo = this.add.image(this.scale.width / 2, (this.scale.height / 2) - 20 * escalaResolucao, 'KatarenaiLogo')
+        .setOrigin(0.5, 0.5).setScale(escalaResolucao).setAlpha(0);
 
       // Fade-In da Logo
       this.tweens.add({
@@ -704,8 +707,8 @@ this.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultima
                   "PRESS ANY BUTTON TO SIGN CONTRACT:\n" +
                   "SIGNATURE: [ ";
 
-                this.mensagemObj = this.add.text(margemX, margemY + 180, '', {
-                  fontFamily: 'RetroFont, monospace', fontSize: '26px', fill: '#00ff00', align: 'left', lineSpacing: 8
+                this.mensagemObj = this.add.text(margemX, margemY + 180 * escalaResolucao, '', {
+                  fontFamily: 'RetroFont, monospace', fontSize: `${26 * escalaResolucao}px`, fill: '#00ff00', align: 'left', lineSpacing: 8 * escalaResolucao
                 });
 
                 let i = 0;

@@ -25,14 +25,16 @@ export default class CenaGameOver extends Phaser.Scene {
     this.conteudoMenu.add(fundo);
 
     // 3. BOTÃO REZERO
-    this.botaoReset = this.add.image(this.scale.width / 2, this.scale.height / 2, "ReZero").setOrigin(0.5, 0.5);
+    this.botaoReset = this.add.image(this.scale.width / 2, this.scale.height / 2, "ReZero")
+      .setOrigin(0.5, 0.5)
+      .setScale(this.scale.width / 1920);
     this.conteudoMenu.add(this.botaoReset);
 
     // Efeito de pulsação no botão ReZero
     this.tweens.add({
       targets: this.botaoReset,
-      scaleX: 1.1,
-      scaleY: 1.1,
+      scaleX: 1.1 * (this.scale.width / 1920),
+      scaleY: 1.1 * (this.scale.width / 1920),
       duration: 500,
       yoyo: true,
       repeat: -1
