@@ -1,10 +1,11 @@
-import mqtt from "mqtt";
+const mqtt = globalThis.mqtt;
+const variaveisAmbiente = import.meta.env ?? {};
 
 const URL_BROKER =
-  import.meta.env.VITE_MQTT_BROKER_URL || "wss://test.mosquitto.org:8081/mqtt";
+  variaveisAmbiente.VITE_MQTT_BROKER_URL || "wss://test.mosquitto.org:8081/mqtt";
 const PREFIXO_TOPICO =
-  import.meta.env.VITE_MQTT_TOPIC_PREFIX || "6080821-2026.2";
-const ID_SALA = import.meta.env.VITE_SNR_ROOM || "arena-01";
+  variaveisAmbiente.VITE_MQTT_TOPIC_PREFIX || "6080821-2026.2";
+const ID_SALA = variaveisAmbiente.VITE_SNR_ROOM || "arena-01";
 const TOPICO_BASE = `${PREFIXO_TOPICO}/SNR/${ID_SALA}`;
 
 export const TOPICO_STATUS = `${TOPICO_BASE}/status`;
@@ -27,6 +28,10 @@ export default class ClienteMQTT extends Phaser.Events.EventEmitter {
 
   conectar() {
     if (this.client) return;
+    if (!mqtt?.connect) {
+      this.emit("error", new Error("O bundle MQTT do navegador nao foi carregado."));
+      return;
+    }
 
     const opcoes = {
       clientId: criarClientId(this.papel),
