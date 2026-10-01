@@ -277,22 +277,22 @@ export default class SpiderSwing {
       };
     };
 
+    const pontosTeia = [{ x: this.ancoraX, y: meoAncoraY }];
+    for (let indice = 1; indice <= 24; indice += 1) {
+      pontosTeia.push(ponto(indice / 24));
+    }
+    this.teia.snrPontosTeia = pontosTeia;
+
     this.teia.clear();
     this.teia.lineStyle(3, 0x4e9fb5, 1);
     this.teia.beginPath();
-    this.teia.moveTo(this.ancoraX, meoAncoraY);
-    for (let indice = 1; indice <= 24; indice += 1) {
-      const posicao = ponto(indice / 24);
-      this.teia.lineTo(posicao.x, posicao.y);
-    }
+    this.teia.moveTo(pontosTeia[0].x, pontosTeia[0].y);
+    pontosTeia.slice(1).forEach((posicao) => this.teia.lineTo(posicao.x, posicao.y));
     this.teia.strokePath();
     this.teia.lineStyle(1.5, 0xffffff, 1);
     this.teia.beginPath();
-    this.teia.moveTo(this.ancoraX, meoAncoraY);
-    for (let indice = 1; indice <= 24; indice += 1) {
-      const posicao = ponto(indice / 24);
-      this.teia.lineTo(posicao.x, posicao.y);
-    }
+    this.teia.moveTo(pontosTeia[0].x, pontosTeia[0].y);
+    pontosTeia.slice(1).forEach((posicao) => this.teia.lineTo(posicao.x, posicao.y));
     this.teia.strokePath();
   }
 

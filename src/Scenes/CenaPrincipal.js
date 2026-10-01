@@ -245,6 +245,10 @@ this.indicadorP2 = this.criarIndicador(
     if (this.physics.config.debug || this.physics.world.drawDebug) {
       this.camHUD.ignore(this.physics.world.debugGraphic);
     }
+    this.objetosVisuaisBaseMQTT = new Set(this.children.list);
+    this.idsVisuaisMQTT = new WeakMap();
+    this.proximoIdVisualMQTT = 0;
+    this.visuaisReplicados = new Map();
     if (this.modoEspectador) {
       this.physics.world.pause();
       this.time.delayedCall(0, () => this.aplicarEstadoEspectador(this.registry.get("estadoEspectador")));
@@ -284,7 +288,12 @@ this.indicadorP2 = this.criarIndicador(
   // 3. LOOP DE ATUALIZAÇÃO
   update(time, delta) {
     if (this.modoEspectador) {
-      this.aplicarEstadoEspectador(this.registry.get("estadoEspectador"));
+      const estado = this.registry.get("estadoEspectador");
+      if (estado?.updatedAt !== this.ultimoSnapshotMQTT) {
+        this.aplicarEstadoEspectador(estado);
+      }
+      this.sistemaLedge.atualizarVisualizacao(this);
+      this.atualizarVisuaisReplicados(time);
       return;
     }
 
@@ -343,7 +352,8 @@ this.indicadorP2 = this.criarIndicador(
   }
 
   publicarEstadoMQTT(tempo, forcar = false) {
-    if (tempo - (this.ultimaPublicacaoMQTT || 0) < 100 && !forcar) return;
+    const intervalo = 1000 / 15;
+    if (tempo - (this.ultimaPublicacaoMQTT || 0) < intervalo && !forcar) return;
     this.ultimaPublicacaoMQTT = tempo;
 
     const capturarJogador = (jogador) => {
@@ -366,6 +376,48 @@ this.indicadorP2 = this.criarIndicador(
       };
     };
 
+    const visuais = this.children.list.flatMap((objeto) => {
+      const ehSprite = objeto instanceof Phaser.GameObjects.Sprite;
+      const ehImagem = objeto instanceof Phaser.GameObjects.Image;
+      const ehTeia = objeto instanceof Phaser.GameObjects.Graphics && Array.isArray(objeto.snrPontosTeia);
+      if (
+        this.objetosVisuaisBaseMQTT.has(objeto) ||
+        (!ehSprite && !ehImagem && !ehTeia) ||
+        !objeto.active ||
+        ((ehSprite || ehImagem) && !objeto.texture?.key)
+      ) return [];
+
+      let id = this.idsVisuaisMQTT.get(objeto);
+      if (!id) {
+        id = `visual-${++this.proximoIdVisualMQTT}`;
+        this.idsVisuaisMQTT.set(objeto, id);
+      }
+
+      return [{
+        id,
+        tipo: ehTeia ? "teia" : ehSprite ? "sprite" : "image",
+        textura: objeto.texture?.key ?? null,
+        quadro: objeto.frame?.name ?? 0,
+        pontos: ehTeia ? objeto.snrPontosTeia : undefined,
+        animacao: objeto.anims?.currentAnim?.key ?? null,
+        x: objeto.x,
+        y: objeto.y,
+        escalaX: objeto.scaleX,
+        escalaY: objeto.scaleY,
+        alpha: objeto.alpha,
+        angulo: objeto.angle,
+        origemX: objeto.originX,
+        origemY: objeto.originY,
+        profundidade: objeto.depth,
+        visivel: objeto.visible,
+        flipX: objeto.flipX,
+        flipY: objeto.flipY,
+        scrollX: objeto.scrollFactorX,
+        scrollY: objeto.scrollFactorY,
+        blend: objeto.blendMode,
+      }];
+    });
+
     publicarEstadoVersus(this, "partida", {
       personagens: { p1: this.escolhaP1, p2: this.escolhaP2 },
       mapa: this.ClasseMapa.name,
@@ -380,11 +432,13 @@ this.indicadorP2 = this.criarIndicador(
         y: this.cameras.main.midPoint.y,
         zoom: this.cameras.main.zoom,
       },
+      visuais,
     });
   }
 
   aplicarEstadoEspectador(estado) {
     if (estado?.cena !== "partida" || estado.modo !== "1v1") return;
+    this.ultimoSnapshotMQTT = estado.updatedAt;
     const dados = estado.dados;
 
     const aplicarJogador = (jogador, remoto) => {
@@ -397,7 +451,13 @@ this.indicadorP2 = this.criarIndicador(
         sprite.play(remoto.animacao);
       }
       if (remoto.frame !== undefined) sprite.setFrame(remoto.frame);
-      sprite.setPosition(remoto.x, remoto.y);
+      jogador.alvoPosicaoMQTT = {
+        xInicial: sprite.x,
+        yInicial: sprite.y,
+        xDestino: remoto.x,
+        yDestino: remoto.y,
+        inicio: this.time.now,
+      };
       sprite.setFlipX(remoto.flipX);
       sprite.setScale(remoto.scaleX, remoto.scaleY);
       sprite.setAlpha(remoto.alpha);
@@ -410,6 +470,7 @@ this.indicadorP2 = this.criarIndicador(
 
     aplicarJogador(this.jogador1, dados.jogadores?.p1);
     aplicarJogador(this.jogador2, dados.jogadores?.p2);
+    this.sincronizarVisuaisReplicados(dados.visuais ?? []);
 
     this.vidasP1 = dados.vidasP1;
     this.vidasP2 = dados.vidasP2;
@@ -421,6 +482,94 @@ this.indicadorP2 = this.criarIndicador(
     if (dados.camera) {
       this.cameras.main.setZoom(dados.camera.zoom);
       this.cameras.main.centerOn(dados.camera.x, dados.camera.y);
+    }
+  }
+
+  sincronizarVisuaisReplicados(visuais) {
+    const idsAtivos = new Set();
+    const agora = this.time.now;
+
+    for (const remoto of visuais) {
+      if (remoto.textura && !this.textures.exists(remoto.textura)) continue;
+      if (remoto.tipo === "teia" && !remoto.pontos?.length) continue;
+      idsAtivos.add(remoto.id);
+
+      let espelho = this.visuaisReplicados.get(remoto.id);
+      if (!espelho || espelho.tipo !== remoto.tipo) {
+        espelho?.objeto.destroy();
+        const objeto = remoto.tipo === "teia"
+          ? this.add.graphics()
+          : remoto.tipo === "sprite"
+            ? this.add.sprite(remoto.x, remoto.y, remoto.textura, remoto.quadro)
+            : this.add.image(remoto.x, remoto.y, remoto.textura, remoto.quadro);
+        this.camHUD?.ignore(objeto);
+        espelho = { tipo: remoto.tipo, objeto };
+        this.visuaisReplicados.set(remoto.id, espelho);
+      }
+
+      const objeto = espelho.objeto;
+      if (remoto.tipo === "teia") {
+        objeto.clear();
+        objeto.lineStyle(3, 0x4e9fb5, 1);
+        objeto.beginPath();
+        objeto.moveTo(remoto.pontos[0].x, remoto.pontos[0].y);
+        remoto.pontos.slice(1).forEach((ponto) => objeto.lineTo(ponto.x, ponto.y));
+        objeto.strokePath();
+        objeto.lineStyle(1.5, 0xffffff, 1);
+        objeto.beginPath();
+        objeto.moveTo(remoto.pontos[0].x, remoto.pontos[0].y);
+        remoto.pontos.slice(1).forEach((ponto) => objeto.lineTo(ponto.x, ponto.y));
+        objeto.strokePath();
+      } else if (objeto.texture.key !== remoto.textura) {
+        objeto.setTexture(remoto.textura, remoto.quadro);
+      } else if (remoto.quadro !== undefined && objeto.setFrame) {
+        objeto.setFrame(remoto.quadro);
+      }
+      if (remoto.animacao && this.anims.exists(remoto.animacao) && objeto.anims?.currentAnim?.key !== remoto.animacao) {
+        objeto.anims.play(remoto.animacao);
+      }
+
+      espelho.xInicial = objeto.x;
+      espelho.yInicial = objeto.y;
+      espelho.xDestino = remoto.x;
+      espelho.yDestino = remoto.y;
+      espelho.inicio = agora;
+      objeto.setScale(remoto.escalaX, remoto.escalaY);
+      objeto.setAlpha(remoto.alpha);
+      objeto.setAngle(remoto.angulo);
+      objeto.setOrigin(remoto.origemX, remoto.origemY);
+      objeto.setDepth(remoto.profundidade);
+      objeto.setVisible(remoto.visivel);
+      objeto.setFlip(remoto.flipX, remoto.flipY);
+      objeto.setScrollFactor(remoto.scrollX, remoto.scrollY);
+      objeto.setBlendMode(remoto.blend);
+    }
+
+    for (const [id, espelho] of this.visuaisReplicados) {
+      if (idsAtivos.has(id)) continue;
+      espelho.objeto.destroy();
+      this.visuaisReplicados.delete(id);
+    }
+  }
+
+  atualizarVisuaisReplicados(tempo) {
+    const duracaoSnapshot = 1000 / 15;
+    for (const jogador of [this.jogador1, this.jogador2]) {
+      const alvo = jogador?.alvoPosicaoMQTT;
+      if (!alvo) continue;
+      const progresso = Phaser.Math.Clamp((tempo - alvo.inicio) / duracaoSnapshot, 0, 1);
+      jogador.sprite.setPosition(
+        Phaser.Math.Linear(alvo.xInicial, alvo.xDestino, progresso),
+        Phaser.Math.Linear(alvo.yInicial, alvo.yDestino, progresso),
+      );
+    }
+
+    for (const espelho of this.visuaisReplicados.values()) {
+      const progresso = Phaser.Math.Clamp((tempo - espelho.inicio) / duracaoSnapshot, 0, 1);
+      espelho.objeto.setPosition(
+        Phaser.Math.Linear(espelho.xInicial, espelho.xDestino, progresso),
+        Phaser.Math.Linear(espelho.yInicial, espelho.yDestino, progresso),
+      );
     }
   }
 
