@@ -64,7 +64,7 @@ export default class PinguNeSpecial {
     projetil.body.setSize(this.special.larguraProjetil, this.special.alturaProjetil);
     projetil.body.setVelocityX(this.special.velocidadeProjetil * direcao);
 
-    const registro = { projetil, colisor: null, ataque: null };
+    const registro = { projetil, colisor: null, ataque: null, timerVida: null };
     this.projeteis.add(registro);
     registro.ataque = registrarAtaqueEspecial(this, projetil, {
       categoria: "projetil",
@@ -83,10 +83,11 @@ export default class PinguNeSpecial {
       );
     }
 
-    projetil.once(`animationcomplete-${this.special.animacaoProjetil}`, () => {
-      this.finalizarProjetil(registro);
-    });
-    projetil.anims.play(this.special.animacaoProjetil);
+    projetil.anims.play({ key: this.special.animacaoProjetil, repeat: -1 });
+    registro.timerVida = this.scene.time.delayedCall(
+      this.special.tempoMaximoProjetil,
+      () => this.finalizarProjetil(registro),
+    );
   }
 
   acertarAlvo(registro, alvo, direcao) {
@@ -94,6 +95,7 @@ export default class PinguNeSpecial {
     alvo.receberDano(this.special.propriedades.dano, this.special.propriedades, {
       x: registro.projetil.x,
       direcao,
+      atacante: this.personagem,
     });
     this.finalizarProjetil(registro);
   }
@@ -102,6 +104,8 @@ export default class PinguNeSpecial {
     if (!this.projeteis.has(registro)) return;
     destruirColisor(registro.colisor);
     registro.colisor = null;
+    registro.timerVida?.remove(false);
+    registro.timerVida = null;
     registro.ataque?.remover();
     registro.ataque = null;
     registro.projetil.destroy();
@@ -132,6 +136,7 @@ PinguNeSpecial.configuracao = {
   texturaProjetil: "Pingu_som",
   animacaoProjetil: "pingu_som",
   velocidadeProjetil: 600,
+  tempoMaximoProjetil: 1800,
   offsetProjetilX: 28,
   offsetProjetilY: -40,
   escalaProjetil: 0.8 ,

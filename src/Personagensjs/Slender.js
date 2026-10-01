@@ -721,12 +721,12 @@ export default class Slenderman extends Personagem {
         texturaProjetil: "Slan_doSpecial-efect",
         animacaoProjetil: "slan_doSpecial-efect",
         framesCorte: 3,
-        escalaProjetil: 0.75,
+        escalaProjetil: 1,
         offsetProjetilX: 20,
         offsetProjetilY: -50,
         hitboxesProjetil: [
-          { largura: 110, altura: 50, offsetX: -55, offsetY: -25 },
-          { largura: 110, altura: 50, offsetX: 55, offsetY: 25 },
+          { largura: 115, altura: 55, offsetX: 57, offsetY: 25 },
+          { largura: 15, altura: 30, offsetX: 87, offsetY: 25 },
         ],
         propriedades: {
           travarMovimentoAir: true,
@@ -745,14 +745,14 @@ export default class Slenderman extends Personagem {
         texturaProjetil: "Slan_siSpecial-efect",
         animacaoProjetil: "slan_siSpecial-efect",
         framesCorte: 2,
-        escalaProjetil: 0.75,
+        escalaProjetil: 1,
         offsetProjetilX: 20,
         offsetProjetilY: -70,
         velocidadeProjetil: 60,
         distanciaProjetil: 60,
         hitboxesProjetil: [
-          { largura: 95, altura: 50, offsetX: 45, offsetY: -10 },
-          { largura: 100, altura: 60, offsetX: -25, offsetY: 25 },
+          { largura: 110, altura: 55, offsetX: 45, offsetY: -15 },
+          { largura: 110, altura: 60, offsetX: -25, offsetY: 25 },
         ],
         propriedades: {
           travarMovimentoAir: true,
@@ -768,12 +768,12 @@ export default class Slenderman extends Personagem {
         duracao: 700,
         cooldown: 1100,
         frameProjetil: 1,
-        escalaProjetil: 0.75,
+        escalaProjetil: 1,
         offsetProjetilX: 20,
         offsetProjetilY: -96,
         hitboxesProjetil: [
-          { largura: 100, altura: 80, offsetX: -10, offsetY: -20 },
-          { largura: 90, altura: 70, offsetX: 40, offsetY: 60 },
+          { largura: 100, altura: 80, offsetX: -5, offsetY: -20 },
+          { largura: 100, altura: 70, offsetX: 45, offsetY: 60 },
         ],
         propriedades: {
           dano: 12,
@@ -784,13 +784,13 @@ export default class Slenderman extends Personagem {
       },
     };
 
-    //-------------------------- ult ------------------------------------
+   
     this.specials.air_cima = {
       animacao: "slan_AupSpecial",
-      duracao: 1063,
+      duracao: 900,
       cooldown: 2500,
       propriedades: {
-        impulsoX: 400,
+        impulsoX: 350,
         impulsoY: -800,
         travarMovimentoAir: true,
         velocidadeMaxQueda: 100,
@@ -831,14 +831,15 @@ export default class Slenderman extends Personagem {
       texturaProjetil: "Slan_AdoSpecial-efect",
       animacaoProjetil: "slan_AdoSpecial-efect",
       framesCorte: 2,
-      offsetProjetilX: 25,
+      offsetProjetilX: 5,
       offsetProjetilY: -30,
       velocidadeProjetil: 50,
       distanciaProjetil: 40,
       distanciaProjetilY: 40,
       hitboxesProjetil: [
-        { largura: 75, altura: 90, offsetX: -20, offsetY: -40 },
-        { largura: 85, altura: 80, offsetX: 50, offsetY: 40 },
+        { largura: 75, altura: 90, offsetX: -35, offsetY: -40 },
+        { largura: 85, altura: 80, offsetX: 20, offsetY: 25 },  
+        { largura: 85, altura: 80, offsetX: 45, offsetY: 50 },
       ],
       propriedades: {
         ...this.specials.lado.propriedades,
@@ -851,7 +852,7 @@ export default class Slenderman extends Personagem {
       golpe.propriedades.corrupcaoSlender = 5;
     }
     for (const special of Object.values(this.specials)) {
-      special.propriedades.corrupcaoSlender = 9;
+      special.propriedades.corrupcaoSlender = 10;
     }
   
 

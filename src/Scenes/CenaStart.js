@@ -32,7 +32,7 @@ export default class CenaStart extends Phaser.Scene {
     this.criarLogo(entradaDoPreload);
 
     this.opcoesMenu = [
-      { id: "story", rotulo: "HISTÓRIA", y: this.scale.height * 0.47, },
+      { id: "story", rotulo: "HISTORIA", y: this.scale.height * 0.47, },
       { id: "1v1", rotulo: "VERSUS", y: this.scale.height * 0.565 },
       { id: "credits", rotulo: "CRÉDITOS", y: this.scale.height * 0.66 },
     ];
@@ -93,6 +93,7 @@ export default class CenaStart extends Phaser.Scene {
       esquerda: Phaser.Input.Keyboard.KeyCodes.LEFT,
       direita: Phaser.Input.Keyboard.KeyCodes.RIGHT
     });
+    this.teclaVoltar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.G);
 
     this.controleP1 = new ControleEntrada(this, teclasP1, 0);
 
@@ -110,6 +111,18 @@ export default class CenaStart extends Phaser.Scene {
     this.controleP1.atualizar();
 
     if (this.emSelecaoPlayers) {
+      const apertouVoltar =
+        Phaser.Input.Keyboard.JustDown(this.teclaVoltar) ||
+        this.controleP1.acabouDeApertar("special");
+      if (apertouVoltar) {
+        this.emSelecaoPlayers = false;
+        this.textoNumPlayers.setVisible(false);
+        this.cursorSelecao.setVisible(true);
+        this.atualizarDestaque();
+        this.controleP1.salvarAnterior();
+        return;
+      }
+
       const apertouEsq = this.controleP1.acabouDeApertar("esquerda") || Phaser.Input.Keyboard.JustDown(this.teclasSetas.esquerda);
       const apertouDir = this.controleP1.acabouDeApertar("direita") || Phaser.Input.Keyboard.JustDown(this.teclasSetas.direita);
 
@@ -121,7 +134,7 @@ export default class CenaStart extends Phaser.Scene {
       const apertouConfirmar = this.controleP1.acabouDeApertar("atack") || this.controleP1.acabouDeApertar("special");
       if (apertouConfirmar) {
         this.bloqueado = true;
-        this.fecharAbaEAvancar("Charmenu", { modo: "historia", numPlayers: this.numPlayersHistoria });
+        this.fecharAbaEAvancar("IntroMovie", { modo: "historia", numPlayers: this.numPlayersHistoria });
       }
     } else {
       const apertouCima = this.controleP1.acabouDeApertar("cima") || Phaser.Input.Keyboard.JustDown(this.teclasSetas.cima);

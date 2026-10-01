@@ -17,6 +17,7 @@ import SistemaLedge from "../Objetos/SistemaLedge.js";
 import SistemaPlataformasAtravessaveis from "../Objetos/SistemaPlataformasAtravessaveis.js";
 import DialogoHistoria from "../Objetos/DialogoHistoria.js";
 import CutsceneFinalHistoria from "../Objetos/CutsceneFinalHistoria.js";
+import { prepararTexturaTeia, limparAssetsPartida } from "../Objetos/CarregarAssetsPartida.js";
 
 export default class CenaHistoria extends Phaser.Scene {
   constructor() {
@@ -40,6 +41,12 @@ export default class CenaHistoria extends Phaser.Scene {
 
   create() {
     encerrarOutrasCenas(this);
+    this.events.once("shutdown", () => {
+      this.sound.stopAll();
+      limparAssetsPartida(this);
+    });
+    this.cameras.main.fadeIn(350, 0, 0, 0);
+    prepararTexturaTeia(this);
 
     this.sistemaPlataformasAtravessaveis =
     new SistemaPlataformasAtravessaveis(this);
@@ -405,6 +412,7 @@ this.indicadorCPU = this.criarIndicador(
 
   respawnar(jogador, spawn) {
     jogador.corrupcaoSlender?.limpar();
+    jogador.congelamentoPingu?.limpar();
     if (jogador.eliminado || jogador.vidas <= 0) return;
     jogador.sprite.body.reset(spawn.x, spawn.y);
     jogador.sprite.setVisible(true).setActive(true);

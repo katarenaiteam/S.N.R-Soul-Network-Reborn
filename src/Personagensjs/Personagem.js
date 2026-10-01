@@ -1,5 +1,6 @@
 import GerenciadorEstados from "../Estados/GerenciadorEstados.js";
 import CorrupcaoSlender from "../Objetos/CorrupcaoSlender.js";
+import CongelamentoPingu from "../Objetos/CongelamentoPingu.js";
 import EstadoIdle from "../Estados/EstadoIdle.js";
 import EstadoWalk from "../Estados/EstadoWalk.js";
 import EstadoJump from "../Estados/EstadoJump.js";
@@ -121,6 +122,7 @@ export default class Personagem {
     this.sprite = scene.physics.add.sprite(x, y, keyAtlas, frameInicial);
     this.sprite.setOrigin(0.5, 1);
     this.corrupcaoSlender = new CorrupcaoSlender(this);
+    this.congelamentoPingu = new CongelamentoPingu(this);
 
     //efeitos visuais
     this.configVFX = {};
@@ -245,10 +247,24 @@ export default class Personagem {
   receberDano(quantidade, propriedades = {}, origem = null) {
     if (this.invulneravel) return true;
 
-     const atacante =
-    this.scene.jogador1 === this
-      ? this.scene.jogador2
-      : this.scene.jogador1;
+    const atacante =
+      this.scene.jogador1 === this
+        ? this.scene.jogador2
+        : this.scene.jogador1;
+    const atacanteDoEfeito = origem?.atacante ?? atacante;
+    const removeuCongelamentoPingu = quantidade > 0 &&
+      atacanteDoEfeito?.nomePersonagem === "Pingu" && this.congelamentoPingu?.congelado;
+    if (removeuCongelamentoPingu) this.congelamentoPingu.limpar();
+    if (
+      quantidade <= 0 &&
+      atacanteDoEfeito?.nomePersonagem === "Pingu" &&
+      propriedades.congelamentoPingu > 0
+    ) {
+      if (!removeuCongelamentoPingu) {
+        this.congelamentoPingu?.adicionar(propriedades.congelamentoPingu);
+      }
+      return false;
+    }
 
   if (atacante?.sprite) {
     atacante.sprite.setDepth(2);
@@ -463,6 +479,14 @@ export default class Personagem {
     // DEPOIS MUDA PARA O ESTADO DE DANO
     this.maquinaEstados.mudarEstado("dano");
 
+    if (
+      !removeuCongelamentoPingu &&
+      atacanteDoEfeito?.nomePersonagem === "Pingu" &&
+      propriedades.congelamentoPingu > 0
+    ) {
+      this.congelamentoPingu?.adicionar(propriedades.congelamentoPingu);
+    }
+
     return false;
   }
 
@@ -629,6 +653,15 @@ consumirUlt() {
 
   // --- LOOP PRINCIPAL ---
  update() {
+    this.congelamentoPingu?.atualizar();
+    if (this.congelamentoPingu?.congelado) {
+      this.congelamentoPingu.manterCongelado();
+      this.controle?.atualizar();
+      this.controle?.salvarAnterior();
+      this.sincronizarHurtbox();
+      return;
+    }
+
     const noChao = this.sprite.body.blocked.down;
     const baseCorpo = this.sprite.body.bottom;
 

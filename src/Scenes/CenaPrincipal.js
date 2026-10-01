@@ -14,6 +14,7 @@ import ControleEntrada from "../Objetos/ControleEntrada.js";
 import SistemaPlataformasAtravessaveis from "../Objetos/SistemaPlataformasAtravessaveis.js";
 import SistemaLedge from "../Objetos/SistemaLedge.js";
 import IntroPartida from "../Objetos/IntroPartida.js";
+import { prepararTexturaTeia, limparAssetsPartida } from "../Objetos/CarregarAssetsPartida.js";
 
 export default class cenaPrincipal extends Phaser.Scene {
   constructor() {
@@ -31,6 +32,12 @@ export default class cenaPrincipal extends Phaser.Scene {
 
   create() {
     encerrarOutrasCenas(this);
+    this.events.once("shutdown", () => {
+      this.sound.stopAll();
+      limparAssetsPartida(this);
+    });
+    this.cameras.main.fadeIn(350, 0, 0, 0);
+    prepararTexturaTeia(this);
 
     this.sistemaPlataformasAtravessaveis =
     new SistemaPlataformasAtravessaveis(this);
@@ -353,6 +360,7 @@ this.indicadorP2 = this.criarIndicador(
 
   respawnar(jogador, pontoRespawn) {
     jogador.corrupcaoSlender?.limpar();
+    jogador.congelamentoPingu?.limpar();
     // reset sincroniza Game Object, Body, prev e prevFrame no mesmo instante.
     // setPosition isolado deixava o Body na posicao anterior ate outro passo.
     jogador.sprite.body.reset(pontoRespawn.x, pontoRespawn.y);

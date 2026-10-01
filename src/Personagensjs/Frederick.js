@@ -1063,7 +1063,7 @@ if (!scene.anims.exists("punch_effect3")) {
       });
       scene.anims.create({
         key: "fj_ult_explosion",
-        frames: scene.anims.generateFrameNumbers("FJ-ultExplosion", { start: 0, end: 59 }),
+        frames: scene.anims.generateFrameNumbers("FJ-ultExplosion", { start: 0, end: 34 }),
         frameRate: 30,
         repeat: 0,
       });

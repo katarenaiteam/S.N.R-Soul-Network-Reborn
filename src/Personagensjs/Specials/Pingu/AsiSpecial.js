@@ -113,6 +113,7 @@ export default class PinguAsiSpecial {
     alvo.receberDano(this.special.propriedades.dano, this.special.propriedades, {
       x: this.personagem.sprite.x,
       direcao: this.direcao,
+      atacante: this.personagem,
     });
     this.finalizar();
   }

@@ -7,6 +7,8 @@ import CenaGameOver from "./Scenes/GameOver.js";
 import CenaSelecaoMapa from "./Scenes/SeleçaoMapas.js";
 import CenaHistoria from "./Scenes/CenaHistoria.js";
 import CenaCreditos from "./Scenes/CenaCreditos.js";
+import IntroMovie from "./Scenes/IntroMovie.js";
+import CenaPreloadVersus from "./Scenes/CenaPreloadVersus.js";
 import { instalarComandosDebug } from "./DebugConsole.js";
 
 const config = {
@@ -42,7 +44,7 @@ const config = {
     gamepad: true,
   },
 
-  scene: [CenaPreload, CenaStart, Charmenu, CenaSelecaoMapa, CenaPrincipal, CenaHistoria, CenaGameOver, CenaCreditos],
+  scene: [CenaPreload, CenaStart, IntroMovie, Charmenu, CenaSelecaoMapa, CenaPreloadVersus, CenaPrincipal, CenaHistoria, CenaGameOver, CenaCreditos],
 };
 
 const game = new Phaser.Game(config);

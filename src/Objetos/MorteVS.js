@@ -23,13 +23,16 @@ export function ladoDaQueda(x, y, limites) {
 }
 
 class VidroMatrix {
-  constructor(scene, jogador, lado, id) {
+  constructor(scene, jogador, lado, id, gerenciador) {
     this.scene = scene;
+    this.gerenciador = gerenciador;
     this.lado = lado;
     this.tempo = 0;
-    this.chave = `morte-vs-${id}`;
-    this.textura = scene.textures.createCanvas(this.chave, 640, 640);
-    this.contexto = this.textura.getContext();
+    this.destruido = false;
+    this.recursos = gerenciador.obterRecursos();
+    this.chave = this.recursos.chave;
+    this.textura = this.recursos.textura;
+    this.contexto = this.recursos.contexto;
     this.vidro = scene.textures.get(`quebrado${lado}2`).getSourceImage();
     this.imagem = scene.add.image(0, 0, this.chave).setOrigin(0).setScrollFactor(0).setDepth(1800);
     scene.camJogo.ignore(this.imagem);
@@ -40,6 +43,8 @@ class VidroMatrix {
     const py = cam.y + oy + (jogador.sprite.y - cam.scrollY - oy) * cam.zoom;
     this.posicaoBorda = (lado === "L" || lado === "R") ? py / scene.scale.height : px / scene.scale.width;
     this.colunas = Array.from({ length: 46 }, (_, i) => ({ x: i * 14, y: Math.random() * 800, velocidade: 70 + Math.random() * 126 }));
+    this.cacheColunas = this.recursos.cacheColunas;
+    this.faseColunas = -1;
     const centros = { R: [570,350], L: [70,320], U: [320,70], D: [320,570] };
     const angulos = { R: Math.PI, L: 0, U: Math.PI / 2, D: -Math.PI / 2 };
     this.particulas = Array.from({ length: 55 }, (_, indice) => {
@@ -47,9 +52,10 @@ class VidroMatrix {
       const velocidade = 320 + Math.random() * 220;
       const dispersao = ((indice % 11) - 5) * 30 + (Math.random() - .5) * 8;
       const distancia = Math.floor(indice / 11) * 32;
+      const letra = LETRAS[Math.floor(Math.random() * LETRAS.length)];
       return { x: centros[lado][0] - Math.sin(angulo) * dispersao + Math.cos(angulo) * distancia,
         y: centros[lado][1] + Math.cos(angulo) * dispersao + Math.sin(angulo) * distancia, vx: Math.cos(angulo) * velocidade,
-        vy: Math.sin(angulo) * velocidade, letra: LETRAS[Math.floor(Math.random() * LETRAS.length)] };
+        vy: Math.sin(angulo) * velocidade, letra, textura: gerenciador.texturasLetras.get(letra) };
     });
     this.atualizar(0);
   }
@@ -81,29 +87,41 @@ class VidroMatrix {
     ctx.clip();
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, 640, 640);
-    ctx.font = "bold 14px monospace";
-    for (const coluna of this.colunas) {
-      const cabeca = (coluna.y + this.tempo * coluna.velocidade) % 840;
-      for (let i = 0; i < 16; i++) {
-        ctx.fillStyle = i === 0 ? "#d4ffe4" : `rgba(0,255,105,${1 - i / 17})`;
-        const indice = (Math.floor(this.tempo * 9) + Math.floor(coluna.x) + i * 7) % LETRAS.length;
-        ctx.fillText(LETRAS[indice], coluna.x, cabeca - i * 16);
+    const faseColunas = Math.floor(this.tempo * 9);
+    if (faseColunas !== this.faseColunas) {
+      for (let indiceColuna = 0; indiceColuna < this.colunas.length; indiceColuna++) {
+        const coluna = this.colunas[indiceColuna];
+        const cache = this.cacheColunas[indiceColuna];
+        const cacheCtx = cache.contexto;
+        cacheCtx.clearRect(0, 0, 32, 272);
+
+        for (let i = 0; i < 16; i++) {
+          cacheCtx.fillStyle = i === 0 ? "#d4ffe4" : `rgba(0,255,105,${1 - i / 17})`;
+          const indice = (faseColunas + Math.floor(coluna.x) + i * 7) % LETRAS.length;
+          cacheCtx.fillText(LETRAS[indice], 0, 256 - i * 16);
+        }
       }
+      this.faseColunas = faseColunas;
+    }
+
+    for (let indiceColuna = 0; indiceColuna < this.colunas.length; indiceColuna++) {
+      const coluna = this.colunas[indiceColuna];
+      const cabeca = (coluna.y + this.tempo * coluna.velocidade) % 840;
+      ctx.drawImage(this.cacheColunas[indiceColuna].canvas, coluna.x, cabeca - 256);
     }
     ctx.restore();
     ctx.drawImage(this.vidro, 0, 0, 640, 640);
     ctx.restore();
-    ctx.font = "bold 28px monospace";
-    ctx.fillStyle = "#baffd3";
-    ctx.shadowColor = "#00ff70";
-    ctx.shadowBlur = 10;
     ctx.globalAlpha = Math.min(1, Math.max(0, (.95 - this.tempo) / .5));
+    const deslocamento = .4 * (1 - Math.exp(-this.tempo / .4));
     for (const p of this.particulas) {
-      const deslocamento = .4 * (1 - Math.exp(-this.tempo / .4));
-      ctx.fillText(p.letra, p.x + p.vx * deslocamento, p.y + p.vy * deslocamento);
+      ctx.drawImage(
+        p.textura,
+        p.x + p.vx * deslocamento - 20,
+        p.y + p.vy * deslocamento - 52,
+      );
     }
     ctx.globalAlpha = 1;
-    ctx.shadowBlur = 0;
     this.textura.refresh();
     const { width: w, height: h } = this.scene.scale;
     const tamanho = Math.min(w, h) * 1.1;
@@ -116,8 +134,10 @@ class VidroMatrix {
   }
 
   destruir() {
+    if (this.destruido) return;
+    this.destruido = true;
     this.imagem.destroy();
-    this.scene.textures.remove(this.chave);
+    this.gerenciador.liberarRecursos(this.recursos);
   }
 }
 
@@ -128,8 +148,61 @@ export default class MorteVS {
     this.pendentes = new Map();
     this.sequencia = 0;
     this.tvAtiva = false;
+    this.recursosLivres = [];
+    this.recursosCriados = [];
+    this.texturasLetras = new Map();
+    this.prepararTexturasLetras();
+    const quantidadeBuffers = scene.scene.key === "CenaHistoria"
+      ? (scene.numPlayers === 2 ? 3 : 2)
+      : 2;
+    for (let i = 0; i < quantidadeBuffers; i += 1) {
+      this.recursosLivres.push(this.criarRecursos());
+    }
     this.aoFimTV = () => this.concluirTV();
     scene.events.once("shutdown", () => this.destruir());
+  }
+
+  prepararTexturasLetras() {
+    for (const letra of new Set(LETRAS)) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 72;
+      canvas.height = 72;
+      const contexto = canvas.getContext("2d");
+      contexto.font = "bold 28px monospace";
+      contexto.fillStyle = "#baffd3";
+      contexto.shadowColor = "#00ff70";
+      contexto.shadowBlur = 10;
+      contexto.fillText(letra, 20, 52);
+      this.texturasLetras.set(letra, canvas);
+    }
+  }
+
+  criarRecursos() {
+    const chave = `morte-vs-buffer-${this.recursosCriados.length + 1}`;
+    const textura = this.scene.textures.createCanvas(chave, 640, 640);
+    const recursos = {
+      chave,
+      textura,
+      contexto: textura.getContext(),
+      cacheColunas: Array.from({ length: 46 }, () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 32;
+        canvas.height = 272;
+        const contexto = canvas.getContext("2d");
+        contexto.font = "bold 14px monospace";
+        return { canvas, contexto };
+      }),
+    };
+    this.recursosCriados.push(recursos);
+    return recursos;
+  }
+
+  obterRecursos() {
+    return this.recursosLivres.pop() || this.criarRecursos();
+  }
+
+  liberarRecursos(recursos) {
+    if (!this.recursosLivres.includes(recursos)) this.recursosLivres.push(recursos);
   }
 
   iniciar(jogador, pontoRespawn, numero) {
@@ -137,7 +210,7 @@ export default class MorteVS {
     jogador.estadoInvencible.sair(false);
     this.scene.camJogo.shake(140, 0.007);
     const efeito = new VidroMatrix(this.scene, jogador,
-      ladoDaQueda(jogador.sprite.x, jogador.sprite.y, this.scene.limitesArena), ++this.sequencia);
+      ladoDaQueda(jogador.sprite.x, jogador.sprite.y, this.scene.limitesArena), ++this.sequencia, this);
     const invulneravel = jogador.invulneravel;
     const fsm = jogador.maquinaEstados;
     if (!fsm.estados.morteVS) fsm.adicionarEstado("morteVS", new EstadoBase(jogador));
@@ -208,5 +281,9 @@ export default class MorteVS {
     this.scene.overlayMorte.off("animationcomplete", this.aoFimTV);
     for (const entrada of this.pendentes.values()) entrada.efeito?.destruir();
     this.pendentes.clear();
+    for (const recursos of this.recursosCriados) this.scene.textures.remove(recursos.chave);
+    this.recursosCriados.length = 0;
+    this.recursosLivres.length = 0;
+    this.texturasLetras.clear();
   }
 }

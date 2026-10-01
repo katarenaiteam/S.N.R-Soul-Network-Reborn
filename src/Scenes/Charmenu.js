@@ -222,6 +222,7 @@ export default class Charmenu extends Phaser.Scene {
     encerrarOutrasCenas(this);
 
     this.cameras.main.setBackgroundColor("#000000");
+    this.cameras.main.fadeIn(350, 0, 0, 0);
 
     this.musica = tocarMusicaSegura(this, "katarenai8bit", {
       loop: true,
@@ -528,6 +529,12 @@ export default class Charmenu extends Phaser.Scene {
 
   atualizarHover(jogador) {
     if (jogador.selecionado) return;
+
+    const xPixel = Math.floor(jogador.mao.x / this.scale.width * 1920);
+    const yPixel = Math.floor(jogador.mao.y / this.scale.height * 1080);
+    if (jogador.pixelHoverX === xPixel && jogador.pixelHoverY === yPixel) return;
+    jogador.pixelHoverX = xPixel;
+    jogador.pixelHoverY = yPixel;
 
     const personagem = this.obterPersonagem(
       jogador.mao.x,
@@ -840,17 +847,11 @@ export default class Charmenu extends Phaser.Scene {
       modo: this.modoJogo
     };
 
-    if (this.modoJogo === "historia") {
-      this.scene.start(
-        "CenaHistoria",
-        escolhas
-      );
-    } else {
-      this.scene.start(
-        "CenaSelecaoMapa",
-        escolhas
-      );
-    }
+    const proximaCena = this.modoJogo === "historia" ? "CenaHistoria" : "CenaSelecaoMapa";
+    this.cameras.main.once("camerafadeoutcomplete", () => {
+      this.scene.start(proximaCena, escolhas);
+    });
+    this.cameras.main.fadeOut(350, 0, 0, 0);
   }
 
   salvarInputs() {
@@ -904,10 +905,12 @@ export default class Charmenu extends Phaser.Scene {
         intervalo: Phaser.Math.Between(140, 280)
       };
 
+      fluxo.container = this.add.container(fluxo.x, fluxo.y);
+
       fluxo.cauda = this.add
         .text(
-          fluxo.x,
-          fluxo.y + fluxo.altura,
+          0,
+          fluxo.altura,
           chars.slice(1).join("\n"),
           {
             fontFamily: "monospace",
@@ -920,8 +923,8 @@ export default class Charmenu extends Phaser.Scene {
 
       fluxo.cabeca = this.add
         .text(
-          fluxo.x,
-          fluxo.y,
+          0,
+          0,
           chars[0],
           {
             fontFamily: "monospace",
@@ -932,10 +935,8 @@ export default class Charmenu extends Phaser.Scene {
         .setOrigin(0.5, 0)
         .setAlpha(0.95);
 
-      this.containerChuva.add([
-        fluxo.cauda,
-        fluxo.cabeca
-      ]);
+      fluxo.container.add([fluxo.cauda, fluxo.cabeca]);
+      this.containerChuva.add(fluxo.container);
 
       this.colunasChuva.push(fluxo);
     }
@@ -958,11 +959,7 @@ export default class Charmenu extends Phaser.Scene {
         fluxo.velocidade *
         (dt / 1000);
 
-      fluxo.cabeca.y =
-        fluxo.y;
-
-      fluxo.cauda.y =
-        fluxo.y + fluxo.altura;
+      fluxo.container.y = fluxo.y;
 
       fluxo.tempo += dt;
 
@@ -976,18 +973,13 @@ export default class Charmenu extends Phaser.Scene {
             fluxo.chars.length - 1
           );
 
-        fluxo.chars[index] =
-          this.caractereChuva();
+        fluxo.chars[index] = this.caractereChuva();
 
-        fluxo.cabeca.setText(
-          fluxo.chars[0]
-        );
-
-        fluxo.cauda.setText(
-          fluxo.chars
-            .slice(1)
-            .join("\n")
-        );
+        if (index === 0) {
+          fluxo.cabeca.setText(fluxo.chars[0]);
+        } else {
+          fluxo.cauda.setText(fluxo.chars.slice(1).join("\n"));
+        }
 
         fluxo.tempo = 0;
       }

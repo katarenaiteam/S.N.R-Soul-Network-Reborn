@@ -18,7 +18,9 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
 
   create() {
     encerrarOutrasCenas(this);
-    this.cameras.main.setBackgroundColor("#05050a");
+    this.cameras.main.setBackgroundColor("#000000");
+    this.cameras.main.fadeIn(350, 0, 0, 0);
+    this.criarChuvaMatrix();
 
     // 1. CONTAINER PARA O MENU
     this.conteudoMenu = this.add.container(0, 0);
@@ -32,11 +34,7 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
       ease: "Cubic.easeOut"
     });
 
-    // 2. IMAGEM DE FUNDO DO MENU DE MAPAS
-    const fundo = this.add.image(0, 0, "Start_menu").setOrigin(0, 0).setDisplaySize(this.scale.width, this.scale.height);
-    this.conteudoMenu.add(fundo);
-
-    // 3. ARRAY DOS MAPAS COM AS SUAS RESPECTIVAS IMAGENS (SPRITES/PREVIEWS)
+    // 2. ARRAY DOS MAPAS COM AS SUAS RESPECTIVAS IMAGENS (SPRITES/PREVIEWS)
     this.mapas = [
       { id: "cidade", nome: "Cidade", classe: Cidade, chaveSprite: "thumb_cidade" },
       { id: "mapaTeste", nome: "Mapa Teste", classe: MapaTeste, chaveSprite: "thumb_teste" },
@@ -53,7 +51,7 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
       this.conteudoMenu.add(spriteMapa);
     });
 
-    // 4. SUPORTE A TECLADO (A/D e SETAS ESQUERDA/DIREITA) + CONTROLEENTRADA
+    // 3. SUPORTE A TECLADO (A/D e SETAS ESQUERDA/DIREITA) + CONTROLEENTRADA
     const teclasP1 = this.input.keyboard.addKeys({
       esquerda: Phaser.Input.Keyboard.KeyCodes.A,
       direita: Phaser.Input.Keyboard.KeyCodes.D,
@@ -73,7 +71,8 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
     this.bloqueado = false;
   }
 
-  update() {
+  update(_tempo, delta) {
+    this.atualizarChuvaMatrix(delta);
     if (this.bloqueado) return;
 
     this.controleP1.atualizar();
@@ -97,6 +96,48 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
     }
 
     this.controleP1.salvarAnterior();
+  }
+
+  criarChuvaMatrix() {
+    this.colunasMatrix = [];
+    const escala = this.scale.width / 1920;
+    const espacamento = Math.max(26, 34 * escala);
+    const quantidade = Math.ceil(this.scale.width / espacamento);
+    const alfabeto = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    for (let i = 0; i < quantidade; i += 1) {
+      if (Phaser.Math.FloatBetween(0, 1) < 0.18) continue;
+      const tamanho = Phaser.Math.Between(10, 18) * escala;
+      const caracteres = Array.from({ length: Phaser.Math.Between(8, 18) }, () =>
+        alfabeto[Phaser.Math.Between(0, alfabeto.length - 1)]
+      );
+      const x = i * espacamento;
+      const y = Phaser.Math.Between(-this.scale.height, this.scale.height);
+      const cauda = this.add.text(x, y, caracteres.join("\n"), {
+        fontFamily: "monospace", fontSize: `${tamanho}px`, color: "#159447", lineSpacing: 1,
+      }).setDepth(-2).setAlpha(0.5);
+      const cabeca = this.add.text(x, y, caracteres[0], {
+        fontFamily: "monospace", fontSize: `${tamanho}px`, color: "#c5ffd8",
+      }).setDepth(-1).setAlpha(0.9);
+      this.colunasMatrix.push({ cauda, cabeca, caracteres, y, velocidade: Phaser.Math.Between(60, 150) * escala, altura: tamanho * caracteres.length });
+    }
+  }
+
+  atualizarChuvaMatrix(delta) {
+    for (const coluna of this.colunasMatrix || []) {
+      coluna.y += coluna.velocidade * (delta / 1000);
+      if (coluna.y > this.scale.height + coluna.altura) {
+        coluna.y = Phaser.Math.Between(-coluna.altura, -20);
+        coluna.caracteres = coluna.caracteres.map(() =>
+          "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Phaser.Math.Between(0, 35)]
+        );
+        coluna.cauda.setText(coluna.caracteres.join("\n"));
+        coluna.cabeca.setText(coluna.caracteres[0]);
+        coluna.altura = coluna.cauda.height;
+      }
+      coluna.cauda.setPosition(coluna.cauda.x, coluna.y);
+      coluna.cabeca.setPosition(coluna.cabeca.x, coluna.y);
+    }
   }
 
   // Disposição e animação estilo catálogo/carrossel
@@ -197,8 +238,9 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
       ease: "Cubic.easeIn",
       onComplete: () => {
         // Inicia a arena repassando a classe do mapa selecionado e os personagens
-        this.scene.start("cenaPrincipal", {
+        this.scene.start("CenaPreloadVersus", {
           ClasseMapa: this.mapas[this.indiceOpcao].classe,
+          mapa: this.mapas[this.indiceOpcao].classe.name,
           p1: this.escolhaPersonagens?.p1,
           p2: this.escolhaPersonagens?.p2
         });

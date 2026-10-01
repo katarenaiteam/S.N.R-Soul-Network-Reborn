@@ -101,10 +101,15 @@ export default class PinguAneSpecial {
   acertarAlvo(alvo) {
     if (this.finalizando || !this.projetil?.active) return;
     const direcao = this.projetil.flipX ? -1 : 1;
-    alvo.receberDano(this.special.propriedades.dano, this.special.propriedades, {
+    const estavaCongelado = alvo.congelamentoPingu?.congelado;
+    const bloqueado = alvo.receberDano(this.special.propriedades.dano, this.special.propriedades, {
       x: this.projetil.x,
       direcao,
+      atacante: this.personagem,
     });
+    if (!bloqueado && !estavaCongelado) {
+      alvo.congelamentoPingu?.adicionar(this.special.acumuloCongelamento);
+    }
     this.finalizarProjetil(true);
   }
 
@@ -193,6 +198,7 @@ PinguAneSpecial.configuracao = {
   larguraProjetil: 90,
   alturaProjetil: 75,
   escalaExplosao: 1,
+  acumuloCongelamento: 35,
   propriedades: {
     travarMovimentoAir: true,
     tipoSomImpacto: "heavy",

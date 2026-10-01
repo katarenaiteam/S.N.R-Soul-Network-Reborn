@@ -4,6 +4,9 @@ import PinguSiSpecial from "./Specials/Pingu/SiSpecial.js";
 import PinguDoSpecial from "./Specials/Pingu/DoSpecial.js";
 import PinguAneSpecial from "./Specials/Pingu/AneSpecial.js";
 import PinguAsiSpecial from "./Specials/Pingu/AsiSpecial.js";
+import PinguAupSpecial from "./Specials/Pingu/AupSpecial.js";
+import PinguAdoSpecial from "./Specials/Pingu/AdoSpecial.js";
+import AupSpecial from "./Specials/FJ/AupSpecial.js";
 
 export default class Pingu extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -77,10 +80,10 @@ export default class Pingu extends Personagem {
       },
 
       jump: {
-        //offsetVisualY: 5 ,
+        offsetVisualX: -1 ,
         largura: 30,
         altura: 70,
-        offsetX: 15,
+        offsetX: 12,
         offsetY: 25,
         escala: 1,
         hurtboxes: [
@@ -234,13 +237,13 @@ export default class Pingu extends Personagem {
         ],
       },
 
-      neutralAir: {offsetVisualX: 10, largura: 30, altura: 70, offsetX: 27, offsetY: 15, escala: 1,
+      neutralAir: {offsetVisualX: 10, largura: 30, altura: 70, offsetX: 26, offsetY: 15, escala: 1,
         hurtboxes: [
           { largura: 30, altura: 55, offsetX: 0, offsetY: -40 }, 
         ],
       },
 
-      sideAtack: {offsetVisualX: 10, largura: 30, altura: 70, offsetX: 28, offsetY: -10, escala: 1,
+      sideAtack: {offsetVisualX: 10, largura: 30, altura: 70, offsetX: 30, offsetY: -10, escala: 1,
         hurtboxes: [
           { largura: 30, altura: 55, offsetX: -4, offsetY: -30 }, 
         ],
@@ -252,7 +255,7 @@ export default class Pingu extends Personagem {
         ],
       },
 
-      sideAir: {offsetVisualY: 5, largura: 30, altura: 70, offsetX: 72, offsetY: 60, escala: 1,
+      sideAir: {offsetVisualY: 5, largura: 30, altura: 70, offsetX: 80, offsetY: 60, escala: 1,
         hurtboxes: [
           { largura: 50, altura: 45, offsetX: -5, offsetY: -60 }, 
         ],
@@ -276,9 +279,9 @@ export default class Pingu extends Personagem {
         ],
       },
 
-      siSpecial: { largura: 30, altura: 70, offsetX: 21, offsetY: 10, escala: 1,
+      siSpecial: { largura: 30, altura: 70, offsetX: 26, offsetY: 10, escala: 1,
         hurtboxes: [
-          { largura: 30, altura: 55, offsetX: -4, offsetY: -50 }, 
+          { largura: 30, altura: 55, offsetX: 0, offsetY: -50 }, 
         ],
       },
 
@@ -288,7 +291,7 @@ export default class Pingu extends Personagem {
         ],
       },
 
-      AsiSpecial: { largura: 30, altura: 70, offsetX: 130, offsetY: 125, escala: 1,
+      AsiSpecial: { offsetVisualY: 40, offsetVisualX: -10, largura: 30, altura: 70, offsetX: 158, offsetY: 132, escala: 1,
         hurtboxes: [
           { largura: 30, altura: 55, offsetX: 0, offsetY: -30 },
         ],
@@ -320,17 +323,27 @@ export default class Pingu extends Personagem {
         ],
       },
 
+      AupSpecial: { largura: 30, altura: 70, offsetX: 6, offsetY: 20, escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 55, offsetX: 5, offsetY: -55 }, 
+        ],
+      },
 
+      AdoSpecial: { offsetVisualY: -5, largura: 40, altura: 40, offsetX: 15, offsetY: 25, escala: 1,
+        hurtboxes: [
+          { largura: 35, altura: 35, offsetX: -5, offsetY: -23 },
+        ],
+      },
     
    };
 
-    this.sons = {
-      ...this.sons,
-      vozAtaque: ["sp-atack", "sp-atack2", "sp-atack3"],
-      vozDanoNormal: ["sp-hurt", "sp-hurt2"],
-      vozDanoForte: ["sp-hurt", "sp-hurt2", "sp-hurt3"],
-      volumeVoz: 0.2,
-    };
+ //   this.sons = {
+ //     ...this.sons,
+ //     vozAtaque: ["sp-atack", "sp-atack2", "sp-atack3"],
+ //     vozDanoNormal: ["sp-hurt", "sp-hurt2"],
+ //     vozDanoForte: ["sp-hurt", "sp-hurt2", "sp-hurt3"],
+ //     volumeVoz: 0.2,
+ //   };
 
 
   
@@ -670,7 +683,9 @@ export default class Pingu extends Personagem {
       lado: PinguSiSpecial.configuracao,
       agachado: PinguDoSpecial.configuracao,
       air_neutro: PinguAneSpecial.configuracao,
+      air_cima: PinguAupSpecial.configuracao,
       air_lado: PinguAsiSpecial.configuracao,
+      air_agachado: PinguAdoSpecial.configuracao,
     };
 
   // --------------------------------- tabela especiais --------------------------
@@ -1058,6 +1073,36 @@ if (!scene.anims.exists("punch_effect3")) {
       }),
       frameRate: 20,
       repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_AupSpecial",
+      frames: scene.anims.generateFrameNumbers("Pingu_AupSpecial", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 12,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_AdoSpecial",
+      frames: scene.anims.generateFrameNumbers("Pingu_AdoSpecial", {
+        start: 0,
+        end: 34,
+      }),
+      frameRate: 24,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_AdoSpecial_loop",
+      frames: scene.anims.generateFrameNumbers("Pingu_AdoSpecial", {
+        start: 3,
+        end: 34,
+      }),
+      frameRate: 24,
+      repeat: -1,
     });
 
     scene.anims.create({

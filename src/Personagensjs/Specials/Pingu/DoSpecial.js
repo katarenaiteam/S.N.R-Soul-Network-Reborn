@@ -225,6 +225,7 @@ export default class PinguDoSpecial {
     alvo.receberDano(propriedades.dano, propriedades, {
       direcao: this.direcao,
       x: this.personagem.sprite.x,
+      atacante: this.personagem,
     });
     this.limparHitbox();
 

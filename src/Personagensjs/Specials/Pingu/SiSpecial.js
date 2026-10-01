@@ -72,6 +72,9 @@ export default class PinguSiSpecial {
     const propriedades = {
       ...this.special.propriedades,
       dano: enxurrada ? this.special.danoEnxurrada : this.special.propriedades.dano,
+      congelamentoPingu: enxurrada
+        ? this.special.acumuloCongelamentoEnxurrada
+        : this.special.acumuloCongelamentoBolaGrande,
     };
     const registro = {
       projetil,
@@ -109,6 +112,7 @@ export default class PinguSiSpecial {
     alvo.receberDano(propriedades.dano, propriedades, {
       x: registro.projetil.x,
       direcao,
+      atacante: this.personagem,
     });
     this.finalizarProjetil(registro);
   }
@@ -184,7 +188,9 @@ PinguSiSpecial.configuracao = {
   escalaProjetil: 1.3,
   larguraProjetil: 10,
   alturaProjetil: 6,
-  danoEnxurrada: 0.5,
+  danoEnxurrada: 0,
+  acumuloCongelamentoBolaGrande: 18,
+  acumuloCongelamentoEnxurrada: 8,
   propriedades: {
     dano: 6,
     tipoSomImpacto: "light",
