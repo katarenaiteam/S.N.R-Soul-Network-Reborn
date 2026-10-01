@@ -8,6 +8,8 @@ const VELOCIDADE_CENTRO_ULT = 600;
 const GRAVIDADE_SUBIDA_ULT = -500;
 const COMPENSACAO_GRAVIDADE_LEVITACAO = -900;
 const IMPULSO_MERGULHO = 1750;
+import { gerarQuadrosUltimateBackground } from "../../Objetos/QuadrosUltimateBackground.js";
+
 const HITBOX_MERGULHO = { largura: 130, altura: 180, offsetY: -100 };
 const HITBOX_EXPLOSAO = { largura: 230, altura: 120, offsetY: -60 };
 const DANO_EXPLOSAO = 90;
@@ -80,16 +82,16 @@ export default class FJUlt {
   }
 
   ativarFundoUltimate() {
-    if (this.fundoUlt?.active || !this.scene.textures.exists("ultimateback")) return;
+    if (this.fundoUlt?.active || !this.scene.textures.exists("ultimateback1")) return;
     if (!this.scene.anims.exists("fj_ultimateback")) {
       this.scene.anims.create({
         key: "fj_ultimateback",
-        frames: this.scene.anims.generateFrameNumbers("ultimateback", { start: 0, end: 115 }),
+        frames: gerarQuadrosUltimateBackground(this.scene),
         frameRate: 36,
         repeat: -1,
       });
     }
-    this.fundoUlt = this.scene.add.sprite(0, 0, "ultimateback", 0);
+    this.fundoUlt = this.scene.add.sprite(0, 0, "ultimateback1", 0);
     this.fundoUlt.setDepth((this.fundoOriginal?.depth ?? -100) + 1);
     this.fundoUlt.setScrollFactor(1);
     this.fundoUlt.play("fj_ultimateback");

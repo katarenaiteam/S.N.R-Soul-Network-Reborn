@@ -1,3 +1,4 @@
+import { gerarQuadrosUltimateBackground } from "../../Objetos/QuadrosUltimateBackground.js";
 import { obterAlvosCombate } from "../../Objetos/SistemaCombateEspecial.js";
 import { garantirQuiqueImpacto } from "../../Objetos/QuiqueImpacto.js";
 // Posicao relativa ao ponto usado em cada chamada abaixo.
@@ -671,7 +672,7 @@ export default class SpiderUlt {
   }
 
   ativarFundoUltimate() {
-    if (this.fundoUlt?.active || !this.scene.textures.exists("ultimateback")) return;
+    if (this.fundoUlt?.active || !this.scene.textures.exists("ultimateback1")) return;
 
     const fundoFase = this.scene.mapaAtual?.imagemFundo;
     this.fundoFaseOriginal = fundoFase || null;
@@ -680,16 +681,13 @@ export default class SpiderUlt {
     if (!this.scene.anims.exists("spider_ultimateback")) {
       this.scene.anims.create({
         key: "spider_ultimateback",
-        frames: this.scene.anims.generateFrameNumbers("ultimateback", {
-          start: 0,
-          end: 115
-        }),
+        frames: gerarQuadrosUltimateBackground(this.scene),
         frameRate: 36,
         repeat: -1
       });
     }
 
-    this.fundoUlt = this.scene.add.sprite(0, 0, "ultimateback", 0);
+    this.fundoUlt = this.scene.add.sprite(0, 0, "ultimateback1", 0);
     this.fundoUlt.setDepth((fundoFase?.depth ?? -100) + 1);
     this.fundoUlt.setScrollFactor(1);
     this.ajustarFundoNaCamera();

@@ -841,7 +841,7 @@ if (!scene.anims.exists("punch_effect3")) {
     if (!scene.anims.exists("miku_nota_ataque_1")) {
       scene.anims.create({
         key: "miku_nota_ataque_1",
-        frames: scene.anims.generateFrameNumbers("Miku_effects", { start: 133, end: 140 }),
+        frames: scene.anims.generateFrameNumbers("Miku_effects", { start: 8, end: 15 }),
         frameRate: 24,
         repeat: 0,
       });
@@ -850,7 +850,7 @@ if (!scene.anims.exists("punch_effect3")) {
     if (!scene.anims.exists("miku_nota_ataque_2")) {
       scene.anims.create({
         key: "miku_nota_ataque_2",
-        frames: scene.anims.generateFrameNumbers("Miku_effects", { start: 142, end: 148 }),
+        frames: scene.anims.generateFrameNumbers("Miku_effects", { start: 16, end: 23 }),
         frameRate: 24,
         repeat: 0,
       });
@@ -1100,14 +1100,14 @@ scene.anims.create({
 
     scene.anims.create({
       key: "miku_nota_especial_1",
-      frames: scene.anims.generateFrameNumbers("Miku_effects", { start: 148, end: 162 }),
+      frames: scene.anims.generateFrameNumbers("Miku_effects", { start: 24, end: 43 }),
       frameRate: 24,
       repeat: -1,
     });
 
     scene.anims.create({
       key: "miku_nota_especial_2",
-      frames: scene.anims.generateFrameNumbers("Miku_effects", { start: 164, end: 182 }),
+      frames: scene.anims.generateFrameNumbers("Miku_effects", { start: 44, end: 63 }),
       frameRate: 24,
       repeat: -1,
     });

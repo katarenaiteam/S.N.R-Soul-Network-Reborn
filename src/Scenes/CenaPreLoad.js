@@ -151,7 +151,10 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("9.png", "assets/Hud/DamagePercentage/0-19_/9.png");
     this.load.image("pct.png", "assets/Hud/DamagePercentage/0-19_/pct.png");
     //ultbar
-    this.load.spritesheet("ultbar", "assets/Hud/Portrait/ultbar.png", { frameWidth: 800, frameHeight: 650 });
+    //this.load.spritesheet("ultbar", "assets/Hud/Portrait/ultbar.png", { frameWidth: 800, frameHeight: 650 });
+    this.load.spritesheet("ultbar1", "assets/Hud/Portrait/ultbar1.png", { frameWidth: 800, frameHeight: 650 });
+    this.load.spritesheet("ultbar2", "assets/Hud/Portrait/ultbar2.png", { frameWidth: 800, frameHeight: 650 });
+    this.load.spritesheet("ultbar3", "assets/Hud/Portrait/ultbar3.png", { frameWidth: 800, frameHeight: 650 });
 
 
     // --- PERSONAGENS ---
@@ -285,7 +288,11 @@ export default class CenaPreload extends Phaser.Scene {
 
 //ult
 this.load.audio("ult-sound", "assets/personagens/SpiderMan/Audio/ult-sound.wav");
-this.load.spritesheet("ultimateback", "assets/personagens/SpiderMan/Sprites/ultimate/ultimatebackground.png", { frameWidth: 640, frameHeight: 480 });
+//this.load.spritesheet("ultimateback", "assets/personagens/SpiderMan/Sprites/ultimate/ultimatebackground.png", { frameWidth: 640, frameHeight: 480 });
+this.load.spritesheet("ultimateback1", "assets/personagens/SpiderMan/Sprites/ultimate/ultimatebackground1.png", { frameWidth: 640, frameHeight: 480 });
+this.load.spritesheet("ultimateback2", "assets/personagens/SpiderMan/Sprites/ultimate/ultimatebackground2.png", { frameWidth: 640, frameHeight: 480 });
+this.load.spritesheet("ultimateback3", "assets/personagens/SpiderMan/Sprites/ultimate/ultimatebackground3.png", { frameWidth: 640, frameHeight: 480 });
+this.load.spritesheet("ultimateback4", "assets/personagens/SpiderMan/Sprites/ultimate/ultimatebackground4.png", { frameWidth: 640, frameHeight: 480 });
 this.load.audio("sp_ShowTime", "assets/personagens/SpiderMan/Audio/sp_ShowTime.wav");
 this.load.spritesheet("SpiderMan_ult0", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult0.png", { frameWidth: 200, frameHeight: 200 }); 
 this.load.spritesheet("SpiderMan_ult1", "assets/personagens/SpiderMan/Sprites/ultimate/SpiderMan_ult1.png", { frameWidth: 500, frameHeight: 200 }); 

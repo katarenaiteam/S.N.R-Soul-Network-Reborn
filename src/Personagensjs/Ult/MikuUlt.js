@@ -1,4 +1,6 @@
 import { obterAlvosCombate } from "../../Objetos/SistemaCombateEspecial.js";
+import { gerarQuadrosUltimateBackground } from "../../Objetos/QuadrosUltimateBackground.js";
+
 const INTRO = {
   duracao: 9300,
 
@@ -1280,14 +1282,12 @@ if (agora < bloqueadoAte) {
     this.scene.anims.create({
       key: chave,
 
-      frames:
-        this.scene.anims.generateFrameNumbers(
-          textura,
-          {
+      frames: textura === "ultimateback"
+        ? gerarQuadrosUltimateBackground(this.scene, inicio, fim)
+        : this.scene.anims.generateFrameNumbers(textura, {
             start: inicio,
             end: fim
-          }
-        ),
+          }),
 
       frameRate: fps,
       repeat
@@ -1296,6 +1296,8 @@ if (agora < bloqueadoAte) {
 
 
   ultimoFrame(textura) {
+    if (textura === "ultimateback") return 115;
+
     return Math.max(
       0,
       this.scene.textures
@@ -1349,7 +1351,7 @@ if (agora < bloqueadoAte) {
   ) {
     if (
       !this.scene.textures.exists(
-        textura
+        textura === "ultimateback" ? "ultimateback1" : textura
       )
     ) {
       console.warn(
@@ -1376,7 +1378,7 @@ if (agora < bloqueadoAte) {
       this.scene.add.sprite(
         0,
         0,
-        textura
+        textura === "ultimateback" ? "ultimateback1" : textura
       );
 
     this.fundoUlt.setDepth(

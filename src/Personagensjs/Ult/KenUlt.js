@@ -1,5 +1,6 @@
 import { conduzirAlvoShoryuken } from "../Specials/Ken/shoryuken.js";
 import { tocarMusicaSegura } from "../../Objetos/AudioSeguro.js";
+import { gerarQuadrosUltimateBackground } from "../../Objetos/QuadrosUltimateBackground.js";
 import {
   obterAlvosCombate,
   registrarAtaqueEspecial
@@ -1367,7 +1368,7 @@ export default class KenUlt {
     if (
       this.fundoUlt?.active ||
       !this.scene.textures.exists(
-        "ultimateback"
+        "ultimateback1"
       )
     ) {
       return;
@@ -1396,16 +1397,7 @@ export default class KenUlt {
       this.scene.anims.create({
         key: "ken_ultimateback",
 
-        frames:
-          this.scene.anims
-            .generateFrameNumbers(
-              "ultimateback",
-
-              {
-                start: 0,
-                end: 115
-              }
-            ),
+        frames: gerarQuadrosUltimateBackground(this.scene),
 
         frameRate: 36,
 
@@ -1418,7 +1410,7 @@ export default class KenUlt {
       this.scene.add.sprite(
         0,
         0,
-        "ultimateback",
+        "ultimateback1",
         0
       );
 

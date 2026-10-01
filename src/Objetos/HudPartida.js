@@ -23,7 +23,7 @@ export function criarHudPartida(jogador, personagem, x, y, ladoDireito) {
 
     // A arte fica no rodape do frame de 800x650: use a mesma escala
     // do retrato para que a barra nao seja desenhada abaixo da tela.
-    const barraUlt = this.add.sprite(0, 0, "ultbar", 0)
+    const barraUlt = this.add.sprite(0, 0, "ultbar1", 0)
       .setOrigin(ladoDireito ? 1 : 0, 0)
       .setDisplaySize(larguraRetrato, larguraRetrato * (650 / 800));
 
@@ -111,7 +111,15 @@ export function atualizarBarraUlt(jogador, hud) {
 
   hud.frameUltAtual = frame;
 
-  hud.barraUlt.setFrame(frame);
+  const parte = Math.floor(frame / 22);
+  const frameParte = frame % 22;
+  const textura = `ultbar${parte + 1}`;
+
+  if (hud.barraUlt.texture.key !== textura) {
+    hud.barraUlt.setTexture(textura, frameParte);
+  } else {
+    hud.barraUlt.setFrame(frameParte);
+  }
 }
 
 export function atualizarIndicadorHabilidade(jogador, hud) {

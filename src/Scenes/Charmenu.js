@@ -259,12 +259,17 @@ export default class Charmenu extends Phaser.Scene {
 
   criarGrade() {
     if (!this.anims.exists("charmenu_grade")) {
+      const frames = [];
+      for (let parte = 1; parte <= 7; parte++) {
+        frames.push(...this.anims.generateFrameNumbers(`grade${parte}`, {
+          start: 0,
+          end: parte === 7 ? 4 : 5,
+        }));
+      }
+
       this.anims.create({
         key: "charmenu_grade",
-        frames: this.anims.generateFrameNumbers("grade", {
-          start: 0,
-          end: 40
-        }),
+        frames,
         frameRate: 24,
         repeat: 0
       });
@@ -274,7 +279,7 @@ export default class Charmenu extends Phaser.Scene {
       .sprite(
         this.scale.width / 2,
         this.scale.height / 2,
-        "grade",
+        "grade1",
         0
       )
       .setDisplaySize(this.scale.width, this.scale.height)
@@ -283,7 +288,7 @@ export default class Charmenu extends Phaser.Scene {
     this.grade.play("charmenu_grade");
 
     this.grade.once("animationcomplete-charmenu_grade", () => {
-      this.grade.setFrame(40);
+      this.grade.setTexture("grade7", 4);
       this.menuPronto = true;
     });
   }
