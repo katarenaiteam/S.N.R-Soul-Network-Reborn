@@ -9,6 +9,7 @@ import CenaHistoria from "./Scenes/CenaHistoria.js";
 import CenaCreditos from "./Scenes/CenaCreditos.js";
 import IntroMovie from "./Scenes/IntroMovie.js";
 import CenaPreloadVersus from "./Scenes/CenaPreloadVersus.js";
+import CenaEspectador from "./Scenes/CenaEspectador.js";
 import { instalarComandosDebug } from "./DebugConsole.js";
 
 const config = {
@@ -44,8 +45,11 @@ const config = {
     gamepad: true,
   },
 
-  scene: [CenaPreload, CenaStart, IntroMovie, Charmenu, CenaSelecaoMapa, CenaPreloadVersus, CenaPrincipal, CenaHistoria, CenaGameOver, CenaCreditos],
+  scene: [CenaPreload, CenaStart, IntroMovie, Charmenu, CenaSelecaoMapa, CenaPreloadVersus, CenaPrincipal, CenaHistoria, CenaGameOver, CenaCreditos, CenaEspectador],
 };
 
 const game = new Phaser.Game(config);
-instalarComandosDebug(game);
+window.__SNR_GAME_DEBUG__ = game;
+if (new URLSearchParams(window.location.search).get("espectador") !== "1") {
+  instalarComandosDebug(game);
+}

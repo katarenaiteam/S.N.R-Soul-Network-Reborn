@@ -1,5 +1,6 @@
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
+import ClienteMQTT from "../Objetos/ClienteMQTT.js";
 
 export default class CenaStart extends Phaser.Scene {
   constructor() {
@@ -8,6 +9,7 @@ export default class CenaStart extends Phaser.Scene {
 
   create(dados = {}) {
     encerrarOutrasCenas(this);
+    this.iniciarMQTT();
     this.cameras.main.setBackgroundColor("#000000");
     const entradaDoPreload = dados.entradaPreload === true;
     if (entradaDoPreload) {
@@ -329,16 +331,32 @@ export default class CenaStart extends Phaser.Scene {
 
     this.animarConfirmacao(() => {
       if (opcao.id === "story") {
+        this.mqtt?.limparEstado();
+        this.mqtt?.publicarStatus("indisponivel");
         this.emSelecaoPlayers = true;
         this.textoNumPlayers.setVisible(true);
         this.cursorSelecao.setVisible(false);
         this.bloqueado = false;
       } else if (opcao.id === "credits") {
+        this.mqtt?.limparEstado();
+        this.mqtt?.publicarStatus("indisponivel");
         this.fecharAbaEAvancar("CenaCreditos");
       } else {
+        this.mqtt?.limparEstado();
+        this.mqtt?.publicarStatus("aguardando-char-menu");
         this.fecharAbaEAvancar("Charmenu", { modo: "1v1" });
       }
     });
+  }
+
+  iniciarMQTT() {
+    this.mqtt = this.registry.get("clienteMQTT");
+    if (!this.mqtt) {
+      this.mqtt = new ClienteMQTT("host");
+      this.registry.set("clienteMQTT", this.mqtt);
+      this.mqtt.conectar();
+    }
+    this.mqtt.publicarStatus("aguardando-versus");
   }
 
   animarConfirmacao(aoConcluir) {

@@ -1,6 +1,7 @@
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import { tocarMusicaSegura } from "../Objetos/AudioSeguro.js";
+import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 
 const PERSONAGENS = [
   {
@@ -216,10 +217,12 @@ export default class Charmenu extends Phaser.Scene {
   init(data) {
     this.modoJogo = data?.modo || "1v1";
     this.numPlayers = data?.numPlayers || 2;
+    this.modoEspectador = data?.espectador === true;
   }
 
   create() {
     encerrarOutrasCenas(this);
+    this.iniciarSincronizacaoMQTT();
 
     this.cameras.main.setBackgroundColor("#000000");
     this.cameras.main.fadeIn(350, 0, 0, 0);
@@ -428,6 +431,10 @@ export default class Charmenu extends Phaser.Scene {
   update(_time, delta) {
     this.atualizarChuvaCaracteres(delta);
 
+    if (this.modoEspectador) return;
+
+    this.publicarEstadoMQTT(_time);
+
     this.controleP1.atualizar();
 
     if (this.p2) {
@@ -453,6 +460,77 @@ export default class Charmenu extends Phaser.Scene {
     }
 
     this.salvarInputs();
+  }
+
+  iniciarSincronizacaoMQTT() {
+    if (this.modoEspectador) {
+      this.mqtt = this.registry.get("clienteMQTT");
+      this.aoReceberEstadoMQTT = (estado) => this.aplicarEstadoEspectador(estado);
+      this.mqtt?.on("state", this.aoReceberEstadoMQTT);
+      this.events.once("shutdown", () => {
+        this.mqtt?.off("state", this.aoReceberEstadoMQTT);
+      });
+      this.time.delayedCall(0, () => this.aplicarEstadoEspectador(this.registry.get("estadoEspectador")));
+      return;
+    }
+
+    const mqtt = this.registry.get("clienteMQTT");
+    if (this.modoJogo === "1v1") {
+      mqtt?.publicarStatus("ao-vivo");
+      this.publicarEstadoMQTT(0, true);
+    } else {
+      mqtt?.limparEstado();
+      mqtt?.publicarStatus("indisponivel");
+    }
+  }
+
+  publicarEstadoMQTT(tempo, forcar = false) {
+    if (this.modoJogo !== "1v1" || tempo - (this.ultimaPublicacaoMQTT || 0) < 100 && !forcar) return;
+    this.ultimaPublicacaoMQTT = tempo;
+
+    const estadoJogador = (jogador) => jogador && ({
+      x: jogador.mao.x,
+      y: jogador.mao.y,
+      hover: jogador.hover?.id ?? null,
+      selecionado: jogador.selecionado?.id ?? null,
+    });
+
+    publicarEstadoVersus(this, "char-menu", {
+      p1: estadoJogador(this.p1),
+      p2: estadoJogador(this.p2),
+    });
+  }
+
+  aplicarEstadoEspectador(estado) {
+    if (estado?.cena !== "char-menu" || estado.modo !== "1v1") return;
+    this.menuPronto = true;
+
+    for (const [jogador, remoto] of [
+      [this.p1, estado.dados?.p1],
+      [this.p2, estado.dados?.p2],
+    ]) {
+      if (!jogador || !remoto) continue;
+      jogador.mao.setPosition(remoto.x, remoto.y);
+
+      const selecionado = PERSONAGENS.find((personagem) => personagem.id === remoto.selecionado);
+      if (jogador.selecionado?.id !== selecionado?.id) {
+        if (jogador.selecionado) this.cancelar(jogador);
+        if (selecionado) {
+          jogador.hover = selecionado;
+          this.confirmar(jogador);
+        }
+      }
+
+      if (remoto.hover) {
+        const hover = PERSONAGENS.find((personagem) => personagem.id === remoto.hover);
+        if (hover && jogador.hover?.id !== hover.id) {
+          jogador.hover = hover;
+          this.mostrarBanner(jogador, hover);
+        }
+      } else if (!selecionado) {
+        this.atualizarHover(jogador);
+      }
+    }
   }
 
   atualizarJogador(jogador, teclas, controle, delta) {

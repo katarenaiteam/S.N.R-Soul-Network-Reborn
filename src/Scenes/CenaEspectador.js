@@ -1,0 +1,156 @@
+import ClienteMQTT from "../Objetos/ClienteMQTT.js";
+
+const ROTAS_ESPECTADOR = {
+  "char-menu": "Charmenu",
+  "selecao-mapa": "CenaSelecaoMapa",
+  "preload-versus": "CenaPreloadVersus",
+  partida: "cenaPrincipal",
+};
+
+export default class CenaEspectador extends Phaser.Scene {
+  constructor() {
+    super({ key: "CenaEspectador" });
+  }
+
+  create() {
+    this.registry.set("modoEspectador", true);
+    this.registry.set("assetsVersusEspectadorProntos", false);
+    this.cenaReplicada = null;
+    this.estadoAtual = null;
+    this.estadoRecebido = null;
+    this.statusAtual = null;
+
+    this.cameras.main.setBackgroundColor("#000000");
+    this.statusTexto = this.add.text(
+      this.scale.width / 2,
+      this.scale.height / 2,
+      "CONECTANDO À SALA SNR...",
+      {
+        fontFamily: "RetroFont, monospace",
+        fontSize: `${34 * (this.scale.width / 1920)}px`,
+        color: "#8cffaa",
+        align: "center",
+      },
+    ).setOrigin(0.5);
+
+    this.mqtt = new ClienteMQTT("espectador");
+    this.registry.set("clienteMQTT", this.mqtt);
+    this.aoReceberEstado = (estado) => this.receberEstado(estado);
+    this.aoReceberStatus = (status) => this.receberStatus(status);
+    this.mqtt.on("state", this.aoReceberEstado);
+    this.mqtt.on("status", this.aoReceberStatus);
+    this.mqtt.on("connect", () => this.atualizarMensagem("CONECTADO. AGUARDANDO VERSUS..."));
+    this.mqtt.on("close", () => this.atualizarMensagem("CONEXÃO ENCERRADA. TENTANDO RECONECTAR..."));
+    this.mqtt.on("error", () => this.atualizarMensagem("NÃO FOI POSSÍVEL CONECTAR À SALA SNR."));
+    this.mqtt.conectar();
+
+    this.events.once("shutdown", () => {
+      this.mqtt.off("state", this.aoReceberEstado);
+      this.mqtt.off("status", this.aoReceberStatus);
+      this.mqtt.desconectar();
+      this.registry.set("modoEspectador", false);
+      this.registry.set("clienteMQTT", null);
+    });
+  }
+
+  receberStatus(dados) {
+    this.statusAtual = dados.status;
+
+    if (dados.status === "ao-vivo") {
+      if (this.estadoRecebido) this.receberEstado(this.estadoRecebido);
+      return;
+    }
+
+    if (dados.status === "offline") {
+      this.estadoAtual = null;
+      this.estadoRecebido = null;
+      this.registry.set("estadoEspectador", null);
+      this.pararCenaReplicada();
+      this.atualizarMensagem("A SALA SNR ESTÁ OFFLINE.");
+      return;
+    }
+
+    if (dados.status === "indisponivel") {
+      this.estadoAtual = null;
+      this.estadoRecebido = null;
+      this.registry.set("estadoEspectador", null);
+      this.pararCenaReplicada();
+      this.atualizarMensagem("A SALA NÃO ESTÁ TRANSMITINDO UM VERSUS.");
+      return;
+    }
+
+    if (dados.status === "encerrada") {
+      this.estadoAtual = null;
+      this.estadoRecebido = null;
+      this.registry.set("estadoEspectador", null);
+      this.pararCenaReplicada();
+      this.atualizarMensagem("VERSUS ENCERRADO.");
+      return;
+    }
+
+    if (dados.status === "aguardando-versus" || dados.status === "aguardando-char-menu") {
+      this.estadoAtual = null;
+      this.estadoRecebido = null;
+      this.registry.set("estadoEspectador", null);
+      this.pararCenaReplicada();
+      this.atualizarMensagem("AGUARDANDO O INÍCIO DE UM VERSUS...");
+    }
+  }
+
+  receberEstado(estado) {
+    if (estado?.modo !== "1v1" || !ROTAS_ESPECTADOR[estado.cena]) return;
+    this.estadoRecebido = estado;
+    if (this.statusAtual !== "ao-vivo") return;
+
+    this.estadoAtual = estado;
+    this.registry.set("estadoEspectador", estado);
+    this.statusTexto.setVisible(false);
+    this.sincronizarCena();
+  }
+
+  sincronizarCena() {
+    const estado = this.estadoAtual;
+    if (!estado) return;
+
+    let destino = ROTAS_ESPECTADOR[estado.cena];
+    if (
+      estado.cena === "partida" &&
+      !this.registry.get("assetsVersusEspectadorProntos")
+    ) {
+      destino = "CenaPreloadVersus";
+    }
+
+    if (destino === this.cenaReplicada) return;
+
+    this.pararCenaReplicada();
+    this.cenaReplicada = destino;
+    const dados = this.dadosDaCena(estado, destino);
+    this.scene.launch(destino, dados);
+    this.scene.bringToTop(destino);
+  }
+
+  dadosDaCena(estado, destino) {
+    if (destino === "cenaPrincipal" || destino === "CenaPreloadVersus") {
+      return {
+        p1: estado.dados?.personagens?.p1 ?? estado.dados?.p1,
+        p2: estado.dados?.personagens?.p2 ?? estado.dados?.p2,
+        mapa: estado.dados?.mapa,
+        espectador: true,
+      };
+    }
+    return { ...estado.dados, espectador: true };
+  }
+
+  pararCenaReplicada() {
+    if (this.cenaReplicada && this.scene.isActive(this.cenaReplicada)) {
+      this.scene.stop(this.cenaReplicada);
+    }
+    this.cenaReplicada = null;
+    this.statusTexto.setVisible(true);
+  }
+
+  atualizarMensagem(texto) {
+    this.statusTexto.setText(texto);
+    this.statusTexto.setVisible(true);
+  }
+}

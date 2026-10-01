@@ -252,6 +252,10 @@ export default class CenaPreload extends Phaser.Scene {
   }
   create() {
     encerrarOutrasCenas(this);
+    if (new URLSearchParams(window.location.search).get("espectador") === "1") {
+      this.scene.start("CenaEspectador");
+      return;
+    }
     this.musicaFundo = tocarMusicaSegura(this, "Aria8bit", { loop: true, volume: 0.1 });
 
     // --- ATALHO DE DEV (ESC para Pular Intro) ---

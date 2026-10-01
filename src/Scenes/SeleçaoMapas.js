@@ -3,6 +3,7 @@ import ControleEntrada from "../Objetos/ControleEntrada.js";
 import Cidade from "../Mapasjs/Cidade.js";
 import MapaTeste from "../Mapasjs/MapaTeste.js";
 import MikuMap from "../Mapasjs/MikuMap.js";
+import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 
 export default class CenaSelecaoMapa extends Phaser.Scene {
   constructor() {
@@ -14,10 +15,19 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
   init(data) {
     // Receber os dados dos personagens selecionados do Charmenu
     this.escolhaPersonagens = data;
+    this.modoEspectador = data?.espectador === true;
   }
 
   create() {
     encerrarOutrasCenas(this);
+    if (this.modoEspectador) {
+      this.mqtt = this.registry.get("clienteMQTT");
+      this.aoReceberEstadoMQTT = (estado) => this.aplicarEstadoEspectador(estado);
+      this.mqtt?.on("state", this.aoReceberEstadoMQTT);
+      this.events.once("shutdown", () => {
+        this.mqtt?.off("state", this.aoReceberEstadoMQTT);
+      });
+    }
     this.cameras.main.setBackgroundColor("#000000");
     this.cameras.main.fadeIn(350, 0, 0, 0);
     this.criarChuvaMatrix();
@@ -69,10 +79,18 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
     // Renderiza o carrossel na posição inicial
     this.atualizarCarrossel(false);
     this.bloqueado = false;
+    if (this.modoEspectador) {
+      this.time.delayedCall(0, () => this.aplicarEstadoEspectador(this.registry.get("estadoEspectador")));
+    } else {
+      this.publicarEstadoMQTT(0, true);
+    }
   }
 
   update(_tempo, delta) {
     this.atualizarChuvaMatrix(delta);
+    if (this.modoEspectador) return;
+
+    this.publicarEstadoMQTT(_tempo);
     if (this.bloqueado) return;
 
     this.controleP1.atualizar();
@@ -96,6 +114,26 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
     }
 
     this.controleP1.salvarAnterior();
+  }
+
+  publicarEstadoMQTT(tempo, forcar = false) {
+    if (tempo - (this.ultimaPublicacaoMQTT || 0) < 100 && !forcar) return;
+    this.ultimaPublicacaoMQTT = tempo;
+    publicarEstadoVersus(this, "selecao-mapa", {
+      p1: this.escolhaPersonagens?.p1,
+      p2: this.escolhaPersonagens?.p2,
+      indiceOpcao: this.indiceOpcao,
+      mapa: this.mapas[this.indiceOpcao]?.classe.name,
+    });
+  }
+
+  aplicarEstadoEspectador(estado) {
+    if (estado?.cena !== "selecao-mapa" || estado.modo !== "1v1") return;
+    const indice = estado.dados?.indiceOpcao;
+    if (!Number.isInteger(indice) || indice < 0 || indice >= this.mapas.length) return;
+    if (indice === this.indiceOpcao) return;
+    this.indiceOpcao = indice;
+    this.atualizarCarrossel(false);
   }
 
   criarChuvaMatrix() {
@@ -242,7 +280,8 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
           ClasseMapa: this.mapas[this.indiceOpcao].classe,
           mapa: this.mapas[this.indiceOpcao].classe.name,
           p1: this.escolhaPersonagens?.p1,
-          p2: this.escolhaPersonagens?.p2
+          p2: this.escolhaPersonagens?.p2,
+          modo: "1v1"
         });
       }
     });

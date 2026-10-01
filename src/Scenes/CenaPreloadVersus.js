@@ -1,5 +1,6 @@
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import { carregarAssetsVersus } from "../Objetos/CarregarAssetsPartida.js";
+import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 
 export default class CenaPreloadVersus extends Phaser.Scene {
   constructor() {
@@ -9,10 +10,18 @@ export default class CenaPreloadVersus extends Phaser.Scene {
   init(dados = {}) {
     this.dadosPartida = dados;
     this.transicionando = false;
+    this.modoEspectador = dados.espectador === true;
   }
 
   create() {
     encerrarOutrasCenas(this);
+    if (!this.modoEspectador) {
+      publicarEstadoVersus(this, "preload-versus", {
+        p1: this.dadosPartida.p1,
+        p2: this.dadosPartida.p2,
+        mapa: this.dadosPartida.mapa || this.dadosPartida.ClasseMapa?.name,
+      });
+    }
     this.cameras.main.setBackgroundColor("#000000");
     this.criarVideo();
     this.events.once("shutdown", this.limparVideo, this);
@@ -39,6 +48,13 @@ export default class CenaPreloadVersus extends Phaser.Scene {
   iniciarPartida() {
     if (this.transicionando) return;
     this.transicionando = true;
+
+    if (this.modoEspectador) {
+      this.registry.set("assetsVersusEspectadorProntos", true);
+      this.game.scene.getScene("CenaEspectador")?.sincronizarCena();
+      return;
+    }
+
     this.scene.start("cenaPrincipal", this.dadosPartida);
   }
 

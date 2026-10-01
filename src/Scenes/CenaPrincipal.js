@@ -4,6 +4,8 @@ import { criarHudPartida, atualizarBarraUlt } from "../Objetos/HudPartida.js";
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 //import * as Phaser from "phaser";
 import MapaCidade from "../Mapasjs/Cidade.js";
+import MapaTeste from "../Mapasjs/MapaTeste.js";
+import MikuMap from "../Mapasjs/MikuMap.js";
 import FJ from "../Personagensjs/Frederick.js";
 import SpiderMan from "../Personagensjs/SpiderMan.js";
 import Miku from "../Personagensjs/Miku.js";
@@ -15,6 +17,7 @@ import SistemaPlataformasAtravessaveis from "../Objetos/SistemaPlataformasAtrave
 import SistemaLedge from "../Objetos/SistemaLedge.js";
 import IntroPartida from "../Objetos/IntroPartida.js";
 import { prepararTexturaTeia, limparAssetsPartida } from "../Objetos/CarregarAssetsPartida.js";
+import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 
 export default class cenaPrincipal extends Phaser.Scene {
   constructor() {
@@ -26,7 +29,9 @@ export default class cenaPrincipal extends Phaser.Scene {
     this.escolhaP1 = dados.p1 || "Frederick";
     this.escolhaP2 = dados.p2 || "Madotsuki";
 
-    this.ClasseMapa = dados.ClasseMapa || dados.mapa || MapaCidade;
+    const mapas = { Cidade: MapaCidade, MapaTeste, MikuMap };
+    this.ClasseMapa = dados.ClasseMapa || mapas[dados.mapa] || MapaCidade;
+    this.modoEspectador = dados.espectador === true;
 
   }
 
@@ -240,7 +245,13 @@ this.indicadorP2 = this.criarIndicador(
     if (this.physics.config.debug || this.physics.world.drawDebug) {
       this.camHUD.ignore(this.physics.world.debugGraphic);
     }
-    this.introPartida = new IntroPartida(this);
+    if (this.modoEspectador) {
+      this.physics.world.pause();
+      this.time.delayedCall(0, () => this.aplicarEstadoEspectador(this.registry.get("estadoEspectador")));
+    } else {
+      this.introPartida = new IntroPartida(this);
+      this.publicarEstadoMQTT(0, true);
+    }
   }
 
   criarHudPartida(...args) {
@@ -272,8 +283,14 @@ this.indicadorP2 = this.criarIndicador(
 
   // 3. LOOP DE ATUALIZAÇÃO
   update(time, delta) {
+    if (this.modoEspectador) {
+      this.aplicarEstadoEspectador(this.registry.get("estadoEspectador"));
+      return;
+    }
+
     if (this.introPartida?.ativa) {
       this.introPartida.atualizar(delta);
+      this.publicarEstadoMQTT(time);
       return;
     }
     this.sistemaLedge.atualizarVisualizacao(this);
@@ -322,6 +339,89 @@ this.indicadorP2 = this.criarIndicador(
     // Checa se alguém saiu da arena (passando o número do jogador como 3º argumento)
     this.verificarMorte(this.jogador1, this.pontoRespawnP1, 1);
     this.verificarMorte(this.jogador2, this.pontoRespawnP2, 2);
+    this.publicarEstadoMQTT(time);
+  }
+
+  publicarEstadoMQTT(tempo, forcar = false) {
+    if (tempo - (this.ultimaPublicacaoMQTT || 0) < 100 && !forcar) return;
+    this.ultimaPublicacaoMQTT = tempo;
+
+    const capturarJogador = (jogador) => {
+      const sprite = jogador?.sprite;
+      if (!sprite?.active) return null;
+      return {
+        x: sprite.x,
+        y: sprite.y,
+        texture: sprite.texture.key,
+        frame: sprite.frame.name,
+        animacao: sprite.anims.currentAnim?.key ?? null,
+        flipX: sprite.flipX,
+        scaleX: sprite.scaleX,
+        scaleY: sprite.scaleY,
+        alpha: sprite.alpha,
+        visible: sprite.visible,
+        dano: jogador.porcentagemDano,
+        ult: jogador.ultCarga,
+        guard: jogador.vidaGuard,
+      };
+    };
+
+    publicarEstadoVersus(this, "partida", {
+      personagens: { p1: this.escolhaP1, p2: this.escolhaP2 },
+      mapa: this.ClasseMapa.name,
+      jogadores: {
+        p1: capturarJogador(this.jogador1),
+        p2: capturarJogador(this.jogador2),
+      },
+      vidasP1: this.vidasP1,
+      vidasP2: this.vidasP2,
+      camera: {
+        x: this.cameras.main.midPoint.x,
+        y: this.cameras.main.midPoint.y,
+        zoom: this.cameras.main.zoom,
+      },
+    });
+  }
+
+  aplicarEstadoEspectador(estado) {
+    if (estado?.cena !== "partida" || estado.modo !== "1v1") return;
+    const dados = estado.dados;
+
+    const aplicarJogador = (jogador, remoto) => {
+      if (!jogador?.sprite || !remoto) return;
+      const sprite = jogador.sprite;
+      if (remoto.texture && sprite.texture.key !== remoto.texture && this.textures.exists(remoto.texture)) {
+        sprite.setTexture(remoto.texture);
+      }
+      if (remoto.animacao && this.anims.exists(remoto.animacao) && sprite.anims.currentAnim?.key !== remoto.animacao) {
+        sprite.play(remoto.animacao);
+      }
+      if (remoto.frame !== undefined) sprite.setFrame(remoto.frame);
+      sprite.setPosition(remoto.x, remoto.y);
+      sprite.setFlipX(remoto.flipX);
+      sprite.setScale(remoto.scaleX, remoto.scaleY);
+      sprite.setAlpha(remoto.alpha);
+      sprite.setVisible(remoto.visible);
+      jogador.porcentagemDano = remoto.dano;
+      jogador.ultCarga = remoto.ult;
+      jogador.vidaGuard = remoto.guard;
+      jogador.textoDano?.setText(`${Math.floor(remoto.dano)}%`);
+    };
+
+    aplicarJogador(this.jogador1, dados.jogadores?.p1);
+    aplicarJogador(this.jogador2, dados.jogadores?.p2);
+
+    this.vidasP1 = dados.vidasP1;
+    this.vidasP2 = dados.vidasP2;
+    this.hudP1_Vidas?.setText(`VIDAS: ${this.vidasP1}`);
+    this.hudP2_Vidas?.setText(`VIDAS: ${this.vidasP2}`);
+    this.atualizarBarraUlt(this.jogador1, this.hudP1_Nome);
+    this.atualizarBarraUlt(this.jogador2, this.hudP2_Nome);
+
+    if (dados.camera) {
+      this.cameras.main.setZoom(dados.camera.zoom);
+      this.cameras.main.centerOn(dados.camera.x, dados.camera.y);
+    }
   }
 
   verificarMorte(jogador, pontoRespawn, numJogador) {

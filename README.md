@@ -63,3 +63,11 @@ No ano de 4154, a Yume Labs apresenta ao mundo o Soul Network Reborn (SNR), um t
 Entretanto, essa promessa é apenas uma mentira criada para atrair participantes. O verdadeiro objetivo da Yume Labs é aprisionar consciências humanas dentro da rede, utilizando-as para alimentar e aperfeiçoar sua tecnologia. Ao conquistar o torneio, o jogador descobre que "se tornar o avatar" significa permanecer preso para sempre na simulação, enquanto seu corpo e sua mente são consumidos pelo sistema. Nesse momento, cabe ao jogador decidir: aceitar a falsa recompensa e permanecer na ilusão, ou desafiar o criador do SNR em uma última batalha para destruir o sistema e tentar escapar da Matrix.
 
 O jogo terá dois finais, que o jogador podera escolher dependendo da sua decisão de enfrentar ou não o boss final.
+
+## Espectadores MQTT
+
+O jogo principal publica o estado da sala fixa `arena-01`. A transmissão começa no Versus, a partir da seleção de personagens; o modo História e as demais opções não publicam cenas assistíveis. Os dispositivos espectadores assinam os tópicos de status e estado, sem enviar comandos ao jogo.
+
+Para abrir a visualização em outro dispositivo, publique o jogo em um endereço HTTPS e use esse endereço com `?espectador=1` como destino do QR code. A sala e o QR permanecem fixos. Pessoas que entrarem durante uma partida recebem o estado atual, sem replay das cenas anteriores.
+
+As configurações MQTT podem ser definidas em `.env.local` com as variáveis de `.env.example`. O broker precisa oferecer MQTT sobre WebSocket seguro (`wss`). O endereço Mosquitto padrão serve apenas para desenvolvimento; para o evento, use um broker estável e configure acesso de leitura para espectadores e publicação somente para a máquina do jogo. Não coloque credenciais do broker no frontend.
