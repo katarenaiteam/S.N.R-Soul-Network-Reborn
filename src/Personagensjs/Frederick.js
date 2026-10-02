@@ -7,7 +7,7 @@ import AupSpecial from "./Specials/FJ/AupSpecial.js";
 import DoSpecial from "./Specials/FJ/DoSpecial.js";
 import FJUlt from "./Ult/FJUlt.js";
 
-const ACERTOS_PARA_STUN = 6;
+const ACERTOS_PARA_STUN = 4;
 
 export default class FJ extends Personagem {
   obterIndicadorHabilidade() {
@@ -555,6 +555,14 @@ this.nomePersonagem = "Frederick Johnson";
       },
    
    };
+
+     this.sons = {
+      ...this.sons,
+      vozAtaque: [ "fj-atck1", "fj-atck2", "fj-atck3", "fj-atck4" ],
+      vozDanoNormal: ["fj-hurt2", "fj-hurt3", "fj-hurt1", "fj-hurt4", ],
+      vozDanoForte: ["fj-hurt5", "fj-hurt6", ],
+      volumeVoz: 0.25,
+    };
     
     // ============================ tabela de golpes =====================================
    this.configAnimacoes.comboRapido1 = {

@@ -18,6 +18,7 @@ export default class PinguAdoSpecial {
   }
 
   executar() {
+    this.personagem.tocarSomSorteado("pingu-Ado", { volume: this.personagem.sons.volumeVoz });
     const sprite = this.personagem.sprite;
     this.direcao = sprite.flipX ? -1 : 1;
     sprite.setVelocity(0, 0);

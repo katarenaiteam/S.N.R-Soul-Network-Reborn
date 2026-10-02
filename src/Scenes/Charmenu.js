@@ -1,6 +1,5 @@
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
-import { tocarMusicaSegura } from "../Objetos/AudioSeguro.js";
 import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 
 const PERSONAGENS = [
@@ -226,11 +225,6 @@ export default class Charmenu extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor("#000000");
     this.cameras.main.fadeIn(350, 0, 0, 0);
-
-    this.musica = tocarMusicaSegura(this, "katarenai8bit", {
-      loop: true,
-      volume: 0.1
-    });
 
     this.menuPronto = false;
     this.transicaoAtiva = false;
@@ -843,6 +837,7 @@ export default class Charmenu extends Phaser.Scene {
     if (!jogador.hover) return;
 
     jogador.selecionado = jogador.hover;
+    this.sound.play("mao-select", { volume: 0.7 });
 
     jogador.ficha = this.add
       .image(
@@ -938,7 +933,12 @@ export default class Charmenu extends Phaser.Scene {
   avancar() {
     this.transicaoAtiva = true;
 
-    this.musica?.stop();
+    if (this.modoJogo === "historia") {
+      const musicaMenu = this.registry.get("musicaMenu");
+      musicaMenu?.stop();
+      musicaMenu?.destroy();
+      this.registry.remove("musicaMenu");
+    }
 
     const escolhas = {
       p1: this.p1.selecionado.id,

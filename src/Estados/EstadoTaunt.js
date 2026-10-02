@@ -19,6 +19,9 @@ export default class EstadoTaunt extends EstadoBase {
     }
 
     // 2. Executa a animação
+    if (this.personagem.nomePersonagem === "Pingu") {
+      this.personagem.tocarSomSorteado("pingu-taunt", { volume: this.personagem.sons.volumeVoz });
+    }
     this.personagem.tocarAnimacao(nomeAnim);
     this.animChaveAtual = `${this.personagem.prefixoAnim}${nomeAnim}`;
 

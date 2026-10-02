@@ -20,6 +20,10 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
 
   create() {
     encerrarOutrasCenas(this);
+    const musicaMenu = this.registry.get("musicaMenu");
+    musicaMenu?.stop();
+    musicaMenu?.destroy();
+    this.registry.remove("musicaMenu");
     if (this.modoEspectador) {
       this.mqtt = this.registry.get("clienteMQTT");
       this.aoReceberEstadoMQTT = (estado) => this.aplicarEstadoEspectador(estado);

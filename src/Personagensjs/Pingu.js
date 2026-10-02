@@ -342,20 +342,16 @@ export default class Pingu extends Personagem {
         hurtboxes: [],
       },
 
-    
-    
    };
 
- //   this.sons = {
- //     ...this.sons,
- //     vozAtaque: ["sp-atack", "sp-atack2", "sp-atack3"],
- //     vozDanoNormal: ["sp-hurt", "sp-hurt2"],
- //     vozDanoForte: ["sp-hurt", "sp-hurt2", "sp-hurt3"],
- //     volumeVoz: 0.2,
- //   };
+    this.sons = {
+      ...this.sons,
+      vozAtaque: [ "pingu-attack1", "pingu-attack2", "pingu-attack3", "pingu-attack4"],
+      vozDanoNormal: ["pingu-hurt2", "pingu-hurt3", "pingu-hurt4"],
+      vozDanoForte: ["pingu-hurt3", "pingu-hurt1"],
+      volumeVoz: 0.2,
+    };
 
-
-  
     // ============================ tabela de golpes =====================================
     this.golpes = {
       neutro1: {

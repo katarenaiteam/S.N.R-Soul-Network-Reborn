@@ -16,6 +16,7 @@ export default class PinguNeSpecial {
   }
 
   executar() {
+    this.personagem.tocarSomSorteado("pingu-nunut", { volume: this.personagem.sons.volumeVoz });
     const sprite = this.personagem.sprite;
     sprite.on("animationupdate", this.aoAtualizarPose);
     this.aoAtualizarPose(sprite.anims.currentAnim, sprite.anims.currentFrame);

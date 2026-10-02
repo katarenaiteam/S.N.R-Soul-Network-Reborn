@@ -20,6 +20,7 @@ export default class PinguAsiSpecial {
   executar() {
     if (this.iniciado) return;
     this.iniciado = true;
+    this.personagem.tocarSomSorteado("pingu-Asi", { volume: this.personagem.sons.volumeVoz });
     this.inicio = this.scene.time.now;
 
     const esquerda = this.personagem.inputDown("esquerda");
