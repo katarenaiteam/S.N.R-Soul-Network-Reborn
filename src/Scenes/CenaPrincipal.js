@@ -28,6 +28,7 @@ export default class cenaPrincipal extends Phaser.Scene {
     // Usa as escolhas passadas; se não houver, usa padrões para evitar erros
     this.escolhaP1 = dados.p1 || "Frederick";
     this.escolhaP2 = dados.p2 || "Madotsuki";
+    this.posicoesIniciaisEspectador = dados.posicoesIniciais ?? null;
 
     const mapas = { Cidade: MapaCidade, MapaTeste, MikuMap };
     this.ClasseMapa = dados.ClasseMapa || mapas[dados.mapa] || MapaCidade;
@@ -110,8 +111,8 @@ export default class cenaPrincipal extends Phaser.Scene {
     //========instanciar fodinhas============
     this.jogador1 = this.criarPersonagem(
   this.escolhaP1,
-  this.mapaAtual.spawnsIniciais.p1.x, // Lê o X dinâmico do mapa
-  this.mapaAtual.spawnsIniciais.p1.y, // Lê o Y dinâmico do mapa
+      this.posicoesIniciaisEspectador?.p1?.x ?? this.mapaAtual.spawnsIniciais.p1.x,
+      this.posicoesIniciaisEspectador?.p1?.y ?? this.mapaAtual.spawnsIniciais.p1.y,
   teclasP1,
   200,
   600,
@@ -120,8 +121,8 @@ export default class cenaPrincipal extends Phaser.Scene {
 
 this.jogador2 = this.criarPersonagem(
   this.escolhaP2,
-  this.mapaAtual.spawnsIniciais.p2.x, // Lê o X dinâmico do mapa
-  this.mapaAtual.spawnsIniciais.p2.y, // Lê o Y dinâmico do mapa
+  this.posicoesIniciaisEspectador?.p2?.x ?? this.mapaAtual.spawnsIniciais.p2.x,
+  this.posicoesIniciaisEspectador?.p2?.y ?? this.mapaAtual.spawnsIniciais.p2.y,
   teclasP2,
   600,
   600,
@@ -292,6 +293,7 @@ this.indicadorP2 = this.criarIndicador(
       if (estado?.updatedAt !== this.ultimoSnapshotMQTT) {
         this.aplicarEstadoEspectador(estado);
       }
+      this.mortesVS?.atualizarEfeitosEspectador(delta);
       this.sistemaLedge.atualizarVisualizacao(this);
       this.atualizarVisuaisReplicados(time);
       return;
@@ -352,13 +354,16 @@ this.indicadorP2 = this.criarIndicador(
   }
 
   publicarEstadoMQTT(tempo, forcar = false) {
+    const mqtt = this.registry.get("clienteMQTT");
+    if (mqtt?.papel !== "host" || !mqtt.client?.connected) return;
+
     const intervalo = 1000 / 15;
     if (tempo - (this.ultimaPublicacaoMQTT || 0) < intervalo && !forcar) return;
     this.ultimaPublicacaoMQTT = tempo;
 
     const capturarJogador = (jogador) => {
       const sprite = jogador?.sprite;
-      if (!sprite?.active) return null;
+      if (!sprite) return null;
       return {
         x: sprite.x,
         y: sprite.y,
@@ -370,6 +375,8 @@ this.indicadorP2 = this.criarIndicador(
         scaleY: sprite.scaleY,
         alpha: sprite.alpha,
         visible: sprite.visible,
+        tint: sprite.isTinted ? sprite.tintTopLeft : null,
+        tintMode: sprite.isTinted ? sprite.tintMode : null,
         dano: jogador.porcentagemDano,
         ult: jogador.ultCarga,
         guard: jogador.vidaGuard,
@@ -382,6 +389,7 @@ this.indicadorP2 = this.criarIndicador(
       const ehTeia = objeto instanceof Phaser.GameObjects.Graphics && Array.isArray(objeto.snrPontosTeia);
       if (
         this.objetosVisuaisBaseMQTT.has(objeto) ||
+        objeto.snrEfeitoProcedural ||
         (!ehSprite && !ehImagem && !ehTeia) ||
         !objeto.active ||
         ((ehSprite || ehImagem) && !objeto.texture?.key)
@@ -410,6 +418,8 @@ this.indicadorP2 = this.criarIndicador(
         origemY: objeto.originY,
         profundidade: objeto.depth,
         visivel: objeto.visible,
+        tint: objeto.isTinted ? objeto.tintTopLeft : null,
+        tintMode: objeto.isTinted ? objeto.tintMode : null,
         flipX: objeto.flipX,
         flipY: objeto.flipY,
         scrollX: objeto.scrollFactorX,
@@ -432,6 +442,8 @@ this.indicadorP2 = this.criarIndicador(
         y: this.cameras.main.midPoint.y,
         zoom: this.cameras.main.zoom,
       },
+      efeitoMorteVS: this.eventoMorteVS,
+      efeitoTVMorte: this.eventoTVMorte,
       visuais,
     });
   }
@@ -462,6 +474,8 @@ this.indicadorP2 = this.criarIndicador(
       sprite.setScale(remoto.scaleX, remoto.scaleY);
       sprite.setAlpha(remoto.alpha);
       sprite.setVisible(remoto.visible);
+      if (remoto.tint === null || remoto.tint === undefined) sprite.clearTint();
+      else sprite.setTint(remoto.tint).setTintMode(remoto.tintMode ?? Phaser.TintModes.NORMAL);
       jogador.porcentagemDano = remoto.dano;
       jogador.ultCarga = remoto.ult;
       jogador.vidaGuard = remoto.guard;
@@ -470,6 +484,8 @@ this.indicadorP2 = this.criarIndicador(
 
     aplicarJogador(this.jogador1, dados.jogadores?.p1);
     aplicarJogador(this.jogador2, dados.jogadores?.p2);
+    this.mortesVS?.reproduzirEfeitoEspectador(dados.efeitoMorteVS);
+    this.mortesVS?.reproduzirTVEspectador(dados.efeitoTVMorte);
     this.sincronizarVisuaisReplicados(dados.visuais ?? []);
 
     this.vidasP1 = dados.vidasP1;
@@ -480,8 +496,16 @@ this.indicadorP2 = this.criarIndicador(
     this.atualizarBarraUlt(this.jogador2, this.hudP2_Nome);
 
     if (dados.camera) {
-      this.cameras.main.setZoom(dados.camera.zoom);
-      this.cameras.main.centerOn(dados.camera.x, dados.camera.y);
+      const camera = this.cameras.main;
+      this.alvoCameraMQTT = {
+        xInicial: camera.midPoint.x,
+        yInicial: camera.midPoint.y,
+        zoomInicial: camera.zoom,
+        xDestino: dados.camera.x,
+        yDestino: dados.camera.y,
+        zoomDestino: dados.camera.zoom,
+        inicio: this.time.now,
+      };
     }
   }
 
@@ -540,6 +564,8 @@ this.indicadorP2 = this.criarIndicador(
       objeto.setOrigin(remoto.origemX, remoto.origemY);
       objeto.setDepth(remoto.profundidade);
       objeto.setVisible(remoto.visivel);
+      if (remoto.tint === null || remoto.tint === undefined) objeto.clearTint();
+      else objeto.setTint(remoto.tint).setTintMode(remoto.tintMode ?? Phaser.TintModes.NORMAL);
       objeto.setFlip(remoto.flipX, remoto.flipY);
       objeto.setScrollFactor(remoto.scrollX, remoto.scrollY);
       objeto.setBlendMode(remoto.blend);
@@ -554,6 +580,18 @@ this.indicadorP2 = this.criarIndicador(
 
   atualizarVisuaisReplicados(tempo) {
     const duracaoSnapshot = 1000 / 15;
+    const alvoCamera = this.alvoCameraMQTT;
+    if (alvoCamera) {
+      const progressoCamera = Phaser.Math.Clamp((tempo - alvoCamera.inicio) / duracaoSnapshot, 0, 1);
+      this.cameras.main.centerOn(
+        Phaser.Math.Linear(alvoCamera.xInicial, alvoCamera.xDestino, progressoCamera),
+        Phaser.Math.Linear(alvoCamera.yInicial, alvoCamera.yDestino, progressoCamera),
+      );
+      this.cameras.main.setZoom(
+        Phaser.Math.Linear(alvoCamera.zoomInicial, alvoCamera.zoomDestino, progressoCamera),
+      );
+    }
+
     for (const jogador of [this.jogador1, this.jogador2]) {
       const alvo = jogador?.alvoPosicaoMQTT;
       if (!alvo) continue;

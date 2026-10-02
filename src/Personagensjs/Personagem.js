@@ -253,6 +253,7 @@ export default class Personagem {
         : this.scene.jogador1;
     const atacanteDoEfeito = origem?.atacante ?? atacante;
     const removeuCongelamentoPingu = quantidade > 0 &&
+      !propriedades.preservarCongelamentoPingu &&
       atacanteDoEfeito?.nomePersonagem === "Pingu" && this.congelamentoPingu?.congelado;
     if (removeuCongelamentoPingu) this.congelamentoPingu.limpar();
     if (
@@ -756,7 +757,8 @@ consumirUlt() {
 
   obterConfigAtual() {
     const animAtual = this.sprite.anims.currentAnim?.key || "";
-    const chaveAnim = animAtual.replace(this.prefixoAnim, "");
+    const chaveAnim = this.configAnimacaoOverride ??
+      animAtual.replace(this.prefixoAnim, "");
     const chaveEstado = this.maquinaEstados.estadoAtual?.nome || "idle";
 
     return (

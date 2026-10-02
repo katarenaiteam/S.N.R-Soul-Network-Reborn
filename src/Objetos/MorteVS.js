@@ -35,6 +35,7 @@ class VidroMatrix {
     this.contexto = this.recursos.contexto;
     this.vidro = scene.textures.get(`quebrado${lado}2`).getSourceImage();
     this.imagem = scene.add.image(0, 0, this.chave).setOrigin(0).setScrollFactor(0).setDepth(1800);
+    this.imagem.snrEfeitoProcedural = true;
     scene.camJogo.ignore(this.imagem);
     const cam = scene.camJogo;
     const ox = cam.width * cam.originX;
@@ -146,7 +147,12 @@ export default class MorteVS {
     this.scene = scene;
     this.aoConcluirMortes = aoConcluirMortes;
     this.pendentes = new Map();
+    this.efeitosReplicados = [];
     this.sequencia = 0;
+    this.sequenciaTV = 0;
+    this.ultimoEfeitoEspectador = 0;
+    this.ultimaTVEspectador = 0;
+    this.aoFimTVEspectador = () => this.scene.overlayMorte.setVisible(false);
     this.tvAtiva = false;
     this.recursosLivres = [];
     this.recursosCriados = [];
@@ -208,9 +214,16 @@ export default class MorteVS {
   iniciar(jogador, pontoRespawn, numero) {
     if (this.pendentes.has(jogador) || jogador.eliminado) return false;
     jogador.estadoInvencible.sair(false);
+    const eventoVisual = {
+      id: ++this.sequencia,
+      x: jogador.sprite.x,
+      y: jogador.sprite.y,
+      lado: ladoDaQueda(jogador.sprite.x, jogador.sprite.y, this.scene.limitesArena),
+      atualizadoEm: Date.now(),
+    };
+    this.scene.eventoMorteVS = eventoVisual;
     this.scene.camJogo.shake(140, 0.007);
-    const efeito = new VidroMatrix(this.scene, jogador,
-      ladoDaQueda(jogador.sprite.x, jogador.sprite.y, this.scene.limitesArena), ++this.sequencia, this);
+    const efeito = new VidroMatrix(this.scene, jogador, eventoVisual.lado, eventoVisual.id, this);
     const invulneravel = jogador.invulneravel;
     const fsm = jogador.maquinaEstados;
     if (!fsm.estados.morteVS) fsm.adicionarEstado("morteVS", new EstadoBase(jogador));
@@ -227,6 +240,46 @@ export default class MorteVS {
     return true;
   }
 
+  reproduzirEfeitoEspectador(evento) {
+    if (
+      !evento ||
+      evento.id <= this.ultimoEfeitoEspectador ||
+      Date.now() - evento.atualizadoEm > TEMPO_CODIGOS
+    ) return;
+    this.ultimoEfeitoEspectador = evento.id;
+    const efeito = new VidroMatrix(
+      this.scene,
+      { sprite: { x: evento.x, y: evento.y } },
+      evento.lado,
+      evento.id,
+      this,
+    );
+    this.efeitosReplicados.push({ efeito, inicio: this.scene.time.now });
+    this.scene.camJogo.shake(140, 0.007);
+  }
+
+  atualizarEfeitosEspectador(delta) {
+    const agora = this.scene.time.now;
+    for (let indice = this.efeitosReplicados.length - 1; indice >= 0; indice -= 1) {
+      const entrada = this.efeitosReplicados[indice];
+      entrada.efeito.atualizar(delta);
+      if (agora - entrada.inicio >= TEMPO_CODIGOS) {
+        entrada.efeito.destruir();
+        this.efeitosReplicados.splice(indice, 1);
+      }
+    }
+  }
+
+  reproduzirTVEspectador(evento) {
+    if (!evento || evento.id <= this.ultimaTVEspectador || Date.now() - evento.atualizadoEm > 1500) return;
+    this.ultimaTVEspectador = evento.id;
+    this.scene.overlayMorte
+      .off("animationcomplete", this.aoFimTVEspectador)
+      .setVisible(true)
+      .play("TVefect", true)
+      .once("animationcomplete", this.aoFimTVEspectador);
+  }
+
   atualizar(delta) {
     for (const entrada of this.pendentes.values()) entrada.efeito?.atualizar(delta);
     if (!this.pendentes.size) return;
@@ -239,6 +292,10 @@ export default class MorteVS {
       entrada.efeito.destruir();
       entrada.efeito = null;
     }
+    this.scene.eventoTVMorte = {
+      id: ++this.sequenciaTV,
+      atualizadoEm: Date.now(),
+    };
     this.scene.overlayMorte.setVisible(true).play("TVefect");
     this.scene.overlayMorte.off("animationcomplete", this.aoFimTV);
     this.scene.overlayMorte.once("animationcomplete", this.aoFimTV);
@@ -279,8 +336,11 @@ export default class MorteVS {
 
   destruir() {
     this.scene.overlayMorte.off("animationcomplete", this.aoFimTV);
+    this.scene.overlayMorte.off("animationcomplete", this.aoFimTVEspectador);
     for (const entrada of this.pendentes.values()) entrada.efeito?.destruir();
     this.pendentes.clear();
+    for (const entrada of this.efeitosReplicados) entrada.efeito.destruir();
+    this.efeitosReplicados.length = 0;
     for (const recursos of this.recursosCriados) this.scene.textures.remove(recursos.chave);
     this.recursosCriados.length = 0;
     this.recursosLivres.length = 0;

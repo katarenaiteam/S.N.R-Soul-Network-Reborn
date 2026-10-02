@@ -4,8 +4,5 @@ export function publicarEstadoVersus(scene, cena, dados) {
   const mqtt = scene.registry.get("clienteMQTT");
   if (mqtt?.papel !== "host") return;
 
-  if (mqtt.statusDesejado !== "ao-vivo") {
-    mqtt.publicarStatus("ao-vivo");
-  }
-  mqtt.publicarEstado({ cena, modo: "1v1", dados });
+  mqtt.publishState({ cena, modo: "1v1", dados });
 }

@@ -13,7 +13,6 @@ export default class PinguDoSpecial {
     this.progressoCarga = 0;
     this.ultimoUpdate = this.scene.time.now;
     this.ultimoApertoSpecial = this.scene.time.now;
-    this.specialEstavaApertado = false;
     this.alvosAtingidos = new Set();
     this.hitbox = null;
     this.registroHitbox = null;
@@ -35,7 +34,6 @@ export default class PinguDoSpecial {
     this.velocidadeGiro = this.special.velocidadeGiroInicial;
     this.ultimoUpdate = this.scene.time.now;
     this.ultimoApertoSpecial = this.scene.time.now;
-    this.specialEstavaApertado = this.personagem.inputDown("special");
     const sprite = this.personagem.sprite;
     sprite.setVelocityX(0);
     sprite.anims.play("pingu_doCharg", true);
@@ -72,12 +70,10 @@ export default class PinguDoSpecial {
 
     if (this.fase === "carga") {
       const specialApertado = this.personagem.inputDown("special");
-      const novoAperto = specialApertado && !this.specialEstavaApertado;
-      this.specialEstavaApertado = specialApertado;
-      if (novoAperto) {
+      if (specialApertado) {
         this.velocidadeGiro = Math.min(
           this.special.velocidadeGiroMaxima,
-          this.velocidadeGiro + this.special.aceleracaoPorAperto,
+          this.velocidadeGiro + this.special.aceleracaoPorAperto * deltaSegundos,
         );
         this.ultimoApertoSpecial = agora;
       } else if (agora - this.ultimoApertoSpecial > this.special.atrasoPerdaVelocidade) {
@@ -297,7 +293,7 @@ PinguDoSpecial.configuracao = {
   cooldown: 1200,
   velocidadeGiroInicial: 2.5,
   velocidadeGiroMaxima: 8,
-  aceleracaoPorAperto: 2,
+  aceleracaoPorAperto: 8,
   atrasoPerdaVelocidade: 500,
   perdaVelocidadePorSegundo: 0.5,
   impulsoXInicial: 300,

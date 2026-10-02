@@ -331,19 +331,16 @@ export default class CenaStart extends Phaser.Scene {
 
     this.animarConfirmacao(() => {
       if (opcao.id === "story") {
-        this.mqtt?.limparEstado();
-        this.mqtt?.publicarStatus("indisponivel");
+        this.mqtt?.clearState();
         this.emSelecaoPlayers = true;
         this.textoNumPlayers.setVisible(true);
         this.cursorSelecao.setVisible(false);
         this.bloqueado = false;
       } else if (opcao.id === "credits") {
-        this.mqtt?.limparEstado();
-        this.mqtt?.publicarStatus("indisponivel");
+        this.mqtt?.clearState();
         this.fecharAbaEAvancar("CenaCreditos");
       } else {
-        this.mqtt?.limparEstado();
-        this.mqtt?.publicarStatus("aguardando-char-menu");
+        this.mqtt?.clearState();
         this.fecharAbaEAvancar("Charmenu", { modo: "1v1" });
       }
     });
@@ -352,11 +349,11 @@ export default class CenaStart extends Phaser.Scene {
   iniciarMQTT() {
     this.mqtt = this.registry.get("clienteMQTT");
     if (!this.mqtt) {
-      this.mqtt = new ClienteMQTT("host");
+      this.mqtt = new ClienteMQTT(this.registry.get("mqttConfig"), "host");
       this.registry.set("clienteMQTT", this.mqtt);
-      this.mqtt.conectar();
+      this.mqtt.connect();
     }
-    this.mqtt.publicarStatus("aguardando-versus");
+    this.mqtt.clearState();
   }
 
   animarConfirmacao(aoConcluir) {

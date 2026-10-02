@@ -463,6 +463,12 @@ const assetsPingu = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_AupSpecial", () => { scene.load.spritesheet("Pingu_AupSpecial", "assets/personagens/Pingu/Sprites/Pingu_AupSpecial.png", { frameWidth: 68, frameHeight: 115 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_siSpecial", () => { scene.load.spritesheet("Pingu_siSpecial", "assets/personagens/Pingu/Sprites/Pingu_siSpecial.png", { frameWidth: 86, frameHeight: 82 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_som", () => { scene.load.spritesheet("Pingu_som", "assets/personagens/Pingu/Sprites/Pingu_som.png", { frameWidth: 105, frameHeight: 101 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_ultPose", () => { scene.load.spritesheet("Pingu_ultPose", "assets/personagens/Pingu/Sprites/ultimate/Pingu_ultPose.png", { frameWidth: 70, frameHeight: 73 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_dance", () => { scene.load.spritesheet("Pingu_dance", "assets/personagens/Pingu/Sprites/ultimate/Pingu_dance.png", { frameWidth: 236, frameHeight: 222 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_Fgo", () => { scene.load.spritesheet("Pingu_Fgo", "assets/personagens/Pingu/Sprites/ultimate/Pingu_Fgo.png", { frameWidth: 561, frameHeight: 216 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_Fdance", () => { scene.load.spritesheet("Pingu_Fdance", "assets/personagens/Pingu/Sprites/ultimate/Pingu_Fdance.png", { frameWidth: 90, frameHeight: 63 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_ultF", () => { scene.load.spritesheet("Pingu_ultF", "assets/personagens/Pingu/Sprites/ultimate/Pingu_ultF.png", { frameWidth: 501, frameHeight: 379 }); }),
+  
 ];
 const assetsMapaTeste = [
   (scene, queued) => queueAsset(scene, queued, "texture", "backtest", () => { scene.load.spritesheet("backtest", "assets/cenarios/MapaTest/backtest.png", { frameWidth: 1200, frameHeight: 600 }); }),

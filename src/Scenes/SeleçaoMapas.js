@@ -23,9 +23,9 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
     if (this.modoEspectador) {
       this.mqtt = this.registry.get("clienteMQTT");
       this.aoReceberEstadoMQTT = (estado) => this.aplicarEstadoEspectador(estado);
-      this.mqtt?.on("state", this.aoReceberEstadoMQTT);
+      this.mqtt?.on("message:state", this.aoReceberEstadoMQTT);
       this.events.once("shutdown", () => {
-        this.mqtt?.off("state", this.aoReceberEstadoMQTT);
+        this.mqtt?.off("message:state", this.aoReceberEstadoMQTT);
       });
     }
     this.cameras.main.setBackgroundColor("#000000");
@@ -133,7 +133,7 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
     if (!Number.isInteger(indice) || indice < 0 || indice >= this.mapas.length) return;
     if (indice === this.indiceOpcao) return;
     this.indiceOpcao = indice;
-    this.atualizarCarrossel(false);
+    this.atualizarCarrossel(true);
   }
 
   criarChuvaMatrix() {

@@ -6,6 +6,7 @@ const ROTAS_ESPECTADOR = {
   "preload-versus": "CenaPreloadVersus",
   partida: "cenaPrincipal",
 };
+const TEMPO_MAXIMO_ESTADO_MS = 30000;
 
 export default class CenaEspectador extends Phaser.Scene {
   constructor() {
@@ -18,7 +19,10 @@ export default class CenaEspectador extends Phaser.Scene {
     this.cenaReplicada = null;
     this.estadoAtual = null;
     this.estadoRecebido = null;
-    this.statusAtual = null;
+    this.estadoCandidato = null;
+    this.expiracaoEstado = null;
+    this.encerramentoPendente = null;
+    this.salaEncontrada = false;
 
     this.cameras.main.setBackgroundColor("#000000");
     this.statusTexto = this.add.text(
@@ -33,75 +37,77 @@ export default class CenaEspectador extends Phaser.Scene {
       },
     ).setOrigin(0.5);
 
-    this.mqtt = new ClienteMQTT("espectador");
+    this.mqtt = new ClienteMQTT(this.registry.get("mqttConfig"), "espectador");
     this.registry.set("clienteMQTT", this.mqtt);
     this.aoReceberEstado = (estado) => this.receberEstado(estado);
-    this.aoReceberStatus = (status) => this.receberStatus(status);
-    this.mqtt.on("state", this.aoReceberEstado);
-    this.mqtt.on("status", this.aoReceberStatus);
+    this.mqtt.on("message:state", this.aoReceberEstado);
     this.mqtt.on("connect", () => this.atualizarMensagem("CONECTADO. AGUARDANDO VERSUS..."));
     this.mqtt.on("close", () => this.atualizarMensagem("CONEXÃO ENCERRADA. TENTANDO RECONECTAR..."));
     this.mqtt.on("error", () => this.atualizarMensagem("NÃO FOI POSSÍVEL CONECTAR À SALA SNR."));
-    this.mqtt.conectar();
+    this.mqtt.connect();
 
     this.events.once("shutdown", () => {
-      this.mqtt.off("state", this.aoReceberEstado);
-      this.mqtt.off("status", this.aoReceberStatus);
-      this.mqtt.desconectar();
+      this.expiracaoEstado?.remove();
+      this.encerramentoPendente?.remove();
+      this.mqtt.off("message:state", this.aoReceberEstado);
+      this.mqtt.disconnect();
       this.registry.set("modoEspectador", false);
       this.registry.set("clienteMQTT", null);
     });
   }
 
-  receberStatus(dados) {
-    this.statusAtual = dados.status;
-
-    if (dados.status === "ao-vivo") {
-      if (this.estadoRecebido) this.receberEstado(this.estadoRecebido);
+  receberEstado(estado) {
+    if (estado === "" && this.salaEncontrada) {
+      this.agendarEncerramentoSala();
       return;
     }
 
-    if (dados.status === "offline") {
-      this.estadoAtual = null;
-      this.estadoRecebido = null;
-      this.registry.set("estadoEspectador", null);
-      this.pararCenaReplicada();
-      this.atualizarMensagem("A SALA SNR ESTÁ OFFLINE.");
-      return;
-    }
-
-    if (dados.status === "indisponivel") {
-      this.estadoAtual = null;
-      this.estadoRecebido = null;
-      this.registry.set("estadoEspectador", null);
-      this.pararCenaReplicada();
-      this.atualizarMensagem("A SALA NÃO ESTÁ TRANSMITINDO UM VERSUS.");
-      return;
-    }
-
-    if (dados.status === "encerrada") {
-      this.estadoAtual = null;
-      this.estadoRecebido = null;
-      this.registry.set("estadoEspectador", null);
-      this.pararCenaReplicada();
-      this.atualizarMensagem("VERSUS ENCERRADO.");
-      return;
-    }
-
-    if (dados.status === "aguardando-versus" || dados.status === "aguardando-char-menu") {
+    const atualizadoEm = Number(estado?.updatedAt);
+    if (
+      estado?.modo !== "1v1" ||
+      !ROTAS_ESPECTADOR[estado.cena] ||
+      !Number.isFinite(atualizadoEm)
+    ) {
+      this.estadoCandidato = null;
+      if (this.salaEncontrada) {
+        this.agendarEncerramentoSala();
+        return;
+      }
+      this.expiracaoEstado?.remove();
+      this.expiracaoEstado = null;
       this.estadoAtual = null;
       this.estadoRecebido = null;
       this.registry.set("estadoEspectador", null);
       this.pararCenaReplicada();
       this.atualizarMensagem("AGUARDANDO O INÍCIO DE UM VERSUS...");
+      return;
     }
-  }
 
-  receberEstado(estado) {
-    if (estado?.modo !== "1v1" || !ROTAS_ESPECTADOR[estado.cena]) return;
+    this.encerramentoPendente?.remove();
+    this.encerramentoPendente = null;
+
+    if (!this.salaEncontrada) {
+      const candidato = this.estadoCandidato;
+      if (
+        !candidato ||
+        candidato.clientId !== estado.clientId ||
+        atualizadoEm <= Number(candidato.updatedAt)
+      ) {
+        this.estadoCandidato = estado;
+        this.atualizarMensagem("CONECTADO. VALIDANDO VERSUS...");
+        return;
+      }
+      this.estadoCandidato = null;
+    }
+
+    this.expiracaoEstado?.remove();
+    this.expiracaoEstado = this.time.delayedCall(
+      TEMPO_MAXIMO_ESTADO_MS,
+      () => this.receberEstado(null),
+    );
     this.estadoRecebido = estado;
-    if (this.statusAtual !== "ao-vivo") return;
 
+    this.salaEncontrada = true;
     this.estadoAtual = estado;
     this.registry.set("estadoEspectador", estado);
     this.statusTexto.setVisible(false);
@@ -135,6 +141,7 @@ export default class CenaEspectador extends Phaser.Scene {
         p1: estado.dados?.personagens?.p1 ?? estado.dados?.p1,
         p2: estado.dados?.personagens?.p2 ?? estado.dados?.p2,
         mapa: estado.dados?.mapa,
+        posicoesIniciais: estado.dados?.jogadores,
         espectador: true,
       };
     }
@@ -147,6 +154,28 @@ export default class CenaEspectador extends Phaser.Scene {
     }
     this.cenaReplicada = null;
     this.statusTexto.setVisible(true);
+  }
+
+  agendarEncerramentoSala() {
+    if (this.encerramentoPendente) return;
+    this.encerramentoPendente = this.time.delayedCall(1500, () => {
+      this.encerramentoPendente = null;
+      this.encerrarSala();
+    });
+  }
+
+  encerrarSala() {
+    this.expiracaoEstado?.remove();
+    this.expiracaoEstado = null;
+    this.encerramentoPendente?.remove();
+    this.encerramentoPendente = null;
+    this.estadoAtual = null;
+    this.estadoRecebido = null;
+    this.estadoCandidato = null;
+    this.salaEncontrada = false;
+    this.registry.set("estadoEspectador", null);
+    this.pararCenaReplicada();
+    this.atualizarMensagem("VERSUS ENCERRADO. AGUARDANDO NOVO VERSUS...");
   }
 
   atualizarMensagem(texto) {

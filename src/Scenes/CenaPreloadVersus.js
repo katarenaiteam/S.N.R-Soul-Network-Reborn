@@ -16,20 +16,35 @@ export default class CenaPreloadVersus extends Phaser.Scene {
   create() {
     encerrarOutrasCenas(this);
     if (!this.modoEspectador) {
-      publicarEstadoVersus(this, "preload-versus", {
-        p1: this.dadosPartida.p1,
-        p2: this.dadosPartida.p2,
-        mapa: this.dadosPartida.mapa || this.dadosPartida.ClasseMapa?.name,
-      });
+      this.ultimaPublicacaoEstado = this.time.now;
+      this.publicarEstadoMQTT();
     }
     this.cameras.main.setBackgroundColor("#000000");
     this.criarVideo();
+    if (this.modoEspectador) {
+      this.load.maxParallelDownloads = 8;
+      this.load.xhr.timeout = 30000;
+    }
     this.events.once("shutdown", this.limparVideo, this);
 
     const quantidade = carregarAssetsVersus(this, this.dadosPartida);
     this.load.once("complete", this.iniciarPartida, this);
     if (quantidade > 0) this.load.start();
     else this.iniciarPartida();
+  }
+
+  update() {
+    if (this.modoEspectador || this.time.now - this.ultimaPublicacaoEstado < 3000) return;
+    this.ultimaPublicacaoEstado = this.time.now;
+    this.publicarEstadoMQTT();
+  }
+
+  publicarEstadoMQTT() {
+    publicarEstadoVersus(this, "preload-versus", {
+      p1: this.dadosPartida.p1,
+      p2: this.dadosPartida.p2,
+      mapa: this.dadosPartida.mapa || this.dadosPartida.ClasseMapa?.name,
+    });
   }
 
   criarVideo() {

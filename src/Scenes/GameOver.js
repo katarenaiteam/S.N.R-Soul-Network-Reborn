@@ -7,9 +7,8 @@ export default class CenaGameOver extends Phaser.Scene {
   create() {
     encerrarOutrasCenas(this);
     const mqtt = this.registry.get("clienteMQTT");
-    if (mqtt?.papel === "host" && mqtt.statusDesejado === "ao-vivo") {
-      mqtt.limparEstado();
-      mqtt.publicarStatus("encerrada");
+    if (mqtt?.papel === "host") {
+      mqtt.clearState();
     }
     this.cameras.main.setBackgroundColor("#05050a");
 

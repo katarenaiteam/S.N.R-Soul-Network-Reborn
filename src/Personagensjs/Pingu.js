@@ -1,12 +1,12 @@
 import Personagem from "./Personagem.js";
-import PinguNeSpecial from "./Specials/Pingu/NeSpecial.js";
 import PinguSiSpecial from "./Specials/Pingu/SiSpecial.js";
 import PinguDoSpecial from "./Specials/Pingu/DoSpecial.js";
 import PinguAneSpecial from "./Specials/Pingu/AneSpecial.js";
 import PinguAsiSpecial from "./Specials/Pingu/AsiSpecial.js";
 import PinguAupSpecial from "./Specials/Pingu/AupSpecial.js";
 import PinguAdoSpecial from "./Specials/Pingu/AdoSpecial.js";
-import AupSpecial from "./Specials/FJ/AupSpecial.js";
+import PinguUlt from "./Ult/PinguUlt.js";
+
 
 export default class Pingu extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -273,9 +273,9 @@ export default class Pingu extends Personagem {
         ],
       },
 
-      neSpecial: { largura: 30, altura: 70, offsetX: 20, offsetY: -12, escala: 1,
+      neSpecial: { offsetVisualY: 14, offsetVisualX: -4, largura: 30, altura: 70, offsetX: 21, offsetY: 17, escala: 1,
         hurtboxes: [
-          { largura: 30, altura: 55, offsetX: -4, offsetY: -30 }, 
+          { largura: 30, altura: 55, offsetX: -4, offsetY: -40 }, 
         ],
       },
 
@@ -334,6 +334,15 @@ export default class Pingu extends Personagem {
           { largura: 35, altura: 35, offsetX: -5, offsetY: -23 },
         ],
       },
+
+      ultPose: { largura: 30, altura: 70, offsetX: 1, offsetY: -10, escala: 1,
+        hurtboxes: [],
+      },
+      dance: { offsetVisualY: 75, offsetVisualX: -5, largura: 40, altura: 70, offsetX: 80, offsetY: 150, escala: 1,
+        hurtboxes: [],
+      },
+
+    
     
    };
 
@@ -679,13 +688,19 @@ export default class Pingu extends Personagem {
     };
 
     this.specials = {
-      neutro: PinguNeSpecial.configuracao,
+      neutro: PinguAneSpecial.configuracaoChao,
       lado: PinguSiSpecial.configuracao,
       agachado: PinguDoSpecial.configuracao,
       air_neutro: PinguAneSpecial.configuracao,
       air_cima: PinguAupSpecial.configuracao,
       air_lado: PinguAsiSpecial.configuracao,
       air_agachado: PinguAdoSpecial.configuracao,
+    };
+
+    this.ult = {
+      animacao: "pingu_ultPose",
+      logica: PinguUlt,
+      propriedades: { anularGravidade: true },
     };
 
   // --------------------------------- tabela especiais --------------------------
@@ -891,7 +906,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 3,
       }),
-      frameRate: 14,
+      frameRate: 18,
       repeat: 0,
     });
 
@@ -1133,6 +1148,56 @@ if (!scene.anims.exists("punch_effect3")) {
       }),
       frameRate: 12,
       repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_ultPose",
+      frames: scene.anims.generateFrameNumbers("Pingu_ultPose", {
+        start: 0,
+        end: 49,
+      }),
+      frameRate: 16,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_dance",
+      frames: scene.anims.generateFrameNumbers("Pingu_dance", {
+        start: 0,
+        end: 35,
+      }),
+      frameRate: 16,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "pingu_Fgo",
+      frames: scene.anims.generateFrameNumbers("Pingu_Fgo", {
+        start: 0,
+        end: 15,
+      }),
+      frameRate: 16,
+      repeat: 0,
+    });
+
+    scene.anims.create({
+      key: "pingu_Fdance",
+      frames: scene.anims.generateFrameNumbers("Pingu_Fdance", {
+        start: 0,
+        end: 12,
+      }),
+      frameRate: 12,
+      repeat: -1,
+    });
+
+    scene.anims.create({
+      key: "pingu_ultF",
+      frames: scene.anims.generateFrameNumbers("Pingu_ultF", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 16,
+      repeat: -1,
     });
 
   }

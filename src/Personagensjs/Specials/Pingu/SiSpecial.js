@@ -72,6 +72,7 @@ export default class PinguSiSpecial {
     const propriedades = {
       ...this.special.propriedades,
       dano: enxurrada ? this.special.danoEnxurrada : this.special.propriedades.dano,
+      preservarCongelamentoPingu: enxurrada,
       congelamentoPingu: enxurrada
         ? this.special.acumuloCongelamentoEnxurrada
         : this.special.acumuloCongelamentoBolaGrande,
@@ -135,6 +136,9 @@ export default class PinguSiSpecial {
     this.personagem.sprite.off(`animationcomplete-${this.special.animacao}`, this.aoCompletarAnimacao);
     this.poseEncerrada = true;
     this.encerrarSeVazio();
+    if (this.personagem.maquinaEstados.estadoAtual === this.estado) {
+      this.personagem.maquinaEstados.mudarEstado("atordoado");
+    }
   }
 
   encerrarSeVazio() {
@@ -188,7 +192,7 @@ PinguSiSpecial.configuracao = {
   escalaProjetil: 1.3,
   larguraProjetil: 10,
   alturaProjetil: 6,
-  danoEnxurrada: 0,
+  danoEnxurrada: 0.5,
   acumuloCongelamentoBolaGrande: 18,
   acumuloCongelamentoEnxurrada: 8,
   propriedades: {

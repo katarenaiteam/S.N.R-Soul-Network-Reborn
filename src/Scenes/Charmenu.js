@@ -431,7 +431,10 @@ export default class Charmenu extends Phaser.Scene {
   update(_time, delta) {
     this.atualizarChuvaCaracteres(delta);
 
-    if (this.modoEspectador) return;
+    if (this.modoEspectador) {
+      this.atualizarMaosEspectador(_time);
+      return;
+    }
 
     this.publicarEstadoMQTT(_time);
 
@@ -466,9 +469,9 @@ export default class Charmenu extends Phaser.Scene {
     if (this.modoEspectador) {
       this.mqtt = this.registry.get("clienteMQTT");
       this.aoReceberEstadoMQTT = (estado) => this.aplicarEstadoEspectador(estado);
-      this.mqtt?.on("state", this.aoReceberEstadoMQTT);
+      this.mqtt?.on("message:state", this.aoReceberEstadoMQTT);
       this.events.once("shutdown", () => {
-        this.mqtt?.off("state", this.aoReceberEstadoMQTT);
+        this.mqtt?.off("message:state", this.aoReceberEstadoMQTT);
       });
       this.time.delayedCall(0, () => this.aplicarEstadoEspectador(this.registry.get("estadoEspectador")));
       return;
@@ -476,16 +479,14 @@ export default class Charmenu extends Phaser.Scene {
 
     const mqtt = this.registry.get("clienteMQTT");
     if (this.modoJogo === "1v1") {
-      mqtt?.publicarStatus("ao-vivo");
       this.publicarEstadoMQTT(0, true);
     } else {
-      mqtt?.limparEstado();
-      mqtt?.publicarStatus("indisponivel");
+      mqtt?.clearState();
     }
   }
 
   publicarEstadoMQTT(tempo, forcar = false) {
-    if (this.modoJogo !== "1v1" || tempo - (this.ultimaPublicacaoMQTT || 0) < 100 && !forcar) return;
+    if (this.modoJogo !== "1v1" || tempo - (this.ultimaPublicacaoMQTT || 0) < 1000 / 15 && !forcar) return;
     this.ultimaPublicacaoMQTT = tempo;
 
     const estadoJogador = (jogador) => jogador && ({
@@ -498,6 +499,7 @@ export default class Charmenu extends Phaser.Scene {
     publicarEstadoVersus(this, "char-menu", {
       p1: estadoJogador(this.p1),
       p2: estadoJogador(this.p2),
+      avisoAvancar: this.todosSelecionados(),
     });
   }
 
@@ -510,7 +512,13 @@ export default class Charmenu extends Phaser.Scene {
       [this.p2, estado.dados?.p2],
     ]) {
       if (!jogador || !remoto) continue;
-      jogador.mao.setPosition(remoto.x, remoto.y);
+      jogador.alvoPosicaoMQTT = {
+        xInicial: jogador.mao.x,
+        yInicial: jogador.mao.y,
+        xDestino: remoto.x,
+        yDestino: remoto.y,
+        inicio: this.time.now,
+      };
 
       const selecionado = PERSONAGENS.find((personagem) => personagem.id === remoto.selecionado);
       if (jogador.selecionado?.id !== selecionado?.id) {
@@ -530,6 +538,20 @@ export default class Charmenu extends Phaser.Scene {
       } else if (!selecionado) {
         this.atualizarHover(jogador);
       }
+    }
+    this.atualizarAvisoAvancar(estado.dados?.avisoAvancar === true);
+  }
+
+  atualizarMaosEspectador(tempo) {
+    const duracaoSnapshot = 1000 / 15;
+    for (const jogador of [this.p1, this.p2]) {
+      const alvo = jogador?.alvoPosicaoMQTT;
+      if (!alvo) continue;
+      const progresso = Phaser.Math.Clamp((tempo - alvo.inicio) / duracaoSnapshot, 0, 1);
+      jogador.mao.setPosition(
+        Phaser.Math.Linear(alvo.xInicial, alvo.xDestino, progresso),
+        Phaser.Math.Linear(alvo.yInicial, alvo.yDestino, progresso),
+      );
     }
   }
 

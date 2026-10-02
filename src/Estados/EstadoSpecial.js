@@ -34,6 +34,8 @@ export default class EstadoSpecial extends EstadoBase {
     }
 
     this.tempoInicio = this.personagem.scene.time.now;
+    this.personagem.configAnimacaoOverride =
+      this.specialAtual.configuracaoAnimacao ?? null;
     this.timerFinalizacaoChao = null;
     this.finalizandoPorChao = false;
     this.timerFinalizacaoAcerto = null;
@@ -75,7 +77,10 @@ export default class EstadoSpecial extends EstadoBase {
 
     if (animChave && this.personagem.scene.anims.exists(animChave)) {
       this.personagem.sprite.anims.play(animChave, true);
-      this.personagem.aplicarConfiguracao(animChave.replace(this.personagem.prefixoAnim, ""));
+      this.personagem.aplicarConfiguracao(
+        this.personagem.configAnimacaoOverride ??
+          animChave.replace(this.personagem.prefixoAnim, "")
+      );
     } else {
       console.warn(`Animação ${animChave} não existe!`);
     }
@@ -249,6 +254,14 @@ export default class EstadoSpecial extends EstadoBase {
   }
 
   exit() {
+    this.personagem.configAnimacaoOverride = null;
+    const animAtual = this.personagem.sprite.anims.currentAnim?.key;
+    if (animAtual) {
+      this.personagem.aplicarConfiguracao(
+        animAtual.replace(this.personagem.prefixoAnim, "")
+      );
+    }
+
     if (this.logicaSpecial && typeof this.logicaSpecial.cancelar === "function") {
       this.logicaSpecial.cancelar();
     }

@@ -208,3 +208,10 @@ PinguAneSpecial.configuracao = {
     tumbling: false,
   },
 };
+
+PinguAneSpecial.configuracaoChao = {
+  ...PinguAneSpecial.configuracao,
+  configuracaoAnimacao: "neSpecial",
+  offsetProjetilX: 50,
+  offsetProjetilY: -54,
+};

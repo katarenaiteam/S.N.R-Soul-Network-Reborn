@@ -1,83 +1,62 @@
 const mqtt = globalThis.mqtt;
-const variaveisAmbiente = import.meta.env ?? {};
-
-const URL_BROKER =
-  variaveisAmbiente.VITE_MQTT_BROKER_URL || "wss://test.mosquitto.org:8081/mqtt";
-const PREFIXO_TOPICO =
-  variaveisAmbiente.VITE_MQTT_TOPIC_PREFIX || "6080821-2026.2";
-const ID_SALA = variaveisAmbiente.VITE_SNR_ROOM || "arena-01";
-const TOPICO_BASE = `${PREFIXO_TOPICO}/SNR/${ID_SALA}`;
-
-export const TOPICO_STATUS = `${TOPICO_BASE}/status`;
-export const TOPICO_ESTADO = `${TOPICO_BASE}/state`;
+const LETRAS_CLIENT_ID = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 function criarClientId(papel) {
-  const aleatorio = Math.random().toString(36).slice(2, 12);
-  return `snr-${papel}-${aleatorio}`;
+  let id = "";
+  for (let indice = 0; indice < 4; indice += 1) {
+    id += LETRAS_CLIENT_ID[Math.floor(Math.random() * LETRAS_CLIENT_ID.length)];
+  }
+  return `snr-${papel}-${id}`;
 }
 
 export default class ClienteMQTT extends Phaser.Events.EventEmitter {
-  constructor(papel) {
+  constructor({ brokerUrl, topicPrefix }, papel) {
     super();
+    this.brokerUrl = brokerUrl;
+    this.topicPrefix = topicPrefix.replace(/\/$/, "");
     this.papel = papel;
     this.client = null;
     this.ultimoEstado = null;
-    this.ultimoStatus = null;
-    this.statusDesejado = "aguardando-versus";
+    this.estadoInicialLimpo = false;
   }
 
-  conectar() {
+  connect() {
     if (this.client) return;
     if (!mqtt?.connect) {
       this.emit("error", new Error("O bundle MQTT do navegador nao foi carregado."));
       return;
     }
 
-    const opcoes = {
-      clientId: criarClientId(this.papel),
-      reconnectPeriod: 2000,
-      connectTimeout: 10000,
-      clean: true,
-    };
-
-    if (this.papel === "host") {
-      opcoes.will = {
-        topic: TOPICO_STATUS,
-        payload: JSON.stringify({ status: "offline" }),
-        qos: 0,
-        retain: true,
-      };
-    }
-
-    this.client = mqtt.connect(URL_BROKER, opcoes);
+    this.clientId = criarClientId(this.papel);
+    this.client = mqtt.connect(this.brokerUrl, { clientId: this.clientId });
 
     this.client.on("connect", () => {
-      if (this.papel === "host") {
-        this.publicarStatus(this.statusDesejado);
-      }
+      console.log(`Connected to MQTT broker at ${this.brokerUrl}`);
       this.emit("connect");
-      if (this.papel !== "espectador") return;
-
-      this.client.subscribe([TOPICO_STATUS, TOPICO_ESTADO], (erro) => {
-        if (erro) this.emit("error", erro);
-      });
+      if (this.papel === "host" && !this.estadoInicialLimpo) {
+        this.estadoInicialLimpo = true;
+        this.clearState();
+      }
+      if (this.papel === "espectador") this.subscribe("state");
     });
 
     this.client.on("message", (topico, mensagem) => {
+      const topicoCurto = topico.startsWith(`${this.topicPrefix}/`)
+        ? topico.slice(this.topicPrefix.length + 1)
+        : topico;
       let dados;
       try {
         dados = JSON.parse(mensagem.toString());
       } catch {
-        return;
+        dados = mensagem.toString();
       }
 
-      if (topico === TOPICO_STATUS) {
-        this.ultimoStatus = dados;
-        this.emit("status", dados);
-      } else if (topico === TOPICO_ESTADO) {
+      if (topicoCurto === "state") {
         this.ultimoEstado = dados;
-        this.emit("state", dados);
       }
+
+      this.emit("message", topicoCurto, dados);
+      this.emit(`message:${topicoCurto}`, dados);
     });
 
     this.client.on("error", (erro) => this.emit("error", erro));
@@ -85,33 +64,39 @@ export default class ClienteMQTT extends Phaser.Events.EventEmitter {
     this.client.on("reconnect", () => this.emit("reconnect"));
   }
 
-  publicarStatus(status) {
-    if (this.papel !== "host") return;
-    this.statusDesejado = status;
+  subscribe(topico) {
+    const topicos = Array.isArray(topico) ? topico : [topico];
+    const topicosComPrefixo = topicos.map((item) => `${this.topicPrefix}/${item}`);
+    this.client?.subscribe(topicosComPrefixo, (erro) => {
+      if (erro) this.emit("error", erro);
+    });
+  }
+
+  publish(topico, dados, opcoes = {}) {
     if (!this.client?.connected) return;
+    const envelope =
+      typeof dados === "object" && dados !== null
+        ? { ...dados, clientId: this.clientId }
+        : { data: dados, clientId: this.clientId };
     this.client.publish(
-      TOPICO_STATUS,
-      JSON.stringify({ status, updatedAt: Date.now() }),
-      { retain: true },
+      `${this.topicPrefix}/${topico}`,
+      JSON.stringify(envelope),
+      opcoes,
     );
   }
 
-  publicarEstado(estado) {
-    if (this.papel !== "host" || !this.client?.connected) return;
-    this.client.publish(
-      TOPICO_ESTADO,
-      JSON.stringify({ ...estado, updatedAt: Date.now() }),
-      { retain: true },
-    );
+  publishState(estado) {
+    if (this.papel !== "host") return;
+    this.publish("state", { ...estado, updatedAt: Date.now() }, { retain: true });
   }
 
-  limparEstado() {
+  clearState() {
     if (this.papel !== "host" || !this.client?.connected) return;
-    this.client.publish(TOPICO_ESTADO, "", { retain: true });
+    this.client.publish(`${this.topicPrefix}/state`, "", { retain: true });
   }
 
-  desconectar() {
-    this.client?.end(true);
+  disconnect() {
+    this.client?.end();
     this.client = null;
   }
 }
