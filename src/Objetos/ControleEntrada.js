@@ -20,6 +20,8 @@ export default class ControleEntrada {
     this.estadoAnterior = { ...this.estadoAtual };
     this.ultimoBaixo = -Infinity;
     this.duploBaixo = false;
+    this.ultimosToquesLaterais = { esquerda: -Infinity, direita: -Infinity };
+    this.duploLateral = false;
   }
 
   get pad() {
@@ -40,8 +42,11 @@ export default class ControleEntrada {
     const padBaixo = y > this.deadZone;
 
     const baixoAgora = this._teclaDown("baixo") || padBaixo;
+    const esquerdaAgora = this._teclaDown("esquerda") || padEsquerda;
+    const direitaAgora = this._teclaDown("direita") || padDireita;
 
     this.duploBaixo = false;
+    this.duploLateral = false;
 
     if (baixoAgora && !this.estadoAtual.baixo) {
     const agora = this.scene.time.now;
@@ -54,18 +59,29 @@ export default class ControleEntrada {
      }
     }
 
-    const padDash = this._botaoPadPressionado(pad, 4);
+    for (const direcao of ["esquerda", "direita"]) {
+      if (this.estadoAtual[direcao] || !(direcao === "esquerda" ? esquerdaAgora : direitaAgora)) continue;
+      const agora = this.scene.time.now;
+      if (agora - this.ultimosToquesLaterais[direcao] <= 500) {
+        this.duploLateral = true;
+        this.ultimosToquesLaterais[direcao] = -Infinity;
+      } else {
+        this.ultimosToquesLaterais[direcao] = agora;
+      }
+    }
+
     const padAtack = this._botaoPadPressionado(pad, 2);
     const padPular = this._botaoPadPressionado(pad, 3);
     const padSpecial = this._botaoPadPressionado(pad, 9);
     const padGuard = this._botaoPadPressionado(pad, 6);
     const padTaunt = this._botaoPadPressionado(pad, 5);
 
-    this.estadoAtual.esquerda = this._teclaDown("esquerda") || padEsquerda;
-    this.estadoAtual.direita = this._teclaDown("direita") || padDireita;
+    this.estadoAtual.esquerda = esquerdaAgora;
+    this.estadoAtual.direita = direitaAgora;
     this.estadoAtual.cima = this._teclaDown("cima") || padCima || padPular;
     this.estadoAtual.baixo = baixoAgora;
-    this.estadoAtual.dash = this._teclaDown("dash") || padDash;
+    // Dash humano usa duplo toque lateral; dash dedicado permanece para controles virtuais.
+    this.estadoAtual.dash = false;
     this.estadoAtual.atack = this._teclaDown("atack") || padAtack;
     this.estadoAtual.special = this._teclaDown("special") || padSpecial;
     this.estadoAtual.guard = this._teclaDown("guard") || padGuard;
@@ -86,6 +102,7 @@ export default class ControleEntrada {
   }
 
   acabouDeApertar(nome) {
+    if (nome === "dash") return this.duploLateral;
     return !!this.estadoAtual[nome] && !this.estadoAnterior[nome];
   }
 
@@ -100,4 +117,8 @@ export default class ControleEntrada {
   foiDuploBaixo() {
   return this.duploBaixo;
  }
+
+  foiDuploLateral() {
+    return this.duploLateral;
+  }
 }
