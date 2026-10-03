@@ -192,8 +192,13 @@ export default class CutsceneFinalHistoria {
         fj.sprite.setVisible(false);
         const cam = this.scene.camJogo;
         cam.once("camerafadeoutcomplete", () => {
+          this.scene.manterAssetsParaHistoria2 = true;
           this.scene.sound.stopAll();
-          this.scene.scene.start("CenaCreditos");
+          this.scene.scene.start("CenaHistoria2", {
+            p1: this.scene.escolhaP1,
+            p2: this.scene.escolhaP2,
+            numPlayers: this.scene.numPlayers,
+          });
         });
         cam.fadeOut(900, 0, 0, 0);
       } });

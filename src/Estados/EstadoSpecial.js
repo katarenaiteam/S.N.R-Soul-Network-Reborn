@@ -182,7 +182,11 @@ export default class EstadoSpecial extends EstadoBase {
       this.specialAtual?.duracao !== undefined &&
       tempoDecorrido >= this.specialAtual.duracao
     ) {
-      this.finalizarSpecial();
+      if (this.specialAtual.atordoarAoFinalizar) {
+        this.personagem.maquinaEstados.mudarEstado("atordoado");
+      } else {
+        this.finalizarSpecial();
+      }
       return;
     }
 

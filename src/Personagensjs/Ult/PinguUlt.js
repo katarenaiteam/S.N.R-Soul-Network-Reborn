@@ -1,5 +1,5 @@
 import { gerarQuadrosUltimateBackground } from "../../Objetos/QuadrosUltimateBackground.js";
-import { registrarAtaqueEspecial } from "../../Objetos/SistemaCombateEspecial.js";
+import { obterAlvosCombate, registrarAtaqueEspecial } from "../../Objetos/SistemaCombateEspecial.js";
 
 const DURACAO_POSE = 2800;
 const DURACAO_ZOOM = 850;
@@ -9,6 +9,7 @@ const INTERVALO_METEOROS = 190;
 export default class PinguUlt {
   constructor(personagem, config, estadoFSM) {
     this.personagem = personagem;
+    this.alvosUlt = obterAlvosCombate(personagem);
     this.scene = personagem.scene;
     this.config = config;
     this.estadoFSM = estadoFSM;
@@ -88,12 +89,16 @@ export default class PinguUlt {
       }
       sprite?.anims?.pause();
       if (ator.maquinaEstados) ator.maquinaEstados.update = () => {};
-      sprite?.setVisible(false);
     });
   }
 
   atualizar() {
     this.ajustarFundoUltimate();
+    if (!this.finalizando && this.alvosUlt.length > 0 && !this.alvosUlt.some((alvo) =>
+      !alvo.eliminado && alvo.sprite?.active && (alvo.vidas === undefined || alvo.vidas > 0)
+    )) {
+      this.finalizarUlt();
+    }
   }
 
   restaurarAtores() {
@@ -114,13 +119,16 @@ export default class PinguUlt {
 
   esconderCenario() {
     const mapa = this.scene.mapaAtual;
-    const visuais = [mapa?.imagemFundo, ...(mapa?.objetosTeloes ?? [])].filter(Boolean);
+    const visuais = [mapa?.imagemFundo, ...(mapa?.objetosTeloes ?? []), mapa?.suportePlataforma].filter(Boolean);
     visuais.forEach((objeto) => {
       this.estadoVisibilidadeCenario.push({ objeto, visible: objeto.visible });
       objeto.setVisible(false);
     });
 
-    const plataformas = mapa?.plataformas?.getChildren?.() ?? [];
+    const plataformas = [
+      ...(mapa?.plataformas?.getChildren?.() ?? []),
+      ...(this.scene.sistemaPlataformasAtravessaveis?.grupo?.getChildren?.() ?? []),
+    ];
     plataformas.forEach((objeto) => {
       this.estadoVisibilidadeCenario.push({ objeto, visible: objeto.visible });
       objeto.setVisible(false);
@@ -387,7 +395,10 @@ export default class PinguUlt {
     this.finalizando = true;
     this.eventoMeteoros?.remove(false);
     this.eventoMeteoros = null;
-    this.projeteis.forEach((registro) => this.removerProjetil(registro));
+    this.projeteis.forEach((registro) => {
+      registro.timer?.remove(false);
+      registro.timer = this.scene.time.delayedCall(registro.fragmento ? 850 : 2200, () => this.removerProjetil(registro));
+    });
     this.limparTimers();
     this.restaurarCenario();
     this.restaurarAtores();
@@ -415,7 +426,7 @@ export default class PinguUlt {
   }
 
   cancelar() {
-    if (this.cancelada || this.finalizando) return;
+    if (this.cancelada || this.finalizada) return;
     this.cancelada = true;
     this.finalizada = true;
     this.eventoMeteoros?.remove(false);

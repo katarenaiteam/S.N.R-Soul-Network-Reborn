@@ -147,6 +147,7 @@ const assetscommon = [
 
 ];
 const assetsFJ = [
+  (scene, queued) => queueAsset(scene, queued, "texture", "FJ_intro", () => { scene.load.spritesheet("FJ_intro", "assets/personagens/FJ/Sprites/FJ_intro.png", { frameWidth: 459, frameHeight: 433 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_idle", () => { scene.load.spritesheet("FJ_idle", "assets/personagens/FJ/Sprites/FJ_Idle.png", { frameWidth: 379, frameHeight: 409 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_walk", () => { scene.load.spritesheet("FJ_walk", "assets/personagens/FJ/Sprites/FJ_walk.png", { frameWidth: 411, frameHeight: 335 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_jump", () => { scene.load.spritesheet("FJ_jump", "assets/personagens/FJ/Sprites/FJ_jump.png", { frameWidth: 342, frameHeight: 553 }); }),
@@ -499,6 +500,12 @@ const assetsPingu = [
   (scene, queued) => queueAsset(scene, queued, "audio", "pingu-deaf", () => { scene.load.audio("pingu-deaf", "assets/personagens/Pingu/Audio/pingu-deaf.wav"); }),
 
 ];
+const assetsIce = [
+  (scene, queued) => queueAsset(scene, queued, "texture", "ice-back", () => { scene.load.spritesheet("ice-back", "assets/cenarios/Ice/ice-back.png", { frameWidth: 640, frameHeight: 389 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ice-plat", () => { scene.load.image("ice-plat", "assets/cenarios/Ice/ice-plat.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ice-trans", () => { scene.load.image("ice-trans", "assets/cenarios/Ice/ice-trans.png"); }),
+ 
+]
 const assetsMapaTeste = [
   (scene, queued) => queueAsset(scene, queued, "texture", "backtest", () => { scene.load.spritesheet("backtest", "assets/cenarios/MapaTest/backtest.png", { frameWidth: 1200, frameHeight: 600 }); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "No_More", () => { scene.load.audio("No_More", "assets/cenarios/MapaTest/No_More.mp3"); }),
@@ -529,6 +536,13 @@ const assetsstory = [
   (scene, queued) => queueAsset(scene, queued, "texture", "puppet", () => { scene.load.image("puppet", "assets/Hud/dialogo/Miku/puppet.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Mk_deaf", () => { scene.load.spritesheet("Mk_deaf", "assets/personagens/Miku/Sprites/Mk_deaf.png", { frameWidth: 169, frameHeight: 163 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_N", () => { scene.load.image("FJ_N", "assets/Hud/dialogo/FJ/FJ-N.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pg_ok", () => { scene.load.image("Pg_ok", "assets/Hud/dialogo/Pingu/Pg_ok.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pg_N", () => { scene.load.image("Pg_N", "assets/Hud/dialogo/Pingu/Pg_N.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pg_mid", () => { scene.load.image("Pg_mid", "assets/Hud/dialogo/Pingu/Pg_mid.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pg_bad", () => { scene.load.image("Pg_bad", "assets/Hud/dialogo/Pingu/Pg_bad.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pg_deaf", () => { scene.load.image("Pg_deaf", "assets/Hud/dialogo/Pingu/Pg_deaf.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "pingu-dance", () => { scene.load.spritesheet("pingu-dance", "assets/Hud/dialogo/Pingu/pingu-dance.png", { frameWidth: 155, frameHeight: 155 }); }),
+   (scene, queued) => queueAsset(scene, queued, "audio", "cat", () => { scene.load.audio("cat", "assets/cenarios/Ice/cat.wav"); }),
 ];
 const personagens = {
   FJ: assetsFJ,
@@ -547,8 +561,12 @@ export function carregarAssetsVersus(scene, dados) {
     if (!nome) continue;
     carregarGrupo(scene, queued, personagens[nome] || assetsKen);
   }
-  const mapas = { Cidade: assetsCidade, MapaTeste: assetsMapaTeste, MikuMap: assetsMikuMap, SkyTowers: assetsSkyTowers };
+  const mapas = { Cidade: assetsCidade, MapaTeste: assetsMapaTeste, MikuMap: assetsMikuMap, SkyTowers: assetsSkyTowers, Ice:assetsIce };
   const mapa = typeof dados.mapa === "string" ? dados.mapa : dados.ClasseMapa?.name;
+  if (mapa === "Ice" && scene.textures.exists("ice-back")) {
+    const texturaIce = scene.textures.get("ice-back");
+    if (!texturaIce.has("0")) scene.textures.remove("ice-back");
+  }
   carregarGrupo(scene, queued, mapas[mapa] || assetsCidade);
   return queued.size;
 }
@@ -560,6 +578,7 @@ export function carregarAssetsHistoria(scene) {
     carregarGrupo(scene, queued, pack);
   }
   carregarGrupo(scene, queued, assetsMikuMap);
+  carregarGrupo(scene, queued, assetsIce);
   carregarGrupo(scene, queued, assetsstory);
   return queued.size;
 }

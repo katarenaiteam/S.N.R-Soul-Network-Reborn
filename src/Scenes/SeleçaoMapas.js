@@ -3,6 +3,7 @@ import ControleEntrada from "../Objetos/ControleEntrada.js";
 import Cidade from "../Mapasjs/Cidade.js";
 import MapaTeste from "../Mapasjs/MapaTeste.js";
 import MikuMap from "../Mapasjs/MikuMap.js";
+import Ice from "../Mapasjs/Ice.js";
 import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 
 export default class CenaSelecaoMapa extends Phaser.Scene {
@@ -53,6 +54,7 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
       { id: "cidade", nome: "Cidade", classe: Cidade, chaveSprite: "thumb_cidade" },
       { id: "mapaTeste", nome: "Mapa Teste", classe: MapaTeste, chaveSprite: "thumb_teste" },
       { id: "MikuMap", nome: "MikuMap", classe: MikuMap, chaveSprite: "thumb_mikushow" },
+      { id: "Ice", nome: "Ice", classe: Ice, chaveSprite: "thumb_ice" },
     ];
 
     this.indiceOpcao = 0; // Começa no primeiro mapa

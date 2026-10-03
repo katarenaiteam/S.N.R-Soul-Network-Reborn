@@ -6,6 +6,7 @@ import CenaStart from "./Scenes/CenaStart.js";
 import CenaGameOver from "./Scenes/GameOver.js";
 import CenaSelecaoMapa from "./Scenes/SeleçaoMapas.js";
 import CenaHistoria from "./Scenes/CenaHistoria.js";
+import CenaHistoria2 from "./Scenes/CenaHistoria2.js";
 import CenaCreditos from "./Scenes/CenaCreditos.js";
 import IntroMovie from "./Scenes/IntroMovie.js";
 import CenaPreloadVersus from "./Scenes/CenaPreloadVersus.js";
@@ -28,7 +29,7 @@ const config = {
     default: "arcade",
     arcade: {
       gravity: { y: 900 },
-      debug: false,
+      debug: true,
     },
   },
   scale: {
@@ -48,7 +49,7 @@ const config = {
 
   mqtt: configMQTT,
 
-  scene: [CenaPreload, CenaStart, IntroMovie, Charmenu, CenaSelecaoMapa, CenaPreloadVersus, CenaPrincipal, CenaHistoria, CenaGameOver, CenaCreditos, CenaEspectador],
+  scene: [CenaPreload, CenaStart, IntroMovie, Charmenu, CenaSelecaoMapa, CenaPreloadVersus, CenaPrincipal, CenaHistoria, CenaHistoria2, CenaGameOver, CenaCreditos, CenaEspectador],
 };
 
 const game = new Phaser.Game(config);

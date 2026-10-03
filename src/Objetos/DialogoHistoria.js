@@ -40,7 +40,11 @@ export default class DialogoHistoria {
     this.transicaoParaIntro = false;
     this.ativa = true;
 
-    this.jogadores = { Miku: scene.boss, FJ: scene.jogador1 };
+    this.jogadores = {
+      Miku: scene.boss,
+      [scene.inimigoNome]: scene.boss,
+      FJ: scene.jogador1,
+    };
     this.usarLimitesCamera = scene.camJogo.useBounds;
     scene.camJogo.useBounds = false;
     for (const { jogador } of (this.prepararPersonagens ? scene.participantes : [])) {

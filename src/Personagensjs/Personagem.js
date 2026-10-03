@@ -478,7 +478,9 @@ export default class Personagem {
     };
 
     // DEPOIS MUDA PARA O ESTADO DE DANO
-    this.maquinaEstados.mudarEstado("dano");
+    if (!propriedades.naoInterromperEstado) {
+      this.maquinaEstados.mudarEstado("dano");
+    }
 
     if (
       !removeuCongelamentoPingu &&
@@ -722,6 +724,18 @@ consumirUlt() {
     this.atualizarLogicasEspeciais();
     this.vfx?.atualizar();
     this.maquinaEstados.update();
+    if (
+      this.scene.mapaAtual?.escorregadio &&
+      this.sprite.body.blocked.down &&
+      this.maquinaEstados.estadoAtual?.nome === "idle" &&
+      !this.inputDown("esquerda") &&
+      !this.inputDown("direita")
+    ) {
+      const delta = this.scene.game.loop.delta || 16.667;
+      const atenuacao = Math.pow(0.96, delta / 16.667);
+      const velocidadeX = this.sprite.body.velocity.x * atenuacao;
+      this.sprite.setVelocityX(Math.abs(velocidadeX) < 5 ? 0 : velocidadeX);
+    }
     // Estados, ataques e especiais podem mover o sprite. Sincronize depois deles.
     this.sincronizarHurtbox();
     this.controle?.salvarAnterior();

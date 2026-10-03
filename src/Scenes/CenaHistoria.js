@@ -20,8 +20,8 @@ import CutsceneFinalHistoria from "../Objetos/CutsceneFinalHistoria.js";
 import { prepararTexturaTeia, limparAssetsPartida } from "../Objetos/CarregarAssetsPartida.js";
 
 export default class CenaHistoria extends Phaser.Scene {
-  constructor() {
-    super("CenaHistoria");
+  constructor(chaveCena = "CenaHistoria") {
+    super(chaveCena);
   }
 
   init(dados = {}) {
@@ -36,14 +36,36 @@ export default class CenaHistoria extends Phaser.Scene {
     this.escolhaP1 = dados.p1 || "Frederick";
     this.escolhaP2 = dados.p2 || (dados.numPlayers === 2 ? "Ken" : null);
     this.numPlayers = dados.numPlayers || 1;
-    this.inimigoNome = "Miku"; // Primeiro Boss da Fase 1
+    this.inimigoNome = this.obterNomeBoss();
+  }
+
+  obterNomeBoss() { return "Miku"; }
+  criarMapaHistoria() { return new MikuMap(this); }
+  criarIAHistoria(controller) { return new Miku_IA(controller); }
+  configurarBotHistoria() {
+    this.botIA = new BotController(this);
+    this.iaHistoria = this.criarIAHistoria(this.botIA);
+    this.botIA.setCerebro(this.iaHistoria);
+  }
+  iniciarAberturaHistoria() {
+    this.dialogoHistoria = new DialogoHistoria(this, () => {
+      this.dialogoHistoria = null;
+      this.iniciarIntroPartida();
+    });
+  }
+  aoVencerHistoria() {
+    this.cutsceneFinalHistoria = new CutsceneFinalHistoria(this);
+  }
+  aoPerderHistoria() {
+    this.sound.stopAll();
+    this.scene.start("CenaGameOver");
   }
 
   create() {
     encerrarOutrasCenas(this);
     this.events.once("shutdown", () => {
       this.sound.stopAll();
-      limparAssetsPartida(this);
+      if (!this.manterAssetsParaHistoria2) limparAssetsPartida(this);
     });
     this.cameras.main.fadeIn(350, 0, 0, 0);
     prepararTexturaTeia(this);
@@ -53,7 +75,7 @@ export default class CenaHistoria extends Phaser.Scene {
 
     this.physics.world.setBounds(0, 0, 2600, 1400);
 
-    this.mapaAtual = new MikuMap(this);
+    this.mapaAtual = this.criarMapaHistoria();
     this.sistemaLedge = new SistemaLedge(this.mapaAtual.areasLedge);
     this.sistemaLedge.criarVisualizacao(this);
     this.limitesArena = this.mapaAtual.limitesArena;
@@ -115,13 +137,11 @@ export default class CenaHistoria extends Phaser.Scene {
 
     // Boss
 // // 1. Instancia o Controlador de Hardware da IA
-    this.botIA = new BotController(this);
+    this.configurarBotHistoria();
 
     // 2. Cria a IA da Miku passando o controller
-    this.mikuIA = new Miku_IA(this.botIA);
 
     // 3. Conecta a IA (cérebro) ao Controlador
-    this.botIA.setCerebro(this.mikuIA);
 
     // 4. Instancia o Boss passando as teclas virtuais do BotController
     this.boss = this.criarPersonagem(
@@ -245,10 +265,7 @@ this.indicadorCPU = this.criarIndicador(
 );
 
     this.mortesVS = new MorteVS(this, lote => this.concluirMortes(lote));
-    this.dialogoHistoria = new DialogoHistoria(this, () => {
-      this.dialogoHistoria = null;
-      this.iniciarIntroPartida();
-    });
+    this.iniciarAberturaHistoria();
   }
 
   iniciarIntroPartida() {
@@ -372,11 +389,10 @@ this.indicadorCPU = this.criarIndicador(
       this.botIA.soltarTudo();
       if (jogadoresVivos && this.vidasBoss === 0) {
         this.time.delayedCall(1000, () => {
-          this.cutsceneFinalHistoria = new CutsceneFinalHistoria(this);
+          this.aoVencerHistoria();
         });
       } else {
-        this.sound.stopAll();
-        this.scene.start('CenaGameOver');
+        this.aoPerderHistoria();
       }
     }
   }

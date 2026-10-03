@@ -127,7 +127,7 @@ export default class SpiderThrow {
     });
 
     const oponentes =
-      this.scene.scene.key === "CenaHistoria"
+      this.scene.scene.key.startsWith("CenaHistoria")
         ? this.personagem === this.scene.boss
           ? [this.scene.jogador1]
           : [this.scene.boss]

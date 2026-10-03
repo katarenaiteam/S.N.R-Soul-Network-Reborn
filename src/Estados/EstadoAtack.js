@@ -523,7 +523,7 @@ export default class EstadoAtack extends EstadoBase {
     let alvos = [];
 
     // MODO HISTÃ“RIA: P1 e P2 batem sÃ³ no Boss. Boss bate nos dois.
-    if (cena.scene.key === "CenaHistoria") {
+    if (cena.scene.key.startsWith("CenaHistoria")) {
       const souPlayer = (this.personagem === cena.jogador1 || this.personagem === cena.jogador2);
       alvos = souPlayer 
         ? [cena.boss] 

@@ -1,4 +1,7 @@
-const ANIMACOES = { SpiderMan: "intro", Ken: "intro", Miku: "intro", Slenderman: "intro" };
+const ANIMACOES = {
+  SpiderMan: "intro", Ken: "intro", Miku: "intro", Slenderman: "intro",
+  FJ: "intro", Frederick: "intro", Pingu: "intro",
+};
 
 const FIM_POSE_P1 = 0.27;
 const INICIO_POSE_P2 = 0.37;

@@ -22,7 +22,7 @@ export default class Pingu extends Personagem {
       "Pingu_idle",
       "0",
       {
-        velocidade: 200,
+        velocidade: 300,
         forcaPulo: -600,
         maxPulos: 2,
         maxDash: 1,

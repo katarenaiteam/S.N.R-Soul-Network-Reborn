@@ -558,7 +558,7 @@ this.nomePersonagem = "Frederick Johnson";
 
      this.sons = {
       ...this.sons,
-      vozAtaque: [ "fj-atck1", "fj-atck2", "fj-atck3", "fj-atck4" ],
+      vozAtaque: [ "fj-atack1", "fj-atack2", "fj-atack3", "fj-atack4" ],
       vozDanoNormal: ["fj-hurt2", "fj-hurt3", "fj-hurt1", "fj-hurt4", ],
       vozDanoForte: ["fj-hurt5", "fj-hurt6", ],
       volumeVoz: 0.25,
@@ -999,6 +999,15 @@ this.nomePersonagem = "Frederick Johnson";
   }
 
   static criarAnimacoes(scene) {
+    if (!scene.anims.exists("fj_intro")) {
+      scene.anims.create({
+        key: "fj_intro",
+        frames: scene.anims.generateFrameNumbers("FJ_intro", { start: 0, end: 13 }),
+        frameRate: 14,
+        repeat: 0,
+      });
+    }
+
     if (!scene.anims.exists("fj_npose")) {
       scene.anims.create({
         key: "fj_npose",

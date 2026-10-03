@@ -664,6 +664,14 @@ this.pose2?.setFlipX(
       return;
     }
 
+    const alvos = this.obterAlvos();
+    if (alvos.length > 0 && !alvos.some((alvo) =>
+      !alvo.eliminado && alvo.sprite?.active && (alvo.vidas === undefined || alvo.vidas > 0)
+    )) {
+      this.finalizarComFade();
+      return;
+    }
+
     if (this.fundoUlt?.active) {
       this.ajustarFundo();
     }
@@ -1326,6 +1334,7 @@ if (agora < bloqueadoAte) {
     const mapa = this.scene.mapaAtual;
     const plataformas = [
       ...(mapa?.plataformas?.getChildren?.() ?? []),
+      ...(this.scene.sistemaPlataformasAtravessaveis?.grupo?.getChildren?.() ?? []),
       ...(mapa?.objetosTeloes ?? []),
       mapa?.suportePlataforma,
     ].filter(Boolean);
