@@ -121,8 +121,8 @@ PinguAupSpecial.configuracao = {
   propriedades: {
     dano: 16,
     tipoSomImpacto: "heavy",
-    knockbackX: 240,
-    knockbackY: -440,
+    knockbackX: 200,
+    knockbackY: -500,
     tumbling: true,
     travarMovimentoAir: true,
   },

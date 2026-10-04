@@ -337,13 +337,23 @@ export default class Personagem {
     }
 
     const oponente = this.scene.jogador1 === this ? this.scene.jogador2 : this.scene.jogador1;
+    const agoraImpactoLoja = this.scene.time.now;
+    const atacanteJogador = atacanteDoEfeito === this.scene.jogador1 || atacanteDoEfeito === this.scene.jogador2;
+    const impulsoLojaAtivo = quantidade > 0 &&
+      atacanteJogador &&
+      atacanteDoEfeito !== this &&
+      this.scene.knockbackLojaPendenteAte > agoraImpactoLoja;
+    if (this.scene.knockbackLojaPendenteAte && this.scene.knockbackLojaPendenteAte <= agoraImpactoLoja) {
+      this.scene.knockbackLojaPendenteAte = 0;
+    }
+    if (impulsoLojaAtivo) this.scene.knockbackLojaPendenteAte = 0;
     const direcaoX = origem?.direcao !== undefined
       ? origem.direcao * Math.sign(propriedades.knockbackX ?? 250)
       : origem?.x !== undefined
         ? (this.sprite.x >= origem.x ? 1 : -1)
       : (oponente && this.sprite.x > oponente.sprite.x ? 1 : -1);
 
-    const kbX = propriedades.knockbackX ?? 250;
+    const kbX = impulsoLojaAtivo ? 2000 : propriedades.knockbackX ?? 250;
     const kbY = propriedades.knockbackY ?? -100;
 
     //  Salva se o golpe exige recuperação manual por comandos
@@ -353,7 +363,10 @@ export default class Personagem {
     // =====================================================
     // KNOCKBACK FIXO OU VARIÁVEL
     // =====================================================
-    const knockbackFixo = propriedades.knockbackFixo ?? false;
+    const knockbackFixo = impulsoLojaAtivo || (propriedades.knockbackFixo ?? false);
+    const propriedadesKnockback = impulsoLojaAtivo
+      ? { ...propriedades, knockbackX: kbX, knockbackFixo: true }
+      : propriedades;
 
     let multiplicadorX = 1;
     let multiplicadorY = 1;
@@ -395,7 +408,7 @@ export default class Personagem {
         x: oponente?.sprite?.body?.center?.x ?? oponente?.sprite?.x,
         y: oponente?.sprite?.body?.center?.y ?? oponente?.sprite?.y,
       },
-      propriedades
+      propriedadesKnockback
     );
     this.sprite.body.setVelocity(
       direcaoX * Math.abs(kbX) * multiplicadorX,

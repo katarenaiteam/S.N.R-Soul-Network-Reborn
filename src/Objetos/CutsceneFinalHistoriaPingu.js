@@ -122,7 +122,7 @@ export default class CutsceneFinalHistoriaPingu {
       ease: "Cubic.In",
       onUpdate: () => {
         this.sincronizar(this.pingu);
-        this.scene.camJogo.centerOn(sprite.x, sprite.y - 40);
+        this.scene.camJogo.centerOn(sprite.x, sprite.y - 36);
       },
       onComplete: () => this.mostrarPoseMorta(),
     });

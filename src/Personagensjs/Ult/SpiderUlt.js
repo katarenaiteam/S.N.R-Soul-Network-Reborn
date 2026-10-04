@@ -700,9 +700,10 @@ export default class SpiderUlt {
     elementosCenario.forEach((objeto) => objeto.setVisible(false));
 
     const plataformas = [
+      this.scene.mapaAtual?.suportePlataforma,
       ...(this.scene.mapaAtual?.plataformas?.getChildren?.() || []),
       ...(this.scene.sistemaPlataformasAtravessaveis?.grupo?.getChildren?.() || []),
-    ];
+    ].filter(Boolean);
     this.visibilidadePlataformas = plataformas.map((plataforma) => ({
       plataforma,
       visivel: plataforma.visible

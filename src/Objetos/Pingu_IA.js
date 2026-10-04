@@ -12,6 +12,7 @@ export default class Pingu_IA extends Miku_IA {
     this.inicioCargaDo = null;
     this.ladoAvanco = null;
     this.direcaoSpecial = null;
+    this.saltoPendente = null;
   }
 
   provocarAposBaixa() {
@@ -114,9 +115,66 @@ export default class Pingu_IA extends Miku_IA {
     return null;
   }
 
+  plataformaCentralSegura(bot = this.ctrl.bot, aerea = false) {
+    const body = bot?.sprite?.body;
+    if (!body) return false;
+    const lista = this.plataformas();
+    let plataforma = this.apoio(bot, lista);
+    if (!plataforma && aerea) {
+      plataforma = lista
+        .filter(p => body.right > p.left && body.left < p.right &&
+          p.top >= body.bottom - 12 && p.top - body.bottom <= 240)
+        .sort((a, b) => a.top - b.top)[0];
+    }
+    if (!plataforma) return false;
+    const centro = (plataforma.left + plataforma.right) / 2;
+    const margem = Math.min(110, plataforma.width * 0.2);
+    return Math.abs(bot.sprite.x - centro) <= margem;
+  }
+
+  podeAtaqueIA(tipo) {
+    if (tipo === "agachado" && !this.plataformaCentralSegura()) return false;
+    return super.podeAtaqueIA(tipo);
+  }
+
+  podeSpecial(tipo) {
+    if (tipo === "agachado" && !this.plataformaCentralSegura()) return false;
+    if (tipo === "air_agachado" && !this.plataformaCentralSegura(this.ctrl.bot, true)) return false;
+    if (tipo === "lado") {
+      const alvo = this.ctrl.alvo ?? this.definirAlvo();
+      if (alvo && Math.abs(alvo.sprite.x - this.ctrl.bot.sprite.x) < 280) return false;
+    }
+    return super.podeSpecial(tipo);
+  }
+
+  prioridadeAtaqueIA(tipo, nota, especial) {
+    if (especial && tipo === "neutro") return nota + 35;
+    if (especial && tipo === "lado") return nota - 25;
+    return super.prioridadeAtaqueIA(tipo, nota, especial);
+  }
+
   navegar(bot, alvo, lista, time) {
     const body = bot.sprite.body;
     const suporte = this.apoio(bot, lista);
+    if (this.saltoPendente) {
+      const { origem, destino, xPouso, inicio } = this.saltoPendente;
+      if (suporte === destino) {
+        this.saltoPendente = null;
+        this.rota = null;
+        return false;
+      }
+      if (body.blocked.down && suporte && suporte !== origem) {
+        this.saltoPendente = null;
+        this.rota = null;
+        return false;
+      }
+      if (time - inicio <= 1800) {
+        this.mover(xPouso);
+        if (body.blocked.down && suporte === origem) this.pular(bot, time);
+        return true;
+      }
+      this.saltoPendente = null;
+    }
     const destino = this.rota;
     const vao = suporte && destino
       ? Math.max(0, destino.left - suporte.right, suporte.left - destino.right)
@@ -134,7 +192,14 @@ export default class Pingu_IA extends Miku_IA {
       this.mover(xAlvo);
       if (Math.abs(bot.sprite.x - xAlvo) < 22) {
         this.mover(centroDestino);
-        this.pular(bot, time);
+        if (this.pular(bot, time)) {
+          this.saltoPendente = {
+            origem: suporte,
+            destino,
+            xPouso: clamp(centroDestino, destino.left + margem, destino.right - margem),
+            inicio: time,
+          };
+        }
       }
       return true;
     }
@@ -196,6 +261,10 @@ export default class Pingu_IA extends Miku_IA {
       return;
     }
 
+    const suporteAtual = this.apoio(bot);
+    if (bot.sprite.body.blocked.down && this.rota && this.rota !== suporteAtual) {
+      this.proximaDecisao = Math.min(this.proximaDecisao, time + 65);
+    }
     super.update(time, delta);
   }
 }

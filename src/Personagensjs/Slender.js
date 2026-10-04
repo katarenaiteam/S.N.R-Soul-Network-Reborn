@@ -1,6 +1,7 @@
 import Personagem from "./Personagem.js";
 import NeSpecial from "./Specials/Slenderman/NeSpecial.js";
 import DoSpecial from "./Specials/Slenderman/DoSpecial.js";
+import SlenderUlt from "./Ult/SlenderUlt.js";
 
 export default class Slenderman extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -854,12 +855,30 @@ export default class Slenderman extends Personagem {
     for (const special of Object.values(this.specials)) {
       special.propriedades.corrupcaoSlender = 10;
     }
+
+    this.ult = {
+      animacao: "slan-ult1",
+      logica: SlenderUlt,
+      propriedades: { anularGravidade: true },
+    };
   
 
   }
 
   //animaçoes====================================================
   static criarAnimacoes(scene) {
+
+    for (const [key, textura, inicio, fim, fps] of [
+      ["slan-ult1", "slan-ult1", 0, 1, 12],
+      ["slan-ult5", "slan-ult5", 0, 17, 18],
+    ]) {
+      if (!scene.anims.exists(key)) scene.anims.create({
+        key,
+        frames: scene.anims.generateFrameNumbers(textura, { start: inicio, end: fim }),
+        frameRate: fps,
+        repeat: 0,
+      });
+    }
 
     for (const { key, textura, inicio, fim, fps } of [
       { key: "slan_AupSpecial", textura: "Slan_AupSpecial", inicio: 0, fim: 16, fps: 16 },

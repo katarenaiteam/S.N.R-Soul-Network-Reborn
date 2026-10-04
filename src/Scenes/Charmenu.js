@@ -2,7 +2,7 @@ import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 
-const PERSONAGENS = [
+export const PERSONAGENS = [
   {
     id: "Aigis",
     icon: "aigis-icon",
@@ -837,7 +837,6 @@ export default class Charmenu extends Phaser.Scene {
     if (!jogador.hover) return;
 
     jogador.selecionado = jogador.hover;
-    this.sound.play("mao-select", { volume: 0.7 });
 
     jogador.ficha = this.add
       .image(

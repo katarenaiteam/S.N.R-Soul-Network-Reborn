@@ -1439,15 +1439,11 @@ export default class KenUlt {
     elementosCenario.forEach(objeto => objeto.setVisible(false));
 
 
-    const plataformas =
-      this.scene.mapaAtual
-        ?.plataformas
-        ?.getChildren?.()
-      ?? [];
-
-    plataformas.push(
-      ...(this.scene.sistemaPlataformasAtravessaveis?.grupo?.getChildren?.() ?? [])
-    );
+    const plataformas = [
+      ...(this.scene.mapaAtual?.plataformas?.getChildren?.() ?? []),
+      this.scene.mapaAtual?.suportePlataforma,
+      ...(this.scene.sistemaPlataformasAtravessaveis?.grupo?.getChildren?.() ?? []),
+    ].filter(Boolean);
 
 
     this.visibilidadePlataformas =

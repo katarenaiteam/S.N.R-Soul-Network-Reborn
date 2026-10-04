@@ -158,7 +158,7 @@ export default class MorteVS {
     this.recursosCriados = [];
     this.texturasLetras = new Map();
     this.prepararTexturasLetras();
-    const quantidadeBuffers = scene.scene.key.startsWith("CenaHistoria")
+    const quantidadeBuffers = scene.scene.key === "CenaHistoria"
       ? (scene.numPlayers === 2 ? 3 : 2)
       : 2;
     for (let i = 0; i < quantidadeBuffers; i += 1) {

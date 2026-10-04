@@ -56,6 +56,18 @@ function carregarGrupo(scene, queued, linhas) {
 }
 
 const assetscommon = [
+  (scene, queued) => queueAsset(scene, queued, "texture", "Miku_puppet", () => { scene.load.spritesheet("Miku_puppet", "assets/personagens/Miku/Sprites/Miku_puppet.png", { frameWidth: 166, frameHeight: 145 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Loja_raio", () => { scene.load.spritesheet("Loja_raio", "assets/efeitos/shop/raio.png", { frameWidth: 200, frameHeight: 600 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Loja_mao", () => { scene.load.spritesheet("Loja_mao", "assets/efeitos/shop/67H.png", { frameWidth: 650, frameHeight: 450 }); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-heal", () => { scene.load.audio("shop-heal", "assets/Loja/sons/heal.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-puppet", () => { scene.load.audio("shop-puppet", "assets/Loja/sons/puppet.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-life", () => { scene.load.audio("shop-life", "assets/Loja/sons/Life.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-slen", () => { scene.load.audio("shop-slen", "assets/Loja/sons/slan.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-gelo", () => { scene.load.audio("shop-gelo", "assets/Loja/sons/gelo-shop.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-lava", () => { scene.load.audio("shop-lava", "assets/Loja/sons/lava.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-raio", () => { scene.load.audio("shop-raio", "assets/Loja/sons/raio.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-ult", () => { scene.load.audio("shop-ult", "assets/Loja/sons/ult-shops.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-dead", () => { scene.load.audio("shop-dead", "assets/Loja/sons/def.mp3"); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "narrador-3-2-1", () => { scene.load.audio("narrador-3-2-1", "assets/cenarios/Intro/narrador-3-2-1.mp3"); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "narrador-fight", () => { scene.load.audio("narrador-fight", "assets/cenarios/Intro/narrador-fight.mp3"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Fight", () => { scene.load.spritesheet("Fight", "assets/cenarios/Intro/Fight.png", { frameWidth: 105, frameHeight: 33 }); }),
@@ -401,6 +413,8 @@ const assetsKen = [
   (scene, queued) => queueAsset(scene, queued, "texture", "ken-launch", () => { scene.load.spritesheet("ken-launch", "assets/personagens/Ken/Sprites/ult/ken-launch.png", { frameWidth: 144, frameHeight: 60 }); }),
 ];
 const assetsSlenderman = [
+  (scene, queued) => queueAsset(scene, queued, "texture", "poseEffect", () => { scene.load.spritesheet("poseEffect", "assets/personagens/SpiderMan/Sprites/ultimate/poseEffect.png", { frameWidth: 320, frameHeight: 72 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "dashEffect", () => { scene.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultimate/dashEffect.png", { frameWidth: 314, frameHeight: 274 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_intro", () => { scene.load.spritesheet("Slan_intro", "assets/personagens/Slenderman/Sprites/Slan_intro.png", { frameWidth: 97, frameHeight: 263 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_idle", () => { scene.load.spritesheet("Slan_idle", "assets/personagens/Slenderman/Sprites/Slan_idle.png", { frameWidth: 91, frameHeight: 124 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_jump", () => { scene.load.spritesheet("Slan_jump", "assets/personagens/Slenderman/Sprites/Slan_jump.png", { frameWidth: 51, frameHeight: 124 }); }),
@@ -438,6 +452,11 @@ const assetsSlenderman = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_AdoSpecial", () => { scene.load.spritesheet("Slan_AdoSpecial", "assets/personagens/Slenderman/Sprites/Slan_AdoSpecial.png", { frameWidth: 68, frameHeight: 156 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_AdoSpecial-efect", () => { scene.load.spritesheet("Slan_AdoSpecial-efect", "assets/personagens/Slenderman/Sprites/Slan_AdoSpecial-efect.png", { frameWidth: 228, frameHeight: 209 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_tv", () => { scene.load.spritesheet("Slan_tv", "assets/personagens/Slenderman/Sprites/Slan_tv.png", { frameWidth: 498, frameHeight: 371 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "slan-ult1", () => { scene.load.spritesheet("slan-ult1", "assets/personagens/Slenderman/Sprites/ult/slan-ult1.png", { frameWidth: 115, frameHeight: 105 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "slan-grab", () => { scene.load.spritesheet("slan-grab", "assets/personagens/Slenderman/Sprites/ult/slan-grab.png", { frameWidth: 70, frameHeight: 123 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "slan-grab2", () => { scene.load.spritesheet("slan-grab2", "assets/personagens/Slenderman/Sprites/ult/slan-grab2.png", { frameWidth: 70, frameHeight: 123 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "slan-ult5", () => { scene.load.spritesheet("slan-ult5", "assets/personagens/Slenderman/Sprites/ult/slan-ult5.png", { frameWidth: 130, frameHeight: 139 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "pages1", () => { scene.load.spritesheet("pages1", "assets/personagens/Slenderman/Sprites/ult/pages1.png", { frameWidth: 283, frameHeight: 352 }); }),
 ];
 const assetsPingu = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_intro", () => { scene.load.spritesheet("Pingu_intro", "assets/personagens/Pingu/Sprites/Pingu_intro.png", { frameWidth: 81, frameHeight: 90 }); }),
