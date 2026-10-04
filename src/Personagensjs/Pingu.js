@@ -95,7 +95,7 @@ export default class Pingu extends Personagem {
         largura: 30,
         altura: 45,
         offsetX: 5,
-        offsetY: -7,
+        offsetY: -5,
         escala: 1,
         hurtboxes: [
         ],

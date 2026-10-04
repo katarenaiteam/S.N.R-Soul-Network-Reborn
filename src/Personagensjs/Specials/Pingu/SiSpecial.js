@@ -205,7 +205,7 @@ PinguSiSpecial.configuracao = {
   inicioEnxurrada: 12,
   intervaloEnxurrada: 2,
   fimEnxurrada: 58,
-  projeteisParaQuebrar: 4,
+  projeteisParaQuebrar: 3,
   texturaProjetil: "Pingu_siBall",
   animacaoProjetil: "pingu_siBall",
   tempoProjetil: 5000,
