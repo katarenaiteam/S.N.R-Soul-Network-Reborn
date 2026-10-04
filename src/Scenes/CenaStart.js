@@ -9,13 +9,6 @@ export default class CenaStart extends Phaser.Scene {
 
   create(dados = {}) {
     encerrarOutrasCenas(this);
-    let musicaMenu = this.registry.get("musicaMenu");
-    if (!musicaMenu || !musicaMenu.isPlaying) {
-      musicaMenu = this.sound.add("menu", { loop: true, volume:0.9});
-      this.registry.set("musicaMenu", musicaMenu);
-      if (this.sound.locked) this.sound.once("unlocked", () => musicaMenu.play());
-      else musicaMenu.play();
-    }
     this.iniciarMQTT();
     this.cameras.main.setBackgroundColor("#000000");
     const entradaDoPreload = dados.entradaPreload === true;
@@ -151,11 +144,9 @@ export default class CenaStart extends Phaser.Scene {
 
       if (apertouCima) {
         this.indiceOpcao = (this.indiceOpcao - 1 + this.opcoesMenu.length) % this.opcoesMenu.length;
-        this.sound.play("Bpass", { volume: 0.7 });
         this.atualizarDestaque();
       } else if (apertouBaixo) {
         this.indiceOpcao = (this.indiceOpcao + 1) % this.opcoesMenu.length;
-        this.sound.play("Bpass", { volume: 0.7 });
         this.atualizarDestaque();
       }
 
@@ -337,7 +328,6 @@ export default class CenaStart extends Phaser.Scene {
 
   confirmarSelecao() {
     const opcao = this.opcoesMenu[this.indiceOpcao];
-    this.sound.play("Bselect", { volume: 0.7 });
 
     this.animarConfirmacao(() => {
       if (opcao.id === "story") {

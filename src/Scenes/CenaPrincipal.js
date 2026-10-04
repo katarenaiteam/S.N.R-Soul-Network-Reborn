@@ -18,10 +18,6 @@ import SistemaLedge from "../Objetos/SistemaLedge.js";
 import IntroPartida from "../Objetos/IntroPartida.js";
 import { prepararTexturaTeia, limparAssetsPartida } from "../Objetos/CarregarAssetsPartida.js";
 import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
-import ChuvaMikuLoja from "../Objetos/ChuvaMikuLoja.js";
-import LojaEspectador from "../Objetos/LojaEspectador.js";
-import { MaoDeadLoja, RaioLoja } from "../Objetos/EfeitosAvancadosLoja.js";
-import PuppetLojaMiku from "../Objetos/PuppetLojaMiku.js";
 
 export default class cenaPrincipal extends Phaser.Scene {
   constructor() {
@@ -32,7 +28,6 @@ export default class cenaPrincipal extends Phaser.Scene {
     // Usa as escolhas passadas; se não houver, usa padrões para evitar erros
     this.escolhaP1 = dados.p1 || "Frederick";
     this.escolhaP2 = dados.p2 || "Madotsuki";
-    this.posicoesIniciaisEspectador = dados.posicoesIniciais ?? null;
 
     const mapas = { Cidade: MapaCidade, MapaTeste, MikuMap };
     this.ClasseMapa = dados.ClasseMapa || mapas[dados.mapa] || MapaCidade;
@@ -48,14 +43,6 @@ export default class cenaPrincipal extends Phaser.Scene {
     });
     this.cameras.main.fadeIn(350, 0, 0, 0);
     prepararTexturaTeia(this);
-    if (!this.anims.exists("loja-raio")) {
-      this.anims.create({
-        key: "loja-raio",
-        frames: this.anims.generateFrameNumbers("Loja_raio", { start: 0, end: 6 }),
-        frameRate: 14,
-        repeat: 0,
-      });
-    }
 
     this.sistemaPlataformasAtravessaveis =
     new SistemaPlataformasAtravessaveis(this);
@@ -123,8 +110,8 @@ export default class cenaPrincipal extends Phaser.Scene {
     //========instanciar fodinhas============
     this.jogador1 = this.criarPersonagem(
   this.escolhaP1,
-      this.posicoesIniciaisEspectador?.p1?.x ?? this.mapaAtual.spawnsIniciais.p1.x,
-      this.posicoesIniciaisEspectador?.p1?.y ?? this.mapaAtual.spawnsIniciais.p1.y,
+  this.mapaAtual.spawnsIniciais.p1.x, // Lê o X dinâmico do mapa
+  this.mapaAtual.spawnsIniciais.p1.y, // Lê o Y dinâmico do mapa
   teclasP1,
   200,
   600,
@@ -133,22 +120,13 @@ export default class cenaPrincipal extends Phaser.Scene {
 
 this.jogador2 = this.criarPersonagem(
   this.escolhaP2,
-  this.posicoesIniciaisEspectador?.p2?.x ?? this.mapaAtual.spawnsIniciais.p2.x,
-  this.posicoesIniciaisEspectador?.p2?.y ?? this.mapaAtual.spawnsIniciais.p2.y,
+  this.mapaAtual.spawnsIniciais.p2.x, // Lê o X dinâmico do mapa
+  this.mapaAtual.spawnsIniciais.p2.y, // Lê o Y dinâmico do mapa
   teclasP2,
   600,
   600,
   controleP2
 );
-
-if (!this.anims.exists("miku_puppet_move")) {
-  this.anims.create({
-    key: "miku_puppet_move",
-    frames: this.anims.generateFrameNumbers("Miku_puppet", { start: 0, end: 3 }),
-    frameRate: 10,
-    repeat: -1,
-  });
-}
   
    this.sistemaPlataformasAtravessaveis.registrar(this.jogador1);
    this.sistemaPlataformasAtravessaveis.registrar(this.jogador2);
@@ -274,130 +252,14 @@ this.indicadorP2 = this.criarIndicador(
     if (this.modoEspectador) {
       this.physics.world.pause();
       this.time.delayedCall(0, () => this.aplicarEstadoEspectador(this.registry.get("estadoEspectador")));
-      this.lojaEspectador = new LojaEspectador(this, this.registry.get("clienteMQTT"));
-      this.camJogo.ignore(this.lojaEspectador.objetos);
     } else {
       this.introPartida = new IntroPartida(this);
       this.publicarEstadoMQTT(0, true);
-
-      const mqtt = this.registry.get("clienteMQTT");
-      if (mqtt?.papel === "host") {
-        this.chuvaMikuLoja = new ChuvaMikuLoja(this);
-        this.pedidosLojaRecebidos = new Set();
-        this.aoReceberPedidoLoja = (pedido) => {
-          if (
-            ![
-              "miku-rain", "less", "puppet", "life", "slen-shop", "1hit",
-              "froze-shop", "lava-shop", "raio", "ult-shop", "dead-shop",
-            ].includes(pedido?.efeito) ||
-            !pedido.clientId ||
-            !pedido.pedidoId
-          ) return;
-
-          const idPedido = `${pedido.clientId}:${pedido.pedidoId}`;
-          if (this.pedidosLojaRecebidos.has(idPedido)) return;
-          this.pedidosLojaRecebidos.add(idPedido);
-
-          if (pedido.efeito === "miku-rain") {
-            this.chuvaMikuLoja.executar();
-            return;
-          }
-
-          if (pedido.efeito === "puppet") {
-            this.reproduzirAudioLoja("shop-puppet", idPedido);
-            new PuppetLojaMiku(this);
-            return;
-          }
-
-          if (pedido.efeito === "1hit") {
-            this.knockbackLojaPendenteAte = this.time.now + 10000;
-            return;
-          }
-
-          if (pedido.efeito === "lava-shop") {
-            this.lavaLojaAtiva = true;
-            this.lavaLojaAtivaAte = this.time.now + 15000;
-            this.ultimoContatoLavaLoja ??= new WeakMap();
-            return;
-          }
-
-          const jogador = pedido.jogador === 1
-            ? this.jogador1
-            : pedido.jogador === 2
-              ? this.jogador2
-              : null;
-          if (!jogador) return;
-
-          if (pedido.efeito === "slen-shop") {
-            jogador.corrupcaoSlender?.adicionar(100);
-            this.reproduzirAudioLoja("shop-slen", idPedido);
-          } else if (pedido.efeito === "froze-shop") {
-            jogador.congelamentoPingu?.adicionar(65);
-            this.reproduzirAudioLoja("shop-gelo", idPedido);
-          } else if (pedido.efeito === "raio") {
-            new RaioLoja(this, jogador.sprite.x, jogador.sprite.y);
-          } else if (pedido.efeito === "ult-shop") {
-            jogador.ultCarga = jogador.ultCargaMax;
-            this.atualizarBarraUlt(jogador, jogador === this.jogador1 ? this.hudP1_Nome : this.hudP2_Nome);
-            this.reproduzirAudioLoja("shop-ult", idPedido);
-          } else if (pedido.efeito === "dead-shop") {
-            new MaoDeadLoja(this, jogador, pedido.jogador);
-          } else if (pedido.efeito === "less") {
-            jogador.porcentagemDano = 0;
-            jogador.textoDano?.setText("0%");
-            this.reproduzirAudioLoja("shop-heal", idPedido);
-          } else if (pedido.efeito === "life") {
-            if (pedido.jogador === 1) {
-              this.vidasP1 += 1;
-              this.hudP1_Vidas?.setText(`VIDAS: ${this.vidasP1}`);
-            } else {
-              this.vidasP2 += 1;
-              this.hudP2_Vidas?.setText(`VIDAS: ${this.vidasP2}`);
-            }
-            this.reproduzirAudioLoja("shop-life", idPedido);
-          }
-        };
-        mqtt.on("message:shop/purchase", this.aoReceberPedidoLoja);
-        mqtt.subscribe("shop/purchase");
-        this.events.once("shutdown", () => {
-          mqtt.off("message:shop/purchase", this.aoReceberPedidoLoja);
-        });
-      }
     }
   }
 
   criarHudPartida(...args) {
     return criarHudPartida.call(this, ...args);
-  }
-
-  reproduzirAudioLoja(chave, id) {
-    this.eventosAudioLoja ??= [];
-    this.eventosAudioLoja.push({ chave, id });
-    if (this.eventosAudioLoja.length > 16) this.eventosAudioLoja.shift();
-    this.sound.play(chave);
-  }
-
-  atualizarLavaLoja() {
-    if (!this.lavaLojaAtiva) return;
-    if (this.time.now >= this.lavaLojaAtivaAte) {
-      this.lavaLojaAtiva = false;
-      this.lavaLojaAtivaAte = 0;
-      return;
-    }
-    this.ultimoContatoLavaLoja ??= new WeakMap();
-    const agora = this.time.now;
-    for (const [jogador, numero] of [[this.jogador1, 1], [this.jogador2, 2]]) {
-      if (!jogador?.sprite?.active || !jogador.sprite.body?.blocked.down) continue;
-      if (agora < (this.ultimoContatoLavaLoja.get(jogador) ?? 0)) continue;
-      this.ultimoContatoLavaLoja.set(jogador, agora + 700);
-      jogador.receberDano(
-        1,
-        { tipoSomImpacto: "light", knockbackX: 0, knockbackY: -650, knockbackFixo: true },
-        { x: jogador.sprite.x, direcao: 0, atacante: this.personagemAmbientalLoja },
-      );
-      this.sequenciaLavaLoja = (this.sequenciaLavaLoja ?? 0) + 1;
-      this.reproduzirAudioLoja("shop-lava", `lava-${numero}-${this.sequenciaLavaLoja}`);
-    }
   }
 
   criarPersonagem(nome, x, y, teclas, minDano, maxDano, controle) {
@@ -430,7 +292,6 @@ this.indicadorP2 = this.criarIndicador(
       if (estado?.updatedAt !== this.ultimoSnapshotMQTT) {
         this.aplicarEstadoEspectador(estado);
       }
-      this.mortesVS?.atualizarEfeitosEspectador(delta);
       this.sistemaLedge.atualizarVisualizacao(this);
       this.atualizarVisuaisReplicados(time);
       return;
@@ -457,8 +318,6 @@ this.indicadorP2 = this.criarIndicador(
 
     this.sistemaPlataformasAtravessaveis.atualizar();
     this.mortesVS.atualizar(delta);
-    this.chuvaMikuLoja?.atualizar();
-    this.atualizarLavaLoja();
 
   this.atualizarBarraUlt(
     this.jogador1,
@@ -493,16 +352,13 @@ this.indicadorP2 = this.criarIndicador(
   }
 
   publicarEstadoMQTT(tempo, forcar = false) {
-    const mqtt = this.registry.get("clienteMQTT");
-    if (mqtt?.papel !== "host" || !mqtt.client?.connected) return;
-
     const intervalo = 1000 / 15;
     if (tempo - (this.ultimaPublicacaoMQTT || 0) < intervalo && !forcar) return;
     this.ultimaPublicacaoMQTT = tempo;
 
     const capturarJogador = (jogador) => {
       const sprite = jogador?.sprite;
-      if (!sprite) return null;
+      if (!sprite?.active) return null;
       return {
         x: sprite.x,
         y: sprite.y,
@@ -514,8 +370,6 @@ this.indicadorP2 = this.criarIndicador(
         scaleY: sprite.scaleY,
         alpha: sprite.alpha,
         visible: sprite.visible,
-        tint: sprite.isTinted ? sprite.tintTopLeft : null,
-        tintMode: sprite.isTinted ? sprite.tintMode : null,
         dano: jogador.porcentagemDano,
         ult: jogador.ultCarga,
         guard: jogador.vidaGuard,
@@ -528,7 +382,6 @@ this.indicadorP2 = this.criarIndicador(
       const ehTeia = objeto instanceof Phaser.GameObjects.Graphics && Array.isArray(objeto.snrPontosTeia);
       if (
         this.objetosVisuaisBaseMQTT.has(objeto) ||
-        objeto.snrEfeitoProcedural ||
         (!ehSprite && !ehImagem && !ehTeia) ||
         !objeto.active ||
         ((ehSprite || ehImagem) && !objeto.texture?.key)
@@ -557,8 +410,6 @@ this.indicadorP2 = this.criarIndicador(
         origemY: objeto.originY,
         profundidade: objeto.depth,
         visivel: objeto.visible,
-        tint: objeto.isTinted ? objeto.tintTopLeft : null,
-        tintMode: objeto.isTinted ? objeto.tintMode : null,
         flipX: objeto.flipX,
         flipY: objeto.flipY,
         scrollX: objeto.scrollFactorX,
@@ -581,9 +432,6 @@ this.indicadorP2 = this.criarIndicador(
         y: this.cameras.main.midPoint.y,
         zoom: this.cameras.main.zoom,
       },
-      efeitoMorteVS: this.eventoMorteVS,
-      efeitoTVMorte: this.eventoTVMorte,
-      audiosLoja: this.eventosAudioLoja ?? [],
       visuais,
     });
   }
@@ -614,8 +462,6 @@ this.indicadorP2 = this.criarIndicador(
       sprite.setScale(remoto.scaleX, remoto.scaleY);
       sprite.setAlpha(remoto.alpha);
       sprite.setVisible(remoto.visible);
-      if (remoto.tint === null || remoto.tint === undefined) sprite.clearTint();
-      else sprite.setTint(remoto.tint).setTintMode(remoto.tintMode ?? Phaser.TintModes.NORMAL);
       jogador.porcentagemDano = remoto.dano;
       jogador.ultCarga = remoto.ult;
       jogador.vidaGuard = remoto.guard;
@@ -624,9 +470,6 @@ this.indicadorP2 = this.criarIndicador(
 
     aplicarJogador(this.jogador1, dados.jogadores?.p1);
     aplicarJogador(this.jogador2, dados.jogadores?.p2);
-    this.mortesVS?.reproduzirEfeitoEspectador(dados.efeitoMorteVS);
-    this.mortesVS?.reproduzirTVEspectador(dados.efeitoTVMorte);
-    this.reproduzirAudioLojaEspectador(dados.audiosLoja);
     this.sincronizarVisuaisReplicados(dados.visuais ?? []);
 
     this.vidasP1 = dados.vidasP1;
@@ -637,34 +480,8 @@ this.indicadorP2 = this.criarIndicador(
     this.atualizarBarraUlt(this.jogador2, this.hudP2_Nome);
 
     if (dados.camera) {
-      const camera = this.cameras.main;
-      this.alvoCameraMQTT = {
-        xInicial: camera.midPoint.x,
-        yInicial: camera.midPoint.y,
-        zoomInicial: camera.zoom,
-        xDestino: dados.camera.x,
-        yDestino: dados.camera.y,
-        zoomDestino: dados.camera.zoom,
-        inicio: this.time.now,
-      };
-    }
-  }
-
-  reproduzirAudioLojaEspectador(evento) {
-    const eventos = Array.isArray(evento) ? evento : evento ? [evento] : [];
-    if (!this.audioLojaSnapshotInicializado) {
-      this.audioLojaSnapshotInicializado = true;
-      this.audiosLojaOuvidos = new Set(eventos.map((item) => item.id).filter(Boolean));
-      return;
-    }
-    this.audiosLojaOuvidos ??= new Set();
-    for (const item of eventos) {
-      if (!item?.id || this.audiosLojaOuvidos.has(item.id)) continue;
-      this.audiosLojaOuvidos.add(item.id);
-      if (this.cache.audio.exists(item.chave)) this.sound.play(item.chave);
-    }
-    while (this.audiosLojaOuvidos.size > 64) {
-      this.audiosLojaOuvidos.delete(this.audiosLojaOuvidos.values().next().value);
+      this.cameras.main.setZoom(dados.camera.zoom);
+      this.cameras.main.centerOn(dados.camera.x, dados.camera.y);
     }
   }
 
@@ -723,8 +540,6 @@ this.indicadorP2 = this.criarIndicador(
       objeto.setOrigin(remoto.origemX, remoto.origemY);
       objeto.setDepth(remoto.profundidade);
       objeto.setVisible(remoto.visivel);
-      if (remoto.tint === null || remoto.tint === undefined) objeto.clearTint();
-      else objeto.setTint(remoto.tint).setTintMode(remoto.tintMode ?? Phaser.TintModes.NORMAL);
       objeto.setFlip(remoto.flipX, remoto.flipY);
       objeto.setScrollFactor(remoto.scrollX, remoto.scrollY);
       objeto.setBlendMode(remoto.blend);
@@ -739,18 +554,6 @@ this.indicadorP2 = this.criarIndicador(
 
   atualizarVisuaisReplicados(tempo) {
     const duracaoSnapshot = 1000 / 15;
-    const alvoCamera = this.alvoCameraMQTT;
-    if (alvoCamera) {
-      const progressoCamera = Phaser.Math.Clamp((tempo - alvoCamera.inicio) / duracaoSnapshot, 0, 1);
-      this.cameras.main.centerOn(
-        Phaser.Math.Linear(alvoCamera.xInicial, alvoCamera.xDestino, progressoCamera),
-        Phaser.Math.Linear(alvoCamera.yInicial, alvoCamera.yDestino, progressoCamera),
-      );
-      this.cameras.main.setZoom(
-        Phaser.Math.Linear(alvoCamera.zoomInicial, alvoCamera.zoomDestino, progressoCamera),
-      );
-    }
-
     for (const jogador of [this.jogador1, this.jogador2]) {
       const alvo = jogador?.alvoPosicaoMQTT;
       if (!alvo) continue;

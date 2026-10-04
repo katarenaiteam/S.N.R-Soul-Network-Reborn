@@ -133,7 +133,7 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
     if (!Number.isInteger(indice) || indice < 0 || indice >= this.mapas.length) return;
     if (indice === this.indiceOpcao) return;
     this.indiceOpcao = indice;
-    this.atualizarCarrossel(true);
+    this.atualizarCarrossel(false);
   }
 
   criarChuvaMatrix() {

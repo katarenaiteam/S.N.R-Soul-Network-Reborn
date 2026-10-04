@@ -244,7 +244,7 @@ export default class SpiderSwing {
     });
 
     const oponentes =
-      this.scene.scene && this.scene.scene.key.startsWith("CenaHistoria")
+      this.scene.scene && this.scene.scene.key === "CenaHistoria"
         ? this.personagem === this.scene.boss
           ? [this.scene.jogador1]
           : [this.scene.boss]
