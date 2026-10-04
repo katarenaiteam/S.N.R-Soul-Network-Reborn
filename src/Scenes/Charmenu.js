@@ -53,12 +53,12 @@ export const PERSONAGENS = [
 
       p1: {
         x: -70,
-        y: 200
+        y: 140
       },
 
       p2: {
         x: 65,
-        y: 200
+        y: 140
       }
     }
   },

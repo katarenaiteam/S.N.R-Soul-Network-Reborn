@@ -79,8 +79,8 @@ export default class DoSpecial {
     this.personagem.aplicarDanoSpecialStun(this, alvo, this.dano, {
       dano: this.dano,
       tipoSomImpacto: "heavy",
-      knockbackX: 240,
-      knockbackY: -430,
+      knockbackX: 312,
+      knockbackY: -559,
       tumbling: true,
     }, { direcao: this.direcao, x: this.personagem.sprite.x });
     const som = this.personagem.sons?.heavy;

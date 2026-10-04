@@ -197,7 +197,7 @@ export default class SiSpecial {
     const somImpacto = this.personagem.sons?.heavy;
     if (somImpacto) this.personagem.tocarSomSorteado(somImpacto, { volume: 0.15 });
     this.personagem.aplicarDanoSpecialStun(this, alvo, 18, {
-      dano: 18, knockbackX: 700, knockbackY: -350, tumbling: true,
+      dano: 18, knockbackX: 910, knockbackY: -455, tumbling: true,
       tipoSomImpacto: "heavy",
     }, { direcao: this.direcao, x: this.personagem.sprite.x });
   }

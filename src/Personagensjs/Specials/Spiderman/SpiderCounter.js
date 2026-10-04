@@ -146,8 +146,8 @@ export default class SpiderCounter {
         this.personagem.estadoInvencible?.aoAcertarAtaque();
       }
       oponente.receberDano(15, { 
-        knockbackX: 650, 
-        knockbackY: -350, 
+        knockbackX: 845,
+        knockbackY: -455,
         tumbling: true 
       });
     }

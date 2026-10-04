@@ -147,7 +147,7 @@ PinguNeSpecial.configuracao = {
   propriedades: {
     dano: 8,
     tipoSomImpacto: "heavy",
-    knockbackX: 300,
-    knockbackY: -100,
+    knockbackX: 390,
+    knockbackY: -130,
   },
 };

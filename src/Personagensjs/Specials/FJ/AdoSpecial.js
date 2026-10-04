@@ -130,8 +130,8 @@ export default class AdoSpecial extends DoSpecial {
     if (somImpacto) this.personagem.tocarSomSorteado(somImpacto, { volume: 0.15 });
     this.personagem.aplicarDanoSpecialStun(this, alvo, dano, {
       dano, tipoSomImpacto: "heavy", tumbling: true,
-      knockbackX: ground ? 360 : 180,
-      knockbackY: ground ? -300 : 180,
+      knockbackX: ground ? 468 : 234,
+      knockbackY: ground ? -390 : 234,
     }, { direcao, x: ground ? this.impacto.x : this.personagem.sprite.x });
   }
 

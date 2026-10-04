@@ -304,7 +304,7 @@ export default class Personagem {
     }
 
     //. LÓGICA PADRÃO DE DANO (Quando toma golpe sem escudo):
-    this.porcentagemDano += quantidade;
+    this.porcentagemDano = Math.min(320, this.porcentagemDano + quantidade);
     const danoDeSlenderman = atacante?.nomePersonagem === "Slanderman" || atacante?.nomePersonagem === "Slenderman";
     if (quantidade > 0 && (propriedades.corrupcaoSlender > 0 || danoDeSlenderman)) {
       this.corrupcaoSlender.adicionar(propriedades.corrupcaoSlender || 5);
@@ -385,8 +385,8 @@ export default class Personagem {
         ? porcentagemEscalada
         : 180 + (porcentagemEscalada - 180) * 0.20;
 
-      const multiplicadorBaseX = 0.65 + danoEscalado / 100;
-      const multiplicadorBaseY = 0.65 + danoEscalado / 180;
+      const multiplicadorBaseX = 0.65 + danoEscalado * 0.625 / 100;
+      const multiplicadorBaseY = 0.65 + danoEscalado * 0.568 / 180;
 
       // Reforça progressivamente o knockback sem criar outro salto brusco.
       // A curva perde inclinação ao se aproximar de 300% e, no teto,

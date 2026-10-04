@@ -697,8 +697,8 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
            tipoSomImpacto: "heavy",
           dano: 8,
-          knockbackX: 300,
-          knockbackY: -250,
+          knockbackX: 420,
+          knockbackY: -350,
           tumbling: true,
           hitstunBaseFrames: 18
         },
@@ -824,8 +824,8 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 9,
-          knockbackX: 120,
-          knockbackY: -470,
+          knockbackX: 168,
+          knockbackY: -658,
           tumbling: true,
           knockbackFixo: false,
         },
@@ -863,8 +863,8 @@ this.nomePersonagem = "Frederick Johnson";
          // anularGravidade: true,
           tipoSomImpacto: "heavy",
           dano: 9,
-          knockbackX: 400,
-          knockbackY: -250,
+          knockbackX: 560,
+          knockbackY: -350,
           tumbling: true,
           knockbackFixo: false,
         },
@@ -903,8 +903,8 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 10,
-          knockbackX: 80,
-          knockbackY: 400,
+          knockbackX: 112,
+          knockbackY: 560,
           quiqueChaoY: 400,
           hitstunMinFrames:25,
         },

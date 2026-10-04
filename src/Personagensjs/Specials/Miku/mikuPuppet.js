@@ -367,7 +367,7 @@ export default class MikuPuppet {
       {
         tipoSomImpacto: "light",
         knockbackX: MikuPuppet.KNOCKBACK_X,
-        knockbackY: -80,
+        knockbackY: -104,
         tumbling: false,
       },
       { x: this.sprite.x, direcao }
@@ -558,7 +558,7 @@ MikuPuppet.VELOCIDADE_DURANTE_ATAQUE = 150;
 MikuPuppet.VELOCIDADE_SUPORTE = 175;
 MikuPuppet.FORCA_PULO = -300;
 MikuPuppet.DANO_ATAQUE = 5;
-MikuPuppet.KNOCKBACK_X = 165;
+MikuPuppet.KNOCKBACK_X = 215;
 MikuPuppet.INTERVALO_ATAQUE = 1500;
 MikuPuppet.DURACAO_HITBOX = 130;
 MikuPuppet.TEMPO_RECUO = 420;

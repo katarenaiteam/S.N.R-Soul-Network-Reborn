@@ -150,6 +150,7 @@ export default class Pingu extends Personagem {
 
       dano: {
         offsetVisualX: -20,
+        offsetVisualY: 20,
          largura: 30,
         altura: 70,
         offsetX: 75,
@@ -272,7 +273,7 @@ export default class Pingu extends Personagem {
         ],
       },
 
-      neSpecial: { offsetVisualY: 14, offsetVisualX: -4, largura: 30, altura: 70, offsetX: 21, offsetY: 10, escala: 1,
+      neSpecial: { offsetVisualY: 14, offsetVisualX: -4, largura: 30, altura: 70, offsetX: 21, offsetY: 16, escala: 1,
         hurtboxes: [
           { largura: 30, altura: 55, offsetX: -4, offsetY: -40 }, 
         ],
@@ -398,7 +399,7 @@ export default class Pingu extends Personagem {
         largura: 48,
         altura: 35,
         duracao: 550,
-       // cancelavel: true,
+        cancelavel: true,
 
         vfxAcerto: [
         {
@@ -450,8 +451,8 @@ export default class Pingu extends Personagem {
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
-          knockbackX: 250,
-          knockbackY: -350,
+          knockbackX: 350,
+          knockbackY: -490,
           knockbackFixo: false,
         },
 
@@ -526,8 +527,8 @@ export default class Pingu extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 400,
-          knockbackY: -250,
+          knockbackX: 560,
+          knockbackY: -350,
           tumbling: true,
           impulsoX: 0,
         },
@@ -603,8 +604,8 @@ export default class Pingu extends Personagem {
   propriedades: {
     tipoSomImpacto: "heavy",
     dano: 11,
-    knockbackX: 50,
-    knockbackY: 350,
+    knockbackX: 70,
+    knockbackY: 490,
     quiqueChaoY: 350,
     hitstunMinFrames:25,
   },
@@ -644,8 +645,8 @@ export default class Pingu extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 300,
-          knockbackY: -130,
+          knockbackX: 420,
+          knockbackY: -182,
           tumbling: true
         },
       },
@@ -673,8 +674,8 @@ export default class Pingu extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 11,
-          knockbackX: 60,
-          knockbackY: -350,
+          knockbackX: 84,
+          knockbackY: -490,
           impulsoX: 30,
           tumbling: true
         },
@@ -1040,7 +1041,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 7,
       }),
-      frameRate: 27,
+      frameRate: 30,
       repeat: -1,
     });
 

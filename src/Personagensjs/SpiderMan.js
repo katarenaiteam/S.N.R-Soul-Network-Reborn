@@ -602,8 +602,8 @@ export default class SpiderMan extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 8,
-          knockbackX: 120,
-          knockbackY: -450,
+          knockbackX: 168,
+          knockbackY: -630,
           tumbling: true
         },
       },
@@ -664,8 +664,8 @@ export default class SpiderMan extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 360,
-          knockbackY: -300,
+          knockbackX: 504,
+          knockbackY: -420,
           tumbling: true,
           impulsoX: 0,
         },
@@ -741,8 +741,8 @@ export default class SpiderMan extends Personagem {
   propriedades: {
     tipoSomImpacto: "heavy",
     dano: 11,
-    knockbackX: 80,
-    knockbackY: 400,
+    knockbackX: 112,
+    knockbackY: 560,
     quiqueChaoY: 350,
     hitstunMinFrames:24,
   },
@@ -782,8 +782,8 @@ export default class SpiderMan extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 360,
-          knockbackY: -140,
+          knockbackX: 504,
+          knockbackY: -196,
           impulsoX: 350,
           tumbling: true
         },
@@ -812,8 +812,8 @@ export default class SpiderMan extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 11,
-          knockbackX: 60,
-          knockbackY: -400,
+          knockbackX: 84,
+          knockbackY: -560,
           tumbling: true
         },
       },
@@ -921,8 +921,8 @@ export default class SpiderMan extends Personagem {
         propriedades: {
           travarMovimentoAir: true,
           dano: 18,
-          knockbackX: 530,
-          knockbackY: -250,
+          knockbackX: 620,
+          knockbackY: -325,
           anularGravidade: true,
           //impulsoX: 0,                    
           //impulsoY: 0,

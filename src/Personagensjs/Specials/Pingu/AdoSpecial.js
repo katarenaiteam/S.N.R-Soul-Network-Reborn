@@ -206,8 +206,8 @@ PinguAdoSpecial.configuracao = {
   propriedades: {
     dano: 15,
     tipoSomImpacto: "heavy",
-    knockbackX: 180,
-    knockbackY: 250,
+    knockbackX: 234,
+    knockbackY: 325,
     tumbling: true,
     travarMovimentoAir: true,
   },

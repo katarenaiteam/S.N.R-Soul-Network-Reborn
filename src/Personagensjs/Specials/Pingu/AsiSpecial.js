@@ -189,8 +189,8 @@ PinguAsiSpecial.configuracao = {
   propriedades: {
     tipoSomImpacto: "heavy",
     dano: 18,
-    knockbackX: 430,
-    knockbackY: -360,
+    knockbackX: 559,
+    knockbackY: -468,
     tumbling: true,
     travarMovimentoAir: true,
   },

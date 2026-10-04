@@ -204,8 +204,8 @@ PinguAneSpecial.configuracao = {
     travarMovimentoAir: true,
     tipoSomImpacto: "heavy",
     dano: 8,
-    knockbackX: 320,
-    knockbackY: -230,
+    knockbackX: 416,
+    knockbackY: -299,
     tumbling: false,
   },
 };
