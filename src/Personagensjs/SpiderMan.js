@@ -920,9 +920,9 @@ export default class SpiderMan extends Personagem {
         // finalizarAoAcertarOponente: false,
         propriedades: {
           travarMovimentoAir: true,
-          dano: 21,
-          knockbackX: 600,
-          knockbackY: -200,
+          dano: 18,
+          knockbackX: 530,
+          knockbackY: -250,
           anularGravidade: true,
           //impulsoX: 0,                    
           //impulsoY: 0,
