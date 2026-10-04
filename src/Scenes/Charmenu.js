@@ -1,9 +1,8 @@
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
-import { tocarMusicaSegura } from "../Objetos/AudioSeguro.js";
 import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 
-const PERSONAGENS = [
+export const PERSONAGENS = [
   {
     id: "Aigis",
     icon: "aigis-icon",
@@ -54,12 +53,12 @@ const PERSONAGENS = [
 
       p1: {
         x: -70,
-        y: 200
+        y: 140
       },
 
       p2: {
         x: 65,
-        y: 200
+        y: 140
       }
     }
   },
@@ -226,11 +225,6 @@ export default class Charmenu extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor("#000000");
     this.cameras.main.fadeIn(350, 0, 0, 0);
-
-    this.musica = tocarMusicaSegura(this, "katarenai8bit", {
-      loop: true,
-      volume: 0.1
-    });
 
     this.menuPronto = false;
     this.transicaoAtiva = false;
@@ -431,7 +425,10 @@ export default class Charmenu extends Phaser.Scene {
   update(_time, delta) {
     this.atualizarChuvaCaracteres(delta);
 
-    if (this.modoEspectador) return;
+    if (this.modoEspectador) {
+      this.atualizarMaosEspectador(_time);
+      return;
+    }
 
     this.publicarEstadoMQTT(_time);
 
@@ -483,7 +480,7 @@ export default class Charmenu extends Phaser.Scene {
   }
 
   publicarEstadoMQTT(tempo, forcar = false) {
-    if (this.modoJogo !== "1v1" || tempo - (this.ultimaPublicacaoMQTT || 0) < 100 && !forcar) return;
+    if (this.modoJogo !== "1v1" || tempo - (this.ultimaPublicacaoMQTT || 0) < 1000 / 15 && !forcar) return;
     this.ultimaPublicacaoMQTT = tempo;
 
     const estadoJogador = (jogador) => jogador && ({
@@ -496,6 +493,7 @@ export default class Charmenu extends Phaser.Scene {
     publicarEstadoVersus(this, "char-menu", {
       p1: estadoJogador(this.p1),
       p2: estadoJogador(this.p2),
+      avisoAvancar: this.todosSelecionados(),
     });
   }
 
@@ -508,7 +506,13 @@ export default class Charmenu extends Phaser.Scene {
       [this.p2, estado.dados?.p2],
     ]) {
       if (!jogador || !remoto) continue;
-      jogador.mao.setPosition(remoto.x, remoto.y);
+      jogador.alvoPosicaoMQTT = {
+        xInicial: jogador.mao.x,
+        yInicial: jogador.mao.y,
+        xDestino: remoto.x,
+        yDestino: remoto.y,
+        inicio: this.time.now,
+      };
 
       const selecionado = PERSONAGENS.find((personagem) => personagem.id === remoto.selecionado);
       if (jogador.selecionado?.id !== selecionado?.id) {
@@ -528,6 +532,20 @@ export default class Charmenu extends Phaser.Scene {
       } else if (!selecionado) {
         this.atualizarHover(jogador);
       }
+    }
+    this.atualizarAvisoAvancar(estado.dados?.avisoAvancar === true);
+  }
+
+  atualizarMaosEspectador(tempo) {
+    const duracaoSnapshot = 1000 / 15;
+    for (const jogador of [this.p1, this.p2]) {
+      const alvo = jogador?.alvoPosicaoMQTT;
+      if (!alvo) continue;
+      const progresso = Phaser.Math.Clamp((tempo - alvo.inicio) / duracaoSnapshot, 0, 1);
+      jogador.mao.setPosition(
+        Phaser.Math.Linear(alvo.xInicial, alvo.xDestino, progresso),
+        Phaser.Math.Linear(alvo.yInicial, alvo.yDestino, progresso),
+      );
     }
   }
 
@@ -914,7 +932,12 @@ export default class Charmenu extends Phaser.Scene {
   avancar() {
     this.transicaoAtiva = true;
 
-    this.musica?.stop();
+    if (this.modoJogo === "historia") {
+      const musicaMenu = this.registry.get("musicaMenu");
+      musicaMenu?.stop();
+      musicaMenu?.destroy();
+      this.registry.remove("musicaMenu");
+    }
 
     const escolhas = {
       p1: this.p1.selecionado.id,

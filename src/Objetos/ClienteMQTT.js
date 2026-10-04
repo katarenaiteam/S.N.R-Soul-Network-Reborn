@@ -17,6 +17,7 @@ export default class ClienteMQTT extends Phaser.Events.EventEmitter {
     this.papel = papel;
     this.client = null;
     this.ultimoEstado = null;
+    this.estadoInicialLimpo = false;
   }
 
   connect() {
@@ -32,6 +33,10 @@ export default class ClienteMQTT extends Phaser.Events.EventEmitter {
     this.client.on("connect", () => {
       console.log(`Connected to MQTT broker at ${this.brokerUrl}`);
       this.emit("connect");
+      if (this.papel === "host" && !this.estadoInicialLimpo) {
+        this.estadoInicialLimpo = true;
+        this.clearState();
+      }
       if (this.papel === "espectador") this.subscribe("state");
     });
 
