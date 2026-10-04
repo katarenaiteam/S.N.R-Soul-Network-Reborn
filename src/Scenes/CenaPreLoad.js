@@ -74,6 +74,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("frontStart", "./assets/Menus/Start_menu/frontStart.png");
     this.load.image("backStart", "./assets/Menus/Start_menu/backStart.png");
     this.load.image("logo", "./assets/Menus/Start_menu/logo.png");
+    this.load.audio("menu", "./assets/Menus/Start_menu/menu.mp3");
     this.load.spritesheet("glitch", "./assets/Menus/Start_menu/glitch.png", { frameWidth: 683, frameHeight: 365 });
 
     // --- charmenu ---
