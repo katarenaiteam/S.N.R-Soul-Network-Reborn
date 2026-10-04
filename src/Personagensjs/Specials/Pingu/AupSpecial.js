@@ -119,9 +119,9 @@ PinguAupSpecial.configuracao = {
   logica: PinguAupSpecial,
   cooldown: 1500,
   propriedades: {
-    dano: 16,
+    dano: 18,
     tipoSomImpacto: "heavy",
-    knockbackX: 200,
+    knockbackX: 150,
     knockbackY: -500,
     tumbling: true,
     travarMovimentoAir: true,

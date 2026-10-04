@@ -12,17 +12,17 @@ export default class LojaEspectador {
     this.rotacaoRoda = 0;
     this.ultimaCompra = -Infinity;
     this.itens = [
-      { efeito: "miku-rain", textura: "shop-miku-rain", rotulo: "MIKU RAIN" },
-      { efeito: "less", textura: "less-shop", rotulo: "LESS", escolherJogador: true },
-      { efeito: "puppet", textura: "puppet-shop", rotulo: "PUPPET" },
-      { efeito: "life", textura: "Lup-shop", rotulo: "LIFE", escolherJogador: true },
-      { efeito: "slen-shop", textura: "slen-shop", rotulo: "SLENDER", escolherJogador: true },
-      { efeito: "1hit", textura: "1hit-shop", rotulo: "1 HIT" },
-      { efeito: "froze-shop", textura: "froze-shop", rotulo: "FROZE", escolherJogador: true },
-      { efeito: "lava-shop", textura: "lava-shop", rotulo: "LAVA" },
-      { efeito: "raio", textura: "raio-shop", rotulo: "RAIO", escolherJogador: true },
-      { efeito: "ult-shop", textura: "ult-shop", rotulo: "ULT", escolherJogador: true },
-      { efeito: "dead-shop", textura: "dead-shop", rotulo: "DEAD", escolherJogador: true },
+      { efeito: "miku-rain", textura: "shop-miku-rain", rotulo: "Miku Rain", descricao: "Essa é pra quem diz que felicidade não cai do céu." },
+      { efeito: "less", textura: "less-shop", rotulo: "Curar vida", descricao: "Uma ajudinha pra aquele amigo meio podre no joguinho.", escolherJogador: true },
+      { efeito: "puppet", textura: "puppet-shop", rotulo: "Hachune Miku", descricao: "Uma grande companhia pra alegrar a partida de qualquer abençoado que tiver a sorte de se deparar com uma." },
+      { efeito: "life", textura: "Lup-shop", rotulo: "Life Up", descricao: "Uma nova chance, ou uma roubalheira do caramba!", escolherJogador: true },
+      { efeito: "slen-shop", textura: "slen-shop", rotulo: "Slender Effect", descricao: "Bizarro!", escolherJogador: true },
+      { efeito: "1hit", textura: "1hit-shop", rotulo: "OneHit K.O", descricao: "Transforme qualquer partidinha mixuruca em um mar de emoções." },
+      { efeito: "froze-shop", textura: "froze-shop", rotulo: "Congelamento", descricao: "Noot no... digo, é impressão minha ou esfriou por aqui?", escolherJogador: true },
+      { efeito: "lava-shop", textura: "lava-shop", rotulo: "O chão é lava", descricao: "Cuidado aonde pisa!" },
+      { efeito: "raio", textura: "raio-shop", rotulo: "Raio", descricao: "Use quando eles menos esperarem!", escolherJogador: true },
+      { efeito: "ult-shop", textura: "ult-shop", rotulo: "Carregar ult", descricao: "Conceda a maior arma disponível ao seu lutador favorito! (Dizem que é o item favorito pra quem joga de Miku).", escolherJogador: true },
+      { efeito: "dead-shop", textura: "dead-shop", rotulo: "Forgotten Hand", descricao: "Imparável e inescapável, um fragmento daquilo que há de mais terrível nas profundezas da matrix.", escolherJogador: true },
     ];
     this.escolhendoJogador = false;
     this.escala = Math.min(scene.scale.width / 1920, scene.scale.height / 1080);
@@ -45,16 +45,24 @@ export default class LojaEspectador {
     this.iconeItem = this.iconesItens[this.indiceSlot];
     this.rotulo = scene.add.text(0, 0, "MIKU RAIN", {
       fontFamily: "RetroFont, monospace",
-      fontSize: `${22 * this.escala}px`,
+      fontSize: `${34 * this.escala}px`,
+      color: "#9cffbb",
+      align: "left",
+    }).setOrigin(0, 0).setScrollFactor(0).setDepth(4003).setVisible(false);
+    this.descricao = scene.add.text(0, 0, "", {
+      fontFamily: "RetroFont, monospace",
+      fontSize: `${25 * this.escala}px`,
       color: "#eafff1",
-      align: "center",
-    }).setOrigin(0.5).setScrollFactor(0).setDepth(4003).setVisible(false);
+      align: "left",
+      wordWrap: { width: 660 * this.escala },
+      lineSpacing: 4 * this.escala,
+    }).setOrigin(0, 0).setScrollFactor(0).setDepth(4003).setVisible(false);
     this.preco = scene.add.text(0, 0, "GRÁTIS", {
       fontFamily: "RetroFont, monospace",
-      fontSize: `${18 * this.escala}px`,
+      fontSize: `${26 * this.escala}px`,
       color: "#9cffbb",
-      align: "center",
-    }).setOrigin(0.5).setScrollFactor(0).setDepth(4003).setVisible(false);
+      align: "left",
+    }).setOrigin(0, 0).setScrollFactor(0).setDepth(4003).setVisible(false);
     this.fechar = scene.add.text(55 * this.escala, 55 * this.escala, "×", {
       fontFamily: "monospace",
       fontSize: `${54 * this.escala}px`,
@@ -129,6 +137,7 @@ export default class LojaEspectador {
       this.iconeLoja,
       ...this.iconesItens,
       this.rotulo,
+      this.descricao,
       this.preco,
       this.fechar,
       this.fundoEscolha,
@@ -144,6 +153,7 @@ export default class LojaEspectador {
     this.roda.setVisible(true);
     this.iconesItens.forEach((icone) => icone.setVisible(true));
     this.rotulo.setVisible(true);
+    this.descricao.setVisible(true);
     this.preco.setVisible(true);
     this.fechar.setVisible(true);
     this.mostrarEscolhaJogador(false);
@@ -156,6 +166,7 @@ export default class LojaEspectador {
     this.roda.setVisible(false);
     this.iconesItens.forEach((icone) => icone.setVisible(false));
     this.rotulo.setVisible(false);
+    this.descricao.setVisible(false);
     this.preco.setVisible(false);
     this.fechar.setVisible(false);
     this.mostrarEscolhaJogador(false);
@@ -172,6 +183,7 @@ export default class LojaEspectador {
     });
     this.iconesItens.forEach((icone) => icone.setVisible(this.aberta && !visible));
     this.rotulo.setVisible(this.aberta && !visible);
+    this.descricao.setVisible(this.aberta && !visible);
     this.preco.setVisible(this.aberta && !visible);
   }
 
@@ -236,8 +248,12 @@ export default class LojaEspectador {
     const item = this.itens[this.indiceSlot];
     this.iconeItem.setDisplaySize(tamanhoItem, tamanhoItem);
     this.rotulo.setText(item.rotulo);
-    this.rotulo.setPosition(this.iconeItem.x, this.iconeItem.y + tamanhoItem * 0.68);
-    this.preco.setPosition(this.iconeItem.x, this.iconeItem.y + tamanhoItem * 0.95);
+    const textoX = this.iconeItem.x + tamanhoItem * 0.48;
+    const textoY = this.iconeItem.y - 45 * this.escala;
+    this.rotulo.setPosition(textoX, textoY);
+    this.descricao.setText(item.descricao);
+    this.descricao.setPosition(textoX, textoY + 44 * this.escala);
+    this.preco.setPosition(textoX, textoY + 44 * this.escala + this.descricao.height + 10 * this.escala);
     this.fechar.setPosition(55 * this.escala, 55 * this.escala);
   }
 

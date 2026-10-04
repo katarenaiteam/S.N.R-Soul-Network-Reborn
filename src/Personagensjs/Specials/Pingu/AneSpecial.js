@@ -198,7 +198,7 @@ PinguAneSpecial.configuracao = {
   escalaFaisca: 0.12,
   larguraProjetil: 90,
   alturaProjetil: 75,
-  escalaExplosao: 1,
+  escalaExplosao: 1.2,
   acumuloCongelamento: 35,
   propriedades: {
     travarMovimentoAir: true,

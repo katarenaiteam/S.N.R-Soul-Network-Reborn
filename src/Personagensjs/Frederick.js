@@ -603,10 +603,10 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
            tipoSomImpacto: "light",
           dano: 4,
-          knockbackX: 30,
+          knockbackX: 20,
           knockbackY: -20,
           knockbackFixo: true,
-          hitstunFrames: 24,
+          hitstunFrames: 25,
           hitsSemDecay: 2
         },
 
@@ -629,7 +629,7 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
            tipoSomImpacto: "heavy",
           dano: 4,
-          knockbackX: 40,
+          knockbackX: 20,
           knockbackY: -30,
           knockbackFixo: true,
           hitstunFrames: 18,
@@ -697,8 +697,8 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
            tipoSomImpacto: "heavy",
           dano: 8,
-          knockbackX: 350,
-          knockbackY: -310,
+          knockbackX: 300,
+          knockbackY: -250,
           tumbling: true,
           hitstunBaseFrames: 18
         },
@@ -746,7 +746,7 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 130,
+          knockbackX: 100,
           knockbackY: -110,
           tumbling: false,
           knockbackFixo: true,
@@ -774,6 +774,7 @@ this.nomePersonagem = "Frederick Johnson";
           knockbackY: -350,
           tumbling: false,
           knockbackFixo: true,
+          hitstunMinFrames:25,
         },
       },
 
@@ -800,6 +801,7 @@ this.nomePersonagem = "Frederick Johnson";
           knockbackY: -470,
           tumbling: false,
           knockbackFixo: true,
+          hitstunMinFrames:25,
         },
       },
 
@@ -862,7 +864,7 @@ this.nomePersonagem = "Frederick Johnson";
           tipoSomImpacto: "heavy",
           dano: 9,
           knockbackX: 400,
-          knockbackY: -150,
+          knockbackY: -250,
           tumbling: true,
           knockbackFixo: false,
         },
@@ -904,6 +906,7 @@ this.nomePersonagem = "Frederick Johnson";
           knockbackX: 80,
           knockbackY: 400,
           quiqueChaoY: 400,
+          hitstunMinFrames:25,
         },
       },
 
@@ -1343,26 +1346,26 @@ scene.anims.create({
     });
     scene.anims.create({
       key: "fj_comboRapido1",
-      frames: scene.anims.generateFrameNumbers("FJ_speedNeu", {
-        start: 0, end: 3,
+      frames: scene.anims.generateFrameNumbers("FJ_combo", {
+        start: 0, end: 4,
       }),
-      frameRate: 60,
+      frameRate: 30,
       repeat: 0,
     });
     scene.anims.create({
       key: "fj_comboRapido2",
-      frames: scene.anims.generateFrameNumbers("FJ_speedNeu", {
-        start: 4, end: 13,
+      frames: scene.anims.generateFrameNumbers("FJ_combo", {
+        start: 5, end: 10,
       }),
-      frameRate: 60,
+      frameRate: 30,
       repeat: 0,
     });
     scene.anims.create({
       key: "fj_comboRapido3",
       frames: scene.anims.generateFrameNumbers("FJ_speedNeu", {
-        start: 14, end: 19,
+        start: 11, end: 16,
       }),
-      frameRate: 60,
+      frameRate: 30,
       repeat: 0,
     });
     scene.anims.create({

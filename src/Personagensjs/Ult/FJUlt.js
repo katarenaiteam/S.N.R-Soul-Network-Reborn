@@ -189,7 +189,6 @@ export default class FJUlt {
     const cam = this.scene.cameras.main;
     cam.setZoom(this.zoomOriginal);
     cam.setScroll(this.scrollOriginal.x, this.scrollOriginal.y);
-    this.scene.atualizarCamera = this.funcaoCameraOriginal;
     this.vooIniciado = true;
 
     this.personagem.pular({ mudarEstado: false });
@@ -213,8 +212,8 @@ export default class FJUlt {
         ? limitesArena.x + limitesArena.largura / 2
         : cam.scrollX + cam.width / cam.zoom / 2,
       y: pisoPrincipal
-        ? pisoPrincipal.body.top - alturaVisivel * 0.55
-        : cam.scrollY + alturaVisivel * 0.2,
+        ? pisoPrincipal.body.top - alturaVisivel * 1.2
+        : cam.scrollY - alturaVisivel * 0.2,
     };
     this.subindoUlt = true;
   }

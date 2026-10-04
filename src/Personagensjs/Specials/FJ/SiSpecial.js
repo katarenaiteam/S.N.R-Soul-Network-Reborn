@@ -115,6 +115,7 @@ export default class SiSpecial {
     this.estadoAlvo = fsm.estados.agarradoFJ;
     fsm.mudarEstado("agarradoFJ", { dono: this });
     this.personagem.tocarSomSorteado("grab", { volume: 0.8 });
+    this.personagem.tocarSomSorteado("c-mon", { volume: 0.8 });
   }
 
   posicionarHitbox() {
@@ -181,7 +182,6 @@ export default class SiSpecial {
 
   lancarAlvo() {
     if (this.fase !== "grab" || !this.alvo || this.alvoLancado) return;
-    this.personagem.tocarSomSorteado("c-mon", { volume: 0.8 });
     const alvo = this.soltarAlvo();
     // A fisica e o estado de dano seguem normalmente durante o voo,
     // mas os comandos continuam bloqueados ate o fim da animacao do FJ.

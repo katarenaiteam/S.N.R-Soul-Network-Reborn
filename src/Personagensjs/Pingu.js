@@ -557,7 +557,7 @@ export default class Pingu extends Personagem {
           knockbackY: -350,
           tumbling: false,
           knockbackFixo: true,
-          hitstunMinFrames:24,
+          hitstunFrames:24,
         },
       },
 
@@ -646,7 +646,6 @@ export default class Pingu extends Personagem {
           dano: 12,
           knockbackX: 300,
           knockbackY: -130,
-          impulsoX: 350,
           tumbling: true
         },
       },
