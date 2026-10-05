@@ -741,7 +741,7 @@ export default class SpiderMan extends Personagem {
   propriedades: {
     tipoSomImpacto: "heavy",
     dano: 11,
-    knockbackX: 112,
+    knockbackX: 82,
     knockbackY: 560,
     quiqueChaoY: 350,
     hitstunMinFrames:24,

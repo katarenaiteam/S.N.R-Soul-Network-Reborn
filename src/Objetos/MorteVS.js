@@ -211,6 +211,15 @@ export default class MorteVS {
     if (!this.recursosLivres.includes(recursos)) this.recursosLivres.push(recursos);
   }
 
+  tocarAudio(chave) {
+    if (this.scene.cache.audio.exists(chave)) this.scene.sound.play(chave);
+  }
+
+  tocarAudioMorte() {
+    this.tocarAudio("glitch-sound");
+    this.tocarAudio("glass");
+  }
+
   iniciar(jogador, pontoRespawn, numero) {
     if (this.pendentes.has(jogador) || jogador.eliminado) return false;
     jogador.estadoInvencible.sair(false);
@@ -223,6 +232,7 @@ export default class MorteVS {
     };
     this.scene.eventoMorteVS = eventoVisual;
     this.scene.camJogo.shake(140, 0.007);
+    this.tocarAudioMorte();
     const efeito = new VidroMatrix(this.scene, jogador, eventoVisual.lado, eventoVisual.id, this);
     const invulneravel = jogador.invulneravel;
     const fsm = jogador.maquinaEstados;
@@ -247,6 +257,7 @@ export default class MorteVS {
       Date.now() - evento.atualizadoEm > TEMPO_CODIGOS
     ) return;
     this.ultimoEfeitoEspectador = evento.id;
+    this.tocarAudioMorte();
     const efeito = new VidroMatrix(
       this.scene,
       { sprite: { x: evento.x, y: evento.y } },
@@ -273,6 +284,7 @@ export default class MorteVS {
   reproduzirTVEspectador(evento) {
     if (!evento || evento.id <= this.ultimaTVEspectador || Date.now() - evento.atualizadoEm > 1500) return;
     this.ultimaTVEspectador = evento.id;
+    this.tocarAudio("tv-static");
     this.scene.overlayMorte
       .off("animationcomplete", this.aoFimTVEspectador)
       .setVisible(true)
@@ -296,6 +308,7 @@ export default class MorteVS {
       id: ++this.sequenciaTV,
       atualizadoEm: Date.now(),
     };
+    this.tocarAudio("tv-static");
     this.scene.overlayMorte.setVisible(true).play("TVefect");
     this.scene.overlayMorte.off("animationcomplete", this.aoFimTV);
     this.scene.overlayMorte.once("animationcomplete", this.aoFimTV);

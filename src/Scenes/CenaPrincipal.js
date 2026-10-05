@@ -512,6 +512,8 @@ this.indicadorP2 = this.criarIndicador(
         flipX: sprite.flipX,
         scaleX: sprite.scaleX,
         scaleY: sprite.scaleY,
+        originX: sprite.originX,
+        originY: sprite.originY,
         alpha: sprite.alpha,
         visible: sprite.visible,
         tint: sprite.isTinted ? sprite.tintTopLeft : null,
@@ -612,6 +614,9 @@ this.indicadorP2 = this.criarIndicador(
       };
       sprite.setFlipX(remoto.flipX);
       sprite.setScale(remoto.scaleX, remoto.scaleY);
+      if (remoto.originX !== undefined && remoto.originY !== undefined) {
+        sprite.setOrigin(remoto.originX, remoto.originY);
+      }
       sprite.setAlpha(remoto.alpha);
       sprite.setVisible(remoto.visible);
       if (remoto.tint === null || remoto.tint === undefined) sprite.clearTint();

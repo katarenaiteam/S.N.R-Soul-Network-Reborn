@@ -154,9 +154,11 @@ const assetscommon = [
   (scene, queued) => queueAsset(scene, queued, "texture", "mid-guard", () => { scene.load.spritesheet("mid-guard", "assets/efeitos/guard/midguard-efect.png", { frameWidth: 638, frameHeight: 632, }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "brokeguard-efect", () => { scene.load.spritesheet("brokeguard-efect", "assets/efeitos/guard/brokeguard-efect.png", { frameWidth: 615, frameHeight: 616, }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Stun_Effect", () => { scene.load.spritesheet("Stun_Effect", "assets/efeitos/Stun_Effect.png", { frameWidth: 128, frameHeight: 128, }); }),
-  (scene, queued) => queueAsset(scene, queued, "audio", "", () => { scene.load.audio("glass", "assets/efeitos/out-effect/glass.mp3"); }),
-  (scene, queued) => queueAsset(scene, queued, "audio", "", () => { scene.load.audio("glitch-sound", "assets/efeitos/out-effect/glitch-sound.mp3"); }),
-  (scene, queued) => queueAsset(scene, queued, "audio", "", () => { scene.load.audio("tv-static", "assets/efeitos/out-effect/tv-static.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "glass", () => { scene.load.audio("glass", "assets/efeitos/out-effect/glass.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "glitch-sound", () => { scene.load.audio("glitch-sound", "assets/efeitos/out-effect/glitch-sound.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "tv-static", () => { scene.load.audio("tv-static", "assets/efeitos/out-effect/tv-static.mp3"); }),
+  
+
 
 ];
 const assetsFJ = [

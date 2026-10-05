@@ -150,7 +150,7 @@ export default class Pingu extends Personagem {
 
       dano: {
         offsetVisualX: -20,
-        offsetVisualY: 20,
+        offsetVisualY: 35,
          largura: 30,
         altura: 70,
         offsetX: 75,

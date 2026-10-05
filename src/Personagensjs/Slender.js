@@ -445,7 +445,7 @@ export default class Slenderman extends Personagem {
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
-          knockbackX: 40,
+          knockbackX: 30,
           knockbackY: -20,
           knockbackFixo: true,
           hitstunFrames: 25,
@@ -481,8 +481,8 @@ export default class Slenderman extends Personagem {
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
-          knockbackX: 112,
-          knockbackY: -560,
+          knockbackX: 110,
+          knockbackY: -550,
           knockbackFixo: false,
           hitstunMinFrames:25,
         },
@@ -547,7 +547,7 @@ export default class Slenderman extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 490,
+          knockbackX: 370,
           knockbackY: -280,
           tumbling: true,
         },
@@ -627,7 +627,7 @@ export default class Slenderman extends Personagem {
     tipoSomImpacto: "heavy", 
     dano: 11,
     knockbackX: 70,
-    knockbackY: 560,
+    knockbackY: 460,
     quiqueChaoY: 350,
   },
 },
@@ -697,7 +697,7 @@ export default class Slenderman extends Personagem {
           tipoSomImpacto: "heavy",
           dano: 11,
           knockbackX: 84,
-          knockbackY: -700,
+          knockbackY: -370,
           impulsoX: 30,
           tumbling: true
         },
@@ -733,8 +733,8 @@ export default class Slenderman extends Personagem {
           travarMovimentoAir: true,
           dano: 12,
           tipoSomImpacto: "heavy",
-          knockbackX: 520,
-          knockbackY: -299,
+          knockbackX: 390,
+          knockbackY: -400,
         },
       },
       lado: {
@@ -759,7 +759,7 @@ export default class Slenderman extends Personagem {
           travarMovimentoAir: true,
           dano: 12,
           tipoSomImpacto: "heavy",
-          knockbackX: 780,
+          knockbackX: 500,
           knockbackY: -299,
         },
       },
@@ -779,8 +779,8 @@ export default class Slenderman extends Personagem {
         propriedades: {
           dano: 12,
           tipoSomImpacto: "heavy",
-          knockbackX: 390,
-          knockbackY: -520,
+          knockbackX: 400,
+          knockbackY: -500,
         },
       },
     };
@@ -845,7 +845,7 @@ export default class Slenderman extends Personagem {
       propriedades: {
         ...this.specials.lado.propriedades,
         knockbackX: 195,
-        knockbackY: 390,
+        knockbackY: 400,
         velocidadeMaxQueda: 100,
       },
     };
