@@ -127,7 +127,7 @@ export default class SpiderThrow {
     });
 
     const oponentes =
-      this.scene.scene.key === "CenaHistoria"
+      this.scene.scene.key.startsWith("CenaHistoria")
         ? this.personagem === this.scene.boss
           ? [this.scene.jogador1]
           : [this.scene.boss]
@@ -305,8 +305,8 @@ export default class SpiderThrow {
         const posicaoLancamento = { x: alvo.sprite.x, y: alvo.sprite.y };
         const props = this.special?.propriedades || {};
         alvo.receberDano(props.dano || 18, {
-          knockbackX: 700 * direcao,
-          knockbackY: -350,
+          knockbackX: 910 * direcao,
+          knockbackY: -455,
           tumbling: true,
         });
 

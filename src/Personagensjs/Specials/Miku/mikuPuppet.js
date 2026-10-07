@@ -23,6 +23,7 @@ export default class MikuPuppet {
     this.grupoHurtbox = null;
     this.hurtbox = null;
     this.colliderMapa = null;
+    this.colliderPlataformasAtravessaveis = null;
     this.overlapsAtaque = [];
     this.colisoresRecebidos = new Set();
     this.morrendo = false;
@@ -95,6 +96,8 @@ export default class MikuPuppet {
         plataformas
       );
     }
+    this.colliderPlataformasAtravessaveis =
+      this.scene.sistemaPlataformasAtravessaveis?.registrar(this, false) ?? null;
 
     this.criarHurtbox();
     this.registrarComoAlvoExtra();
@@ -175,7 +178,7 @@ export default class MikuPuppet {
   }
 
   obterOponentes() {
-    if (this.scene.scene.key === "CenaHistoria") {
+    if (this.scene.scene.key.startsWith("CenaHistoria")) {
       return [this.personagem === this.scene.boss
         ? this.scene.jogador1
         : this.scene.boss].filter(Boolean);
@@ -189,9 +192,11 @@ export default class MikuPuppet {
   }
 
   obterPlataformasValidas() {
-    return (this.scene.mapaAtual?.plataformas?.getChildren?.() ?? []).filter(
-      (plataforma) => plataforma?.body?.enable
-    );
+    const plataformas = [
+      ...(this.scene.mapaAtual?.plataformas?.getChildren?.() ?? []),
+      ...(this.scene.sistemaPlataformasAtravessaveis?.grupo?.getChildren?.() ?? []),
+    ];
+    return plataformas.filter((plataforma) => plataforma?.body?.enable);
   }
 
   estaSobreAreaSegura(sprite) {
@@ -362,7 +367,7 @@ export default class MikuPuppet {
       {
         tipoSomImpacto: "light",
         knockbackX: MikuPuppet.KNOCKBACK_X,
-        knockbackY: -80,
+        knockbackY: -104,
         tumbling: false,
       },
       { x: this.sprite.x, direcao }
@@ -506,6 +511,12 @@ export default class MikuPuppet {
     this.timerTempoDeVida = null;
     this.limparHitboxAtaque();
     this.removerColisoresRecebidos();
+    if (this.scene.sistemaPlataformasAtravessaveis) {
+      this.scene.sistemaPlataformasAtravessaveis.desregistrar(this);
+    } else {
+      destruirColisor(this.colliderPlataformasAtravessaveis);
+    }
+    this.colliderPlataformasAtravessaveis = null;
     destruirColisor(this.colliderMapa);
     this.colliderMapa = null;
     this.grupoHurtbox?.clear(true, true);
@@ -547,7 +558,7 @@ MikuPuppet.VELOCIDADE_DURANTE_ATAQUE = 150;
 MikuPuppet.VELOCIDADE_SUPORTE = 175;
 MikuPuppet.FORCA_PULO = -300;
 MikuPuppet.DANO_ATAQUE = 5;
-MikuPuppet.KNOCKBACK_X = 165;
+MikuPuppet.KNOCKBACK_X = 215;
 MikuPuppet.INTERVALO_ATAQUE = 1500;
 MikuPuppet.DURACAO_HITBOX = 130;
 MikuPuppet.TEMPO_RECUO = 420;

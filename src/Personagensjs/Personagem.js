@@ -304,7 +304,7 @@ export default class Personagem {
     }
 
     //. LÓGICA PADRÃO DE DANO (Quando toma golpe sem escudo):
-    this.porcentagemDano += quantidade;
+    this.porcentagemDano = Math.min(320, this.porcentagemDano + quantidade);
     const danoDeSlenderman = atacante?.nomePersonagem === "Slanderman" || atacante?.nomePersonagem === "Slenderman";
     if (quantidade > 0 && (propriedades.corrupcaoSlender > 0 || danoDeSlenderman)) {
       this.corrupcaoSlender.adicionar(propriedades.corrupcaoSlender || 5);
@@ -337,13 +337,23 @@ export default class Personagem {
     }
 
     const oponente = this.scene.jogador1 === this ? this.scene.jogador2 : this.scene.jogador1;
+    const agoraImpactoLoja = this.scene.time.now;
+    const atacanteJogador = atacanteDoEfeito === this.scene.jogador1 || atacanteDoEfeito === this.scene.jogador2;
+    const impulsoLojaAtivo = quantidade > 0 &&
+      atacanteJogador &&
+      atacanteDoEfeito !== this &&
+      this.scene.knockbackLojaPendenteAte > agoraImpactoLoja;
+    if (this.scene.knockbackLojaPendenteAte && this.scene.knockbackLojaPendenteAte <= agoraImpactoLoja) {
+      this.scene.knockbackLojaPendenteAte = 0;
+    }
+    if (impulsoLojaAtivo) this.scene.knockbackLojaPendenteAte = 0;
     const direcaoX = origem?.direcao !== undefined
       ? origem.direcao * Math.sign(propriedades.knockbackX ?? 250)
       : origem?.x !== undefined
         ? (this.sprite.x >= origem.x ? 1 : -1)
       : (oponente && this.sprite.x > oponente.sprite.x ? 1 : -1);
 
-    const kbX = propriedades.knockbackX ?? 250;
+    const kbX = impulsoLojaAtivo ? 2000 : propriedades.knockbackX ?? 250;
     const kbY = propriedades.knockbackY ?? -100;
 
     //  Salva se o golpe exige recuperação manual por comandos
@@ -353,7 +363,10 @@ export default class Personagem {
     // =====================================================
     // KNOCKBACK FIXO OU VARIÁVEL
     // =====================================================
-    const knockbackFixo = propriedades.knockbackFixo ?? false;
+    const knockbackFixo = impulsoLojaAtivo || (propriedades.knockbackFixo ?? false);
+    const propriedadesKnockback = impulsoLojaAtivo
+      ? { ...propriedades, knockbackX: kbX, knockbackFixo: true }
+      : propriedades;
 
     let multiplicadorX = 1;
     let multiplicadorY = 1;
@@ -372,8 +385,8 @@ export default class Personagem {
         ? porcentagemEscalada
         : 180 + (porcentagemEscalada - 180) * 0.20;
 
-      const multiplicadorBaseX = 0.65 + danoEscalado / 100;
-      const multiplicadorBaseY = 0.65 + danoEscalado / 180;
+      const multiplicadorBaseX = 0.65 + danoEscalado * 0.625 / 100;
+      const multiplicadorBaseY = 0.65 + danoEscalado * 0.568 / 180;
 
       // Reforça progressivamente o knockback sem criar outro salto brusco.
       // A curva perde inclinação ao se aproximar de 300% e, no teto,
@@ -395,7 +408,7 @@ export default class Personagem {
         x: oponente?.sprite?.body?.center?.x ?? oponente?.sprite?.x,
         y: oponente?.sprite?.body?.center?.y ?? oponente?.sprite?.y,
       },
-      propriedades
+      propriedadesKnockback
     );
     this.sprite.body.setVelocity(
       direcaoX * Math.abs(kbX) * multiplicadorX,
@@ -478,7 +491,9 @@ export default class Personagem {
     };
 
     // DEPOIS MUDA PARA O ESTADO DE DANO
-    this.maquinaEstados.mudarEstado("dano");
+    if (!propriedades.naoInterromperEstado) {
+      this.maquinaEstados.mudarEstado("dano");
+    }
 
     if (
       !removeuCongelamentoPingu &&
@@ -722,6 +737,18 @@ consumirUlt() {
     this.atualizarLogicasEspeciais();
     this.vfx?.atualizar();
     this.maquinaEstados.update();
+    if (
+      this.scene.mapaAtual?.escorregadio &&
+      this.sprite.body.blocked.down &&
+      this.maquinaEstados.estadoAtual?.nome === "idle" &&
+      !this.inputDown("esquerda") &&
+      !this.inputDown("direita")
+    ) {
+      const delta = this.scene.game.loop.delta || 16.667;
+      const atenuacao = Math.pow(0.96, delta / 16.667);
+      const velocidadeX = this.sprite.body.velocity.x * atenuacao;
+      this.sprite.setVelocityX(Math.abs(velocidadeX) < 5 ? 0 : velocidadeX);
+    }
     // Estados, ataques e especiais podem mover o sprite. Sincronize depois deles.
     this.sincronizarHurtbox();
     this.controle?.salvarAnterior();

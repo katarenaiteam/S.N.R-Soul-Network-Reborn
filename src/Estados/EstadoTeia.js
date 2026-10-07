@@ -4,6 +4,9 @@ import { tocarSomSeguro } from "../Objetos/AudioSeguro.js";
 export default class EstadoTeia extends EstadoBase {
 
     enter() {
+        this.apertosMovimento = 0;
+        this.tempoPresoOriginal = this.personagem.tempoPresoTeiaAtual ?? this.personagem.timerTeia?.delay ?? 1500;
+        this.tweenTremorTeia = null;
         tocarSomSeguro(this.personagem.scene, "preso", { volume: 0.2 });
         const body = this.personagem.sprite.body;
 
@@ -25,9 +28,53 @@ export default class EstadoTeia extends EstadoBase {
             body.setVelocityX(0);
             body.setAllowGravity(true);
         }
+
+        const direcoes = ["esquerda", "direita", "cima", "baixo"];
+        const apertadas = direcoes.filter((direcao) => this.personagem.inputJustDown(direcao));
+        if (apertadas.length > 0) {
+            this.apertosMovimento += apertadas.length;
+            const reducaoMaxima = Math.min(this.tempoPresoOriginal - 800, 1200);
+            const reducao = Math.min(this.apertosMovimento * 60, reducaoMaxima);
+            if (this.personagem.timerTeia) {
+                this.personagem.timerTeia.delay = this.tempoPresoOriginal - reducao;
+            }
+            apertadas.forEach(() => this.tremerCasulo());
+        }
+    }
+
+    tremerCasulo() {
+        const teia = this.personagem.teiaPresaSprite;
+        if (!teia?.active) return;
+        this.tweenTremorTeia?.stop();
+        const deslocamento = this.personagem.deslocamentoTremorTeia ?? { x: 0, y: 0 };
+        this.personagem.deslocamentoTremorTeia = deslocamento;
+        deslocamento.x = 0;
+        deslocamento.y = 0;
+        const intensidade = Math.min(3 + this.apertosMovimento * 0.2, 6);
+        const deslocamentoX = Phaser.Math.Between(-intensidade, intensidade) || intensidade;
+        this.tweenTremorTeia = this.personagem.scene.tweens.add({
+            targets: deslocamento,
+            x: deslocamentoX,
+            y: 0,
+            duration: 30,
+            yoyo: true,
+            repeat: 3,
+            onComplete: () => {
+                deslocamento.x = 0;
+                deslocamento.y = 0;
+                if (teia.active) teia.setPosition(this.personagem.sprite.x, this.personagem.sprite.y - 40);
+                this.tweenTremorTeia = null;
+            }
+        });
     }
 
     exit() {
+        this.tweenTremorTeia?.stop();
+        this.tweenTremorTeia = null;
+        if (this.personagem.deslocamentoTremorTeia) {
+            this.personagem.deslocamentoTremorTeia.x = 0;
+            this.personagem.deslocamentoTremorTeia.y = 0;
+        }
         tocarSomSeguro(this.personagem.scene, "solto", { volume: 0.04 });
         // receberDano já aplicou o impulso do ataque antes da troca de estado.
         // Preserve os dois eixos ao soltar a teia.

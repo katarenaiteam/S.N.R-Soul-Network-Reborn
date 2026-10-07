@@ -17,6 +17,7 @@ export default class PinguAneSpecial {
   }
 
   executar() {
+    this.personagem.tocarSomSorteado("pingu-nunut", { volume: this.personagem.sons.volumeVoz });
     const sprite = this.personagem.sprite;
     this.direcao = sprite.flipX ? -1 : 1;
     sprite.on("animationupdate", this.aoAtualizarAnimacao);
@@ -197,14 +198,14 @@ PinguAneSpecial.configuracao = {
   escalaFaisca: 0.12,
   larguraProjetil: 90,
   alturaProjetil: 75,
-  escalaExplosao: 1,
+  escalaExplosao: 1.2,
   acumuloCongelamento: 35,
   propriedades: {
     travarMovimentoAir: true,
     tipoSomImpacto: "heavy",
     dano: 8,
-    knockbackX: 320,
-    knockbackY: -230,
+    knockbackX: 416,
+    knockbackY: -299,
     tumbling: false,
   },
 };

@@ -148,8 +148,8 @@ export default class NeSpecial {
     this.personagem.aplicarDanoSpecialStun(this, alvo, this.dano, {
       dano: this.dano,
       tipoSomImpacto: "heavy",
-      knockbackX: (this.aereo ? 150 : 350) * this.multiplicadorCarga,
-      knockbackY: (this.aereo ? 450 : -250) * this.multiplicadorCarga,
+      knockbackX: (this.aereo ? 195 : 455) * this.multiplicadorCarga,
+      knockbackY: (this.aereo ? 585 : -325) * this.multiplicadorCarga,
       tumbling: true,
     }, { direcao: this.direcao, x: this.personagem.sprite.x });
     const som = this.personagem.sons?.heavy;

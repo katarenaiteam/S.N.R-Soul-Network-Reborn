@@ -1,6 +1,7 @@
 import Personagem from "./Personagem.js";
 import NeSpecial from "./Specials/Slenderman/NeSpecial.js";
 import DoSpecial from "./Specials/Slenderman/DoSpecial.js";
+import SlenderUlt from "./Ult/SlenderUlt.js";
 
 export default class Slenderman extends Personagem {
   constructor(scene, x, y, teclas, hudX, hudY, controle) {
@@ -444,7 +445,7 @@ export default class Slenderman extends Personagem {
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
-          knockbackX: 40,
+          knockbackX: 30,
           knockbackY: -20,
           knockbackFixo: true,
           hitstunFrames: 25,
@@ -480,8 +481,8 @@ export default class Slenderman extends Personagem {
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
-          knockbackX: 80,
-          knockbackY: -400,
+          knockbackX: 110,
+          knockbackY: -550,
           knockbackFixo: false,
           hitstunMinFrames:25,
         },
@@ -546,8 +547,8 @@ export default class Slenderman extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 350,
-          knockbackY: -200,
+          knockbackX: 370,
+          knockbackY: -280,
           tumbling: true,
         },
       },
@@ -625,8 +626,8 @@ export default class Slenderman extends Personagem {
   propriedades: {
     tipoSomImpacto: "heavy", 
     dano: 11,
-    knockbackX: 50,
-    knockbackY: 400,
+    knockbackX: 70,
+    knockbackY: 460,
     quiqueChaoY: 350,
   },
 },
@@ -665,8 +666,8 @@ export default class Slenderman extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 300,
-          knockbackY: -130,
+          knockbackX: 420,
+          knockbackY: -182,
           impulsoX: 350,
           tumbling: true
         },
@@ -695,8 +696,8 @@ export default class Slenderman extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 11,
-          knockbackX: 60,
-          knockbackY: -500,
+          knockbackX: 84,
+          knockbackY: -400,
           impulsoX: 30,
           tumbling: true
         },
@@ -732,8 +733,8 @@ export default class Slenderman extends Personagem {
           travarMovimentoAir: true,
           dano: 12,
           tipoSomImpacto: "heavy",
-          knockbackX: 400,
-          knockbackY: -230,
+          knockbackX: 390,
+          knockbackY: -400,
         },
       },
       lado: {
@@ -758,8 +759,8 @@ export default class Slenderman extends Personagem {
           travarMovimentoAir: true,
           dano: 12,
           tipoSomImpacto: "heavy",
-          knockbackX: 600,
-          knockbackY: -230,
+          knockbackX: 500,
+          knockbackY: -299,
         },
       },
       neutro: {
@@ -778,8 +779,8 @@ export default class Slenderman extends Personagem {
         propriedades: {
           dano: 12,
           tipoSomImpacto: "heavy",
-          knockbackX: 300,
-          knockbackY: -400,
+          knockbackX: 400,
+          knockbackY: -500,
         },
       },
     };
@@ -843,8 +844,8 @@ export default class Slenderman extends Personagem {
       ],
       propriedades: {
         ...this.specials.lado.propriedades,
-        knockbackX: 150,
-        knockbackY: 300,
+        knockbackX: 195,
+        knockbackY: 400,
         velocidadeMaxQueda: 100,
       },
     };
@@ -854,12 +855,30 @@ export default class Slenderman extends Personagem {
     for (const special of Object.values(this.specials)) {
       special.propriedades.corrupcaoSlender = 10;
     }
+
+    this.ult = {
+      animacao: "slan-ult1",
+      logica: SlenderUlt,
+      propriedades: { anularGravidade: true },
+    };
   
 
   }
 
   //animaçoes====================================================
   static criarAnimacoes(scene) {
+
+    for (const [key, textura, inicio, fim, fps] of [
+      ["slan-ult1", "slan-ult1", 0, 1, 12],
+      ["slan-ult5", "slan-ult5", 0, 17, 18],
+    ]) {
+      if (!scene.anims.exists(key)) scene.anims.create({
+        key,
+        frames: scene.anims.generateFrameNumbers(textura, { start: inicio, end: fim }),
+        frameRate: fps,
+        repeat: 0,
+      });
+    }
 
     for (const { key, textura, inicio, fim, fps } of [
       { key: "slan_AupSpecial", textura: "Slan_AupSpecial", inicio: 0, fim: 16, fps: 16 },

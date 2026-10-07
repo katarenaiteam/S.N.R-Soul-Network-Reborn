@@ -6,17 +6,27 @@ export default class SistemaPlataformasAtravessaveis {
   }
 
   registrar(personagem, podeDescer = true) {
-    this.jogadores.set(personagem, {
+    const dados = {
       podeDescer,
-      ignorarAte: 0
-    });
+      ignorarAte: 0,
+      colisor: null,
+    };
+    this.jogadores.set(personagem, dados);
 
-    this.scene.physics.add.collider(
+    dados.colisor = this.scene.physics.add.collider(
       personagem.sprite,
       this.grupo,
       null,
       (_, plataforma) => this.podeColidir(personagem, plataforma)
     );
+    return dados.colisor;
+  }
+
+  desregistrar(personagem) {
+    const dados = this.jogadores.get(personagem);
+    if (!dados) return;
+    dados.colisor?.destroy();
+    this.jogadores.delete(personagem);
   }
 
   podeColidir(personagem, plataforma) {

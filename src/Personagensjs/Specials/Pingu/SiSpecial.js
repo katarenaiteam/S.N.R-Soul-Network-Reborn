@@ -12,6 +12,9 @@ export default class PinguSiSpecial {
     this.quadrosDisparados = new Set();
     this.projeteis = new Set();
     this.totalProjeteis = 0;
+    this.acertosPorAlvo = new WeakMap();
+    this.projeteisPorAlvo = new WeakMap();
+    this.primeiroProjetilDisparado = false;
     this.poseEncerrada = false;
     this.aoAtualizarAnimacao = this.aoAtualizarAnimacao.bind(this);
     this.aoCompletarAnimacao = this.aoCompletarAnimacao.bind(this);
@@ -38,10 +41,12 @@ export default class PinguSiSpecial {
         quadro === this.special.fimEnxurrada);
     if (!primeiro && !segundo && !enxurrada) return;
 
-    if (!this.personagem.inputDown("special")) return;
+    if (!this.personagem.inputDown("special") &&
+      !(primeiro && !this.primeiroProjetilDisparado)) return;
 
     this.quadrosDisparados.add(quadro);
     this.criarProjetil(!primeiro && !segundo);
+    if (primeiro) this.primeiroProjetilDisparado = true;
   }
 
   criarProjetil(enxurrada) {
@@ -88,6 +93,15 @@ export default class PinguSiSpecial {
     registro.ataque = registrarAtaqueEspecial(this, projetil, {
       categoria: "projetil",
       aoColidir: () => this.finalizarProjetil(registro),
+      aoColidirProjetil: (outroAtaque) => {
+        let projeteis = this.projeteisPorAlvo.get(outroAtaque);
+        if (!projeteis) {
+          projeteis = new Set();
+          this.projeteisPorAlvo.set(outroAtaque, projeteis);
+        }
+        projeteis.add(registro);
+        return projeteis.size >= this.special.projeteisParaQuebrar;
+      },
       aoAtingirAlvo: (alvo) => this.acertarAlvo(registro, alvo, direcao, propriedades),
     });
 
@@ -110,7 +124,15 @@ export default class PinguSiSpecial {
 
   acertarAlvo(registro, alvo, direcao, propriedades) {
     if (!registro.projetil.active) return;
-    alvo.receberDano(propriedades.dano, propriedades, {
+    const quantidadeAcertos = (this.acertosPorAlvo.get(alvo) ?? 0) + 1;
+    this.acertosPorAlvo.set(alvo, quantidadeAcertos);
+    alvo.receberDano(propriedades.dano, {
+      ...propriedades,
+      naoInterromperEstado: quantidadeAcertos < this.special.projeteisParaQuebrar,
+      hitstunFrames: quantidadeAcertos >= this.special.projeteisParaQuebrar
+        ? propriedades.hitstunFrames
+        : 0,
+    }, {
       x: registro.projetil.x,
       direcao,
       atacante: this.personagem,
@@ -150,7 +172,7 @@ export default class PinguSiSpecial {
 
   atualizar() {
     if (this.personagem.maquinaEstados.estadoAtual === this.estado) {
-      if (!this.personagem.inputDown("special")) {
+      if (!this.personagem.inputDown("special") && this.primeiroProjetilDisparado) {
         this.estado.finalizarSpecial();
         return;
       }
@@ -175,13 +197,15 @@ export default class PinguSiSpecial {
 PinguSiSpecial.configuracao = {
   animacao: "pingu_siSpecial",
   logica: PinguSiSpecial,
-  duracao: 4917,
+  duracao: 3278,
+  atordoarAoFinalizar: true,
   cooldown: 1100,
   quadroPrimeiroProjetil: 5,
   quadroSegundoProjetil: 11,
   inicioEnxurrada: 12,
   intervaloEnxurrada: 2,
   fimEnxurrada: 58,
+  projeteisParaQuebrar: 3,
   texturaProjetil: "Pingu_siBall",
   animacaoProjetil: "pingu_siBall",
   tempoProjetil: 5000,

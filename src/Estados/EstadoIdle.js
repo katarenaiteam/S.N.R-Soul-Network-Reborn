@@ -2,7 +2,9 @@ import EstadoBase from "./EstadoBase.js";
 
 export default class EstadoIdle extends EstadoBase {
   enter() {
-    this.personagem.sprite.setVelocityX(0);
+    if (!this.personagem.scene.mapaAtual?.escorregadio) {
+      this.personagem.sprite.setVelocityX(0);
+    }
     this.personagem.tocarAnimacao("idle");
   }
 

@@ -1,9 +1,8 @@
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
-import { tocarMusicaSegura } from "../Objetos/AudioSeguro.js";
 import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 
-const PERSONAGENS = [
+export const PERSONAGENS = [
   {
     id: "Aigis",
     icon: "aigis-icon",
@@ -54,12 +53,12 @@ const PERSONAGENS = [
 
       p1: {
         x: -70,
-        y: 200
+        y: 140
       },
 
       p2: {
         x: 65,
-        y: 200
+        y: 140
       }
     }
   },
@@ -226,11 +225,6 @@ export default class Charmenu extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor("#000000");
     this.cameras.main.fadeIn(350, 0, 0, 0);
-
-    this.musica = tocarMusicaSegura(this, "katarenai8bit", {
-      loop: true,
-      volume: 0.1
-    });
 
     this.menuPronto = false;
     this.transicaoAtiva = false;
@@ -938,7 +932,12 @@ export default class Charmenu extends Phaser.Scene {
   avancar() {
     this.transicaoAtiva = true;
 
-    this.musica?.stop();
+    if (this.modoJogo === "historia") {
+      const musicaMenu = this.registry.get("musicaMenu");
+      musicaMenu?.stop();
+      musicaMenu?.destroy();
+      this.registry.remove("musicaMenu");
+    }
 
     const escolhas = {
       p1: this.p1.selecionado.id,

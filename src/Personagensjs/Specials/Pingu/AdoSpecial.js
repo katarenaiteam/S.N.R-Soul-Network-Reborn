@@ -18,6 +18,7 @@ export default class PinguAdoSpecial {
   }
 
   executar() {
+    this.personagem.tocarSomSorteado("pingu-Ado", { volume: this.personagem.sons.volumeVoz });
     const sprite = this.personagem.sprite;
     this.direcao = sprite.flipX ? -1 : 1;
     sprite.setVelocity(0, 0);
@@ -198,15 +199,15 @@ PinguAdoSpecial.configuracao = {
   animacaoLoop: "pingu_AdoSpecial_loop",
   logica: PinguAdoSpecial,
   frameInicioMergulho: 3,
-  velocidadeMergulho: 900,
+  velocidadeMergulho: 1000,
   impulsoQuique: 350,
   duracaoQuique: 300,
   cooldown: 1500,
   propriedades: {
-    dano: 16,
+    dano: 15,
     tipoSomImpacto: "heavy",
-    knockbackX: 180,
-    knockbackY: 220,
+    knockbackX: 234,
+    knockbackY: 325,
     tumbling: true,
     travarMovimentoAir: true,
   },

@@ -14,7 +14,8 @@ export default class BotController {
       dash:     { isDown: false, justDown: false, justUp: false, isVirtual: true },
       atack:    { isDown: false, justDown: false, justUp: false, isVirtual: true },
       special:  { isDown: false, justDown: false, justUp: false, isVirtual: true },
-      guard:    { isDown: false, justDown: false, justUp: false, isVirtual: true }
+      guard:    { isDown: false, justDown: false, justUp: false, isVirtual: true },
+      taunt:    { isDown: false, justDown: false, justUp: false, isVirtual: true }
     };
 
     this.teclasParaZerar = [];

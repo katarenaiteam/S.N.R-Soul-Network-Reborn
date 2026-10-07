@@ -110,8 +110,9 @@ export default class WebShot {
     alvo.estaPresoNaTeia = true;
     alvo.imuneTeia = true;
 
-    const tempoPreso = this.special?.propriedades?.duracaoTeia || 1500;
+    const tempoPreso = this.special?.propriedades?.duracaoTeia || 2000;
     const tempoImunidade = 1000;
+    alvo.tempoPresoTeiaAtual = tempoPreso;
 
     // Força o oponente a ir para o EstadoTeia
     alvo.maquinaEstados.mudarEstado("teia");
@@ -135,7 +136,11 @@ export default class WebShot {
     // Atualiza a posição da teia junto com o oponente
     const seguirOponente = () => {
       if (teiaPresa && teiaPresa.active && alvo.sprite) {
-        teiaPresa.setPosition(alvo.sprite.x, alvo.sprite.y - 40);
+        const tremor = alvo.deslocamentoTremorTeia;
+        teiaPresa.setPosition(
+          alvo.sprite.x + (tremor?.x ?? 0),
+          alvo.sprite.y - 40 + (tremor?.y ?? 0)
+        );
       }
     };
     this.scene.events.on("update", seguirOponente);
@@ -166,6 +171,7 @@ export default class WebShot {
       }
 
       alvo.teiaPresaSprite = null;
+      alvo.tempoPresoTeiaAtual = null;
 
       // Timer de imunidade
       this.scene.time.delayedCall(tempoImunidade, () => {

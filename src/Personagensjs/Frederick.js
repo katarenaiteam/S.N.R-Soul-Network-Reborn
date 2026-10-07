@@ -7,7 +7,7 @@ import AupSpecial from "./Specials/FJ/AupSpecial.js";
 import DoSpecial from "./Specials/FJ/DoSpecial.js";
 import FJUlt from "./Ult/FJUlt.js";
 
-const ACERTOS_PARA_STUN = 6;
+const ACERTOS_PARA_STUN = 4;
 
 export default class FJ extends Personagem {
   obterIndicadorHabilidade() {
@@ -555,6 +555,14 @@ this.nomePersonagem = "Frederick Johnson";
       },
    
    };
+
+     this.sons = {
+      ...this.sons,
+      vozAtaque: [ "fj-atack1", "fj-atack2", "fj-atack3", "fj-atack4" ],
+      vozDanoNormal: ["fj-hurt2", "fj-hurt3", "fj-hurt1", "fj-hurt4", ],
+      vozDanoForte: ["fj-hurt5", "fj-hurt6", ],
+      volumeVoz: 0.25,
+    };
     
     // ============================ tabela de golpes =====================================
    this.configAnimacoes.comboRapido1 = {
@@ -595,10 +603,10 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
            tipoSomImpacto: "light",
           dano: 4,
-          knockbackX: 30,
+          knockbackX: 20,
           knockbackY: -20,
           knockbackFixo: true,
-          hitstunFrames: 24,
+          hitstunFrames: 25,
           hitsSemDecay: 2
         },
 
@@ -621,7 +629,7 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
            tipoSomImpacto: "heavy",
           dano: 4,
-          knockbackX: 40,
+          knockbackX: 20,
           knockbackY: -30,
           knockbackFixo: true,
           hitstunFrames: 18,
@@ -689,8 +697,8 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
            tipoSomImpacto: "heavy",
           dano: 8,
-          knockbackX: 350,
-          knockbackY: -310,
+          knockbackX: 420,
+          knockbackY: -350,
           tumbling: true,
           hitstunBaseFrames: 18
         },
@@ -738,7 +746,7 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 130,
+          knockbackX: 100,
           knockbackY: -110,
           tumbling: false,
           knockbackFixo: true,
@@ -766,6 +774,7 @@ this.nomePersonagem = "Frederick Johnson";
           knockbackY: -350,
           tumbling: false,
           knockbackFixo: true,
+          hitstunMinFrames:25,
         },
       },
 
@@ -792,6 +801,7 @@ this.nomePersonagem = "Frederick Johnson";
           knockbackY: -470,
           tumbling: false,
           knockbackFixo: true,
+          hitstunMinFrames:25,
         },
       },
 
@@ -814,8 +824,8 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 9,
-          knockbackX: 120,
-          knockbackY: -470,
+          knockbackX: 168,
+          knockbackY: -658,
           tumbling: true,
           knockbackFixo: false,
         },
@@ -853,8 +863,8 @@ this.nomePersonagem = "Frederick Johnson";
          // anularGravidade: true,
           tipoSomImpacto: "heavy",
           dano: 9,
-          knockbackX: 400,
-          knockbackY: -150,
+          knockbackX: 560,
+          knockbackY: -350,
           tumbling: true,
           knockbackFixo: false,
         },
@@ -893,9 +903,10 @@ this.nomePersonagem = "Frederick Johnson";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 10,
-          knockbackX: 80,
-          knockbackY: 400,
+          knockbackX: 112,
+          knockbackY: 560,
           quiqueChaoY: 400,
+          hitstunMinFrames:25,
         },
       },
 
@@ -991,6 +1002,15 @@ this.nomePersonagem = "Frederick Johnson";
   }
 
   static criarAnimacoes(scene) {
+    if (!scene.anims.exists("fj_intro")) {
+      scene.anims.create({
+        key: "fj_intro",
+        frames: scene.anims.generateFrameNumbers("FJ_intro", { start: 0, end: 13 }),
+        frameRate: 14,
+        repeat: 0,
+      });
+    }
+
     if (!scene.anims.exists("fj_npose")) {
       scene.anims.create({
         key: "fj_npose",
@@ -1326,26 +1346,26 @@ scene.anims.create({
     });
     scene.anims.create({
       key: "fj_comboRapido1",
-      frames: scene.anims.generateFrameNumbers("FJ_speedNeu", {
-        start: 0, end: 3,
+      frames: scene.anims.generateFrameNumbers("FJ_combo", {
+        start: 0, end: 4,
       }),
-      frameRate: 60,
+      frameRate: 30,
       repeat: 0,
     });
     scene.anims.create({
       key: "fj_comboRapido2",
-      frames: scene.anims.generateFrameNumbers("FJ_speedNeu", {
-        start: 4, end: 13,
+      frames: scene.anims.generateFrameNumbers("FJ_combo", {
+        start: 5, end: 10,
       }),
-      frameRate: 60,
+      frameRate: 30,
       repeat: 0,
     });
     scene.anims.create({
       key: "fj_comboRapido3",
       frames: scene.anims.generateFrameNumbers("FJ_speedNeu", {
-        start: 14, end: 19,
+        start: 11, end: 16,
       }),
-      frameRate: 60,
+      frameRate: 30,
       repeat: 0,
     });
     scene.anims.create({

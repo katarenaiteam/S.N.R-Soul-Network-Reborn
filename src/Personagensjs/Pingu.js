@@ -22,7 +22,7 @@ export default class Pingu extends Personagem {
       "Pingu_idle",
       "0",
       {
-        velocidade: 200,
+        velocidade: 300,
         forcaPulo: -600,
         maxPulos: 2,
         maxDash: 1,
@@ -95,7 +95,7 @@ export default class Pingu extends Personagem {
         largura: 30,
         altura: 45,
         offsetX: 5,
-        offsetY: -7,
+        offsetY: -5,
         escala: 1,
         hurtboxes: [
         ],
@@ -149,8 +149,8 @@ export default class Pingu extends Personagem {
       },
 
       dano: {
-        offsetVisualY: 40,
         offsetVisualX: -20,
+        offsetVisualY: 35,
          largura: 30,
         altura: 70,
         offsetX: 75,
@@ -273,7 +273,7 @@ export default class Pingu extends Personagem {
         ],
       },
 
-      neSpecial: { offsetVisualY: 14, offsetVisualX: -4, largura: 30, altura: 70, offsetX: 21, offsetY: 17, escala: 1,
+      neSpecial: { offsetVisualY: 14, offsetVisualX: -4, largura: 30, altura: 70, offsetX: 21, offsetY: 16, escala: 1,
         hurtboxes: [
           { largura: 30, altura: 55, offsetX: -4, offsetY: -40 }, 
         ],
@@ -342,20 +342,16 @@ export default class Pingu extends Personagem {
         hurtboxes: [],
       },
 
-    
-    
    };
 
- //   this.sons = {
- //     ...this.sons,
- //     vozAtaque: ["sp-atack", "sp-atack2", "sp-atack3"],
- //     vozDanoNormal: ["sp-hurt", "sp-hurt2"],
- //     vozDanoForte: ["sp-hurt", "sp-hurt2", "sp-hurt3"],
- //     volumeVoz: 0.2,
- //   };
+    this.sons = {
+      ...this.sons,
+      vozAtaque: [ "pingu-attack1", "pingu-attack2", "pingu-attack3", "pingu-attack4"],
+      vozDanoNormal: ["pingu-hurt2", "pingu-hurt3", "pingu-hurt4"],
+      vozDanoForte: ["pingu-hurt3", "pingu-hurt1"],
+      volumeVoz: 0.2,
+    };
 
-
-  
     // ============================ tabela de golpes =====================================
     this.golpes = {
       neutro1: {
@@ -403,7 +399,7 @@ export default class Pingu extends Personagem {
         largura: 48,
         altura: 35,
         duracao: 550,
-       // cancelavel: true,
+        cancelavel: true,
 
         vfxAcerto: [
         {
@@ -455,8 +451,8 @@ export default class Pingu extends Personagem {
         propriedades: {
           tipoSomImpacto: "light",
           dano: 4,
-          knockbackX: 250,
-          knockbackY: -350,
+          knockbackX: 350,
+          knockbackY: -490,
           knockbackFixo: false,
         },
 
@@ -493,7 +489,7 @@ export default class Pingu extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 6,
-          knockbackX: 50,
+          knockbackX: 80,
           knockbackY: -350,
           knockbackFixo: true,
           tumbling: true,
@@ -531,8 +527,8 @@ export default class Pingu extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 600,
-          knockbackY: -400,
+          knockbackX: 560,
+          knockbackY: -350,
           tumbling: true,
           impulsoX: 0,
         },
@@ -562,7 +558,7 @@ export default class Pingu extends Personagem {
           knockbackY: -350,
           tumbling: false,
           knockbackFixo: true,
-          hitstunMinFrames:24,
+          hitstunFrames:24,
         },
       },
 
@@ -608,8 +604,8 @@ export default class Pingu extends Personagem {
   propriedades: {
     tipoSomImpacto: "heavy",
     dano: 11,
-    knockbackX: 50,
-    knockbackY: 400,
+    knockbackX: 70,
+    knockbackY: 490,
     quiqueChaoY: 350,
     hitstunMinFrames:25,
   },
@@ -649,9 +645,8 @@ export default class Pingu extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 300,
-          knockbackY: -130,
-          impulsoX: 350,
+          knockbackX: 420,
+          knockbackY: -182,
           tumbling: true
         },
       },
@@ -679,8 +674,8 @@ export default class Pingu extends Personagem {
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 11,
-          knockbackX: 60,
-          knockbackY: -500,
+          knockbackX: 84,
+          knockbackY: -490,
           impulsoX: 30,
           tumbling: true
         },
@@ -1046,7 +1041,7 @@ if (!scene.anims.exists("punch_effect3")) {
         start: 0,
         end: 7,
       }),
-      frameRate: 27,
+      frameRate: 30,
       repeat: -1,
     });
 

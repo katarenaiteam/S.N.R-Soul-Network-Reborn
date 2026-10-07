@@ -341,6 +341,15 @@ export default class Miku_IA {
     return !!this.ctrl.bot.specials?.[tipo] && this.ctrl.bot.podeUsarSpecial(tipo);
   }
 
+  podeAtaqueIA(tipo) {
+    const bot = this.ctrl.bot;
+    return !!bot.golpes?.[tipo] && bot.podeUsarAtaque(tipo);
+  }
+
+  prioridadeAtaqueIA(tipo, nota, especial) {
+    return nota;
+  }
+
   preparar(tipo) {
     const bot = this.ctrl.bot;
     this.ctrl.soltarTudo();
@@ -413,8 +422,9 @@ export default class Miku_IA {
       (['atack', 'special'].includes(estadoAlvo) && !ameaca);
     const opcoes = [];
     const adicionar = (tipo, nota, especial = false) => {
-      if (especial ? !this.podeSpecial(tipo) : !bot.golpes?.[tipo] || !bot.podeUsarAtaque(tipo)) return;
-      opcoes.push({ tipo, especial, nota: nota - (time - (this.usos.get(tipo) ?? -Infinity) < 3500 ? 22 : 0) });
+      if (especial ? !this.podeSpecial(tipo) : !this.podeAtaqueIA(tipo)) return;
+      const prioridade = this.prioridadeAtaqueIA(tipo, nota, especial);
+      opcoes.push({ tipo, especial, nota: prioridade - (time - (this.usos.get(tipo) ?? -Infinity) < 3500 ? 22 : 0) });
     };
     if ((time >= this.proximoAtaque || (abertura && dist < 190)) && !alvo.estadoInvencible?.ativo) {
       if (chao) {

@@ -20,6 +20,7 @@ export default class PinguAsiSpecial {
   executar() {
     if (this.iniciado) return;
     this.iniciado = true;
+    this.personagem.tocarSomSorteado("pingu-Asi", { volume: this.personagem.sons.volumeVoz });
     this.inicio = this.scene.time.now;
 
     const esquerda = this.personagem.inputDown("esquerda");
@@ -175,21 +176,21 @@ PinguAsiSpecial.configuracao = {
   duracaoMinima: 800,
   duracaoMaxima: 7000,
   tempoExpansao: 650,
-  velocidadeInicial: 160,
+  velocidadeInicial: 170,
   velocidadeMaxima: 645,
   aceleracao: 900,
   desaceleracaoReversao: 760,
   velocidadeMaximaQueda: 85,
   larguraHitboxInicial: 15,
-  larguraHitboxMaxima: 68,
+  larguraHitboxMaxima: 72,
   alturaHitbox: 30,
   offsetHitboxX: 0,
-  offsetHitboxY: -110,
+  offsetHitboxY: -80,
   propriedades: {
     tipoSomImpacto: "heavy",
     dano: 18,
-    knockbackX: 430,
-    knockbackY: -360,
+    knockbackX: 559,
+    knockbackY: -468,
     tumbling: true,
     travarMovimentoAir: true,
   },

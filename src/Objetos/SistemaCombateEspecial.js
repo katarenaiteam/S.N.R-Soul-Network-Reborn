@@ -29,7 +29,7 @@ function obterHurtboxesValidas(alvo) {
 
 export function obterAlvosCombate(personagem) {
   const scene = personagem.scene;
-  const jogadores = scene.scene.key === "CenaHistoria"
+  const jogadores = scene.scene.key.startsWith("CenaHistoria")
     ? (personagem === scene.boss ? [scene.jogador1, scene.jogador2] : [scene.boss])
     : [scene.jogador1, scene.jogador2, scene.jogador3, scene.jogador4];
   const extras = scene.alvosAtaqueExtras ?? [];
@@ -59,6 +59,7 @@ export function registrarAtaqueEspecial(logica, objeto, opcoes = {}) {
     // Invocacoes e projeteis devem apenas acionar o counter.
     contraAtacarDono: opcoes.contraAtacarDono === true,
     aoColidir: opcoes.aoColidir,
+    aoColidirProjetil: opcoes.aoColidirProjetil,
     aoAtingirAlvo: opcoes.aoAtingirAlvo,
     colisores: new Map(),
     encerrado: false,
@@ -116,6 +117,9 @@ export function registrarAtaqueEspecial(logica, objeto, opcoes = {}) {
       if (!objeto.body || !outra.objeto.body) return;
       const colisor = scene.physics.add.overlap(objeto, outra.objeto, () => {
         if (entrada.encerrado || outra.encerrado) return;
+        const consumirEntrada = entrada.aoColidirProjetil?.(outra) ?? true;
+        const consumirOutra = outra.aoColidirProjetil?.(entrada) ?? true;
+        if (!consumirEntrada || !consumirOutra) return;
         if (!entrada.persistirAoColidirProjetil) entrada.aoColidir?.(outra);
         if (!outra.persistirAoColidirProjetil) outra.aoColidir?.(entrada);
         if (!entrada.persistirAoColidirProjetil) entrada.remover();
@@ -135,7 +139,7 @@ export function obterAtaquesEspeciaisInimigos(scene, personagem) {
     !entrada.encerrado &&
     entrada.contraAtacavel &&
     entrada.dono !== personagem &&
-    (scene.scene.key !== "CenaHistoria" ||
+    (!scene.scene.key.startsWith("CenaHistoria") ||
       (personagem === scene.boss ? entrada.dono !== scene.boss : entrada.dono === scene.boss)) &&
     entrada.objeto?.active
   );

@@ -56,6 +56,19 @@ function carregarGrupo(scene, queued, linhas) {
 }
 
 const assetscommon = [
+  (scene, queued) => queueAsset(scene, queued, "texture", "Miku_puppet", () => { scene.load.spritesheet("Miku_puppet", "assets/personagens/Miku/Sprites/Miku_puppet.png", { frameWidth: 166, frameHeight: 145 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Loja_raio", () => { scene.load.spritesheet("Loja_raio", "assets/efeitos/shop/raio.png", { frameWidth: 200, frameHeight: 600 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Loja_mao", () => { scene.load.spritesheet("Loja_mao", "assets/efeitos/shop/67H.png", { frameWidth: 650, frameHeight: 450 }); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-heal", () => { scene.load.audio("shop-heal", "assets/Loja/sons/heal.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-puppet", () => { scene.load.audio("shop-puppet", "assets/Loja/sons/puppet.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-life", () => { scene.load.audio("shop-life", "assets/Loja/sons/Life.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-slen", () => { scene.load.audio("shop-slen", "assets/Loja/sons/slan.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-gelo", () => { scene.load.audio("shop-gelo", "assets/Loja/sons/gelo-shop.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-lava", () => { scene.load.audio("shop-lava", "assets/Loja/sons/lava.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-raio", () => { scene.load.audio("shop-raio", "assets/Loja/sons/raio.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-ult", () => { scene.load.audio("shop-ult", "assets/Loja/sons/ult-shops.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "shop-dead", () => { scene.load.audio("shop-dead", "assets/Loja/sons/def.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Slan_tv", () => { scene.load.spritesheet("Slan_tv", "assets/personagens/Slenderman/Sprites/Slan_tv.png", { frameWidth: 498, frameHeight: 371 }); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "narrador-3-2-1", () => { scene.load.audio("narrador-3-2-1", "assets/cenarios/Intro/narrador-3-2-1.mp3"); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "narrador-fight", () => { scene.load.audio("narrador-fight", "assets/cenarios/Intro/narrador-fight.mp3"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Fight", () => { scene.load.spritesheet("Fight", "assets/cenarios/Intro/Fight.png", { frameWidth: 105, frameHeight: 33 }); }),
@@ -141,8 +154,15 @@ const assetscommon = [
   (scene, queued) => queueAsset(scene, queued, "texture", "mid-guard", () => { scene.load.spritesheet("mid-guard", "assets/efeitos/guard/midguard-efect.png", { frameWidth: 638, frameHeight: 632, }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "brokeguard-efect", () => { scene.load.spritesheet("brokeguard-efect", "assets/efeitos/guard/brokeguard-efect.png", { frameWidth: 615, frameHeight: 616, }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Stun_Effect", () => { scene.load.spritesheet("Stun_Effect", "assets/efeitos/Stun_Effect.png", { frameWidth: 128, frameHeight: 128, }); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "glass", () => { scene.load.audio("glass", "assets/efeitos/out-effect/glass.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "glitch-sound", () => { scene.load.audio("glitch-sound", "assets/efeitos/out-effect/glitch-sound.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "tv-static", () => { scene.load.audio("tv-static", "assets/efeitos/out-effect/tv-static.mp3"); }),
+  
+
+
 ];
 const assetsFJ = [
+  (scene, queued) => queueAsset(scene, queued, "texture", "FJ_intro", () => { scene.load.spritesheet("FJ_intro", "assets/personagens/FJ/Sprites/FJ_intro.png", { frameWidth: 459, frameHeight: 433 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_idle", () => { scene.load.spritesheet("FJ_idle", "assets/personagens/FJ/Sprites/FJ_Idle.png", { frameWidth: 379, frameHeight: 409 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_walk", () => { scene.load.spritesheet("FJ_walk", "assets/personagens/FJ/Sprites/FJ_walk.png", { frameWidth: 411, frameHeight: 335 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_jump", () => { scene.load.spritesheet("FJ_jump", "assets/personagens/FJ/Sprites/FJ_jump.png", { frameWidth: 342, frameHeight: 553 }); }),
@@ -200,6 +220,17 @@ const assetsFJ = [
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_ultN", () => { scene.load.spritesheet("FJ_ultN", "assets/personagens/FJ/Sprites/ult/FJ_ultN.png", { frameWidth: 615, frameHeight: 616 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ-ultExplosion", () => { scene.load.spritesheet("FJ-ultExplosion", "assets/personagens/FJ/Sprites/ult/FJ-ultExplosion.png", { frameWidth: 720, frameHeight: 480 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ-eyes", () => { scene.load.spritesheet("FJ-eyes", "assets/personagens/FJ/Sprites/ult/FJ-eyes-9.png", { frameWidth: 1410, frameHeight: 250 }); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "fj-atack1", () => { scene.load.audio("fj-atack1", "assets/personagens/FJ/Audio/fj-atack1.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "fj-atack2", () => { scene.load.audio("fj-atack2", "assets/personagens/FJ/Audio/fj-atack2.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "fj-atack3", () => { scene.load.audio("fj-atack3", "assets/personagens/FJ/Audio/fj-atack3.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "fj-atack4", () => { scene.load.audio("fj-atack4", "assets/personagens/FJ/Audio/fj-atack4.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "fj-hurt1", () => { scene.load.audio("fj-hurt1", "assets/personagens/FJ/Audio/fj-hurt1.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "fj-hurt2", () => { scene.load.audio("fj-hurt2", "assets/personagens/FJ/Audio/fj-hurt2.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "fj-hurt3", () => { scene.load.audio("fj-hurt3", "assets/personagens/FJ/Audio/fj-hurt3.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "fj-hurt4", () => { scene.load.audio("fj-hurt4", "assets/personagens/FJ/Audio/fj-hurt4.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "fj-hurt5", () => { scene.load.audio("fj-hurt5", "assets/personagens/FJ/Audio/fj-hurt5.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "fj-hurt6", () => { scene.load.audio("fj-hurt6", "assets/personagens/FJ/Audio/fj-hurt6.wav"); }),
+
 ];
 const assetsSpiderMan = [
   (scene, queued) => queueAsset(scene, queued, "texture", "SpiderMan_intro", () => { scene.load.spritesheet("SpiderMan_intro", "assets/personagens/SpiderMan/Sprites/SpiderMan_intro.png", { frameWidth: 126, frameHeight: 134 }); }),
@@ -385,6 +416,8 @@ const assetsKen = [
   (scene, queued) => queueAsset(scene, queued, "texture", "ken-launch", () => { scene.load.spritesheet("ken-launch", "assets/personagens/Ken/Sprites/ult/ken-launch.png", { frameWidth: 144, frameHeight: 60 }); }),
 ];
 const assetsSlenderman = [
+  (scene, queued) => queueAsset(scene, queued, "texture", "poseEffect", () => { scene.load.spritesheet("poseEffect", "assets/personagens/SpiderMan/Sprites/ultimate/poseEffect.png", { frameWidth: 320, frameHeight: 72 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "dashEffect", () => { scene.load.spritesheet("dashEffect", "assets/personagens/SpiderMan/Sprites/ultimate/dashEffect.png", { frameWidth: 314, frameHeight: 274 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_intro", () => { scene.load.spritesheet("Slan_intro", "assets/personagens/Slenderman/Sprites/Slan_intro.png", { frameWidth: 97, frameHeight: 263 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_idle", () => { scene.load.spritesheet("Slan_idle", "assets/personagens/Slenderman/Sprites/Slan_idle.png", { frameWidth: 91, frameHeight: 124 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_jump", () => { scene.load.spritesheet("Slan_jump", "assets/personagens/Slenderman/Sprites/Slan_jump.png", { frameWidth: 51, frameHeight: 124 }); }),
@@ -421,7 +454,12 @@ const assetsSlenderman = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_AupSpecial", () => { scene.load.spritesheet("Slan_AupSpecial", "assets/personagens/Slenderman/Sprites/Slan_AupSpecial.png", { frameWidth: 191, frameHeight: 149 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_AdoSpecial", () => { scene.load.spritesheet("Slan_AdoSpecial", "assets/personagens/Slenderman/Sprites/Slan_AdoSpecial.png", { frameWidth: 68, frameHeight: 156 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_AdoSpecial-efect", () => { scene.load.spritesheet("Slan_AdoSpecial-efect", "assets/personagens/Slenderman/Sprites/Slan_AdoSpecial-efect.png", { frameWidth: 228, frameHeight: 209 }); }),
-  (scene, queued) => queueAsset(scene, queued, "texture", "Slan_tv", () => { scene.load.spritesheet("Slan_tv", "assets/personagens/Slenderman/Sprites/Slan_tv.png", { frameWidth: 498, frameHeight: 371 }); }),
+ // (scene, queued) => queueAsset(scene, queued, "texture", "Slan_tv", () => { scene.load.spritesheet("Slan_tv", "assets/personagens/Slenderman/Sprites/Slan_tv.png", { frameWidth: 498, frameHeight: 371 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "slan-ult1", () => { scene.load.spritesheet("slan-ult1", "assets/personagens/Slenderman/Sprites/ult/slan-ult1.png", { frameWidth: 115, frameHeight: 105 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "slan-grab", () => { scene.load.spritesheet("slan-grab", "assets/personagens/Slenderman/Sprites/ult/slan-grab.png", { frameWidth: 70, frameHeight: 123 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "slan-grab2", () => { scene.load.spritesheet("slan-grab2", "assets/personagens/Slenderman/Sprites/ult/slan-grab2.png", { frameWidth: 70, frameHeight: 123 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "slan-ult5", () => { scene.load.spritesheet("slan-ult5", "assets/personagens/Slenderman/Sprites/ult/slan-ult5.png", { frameWidth: 130, frameHeight: 139 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "pages1", () => { scene.load.spritesheet("pages1", "assets/personagens/Slenderman/Sprites/ult/pages1.png", { frameWidth: 283, frameHeight: 352 }); }),
 ];
 const assetsPingu = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_intro", () => { scene.load.spritesheet("Pingu_intro", "assets/personagens/Pingu/Sprites/Pingu_intro.png", { frameWidth: 81, frameHeight: 90 }); }),
@@ -468,8 +506,28 @@ const assetsPingu = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_Fgo", () => { scene.load.spritesheet("Pingu_Fgo", "assets/personagens/Pingu/Sprites/ultimate/Pingu_Fgo.png", { frameWidth: 561, frameHeight: 216 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_Fdance", () => { scene.load.spritesheet("Pingu_Fdance", "assets/personagens/Pingu/Sprites/ultimate/Pingu_Fdance.png", { frameWidth: 90, frameHeight: 63 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_ultF", () => { scene.load.spritesheet("Pingu_ultF", "assets/personagens/Pingu/Sprites/ultimate/Pingu_ultF.png", { frameWidth: 501, frameHeight: 379 }); }),
-  
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-intro", () => { scene.load.audio("pingu-intro", "assets/personagens/Pingu/Audio/pingu-intro.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-hurt1", () => { scene.load.audio("pingu-hurt1", "assets/personagens/Pingu/Audio/pingu-hurt1.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-hurt2", () => { scene.load.audio("pingu-hurt2", "assets/personagens/Pingu/Audio/pingu-hurt2.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-hurt3", () => { scene.load.audio("pingu-hurt3", "assets/personagens/Pingu/Audio/pingu-hurt3.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-hurt4", () => { scene.load.audio("pingu-hurt4", "assets/personagens/Pingu/Audio/pingu-hurt4.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-taunt", () => { scene.load.audio("pingu-taunt", "assets/personagens/Pingu/Audio/pingu-taunt.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-attack1", () => { scene.load.audio("pingu-attack1", "assets/personagens/Pingu/Audio/pingu-attack1.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-attack2", () => { scene.load.audio("pingu-attack2", "assets/personagens/Pingu/Audio/pingu-attack2.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-attack3", () => { scene.load.audio("pingu-attack3", "assets/personagens/Pingu/Audio/pingu-attack3.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-attack4", () => { scene.load.audio("pingu-attack4", "assets/personagens/Pingu/Audio/pingu-attack4.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-nunut", () => { scene.load.audio("pingu-nunut", "assets/personagens/Pingu/Audio/nunut.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-Asi", () => { scene.load.audio("pingu-Asi", "assets/personagens/Pingu/Audio/pingu-Asi.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-Ado", () => { scene.load.audio("pingu-Ado", "assets/personagens/Pingu/Audio/pingu-Ado.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-deaf", () => { scene.load.audio("pingu-deaf", "assets/personagens/Pingu/Audio/pingu-deaf.wav"); }),
+
 ];
+const assetsIce = [
+  (scene, queued) => queueAsset(scene, queued, "texture", "ice-back", () => { scene.load.spritesheet("ice-back", "assets/cenarios/Ice/ice-back.png", { frameWidth: 640, frameHeight: 389 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ice-plat", () => { scene.load.image("ice-plat", "assets/cenarios/Ice/ice-plat.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ice-trans", () => { scene.load.image("ice-trans", "assets/cenarios/Ice/ice-trans.png"); }),
+ 
+]
 const assetsMapaTeste = [
   (scene, queued) => queueAsset(scene, queued, "texture", "backtest", () => { scene.load.spritesheet("backtest", "assets/cenarios/MapaTest/backtest.png", { frameWidth: 1200, frameHeight: 600 }); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "No_More", () => { scene.load.audio("No_More", "assets/cenarios/MapaTest/No_More.mp3"); }),
@@ -491,6 +549,13 @@ const assetsSkyTowers = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Plat-trans", () => { scene.load.image("Plat-trans", "assets/cenarios/Plat-trans.png"); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "Gathers_Under_Night", () => { scene.load.audio("Gathers_Under_Night", "assets/cenarios/MapaSkytowers/Ost/Gathers_Under_Night.mp3"); }),
 ];
+const assetsSlenderMap = [
+  (scene, queued) => queueAsset(scene, queued, "texture", "slen-back1", () => { scene.load.spritesheet("slen-back1", "assets/cenarios/SlenMap/slen-back1.png", { frameWidth: 960, frameHeight: 541 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "slen-back2", () => { scene.load.spritesheet("slen-back2", "assets/cenarios/SlenMap/slen-back2.png", { frameWidth: 960, frameHeight: 541 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "slen-plat", () => { scene.load.image("slen-plat", "assets/cenarios/SlenMap/slen-plat.png"); }),
+
+
+];
 const assetsstory = [
   (scene, queued) => queueAsset(scene, queued, "audio", "Sayonara", () => { scene.load.audio("Sayonara", "assets/cenarios/MikuShow/Sayonara.wav"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "txtbox", () => { scene.load.image("txtbox", "assets/Hud/dialogo/txtbox.png"); }),
@@ -500,6 +565,13 @@ const assetsstory = [
   (scene, queued) => queueAsset(scene, queued, "texture", "puppet", () => { scene.load.image("puppet", "assets/Hud/dialogo/Miku/puppet.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Mk_deaf", () => { scene.load.spritesheet("Mk_deaf", "assets/personagens/Miku/Sprites/Mk_deaf.png", { frameWidth: 169, frameHeight: 163 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_N", () => { scene.load.image("FJ_N", "assets/Hud/dialogo/FJ/FJ-N.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pg_ok", () => { scene.load.image("Pg_ok", "assets/Hud/dialogo/Pingu/Pg_ok.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pg_N", () => { scene.load.image("Pg_N", "assets/Hud/dialogo/Pingu/Pg_N.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pg_mid", () => { scene.load.image("Pg_mid", "assets/Hud/dialogo/Pingu/Pg_mid.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pg_bad", () => { scene.load.image("Pg_bad", "assets/Hud/dialogo/Pingu/Pg_bad.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pg_deaf", () => { scene.load.image("Pg_deaf", "assets/Hud/dialogo/Pingu/Pg_deaf.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "pingu-dance", () => { scene.load.spritesheet("pingu-dance", "assets/Hud/dialogo/Pingu/pingu-dance.png", { frameWidth: 155, frameHeight: 155 }); }),
+   (scene, queued) => queueAsset(scene, queued, "audio", "cat", () => { scene.load.audio("cat", "assets/cenarios/Ice/cat.wav"); }),
 ];
 const personagens = {
   FJ: assetsFJ,
@@ -518,8 +590,12 @@ export function carregarAssetsVersus(scene, dados) {
     if (!nome) continue;
     carregarGrupo(scene, queued, personagens[nome] || assetsKen);
   }
-  const mapas = { Cidade: assetsCidade, MapaTeste: assetsMapaTeste, MikuMap: assetsMikuMap, SkyTowers: assetsSkyTowers };
+  const mapas = { Cidade: assetsCidade, MapaTeste: assetsMapaTeste, MikuMap: assetsMikuMap, SkyTowers: assetsSkyTowers, Ice:assetsIce, SlenderMap:assetsSlenderMap };
   const mapa = typeof dados.mapa === "string" ? dados.mapa : dados.ClasseMapa?.name;
+  if (mapa === "Ice" && scene.textures.exists("ice-back")) {
+    const texturaIce = scene.textures.get("ice-back");
+    if (!texturaIce.has("0")) scene.textures.remove("ice-back");
+  }
   carregarGrupo(scene, queued, mapas[mapa] || assetsCidade);
   return queued.size;
 }
@@ -531,6 +607,8 @@ export function carregarAssetsHistoria(scene) {
     carregarGrupo(scene, queued, pack);
   }
   carregarGrupo(scene, queued, assetsMikuMap);
+  carregarGrupo(scene, queued, assetsIce);
+  carregarGrupo(scene, queued, assetsSlenderMap);
   carregarGrupo(scene, queued, assetsstory);
   return queued.size;
 }

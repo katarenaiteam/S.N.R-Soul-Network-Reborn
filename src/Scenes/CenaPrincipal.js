@@ -18,6 +18,10 @@ import SistemaLedge from "../Objetos/SistemaLedge.js";
 import IntroPartida from "../Objetos/IntroPartida.js";
 import { prepararTexturaTeia, limparAssetsPartida } from "../Objetos/CarregarAssetsPartida.js";
 import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
+import ChuvaMikuLoja from "../Objetos/ChuvaMikuLoja.js";
+import LojaEspectador from "../Objetos/LojaEspectador.js";
+import { MaoDeadLoja, RaioLoja } from "../Objetos/EfeitosAvancadosLoja.js";
+import PuppetLojaMiku from "../Objetos/PuppetLojaMiku.js";
 
 export default class cenaPrincipal extends Phaser.Scene {
   constructor() {
@@ -44,6 +48,14 @@ export default class cenaPrincipal extends Phaser.Scene {
     });
     this.cameras.main.fadeIn(350, 0, 0, 0);
     prepararTexturaTeia(this);
+    if (!this.anims.exists("loja-raio")) {
+      this.anims.create({
+        key: "loja-raio",
+        frames: this.anims.generateFrameNumbers("Loja_raio", { start: 0, end: 6 }),
+        frameRate: 14,
+        repeat: 0,
+      });
+    }
 
     this.sistemaPlataformasAtravessaveis =
     new SistemaPlataformasAtravessaveis(this);
@@ -99,9 +111,9 @@ export default class cenaPrincipal extends Phaser.Scene {
       cima: Phaser.Input.Keyboard.KeyCodes.UP,
       baixo: Phaser.Input.Keyboard.KeyCodes.DOWN,
       dash: Phaser.Input.Keyboard.KeyCodes.NUMPAD_ZERO,
-      atack: Phaser.Input.Keyboard.KeyCodes.J,
-      special: Phaser.Input.Keyboard.KeyCodes.K,
-      guard: Phaser.Input.Keyboard.KeyCodes.M,
+      atack: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FOUR,
+      special: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FIVE,
+      guard: Phaser.Input.Keyboard.KeyCodes.NUMPAD_SIX,
       taunt: Phaser.Input.Keyboard.KeyCodes.NUMPAD_EIGHT,
     });
 
@@ -128,6 +140,15 @@ this.jogador2 = this.criarPersonagem(
   600,
   controleP2
 );
+
+if (!this.anims.exists("miku_puppet_move")) {
+  this.anims.create({
+    key: "miku_puppet_move",
+    frames: this.anims.generateFrameNumbers("Miku_puppet", { start: 0, end: 3 }),
+    frameRate: 10,
+    repeat: -1,
+  });
+}
   
    this.sistemaPlataformasAtravessaveis.registrar(this.jogador1);
    this.sistemaPlataformasAtravessaveis.registrar(this.jogador2);
@@ -232,11 +253,12 @@ this.indicadorP2 = this.criarIndicador(
     this.camHUD.ignore([
       this.sistemaLedge.visualizacao,
       this.mapaAtual.plataformas,
+      this.mapaAtual.imagemPlataforma,
       ...this.sistemaPlataformasAtravessaveis.grupo.getChildren(),
-      this.mapaAtual.imagemFundo,
+      ...(this.mapaAtual.fundos || [this.mapaAtual.imagemFundo]),
       this.jogador1.sprite,
       this.jogador2.sprite,
-    ]);
+    ].filter(Boolean));
     if (this.mapaAtual.suportePlataforma) {
       this.camHUD.ignore(this.mapaAtual.suportePlataforma);
     }
@@ -253,14 +275,130 @@ this.indicadorP2 = this.criarIndicador(
     if (this.modoEspectador) {
       this.physics.world.pause();
       this.time.delayedCall(0, () => this.aplicarEstadoEspectador(this.registry.get("estadoEspectador")));
+      this.lojaEspectador = new LojaEspectador(this, this.registry.get("clienteMQTT"));
+      this.camJogo.ignore(this.lojaEspectador.objetos);
     } else {
       this.introPartida = new IntroPartida(this);
       this.publicarEstadoMQTT(0, true);
+
+      const mqtt = this.registry.get("clienteMQTT");
+      if (mqtt?.papel === "host") {
+        this.chuvaMikuLoja = new ChuvaMikuLoja(this);
+        this.pedidosLojaRecebidos = new Set();
+        this.aoReceberPedidoLoja = (pedido) => {
+          if (
+            ![
+              "miku-rain", "less", "puppet", "life", "slen-shop", "1hit",
+              "froze-shop", "lava-shop", "raio", "ult-shop", "dead-shop",
+            ].includes(pedido?.efeito) ||
+            !pedido.clientId ||
+            !pedido.pedidoId
+          ) return;
+
+          const idPedido = `${pedido.clientId}:${pedido.pedidoId}`;
+          if (this.pedidosLojaRecebidos.has(idPedido)) return;
+          this.pedidosLojaRecebidos.add(idPedido);
+
+          if (pedido.efeito === "miku-rain") {
+            this.chuvaMikuLoja.executar();
+            return;
+          }
+
+          if (pedido.efeito === "puppet") {
+            this.reproduzirAudioLoja("shop-puppet", idPedido);
+            new PuppetLojaMiku(this);
+            return;
+          }
+
+          if (pedido.efeito === "1hit") {
+            this.knockbackLojaPendenteAte = this.time.now + 10000;
+            return;
+          }
+
+          if (pedido.efeito === "lava-shop") {
+            this.lavaLojaAtiva = true;
+            this.lavaLojaAtivaAte = this.time.now + 15000;
+            this.ultimoContatoLavaLoja ??= new WeakMap();
+            return;
+          }
+
+          const jogador = pedido.jogador === 1
+            ? this.jogador1
+            : pedido.jogador === 2
+              ? this.jogador2
+              : null;
+          if (!jogador) return;
+
+          if (pedido.efeito === "slen-shop") {
+            jogador.corrupcaoSlender?.adicionar(100);
+            this.reproduzirAudioLoja("shop-slen", idPedido);
+          } else if (pedido.efeito === "froze-shop") {
+            jogador.congelamentoPingu?.adicionar(65);
+            this.reproduzirAudioLoja("shop-gelo", idPedido);
+          } else if (pedido.efeito === "raio") {
+            new RaioLoja(this, jogador.sprite.x, jogador.sprite.y);
+          } else if (pedido.efeito === "ult-shop") {
+            jogador.ultCarga = jogador.ultCargaMax;
+            this.atualizarBarraUlt(jogador, jogador === this.jogador1 ? this.hudP1_Nome : this.hudP2_Nome);
+            this.reproduzirAudioLoja("shop-ult", idPedido);
+          } else if (pedido.efeito === "dead-shop") {
+            new MaoDeadLoja(this, jogador, pedido.jogador);
+          } else if (pedido.efeito === "less") {
+            jogador.porcentagemDano = 0;
+            jogador.textoDano?.setText("0%");
+            this.reproduzirAudioLoja("shop-heal", idPedido);
+          } else if (pedido.efeito === "life") {
+            if (pedido.jogador === 1) {
+              this.vidasP1 += 1;
+              this.hudP1_Vidas?.setText(`VIDAS: ${this.vidasP1}`);
+            } else {
+              this.vidasP2 += 1;
+              this.hudP2_Vidas?.setText(`VIDAS: ${this.vidasP2}`);
+            }
+            this.reproduzirAudioLoja("shop-life", idPedido);
+          }
+        };
+        mqtt.on("message:shop/purchase", this.aoReceberPedidoLoja);
+        mqtt.subscribe("shop/purchase");
+        this.events.once("shutdown", () => {
+          mqtt.off("message:shop/purchase", this.aoReceberPedidoLoja);
+        });
+      }
     }
   }
 
   criarHudPartida(...args) {
     return criarHudPartida.call(this, ...args);
+  }
+
+  reproduzirAudioLoja(chave, id) {
+    this.eventosAudioLoja ??= [];
+    this.eventosAudioLoja.push({ chave, id });
+    if (this.eventosAudioLoja.length > 16) this.eventosAudioLoja.shift();
+    this.sound.play(chave);
+  }
+
+  atualizarLavaLoja() {
+    if (!this.lavaLojaAtiva) return;
+    if (this.time.now >= this.lavaLojaAtivaAte) {
+      this.lavaLojaAtiva = false;
+      this.lavaLojaAtivaAte = 0;
+      return;
+    }
+    this.ultimoContatoLavaLoja ??= new WeakMap();
+    const agora = this.time.now;
+    for (const [jogador, numero] of [[this.jogador1, 1], [this.jogador2, 2]]) {
+      if (!jogador?.sprite?.active || !jogador.sprite.body?.blocked.down) continue;
+      if (agora < (this.ultimoContatoLavaLoja.get(jogador) ?? 0)) continue;
+      this.ultimoContatoLavaLoja.set(jogador, agora + 700);
+      jogador.receberDano(
+        1,
+        { tipoSomImpacto: "light", knockbackX: 0, knockbackY: -650, knockbackFixo: true },
+        { x: jogador.sprite.x, direcao: 0, atacante: this.personagemAmbientalLoja },
+      );
+      this.sequenciaLavaLoja = (this.sequenciaLavaLoja ?? 0) + 1;
+      this.reproduzirAudioLoja("shop-lava", `lava-${numero}-${this.sequenciaLavaLoja}`);
+    }
   }
 
   criarPersonagem(nome, x, y, teclas, minDano, maxDano, controle) {
@@ -320,6 +458,8 @@ this.indicadorP2 = this.criarIndicador(
 
     this.sistemaPlataformasAtravessaveis.atualizar();
     this.mortesVS.atualizar(delta);
+    this.chuvaMikuLoja?.atualizar();
+    this.atualizarLavaLoja();
 
   this.atualizarBarraUlt(
     this.jogador1,
@@ -373,6 +513,8 @@ this.indicadorP2 = this.criarIndicador(
         flipX: sprite.flipX,
         scaleX: sprite.scaleX,
         scaleY: sprite.scaleY,
+        originX: sprite.originX,
+        originY: sprite.originY,
         alpha: sprite.alpha,
         visible: sprite.visible,
         tint: sprite.isTinted ? sprite.tintTopLeft : null,
@@ -444,6 +586,7 @@ this.indicadorP2 = this.criarIndicador(
       },
       efeitoMorteVS: this.eventoMorteVS,
       efeitoTVMorte: this.eventoTVMorte,
+      audiosLoja: this.eventosAudioLoja ?? [],
       visuais,
     });
   }
@@ -472,6 +615,9 @@ this.indicadorP2 = this.criarIndicador(
       };
       sprite.setFlipX(remoto.flipX);
       sprite.setScale(remoto.scaleX, remoto.scaleY);
+      if (remoto.originX !== undefined && remoto.originY !== undefined) {
+        sprite.setOrigin(remoto.originX, remoto.originY);
+      }
       sprite.setAlpha(remoto.alpha);
       sprite.setVisible(remoto.visible);
       if (remoto.tint === null || remoto.tint === undefined) sprite.clearTint();
@@ -486,6 +632,7 @@ this.indicadorP2 = this.criarIndicador(
     aplicarJogador(this.jogador2, dados.jogadores?.p2);
     this.mortesVS?.reproduzirEfeitoEspectador(dados.efeitoMorteVS);
     this.mortesVS?.reproduzirTVEspectador(dados.efeitoTVMorte);
+    this.reproduzirAudioLojaEspectador(dados.audiosLoja);
     this.sincronizarVisuaisReplicados(dados.visuais ?? []);
 
     this.vidasP1 = dados.vidasP1;
@@ -506,6 +653,24 @@ this.indicadorP2 = this.criarIndicador(
         zoomDestino: dados.camera.zoom,
         inicio: this.time.now,
       };
+    }
+  }
+
+  reproduzirAudioLojaEspectador(evento) {
+    const eventos = Array.isArray(evento) ? evento : evento ? [evento] : [];
+    if (!this.audioLojaSnapshotInicializado) {
+      this.audioLojaSnapshotInicializado = true;
+      this.audiosLojaOuvidos = new Set(eventos.map((item) => item.id).filter(Boolean));
+      return;
+    }
+    this.audiosLojaOuvidos ??= new Set();
+    for (const item of eventos) {
+      if (!item?.id || this.audiosLojaOuvidos.has(item.id)) continue;
+      this.audiosLojaOuvidos.add(item.id);
+      if (this.cache.audio.exists(item.chave)) this.sound.play(item.chave);
+    }
+    while (this.audiosLojaOuvidos.size > 64) {
+      this.audiosLojaOuvidos.delete(this.audiosLojaOuvidos.values().next().value);
     }
   }
 

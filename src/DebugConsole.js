@@ -124,8 +124,10 @@ export function instalarComandosDebug(game) {
     },
 
     matarBoss() {
-      const scene = game.scene.getScene("CenaHistoria");
-      if (!scene?.scene.isActive()) {
+      const scene = ["CenaHistoria", "CenaHistoria2"]
+        .map(chave => game.scene.getScene(chave))
+        .find(cena => cena?.scene.isActive());
+      if (!scene) {
         console.error("Entre na fase da historia antes de usar matarBoss().");
         return false;
       }
@@ -142,8 +144,21 @@ export function instalarComandosDebug(game) {
       scene.vidasBoss = 1;
       scene.boss.vidas = 1;
       scene.processarQueda(scene.boss, scene.pontoRespawnP2);
-      console.log("Ultima vida da Miku removida; a cutscene final vai iniciar apos a animacao de morte.");
+      console.log(`Ultima vida de ${scene.inimigoNome} removida; a cutscene final vai iniciar apos a animacao de morte.`);
       return true;
+    },
+
+    lutaPingu(personagem = "FJ") {
+      const nomes = {
+        fj: "FJ", frederick: "Frederick", spiderman: "SpiderMan",
+        miku: "Miku", ken: "Ken", slenderman: "Slenderman", pingu: "Pingu",
+      };
+      const escolhido = nomes[normalizar(personagem)];
+      if (!escolhido) {
+        console.error("Personagem invalido. Use FJ, SpiderMan, Miku, Ken, Slenderman ou Pingu.");
+        return false;
+      }
+      return api.ir("CenaHistoria2", { p1: escolhido, numPlayers: 1 });
     },
 
     diagnosticarSpecials() {
@@ -190,7 +205,8 @@ export function instalarComandosDebug(game) {
         "  resetar()               reinicia a tela/fase atual",
         "  carregarUlt()           carrega totalmente a ult do P1",
         "  carregarUlt(2)          carrega totalmente a ult do P2",
-        "  matarBoss()             remove a ultima vida da Miku na fase historia",
+        "  matarBoss()             remove a ultima vida do boss da historia ativa",
+        '  lutaPingu("FJ")         inicia a historia do Pingu usando o personagem escolhido',
         "  SNR.diagnosticarSpecials() registra a leitura de G/K",
         "Aliases: preload, start, personagens, mapas, luta, historia, gameover, creditos",
       ].join("\n"));
@@ -204,6 +220,7 @@ export function instalarComandosDebug(game) {
   window.resetar = api.resetar.bind(api);
   window.carregarUlt = api.carregarUlt.bind(api);
   window.matarBoss = api.matarBoss.bind(api);
+  window.lutaPingu = api.lutaPingu.bind(api);
 
   console.log("Comandos de teste carregados. Digite SNR.ajuda() no console.");
 }

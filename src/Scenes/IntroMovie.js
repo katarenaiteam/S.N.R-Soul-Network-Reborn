@@ -15,6 +15,10 @@ export default class IntroMovie extends Phaser.Scene {
 
   create() {
     encerrarOutrasCenas(this);
+    const musicaMenu = this.registry.get("musicaMenu");
+    musicaMenu?.stop();
+    musicaMenu?.destroy();
+    this.registry.remove("musicaMenu");
     this.cameras.main.setBackgroundColor("#000000");
     this.criarVideo();
     this.criarAviso();

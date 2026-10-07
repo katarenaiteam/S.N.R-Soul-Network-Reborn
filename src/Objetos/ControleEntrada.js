@@ -62,7 +62,7 @@ export default class ControleEntrada {
     for (const direcao of ["esquerda", "direita"]) {
       if (this.estadoAtual[direcao] || !(direcao === "esquerda" ? esquerdaAgora : direitaAgora)) continue;
       const agora = this.scene.time.now;
-      if (agora - this.ultimosToquesLaterais[direcao] <= 500) {
+      if (agora - this.ultimosToquesLaterais[direcao] <= 250) {
         this.duploLateral = true;
         this.ultimosToquesLaterais[direcao] = -Infinity;
       } else {
@@ -73,7 +73,7 @@ export default class ControleEntrada {
     const padAtack = this._botaoPadPressionado(pad, 2);
     const padPular = this._botaoPadPressionado(pad, 3);
     const padSpecial = this._botaoPadPressionado(pad, 9);
-    const padGuard = this._botaoPadPressionado(pad, 6);
+    const padGuard = this._botaoPadPressionado(pad, 1);
     const padTaunt = this._botaoPadPressionado(pad, 5);
 
     this.estadoAtual.esquerda = esquerdaAgora;

@@ -6,6 +6,8 @@ import CenaStart from "./Scenes/CenaStart.js";
 import CenaGameOver from "./Scenes/GameOver.js";
 import CenaSelecaoMapa from "./Scenes/SeleçaoMapas.js";
 import CenaHistoria from "./Scenes/CenaHistoria.js";
+import CenaHistoria2 from "./Scenes/CenaHistoria2.js";
+import CenaHistoria3 from "./Scenes/CenaHistoria3.js";
 import CenaCreditos from "./Scenes/CenaCreditos.js";
 import IntroMovie from "./Scenes/IntroMovie.js";
 import CenaPreloadVersus from "./Scenes/CenaPreloadVersus.js";
@@ -16,8 +18,8 @@ import configMQTT from "./Objetos/ConfigMQTT.js";
 const config = {
   type: Phaser.AUTO,
   // Resolucao interna Full HD; o FIT preserva a proporcao na tela.
-  width: 1920,
-  height: 1080,
+  width: 1366,
+  height: 768,
   fps: {
     target: 30,
     forceSetTimeout: true,
@@ -48,7 +50,7 @@ const config = {
 
   mqtt: configMQTT,
 
-  scene: [CenaPreload, CenaStart, IntroMovie, Charmenu, CenaSelecaoMapa, CenaPreloadVersus, CenaPrincipal, CenaHistoria, CenaGameOver, CenaCreditos, CenaEspectador],
+  scene: [CenaPreload, CenaStart, IntroMovie, Charmenu, CenaSelecaoMapa, CenaPreloadVersus, CenaPrincipal, CenaHistoria, CenaHistoria2, CenaHistoria3, CenaGameOver, CenaCreditos, CenaEspectador],
 };
 
 const game = new Phaser.Game(config);

@@ -1,6 +1,11 @@
+const variaveisAmbiente = import.meta.env ?? {};
+const sala = variaveisAmbiente.VITE_SNR_ROOM || "arena-01";
+
 const configMQTT = {
-  brokerUrl: "wss://test.mosquitto.org:8081/mqtt",
-  topicPrefix: "6080821-2026.2/SNR/arena-01",
+  brokerUrl:
+    variaveisAmbiente.VITE_MQTT_BROKER_URL ||
+    "wss://snr.feira-de-jogos.dev.br/mqtt",
+  topicPrefix: `SNR/${sala}`,
 };
 
 export default configMQTT;

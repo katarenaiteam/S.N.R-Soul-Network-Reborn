@@ -38,6 +38,7 @@ export default class SpiderUlt {
     this.fundoFaseOriginal = null;
     this.fundoFaseEraVisivel = true;
     this.visibilidadePlataformas = [];
+    this.visibilidadeElementosCenario = [];
     this.timerFalhaUlt = null;
     this.timerFreezeUlt = null;
     this.cancelada = false;
@@ -694,7 +695,15 @@ export default class SpiderUlt {
     this.fundoUlt.play("spider_ultimateback");
     fundoFase?.setVisible(false);
 
-    const plataformas = this.scene.mapaAtual?.plataformas?.getChildren?.() || [];
+    const elementosCenario = this.scene.mapaAtual?.objetosTeloes ?? [];
+    this.visibilidadeElementosCenario = elementosCenario.map((objeto) => ({ objeto, visivel: objeto.visible }));
+    elementosCenario.forEach((objeto) => objeto.setVisible(false));
+
+    const plataformas = [
+      this.scene.mapaAtual?.suportePlataforma,
+      ...(this.scene.mapaAtual?.plataformas?.getChildren?.() || []),
+      ...(this.scene.sistemaPlataformasAtravessaveis?.grupo?.getChildren?.() || []),
+    ].filter(Boolean);
     this.visibilidadePlataformas = plataformas.map((plataforma) => ({
       plataforma,
       visivel: plataforma.visible
@@ -727,6 +736,10 @@ export default class SpiderUlt {
       if (plataforma?.active) plataforma.setVisible(visivel);
     });
     this.visibilidadePlataformas = [];
+    this.visibilidadeElementosCenario.forEach(({ objeto, visivel }) => {
+      if (objeto?.active) objeto.setVisible(visivel);
+    });
+    this.visibilidadeElementosCenario = [];
   }
 
   iniciarTremorFinal(cam) {

@@ -75,6 +75,9 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("backStart", "./assets/Menus/Start_menu/backStart.png");
     this.load.image("logo", "./assets/Menus/Start_menu/logo.png");
     this.load.spritesheet("glitch", "./assets/Menus/Start_menu/glitch.png", { frameWidth: 683, frameHeight: 365 });
+    this.load.audio("menu", "assets/Menus/Start_menu/menu.mp3");
+    this.load.audio("Bpass", "assets/Menus/Start_menu/Bpass.wav");
+    this.load.audio("Bselect", "assets/Menus/Start_menu/Bselect.mp3");
 
     // --- charmenu ---
     
@@ -85,6 +88,8 @@ export default class CenaPreload extends Phaser.Scene {
     // --- new charmenu ---
     // - grade
     carregarGradeMenu(this);
+    //sons
+    this.load.audio("mao-select", "assets/Menus/Char_menu/Audio/mao-select.wav");
     // - ficha
     this.load.image("P1maoCficha", "/assets/Menus/Char_menu/Sprites/ficha/P1maoCficha.png");
     this.load.image("P1maoSficha", "/assets/Menus/Char_menu/Sprites/ficha/P1maoSficha.png");
@@ -121,6 +126,12 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("thumb_cidade", "assets/cenarios/MapaCidade/Sprites/thumb_cidade.png");
     this.load.image("thumb_teste", "assets/cenarios/MapaTest/thumb_teste.png");
     this.load.image("thumb_mikushow", "assets/cenarios/MikuShow/thumb_mikushow.png");
+    this.load.image("thumb_ice", "assets/cenarios/Ice/thumb_ice.png");
+    this.load.image("thumb_slen", "assets/cenarios/SlenMap/thumb_slen.png");
+
+    //versus
+   this.load.image("Vs-back", "/assets/Menus/Vs/Vs-back.png");
+   this.load.spritesheet("Vss", "./assets/Menus/Vs/Vss.png", { frameWidth: 320, frameHeight: 240 });
   }
 
   iniciarSequenciaLogo() {

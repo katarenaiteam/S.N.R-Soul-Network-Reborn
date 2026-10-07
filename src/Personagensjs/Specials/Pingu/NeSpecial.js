@@ -16,6 +16,7 @@ export default class PinguNeSpecial {
   }
 
   executar() {
+    this.personagem.tocarSomSorteado("pingu-nunut", { volume: this.personagem.sons.volumeVoz });
     const sprite = this.personagem.sprite;
     sprite.on("animationupdate", this.aoAtualizarPose);
     this.aoAtualizarPose(sprite.anims.currentAnim, sprite.anims.currentFrame);
@@ -146,7 +147,7 @@ PinguNeSpecial.configuracao = {
   propriedades: {
     dano: 8,
     tipoSomImpacto: "heavy",
-    knockbackX: 300,
-    knockbackY: -100,
+    knockbackX: 390,
+    knockbackY: -130,
   },
 };
