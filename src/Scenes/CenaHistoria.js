@@ -73,9 +73,14 @@ export default class CenaHistoria extends Phaser.Scene {
     this.sistemaPlataformasAtravessaveis =
     new SistemaPlataformasAtravessaveis(this);
 
-    this.physics.world.setBounds(0, 0, 2600, 1400);
-
     this.mapaAtual = this.criarMapaHistoria();
+    const limitesMundo = this.mapaAtual.configCamera?.limites;
+    this.physics.world.setBounds(
+      limitesMundo?.x ?? 0,
+      limitesMundo?.y ?? 0,
+      limitesMundo?.largura ?? 2600,
+      limitesMundo?.altura ?? 1400
+    );
     this.sistemaLedge = new SistemaLedge(this.mapaAtual.areasLedge);
     this.sistemaLedge.criarVisualizacao(this);
     this.limitesArena = this.mapaAtual.limitesArena;

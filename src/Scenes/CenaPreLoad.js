@@ -127,6 +127,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("thumb_teste", "assets/cenarios/MapaTest/thumb_teste.png");
     this.load.image("thumb_mikushow", "assets/cenarios/MikuShow/thumb_mikushow.png");
     this.load.image("thumb_ice", "assets/cenarios/Ice/thumb_ice.png");
+    this.load.image("thumb_slen", "assets/cenarios/SlenMap/thumb_slen.png");
 
     //versus
    this.load.image("Vs-back", "/assets/Menus/Vs/Vs-back.png");

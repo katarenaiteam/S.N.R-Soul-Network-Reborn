@@ -253,8 +253,9 @@ this.indicadorP2 = this.criarIndicador(
     this.camHUD.ignore([
       this.sistemaLedge.visualizacao,
       this.mapaAtual.plataformas,
+      this.mapaAtual.imagemPlataforma,
       ...this.sistemaPlataformasAtravessaveis.grupo.getChildren(),
-      this.mapaAtual.imagemFundo,
+      ...(this.mapaAtual.fundos || [this.mapaAtual.imagemFundo]),
       this.jogador1.sprite,
       this.jogador2.sprite,
     ]);

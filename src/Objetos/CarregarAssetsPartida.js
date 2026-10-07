@@ -549,6 +549,13 @@ const assetsSkyTowers = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Plat-trans", () => { scene.load.image("Plat-trans", "assets/cenarios/Plat-trans.png"); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "Gathers_Under_Night", () => { scene.load.audio("Gathers_Under_Night", "assets/cenarios/MapaSkytowers/Ost/Gathers_Under_Night.mp3"); }),
 ];
+const assetsSlenderMap = [
+  (scene, queued) => queueAsset(scene, queued, "texture", "slen-back1", () => { scene.load.spritesheet("slen-back1", "assets/cenarios/SlenMap/slen-back1.png", { frameWidth: 960, frameHeight: 541 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "slen-back2", () => { scene.load.spritesheet("slen-back2", "assets/cenarios/SlenMap/slen-back2.png", { frameWidth: 960, frameHeight: 541 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "slen-plat", () => { scene.load.image("slen-plat", "assets/cenarios/SlenMap/slen-plat.png"); }),
+
+
+];
 const assetsstory = [
   (scene, queued) => queueAsset(scene, queued, "audio", "Sayonara", () => { scene.load.audio("Sayonara", "assets/cenarios/MikuShow/Sayonara.wav"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "txtbox", () => { scene.load.image("txtbox", "assets/Hud/dialogo/txtbox.png"); }),
@@ -583,7 +590,7 @@ export function carregarAssetsVersus(scene, dados) {
     if (!nome) continue;
     carregarGrupo(scene, queued, personagens[nome] || assetsKen);
   }
-  const mapas = { Cidade: assetsCidade, MapaTeste: assetsMapaTeste, MikuMap: assetsMikuMap, SkyTowers: assetsSkyTowers, Ice:assetsIce };
+  const mapas = { Cidade: assetsCidade, MapaTeste: assetsMapaTeste, MikuMap: assetsMikuMap, SkyTowers: assetsSkyTowers, Ice:assetsIce, SlenderMap:assetsSlenderMap };
   const mapa = typeof dados.mapa === "string" ? dados.mapa : dados.ClasseMapa?.name;
   if (mapa === "Ice" && scene.textures.exists("ice-back")) {
     const texturaIce = scene.textures.get("ice-back");
@@ -601,6 +608,7 @@ export function carregarAssetsHistoria(scene) {
   }
   carregarGrupo(scene, queued, assetsMikuMap);
   carregarGrupo(scene, queued, assetsIce);
+  carregarGrupo(scene, queued, assetsSlenderMap);
   carregarGrupo(scene, queued, assetsstory);
   return queued.size;
 }

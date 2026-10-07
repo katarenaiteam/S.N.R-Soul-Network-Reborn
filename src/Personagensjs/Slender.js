@@ -697,7 +697,7 @@ export default class Slenderman extends Personagem {
           tipoSomImpacto: "heavy",
           dano: 11,
           knockbackX: 84,
-          knockbackY: -370,
+          knockbackY: -400,
           impulsoX: 30,
           tumbling: true
         },
