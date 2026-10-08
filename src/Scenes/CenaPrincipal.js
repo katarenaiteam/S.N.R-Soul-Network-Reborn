@@ -232,7 +232,7 @@ if (!this.anims.exists("miku_puppet_move")) {
     this.hudP2_Vidas,
     this.hudP1_Nome,
     this.hudP2_Nome
-  ].filter(Boolean));
+  ].filter((objeto) => objeto instanceof Phaser.GameObjects.GameObject));
 
   this.indicadorP1 = this.criarIndicador(
   this.jogador1,
@@ -265,7 +265,10 @@ this.indicadorP2 = this.criarIndicador(
 
     this.mortesVS = new MorteVS(this);
 
-    if (this.physics.config.debug || this.physics.world.drawDebug) {
+    if (
+      (this.physics.config.debug || this.physics.world.drawDebug) &&
+      this.physics.world.debugGraphic instanceof Phaser.GameObjects.GameObject
+    ) {
       this.camHUD.ignore(this.physics.world.debugGraphic);
     }
     this.objetosVisuaisBaseMQTT = new Set(this.children.list);

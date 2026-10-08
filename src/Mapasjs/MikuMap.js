@@ -126,7 +126,11 @@ export default class MikuMap {
         this.objetosTeloes.push(this.numeroEsquerda, this.numeroDireita, separador);
         this.atualizarTeloes();
 
-        const ignorarHUD = () => scene.camHUD?.ignore([...this.objetosTeloes, this.suportePlataforma]);
+        const ignorarHUD = () => {
+            const objetos = [...this.objetosTeloes, this.suportePlataforma]
+                .filter(objeto => objeto instanceof Phaser.GameObjects.GameObject);
+            if (objetos.length) scene.camHUD?.ignore(objetos);
+        };
         scene.events.once("create", ignorarHUD);
         scene.events.on("postupdate", this.atualizarTeloes, this);
         scene.events.once("shutdown", () => {
