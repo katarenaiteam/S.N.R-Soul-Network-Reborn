@@ -4,10 +4,6 @@ export default class SlenderMap {
     constructor(scene) {
         this.scene = scene;
 
-       // if (scene.sound) {
-       //     this.musica = tocarMusicaSegura(scene, 'Gathers_Under_Night', { loop: true, volume: 0.0 });
-       // }
-
         // 1. TAMANHO REDUZIDO DO MUNDO (Fica menor e mais proporcional)
         const larguraMundo = 2200;
         const alturaMundo = 1200;
@@ -35,13 +31,13 @@ export default class SlenderMap {
 
         // 3. SPAWNS INICIAIS (Em cima das plataformas centralizadas)
         this.spawnsIniciais = {
-            p1: { x: 846, y: 770 },
-            p2: { x: 1354, y: 570 }
+            p1: { x: 660, y: 687 },
+            p2: { x: 1700, y: 807 }
         };
 
         this.spawnsRespawn = {
-            p1: { x: 846, y: 635 },
-            p2: { x: 1354, y: 535 }
+            p1: { x: 660, y: 687 },
+            p2: { x: 1700, y: 807 }
         };
 
         this.plataformas = scene.physics.add.staticGroup();
@@ -78,6 +74,11 @@ export default class SlenderMap {
         this.imagemFundo.setDisplaySize(larguraMundo, alturaMundo);
         this.imagemFundo.play(chaveAnimacao);
         this.fundos = [this.imagemFundo];
+    }
+
+    iniciarMusica() {
+        if (this.musica?.isPlaying || !this.scene.sound) return;
+        this.musica = tocarMusicaSegura(this.scene, 'backTv', { loop: true, volume: 0.2 });
     }
 
 

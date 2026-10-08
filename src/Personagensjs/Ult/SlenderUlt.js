@@ -120,6 +120,7 @@ export default class SlenderUlt {
   acertar() {
     const p = this.personagem.sprite;
     const alvo = this.oponente.sprite;
+    this.scene.aoAcertoUltimateSlenderman?.();
     p.setVisible(false);
     this.camera.pan(alvo.x, alvo.y - 40, 300, "Cubic.easeOut");
     this.camera.zoomTo(this.camera.zoom * 1.1, 300);
@@ -197,7 +198,6 @@ export default class SlenderUlt {
         this.criarHitboxAtaque(personagemAlvo, 40, lado, () => {
           if (personagemAlvo.corrupcaoSlender) {
             personagemAlvo.corrupcaoSlender.adicionar(100);
-            personagemAlvo.corrupcaoSlender.valor = 100;
           }
           if (personagemAlvo.maquinaEstados?.mudarEstado("atordoado") === false) personagemAlvo.tocarAnimacao?.("stun", true);
           this.finalizar();

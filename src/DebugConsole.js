@@ -161,6 +161,19 @@ export function instalarComandosDebug(game) {
       return api.ir("CenaHistoria2", { p1: escolhido, numPlayers: 1 });
     },
 
+    lutaSlenderman(personagem = "FJ") {
+      const nomes = {
+        fj: "FJ", frederick: "Frederick", spiderman: "SpiderMan",
+        miku: "Miku", ken: "Ken", slenderman: "Slenderman", pingu: "Pingu",
+      };
+      const escolhido = nomes[normalizar(personagem)];
+      if (!escolhido) {
+        console.error("Personagem invalido. Use FJ, SpiderMan, Miku, Ken, Slenderman ou Pingu.");
+        return false;
+      }
+      return api.ir("CenaHistoria3", { p1: escolhido, numPlayers: 1 });
+    },
+
     diagnosticarSpecials() {
       removerDiagnosticoSpecial?.();
 
@@ -207,6 +220,7 @@ export function instalarComandosDebug(game) {
         "  carregarUlt(2)          carrega totalmente a ult do P2",
         "  matarBoss()             remove a ultima vida do boss da historia ativa",
         '  lutaPingu("FJ")         inicia a historia do Pingu usando o personagem escolhido',
+        '  lutaSlenderman("FJ")   inicia a historia do Slenderman usando o personagem escolhido',
         "  SNR.diagnosticarSpecials() registra a leitura de G/K",
         "Aliases: preload, start, personagens, mapas, luta, historia, gameover, creditos",
       ].join("\n"));
@@ -221,6 +235,7 @@ export function instalarComandosDebug(game) {
   window.carregarUlt = api.carregarUlt.bind(api);
   window.matarBoss = api.matarBoss.bind(api);
   window.lutaPingu = api.lutaPingu.bind(api);
+  window.lutaSlenderman = api.lutaSlenderman.bind(api);
 
   console.log("Comandos de teste carregados. Digite SNR.ajuda() no console.");
 }

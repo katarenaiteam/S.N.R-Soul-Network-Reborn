@@ -43,6 +43,7 @@ export default class NeSpecial {
     this.origemProjetilX = efeito.x;
     this.origemProjetilY = efeito.y;
     efeito.setScale(this.special.escalaProjetil ?? 1);
+    efeito.anims.timeScale = this.special.multiplicadorVelocidadeAnimacaoProjetil ?? 1;
     efeito.setFlipX(this.direcao < 0);
     efeito.setDepth(sprite.depth + 1);
     this.scene.camHUD?.ignore(efeito);
@@ -64,7 +65,25 @@ export default class NeSpecial {
 
     this.registrarProjetil();
     efeito.on("animationupdate", (animacao, frame) => {
+      const framesCorte = this.special.framesCorte ?? 3;
+      if (
+        !this.corteAlongado &&
+        this.special.duracaoCorteExtraMs > 0 &&
+        Number(frame.textureFrame) >= framesCorte - 1
+      ) {
+        this.corteAlongado = true;
+        efeito.anims.pause();
+        this.scene.tweens.add({
+          targets: efeito,
+          alpha: 0,
+          duration: this.special.duracaoCorteExtraMs,
+          onComplete: () => {
+            if (efeito.active) efeito.anims.resume();
+          },
+        });
+      }
       if (!this.cartas && Number(frame.textureFrame) >= (this.special.framesCorte ?? 3)) {
+        efeito.setAlpha(1);
         this.cartas = true;
         this.hitboxes.forEach((hitbox) => { hitbox.body.debugBodyColor = 0x00ffff; });
         // Mantem o corpo para colisao com projeteis, sem atingir personagens.
@@ -79,16 +98,23 @@ export default class NeSpecial {
 
   atualizar() {
     if (!this.projetil?.active || !this.special.velocidadeProjetil) return;
-    const progresso = Math.min(
-      1,
-      (this.scene.time.now - this.inicioProjetil) / 1000 *
-        this.special.velocidadeProjetil / this.special.distanciaProjetil,
-    );
-    const distancia = this.special.distanciaProjetil *
-      progresso * progresso * (3 - 2 * progresso);
+    const animacao = this.projetil.anims.currentAnim;
+    const escalaAnimacao = Math.max(0.01, this.projetil.anims.timeScale);
+    const duracao = animacao.duration / escalaAnimacao +
+      (this.special.duracaoCorteExtraMs ?? 0);
+    const tempo = Math.min(duracao, this.scene.time.now - this.inicioProjetil);
+    const metade = duracao / 2;
+    const velocidade = this.special.velocidadeProjetil;
+    // A velocidade cai linearmente de 3x para a velocidade configurada
+    // durante a primeira metade; na segunda metade, mantém essa velocidade.
+    const distancia = tempo <= metade
+      ? 3 * velocidade * tempo / 1000 - velocidade * tempo ** 2 / (metade * 1000)
+      : velocidade * duracao / 1000 + velocidade * (tempo - metade) / 1000;
     this.projetil.x = this.origemProjetilX + distancia * this.direcao;
+    const progresso = duracao > 0 ? tempo / duracao : 1;
+    const progressoY = progresso * progresso * (3 - 2 * progresso);
     this.projetil.y = this.origemProjetilY +
-      (this.special.distanciaProjetilY ?? 0) * progresso * progresso * (3 - 2 * progresso);
+      (this.special.distanciaProjetilY ?? 0) * progressoY;
     const escala = this.special.escalaProjetil ?? 1;
     this.hitboxes.forEach((hitbox, indice) => {
       const caixa = this.special.hitboxesProjetil[indice];

@@ -454,7 +454,7 @@ const assetsSlenderman = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_AupSpecial", () => { scene.load.spritesheet("Slan_AupSpecial", "assets/personagens/Slenderman/Sprites/Slan_AupSpecial.png", { frameWidth: 191, frameHeight: 149 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_AdoSpecial", () => { scene.load.spritesheet("Slan_AdoSpecial", "assets/personagens/Slenderman/Sprites/Slan_AdoSpecial.png", { frameWidth: 68, frameHeight: 156 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_AdoSpecial-efect", () => { scene.load.spritesheet("Slan_AdoSpecial-efect", "assets/personagens/Slenderman/Sprites/Slan_AdoSpecial-efect.png", { frameWidth: 228, frameHeight: 209 }); }),
- // (scene, queued) => queueAsset(scene, queued, "texture", "Slan_tv", () => { scene.load.spritesheet("Slan_tv", "assets/personagens/Slenderman/Sprites/Slan_tv.png", { frameWidth: 498, frameHeight: 371 }); }),
+  //(scene, queued) => queueAsset(scene, queued, "texture", "Slan_tv", () => { scene.load.spritesheet("Slan_tv", "assets/personagens/Slenderman/Sprites/Slan_tv.png", { frameWidth: 498, frameHeight: 371 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "slan-ult1", () => { scene.load.spritesheet("slan-ult1", "assets/personagens/Slenderman/Sprites/ult/slan-ult1.png", { frameWidth: 115, frameHeight: 105 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "slan-grab", () => { scene.load.spritesheet("slan-grab", "assets/personagens/Slenderman/Sprites/ult/slan-grab.png", { frameWidth: 70, frameHeight: 123 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "slan-grab2", () => { scene.load.spritesheet("slan-grab2", "assets/personagens/Slenderman/Sprites/ult/slan-grab2.png", { frameWidth: 70, frameHeight: 123 }); }),
@@ -553,7 +553,7 @@ const assetsSlenderMap = [
   (scene, queued) => queueAsset(scene, queued, "texture", "slen-back1", () => { scene.load.spritesheet("slen-back1", "assets/cenarios/SlenMap/slen-back1.png", { frameWidth: 960, frameHeight: 541 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "slen-back2", () => { scene.load.spritesheet("slen-back2", "assets/cenarios/SlenMap/slen-back2.png", { frameWidth: 960, frameHeight: 541 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "slen-plat", () => { scene.load.image("slen-plat", "assets/cenarios/SlenMap/slen-plat.png"); }),
-
+   (scene, queued) => queueAsset(scene, queued, "audio", "backTv", () => { scene.load.audio("backTv", "assets/Hud/dialogo/Slan/backTv.mp3"); }),
 
 ];
 const assetsstory = [
@@ -571,7 +571,12 @@ const assetsstory = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Pg_bad", () => { scene.load.image("Pg_bad", "assets/Hud/dialogo/Pingu/Pg_bad.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Pg_deaf", () => { scene.load.image("Pg_deaf", "assets/Hud/dialogo/Pingu/Pg_deaf.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "pingu-dance", () => { scene.load.spritesheet("pingu-dance", "assets/Hud/dialogo/Pingu/pingu-dance.png", { frameWidth: 155, frameHeight: 155 }); }),
-   (scene, queued) => queueAsset(scene, queued, "audio", "cat", () => { scene.load.audio("cat", "assets/cenarios/Ice/cat.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "cat", () => { scene.load.audio("cat", "assets/cenarios/Ice/cat.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "S1", () => { scene.load.image("S1", "assets/Hud/dialogo/Slan/S1.png"); }),
+ // (scene, queued) => queueAsset(scene, queued, "texture", "S2", () => { scene.load.image("S2", "assets/Hud/dialogo/Slan/S2.png"); }),
+ // (scene, queued) => queueAsset(scene, queued, "texture", "S3", () => { scene.load.image("S3", "assets/Hud/dialogo/Slan/S3.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "suspiro", () => { scene.load.audio("suspiro", "assets/Hud/dialogo/Slan/suspiro.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "jumpscare", () => { scene.load.audio("jumpscare", "assets/Hud/dialogo/Slan/jumpscare.mp3"); }),
 ];
 const personagens = {
   FJ: assetsFJ,

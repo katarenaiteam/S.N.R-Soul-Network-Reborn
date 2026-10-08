@@ -63,6 +63,7 @@ export default class cenaPrincipal extends Phaser.Scene {
     //criar o mapa que vou estar
     // 1. Instancia o mapa dinâmico trazido do init
    this.mapaAtual = new this.ClasseMapa(this);
+   this.mapaAtual.iniciarMusica?.();
    this.sistemaLedge = new SistemaLedge(this.mapaAtual.areasLedge);
    this.sistemaLedge.criarVisualizacao(this);
 
@@ -235,7 +236,7 @@ if (!this.anims.exists("miku_puppet_move")) {
     this.hudP2_Vidas,
     this.hudP1_Nome,
     this.hudP2_Nome
-  ]);
+  ].filter(Boolean));
 
   this.indicadorP1 = this.criarIndicador(
   this.jogador1,
@@ -252,13 +253,13 @@ this.indicadorP2 = this.criarIndicador(
     // Diga para a câmera de HUD mostrar SOMENTE o HUD e ignorar o jogo/cenário/personagens:
     this.camHUD.ignore([
       this.sistemaLedge.visualizacao,
-      this.mapaAtual.plataformas,
+      ...(this.mapaAtual.plataformas?.getChildren?.() ?? []),
       this.mapaAtual.imagemPlataforma,
       ...this.sistemaPlataformasAtravessaveis.grupo.getChildren(),
       ...(this.mapaAtual.fundos || [this.mapaAtual.imagemFundo]),
       this.jogador1.sprite,
       this.jogador2.sprite,
-    ]);
+    ].filter(Boolean));
     if (this.mapaAtual.suportePlataforma) {
       this.camHUD.ignore(this.mapaAtual.suportePlataforma);
     }

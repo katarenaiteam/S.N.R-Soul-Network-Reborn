@@ -34,8 +34,86 @@ export default class CorrupcaoSlender {
 
   adicionar(quantidade) {
     const anterior = this.valor;
-    this.valor = Math.min(100, this.valor + quantidade);
-    if (anterior < 30 && this.valor >= 30) this.proximoDano = this.scene.time.now + 6000;
+    this.valor = Math.max(0, this.valor + quantidade);
+    if (anterior < 30 && this.valor >= 30) this.proximoDano = this.scene.time.now + 2000;
+  }
+
+  reduzir(quantidade) {
+    this.valor = Math.max(0, this.valor - quantidade);
+    if (this.valor < 30) this.proximoDano = 0;
+  }
+
+  atualizarPaginas() {
+    const cena = this.scene;
+    const agora = cena.time.now;
+    const estado = cena.paginasCorrupcaoSlender ??= {
+      sprites: [],
+      proximoSpawn: agora + 12000,
+    };
+    estado.sprites = estado.sprites.filter((pagina) => pagina.active);
+
+    const jogadores = [cena.jogador1, cena.jogador2].filter(Boolean);
+    if (!jogadores.some((jogador) => jogador.corrupcaoSlender?.valor > 0)) {
+      estado.sprites.forEach((pagina) => pagina.destroy());
+      estado.sprites = [];
+      estado.proximoSpawn = agora + 3000;
+      return;
+    }
+    if (agora < estado.proximoSpawn || estado.sprites.length >= 3 || !cena.textures.exists("pages1")) return;
+
+    const plataformas = cena.mapaAtual?.plataformas?.getChildren()
+      .filter((plataforma) => plataforma.active && plataforma.body?.enable && plataforma.body.width > 100);
+    if (!plataformas?.length) {
+      estado.proximoSpawn = agora + 2000;
+      return;
+    }
+    const larguraPagina = 283 * 0.18;
+    const metadePagina = larguraPagina / 2;
+    const alturaPagina = 352 * 0.18;
+    const paginasAtivas = estado.sprites.filter((pagina) => pagina.active);
+    let posicao = null;
+    for (let tentativa = 0; tentativa < 12; tentativa++) {
+      const plataforma = Phaser.Utils.Array.GetRandom(plataformas);
+      const corpoPlataforma = plataforma.body;
+      const inicioX = Math.ceil(corpoPlataforma.left + metadePagina);
+      const fimX = Math.floor(corpoPlataforma.right - metadePagina);
+      const candidata = {
+        x: Phaser.Math.Between(inicioX, Math.max(inicioX, fimX)),
+        y: corpoPlataforma.top - alturaPagina / 2,
+      };
+      posicao = candidata;
+      if (paginasAtivas.every((pagina) =>
+        Phaser.Math.Distance.Between(candidata.x, candidata.y, pagina.x, pagina.y) >= 300
+      )) break;
+    }
+    const { x, y } = posicao;
+    const pagina = cena.add.sprite(x, y, "pages1", Phaser.Math.Between(0, 7))
+      .setScale(0.18)
+      .setDepth((cena.jogador1?.sprite?.depth ?? 1) + 1);
+    cena.physics.add.existing(pagina);
+    pagina.body.setAllowGravity(false);
+    pagina.body.setImmovable(true);
+    pagina.body.setSize(220, 280, true);
+    cena.camHUD?.ignore(pagina);
+    estado.sprites.push(pagina);
+    estado.proximoSpawn = agora + 12000;
+
+    cena.tweens.add({
+      targets: pagina,
+      y: y - 18,
+      duration: 900,
+      ease: "Sine.InOut",
+      yoyo: true,
+      repeat: -1,
+    });
+    jogadores.forEach((jogador) => {
+      if (!jogador.sprite?.body) return;
+      cena.physics.add.overlap(pagina, jogador.sprite, () => {
+        if (!pagina.active || jogador.corrupcaoSlender?.valor <= 0) return;
+        jogador.corrupcaoSlender.reduzir(20);
+        pagina.destroy();
+      });
+    });
   }
 
   criarVisuais() {
@@ -72,6 +150,7 @@ export default class CorrupcaoSlender {
   atualizar() {
     const p = this.personagem;
     const sprite = p.sprite;
+    this.atualizarPaginas();
     if (p.emMorteVS || p.eliminado || !sprite.active) {
       this.limpar();
       return;
@@ -80,12 +159,12 @@ export default class CorrupcaoSlender {
     this.criarVisuais();
     const agora = this.scene.time.now;
     const estagio = this.valor >= 90 ? 3 : this.valor >= 60 ? 2 : 1;
-    const intensidade = (this.valor - 30) / 70;
+    const intensidade = Phaser.Math.Clamp((this.valor - 30) / 60, 0, 1);
     if (agora >= this.proximoDano) {
-      const ciclos = Math.floor((agora - this.proximoDano) / 6000) + 1;
-      p.porcentagemDano += [0, 2, 4, 8][estagio] * ciclos;
+      const ciclos = Math.floor((agora - this.proximoDano) / 2000) + 1;
+      p.porcentagemDano += [0, 4, 8, 16][estagio] * ciclos;
       p.textoDano?.setText(`${Math.floor(p.porcentagemDano)}%`);
-      this.proximoDano += ciclos * 6000;
+      this.proximoDano += ciclos * 2000;
     }
     if (agora >= this.proximoRuido) {
       this.proximoRuido = agora + (estagio === 3 ? 45 : 90);

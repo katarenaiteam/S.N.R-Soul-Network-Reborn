@@ -48,12 +48,12 @@ export default class Ice {
         this.plataformas = scene.physics.add.staticGroup();
         this.criarPlataformas();
         this.areasLedge = [
-            { x: 867, y: 920, largura: 40, altura: 20, direcao: 1 },
-            { x: 1733, y: 920, largura: 40, altura: 20, direcao: -1 },
+            { x: 367, y: 940, largura: 40, altura: 20, direcao: 1 },
+            { x: 1110, y: 940, largura: 40, altura: 20, direcao: -1 },
+            { x: 1463, y: 850, largura: 40, altura: 20, direcao: 1 },
             
-            { x: 2360, y: 670, largura: 40, altura: 20, direcao: -1 },
-            { x: 290, y: 670, largura: 40, altura: 20, direcao: 1 },
-           
+            { x: 2234, y: 850, largura: 40, altura: 20, direcao: -1 },
+      
         ];
 
         

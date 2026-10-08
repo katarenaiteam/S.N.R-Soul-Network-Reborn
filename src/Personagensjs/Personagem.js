@@ -304,7 +304,7 @@ export default class Personagem {
     }
 
     //. LÓGICA PADRÃO DE DANO (Quando toma golpe sem escudo):
-    this.porcentagemDano = Math.min(320, this.porcentagemDano + quantidade);
+    this.porcentagemDano += quantidade;
     const danoDeSlenderman = atacante?.nomePersonagem === "Slanderman" || atacante?.nomePersonagem === "Slenderman";
     if (quantidade > 0 && (propriedades.corrupcaoSlender > 0 || danoDeSlenderman)) {
       this.corrupcaoSlender.adicionar(propriedades.corrupcaoSlender || 5);
@@ -372,15 +372,10 @@ export default class Personagem {
     let multiplicadorY = 1;
 
     if (!knockbackFixo) {
-      // A porcentagem deixa de influenciar o lançamento depois de 300%.
-      // Até 180% ela cresce normalmente e, depois disso, cada ponto passa
-      // a valer menos, preservando a curva que o sistema já usava.
-      const tetoPorcentagem = 300;
-      const porcentagemEscalada = Phaser.Math.Clamp(
-        this.porcentagemDano,
-        0,
-        tetoPorcentagem
-      );
+      // Até 180% a porcentagem cresce normalmente; acima disso, cada ponto
+      // vale menos na curva base. Depois de 320%, o knockback ganha um reforço
+      // adicional para que ataques continuem ficando mais fortes.
+      const porcentagemEscalada = Math.max(0, this.porcentagemDano);
       const danoEscalado = porcentagemEscalada <= 180
         ? porcentagemEscalada
         : 180 + (porcentagemEscalada - 180) * 0.20;
@@ -388,15 +383,14 @@ export default class Personagem {
       const multiplicadorBaseX = 0.65 + danoEscalado * 0.625 / 100;
       const multiplicadorBaseY = 0.65 + danoEscalado * 0.568 / 180;
 
-      // Reforça progressivamente o knockback sem criar outro salto brusco.
-      // A curva perde inclinação ao se aproximar de 300% e, no teto,
-      // entrega 2,1 vezes o knockback que a regulagem anterior entregava.
-      const progresso = porcentagemEscalada / tetoPorcentagem;
+      // Reforça progressivamente até 300%, sem deixar a curva cair depois.
+      const progresso = Phaser.Math.Clamp(porcentagemEscalada / 300, 0, 1);
       const progressoSuave = 1 - (1 - progresso) ** 2;
       const reforcoKnockback = 1 + 1.1 * progressoSuave;
+      const reforcoAcima320 = 1 + Math.max(0, porcentagemEscalada - 320) / 100;
 
-      multiplicadorX = multiplicadorBaseX * reforcoKnockback;
-      multiplicadorY = multiplicadorBaseY * reforcoKnockback;
+      multiplicadorX = multiplicadorBaseX * reforcoKnockback * reforcoAcima320;
+      multiplicadorY = multiplicadorBaseY * reforcoKnockback * reforcoAcima320;
     }
 
     // Captura o contato e o movimento anterior, sem modificar o impulso.

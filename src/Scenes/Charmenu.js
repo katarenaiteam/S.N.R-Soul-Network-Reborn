@@ -149,7 +149,7 @@ export const PERSONAGENS = [
     banner: "Slen_baner",
 
     bannerConfig: {
-      escala: 1,
+      escala: 0.8,
 
       p1: {
         x: -150,
@@ -158,7 +158,7 @@ export const PERSONAGENS = [
 
       p2: {
         x: 230,
-        y: 200
+        y: 40
       }
     }
   },

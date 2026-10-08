@@ -20,6 +20,7 @@ export default class IntroPartida {
     this.participantes = opcoes.participantes ?? this.jogadores;
     this.nomes = opcoes.nomes ?? [scene.escolhaP1, scene.escolhaP2];
     this.enquadramentoLuta = opcoes.alvoLuta;
+    this.aoFimContagem = opcoes.aoFimContagem;
     this.sons = ["narrador-3-2-1", "narrador-fight"].map(chave =>
       scene.cache.audio.exists(chave) ? scene.sound.add(chave) : null);
     this.duracaoContagem = (this.sons[0]?.duration || 3) * 1000;
@@ -54,7 +55,10 @@ export default class IntroPartida {
     else this.iniciar();
     this.encerrar = () => this.destruir();
     scene.events.once("shutdown", this.encerrar);
-    this.pular = () => this.finalizar();
+    this.pular = () => {
+      if (this.aoFimContagem) return;
+      this.finalizar();
+    };
     scene.input.keyboard.on("keydown-ESC", this.pular);
   }
 
@@ -136,6 +140,10 @@ export default class IntroPartida {
 
   atualizar(delta) {
     if (!this.ativa || !this.iniciada) return;
+    if (this.interrompida) {
+      this.participantes.forEach(j => this.sincronizarCorpo(j));
+      return;
+    }
     const som = this.sons[this.fight ? 1 : 0];
     // Usa o relogio do audio quando disponivel; sem audio, usa o da cena.
     if (som?.isPlaying && Number.isFinite(som.seek)) this.tempo = som.seek * 1000;
@@ -145,10 +153,10 @@ export default class IntroPartida {
       const escalaResolucao = this.scene.scale.width / 1920;
       this.visual.setTexture(`${Math.max(1, 3 - Math.floor(progresso * 3))}.png`)
         .setDisplaySize(148 * escalaResolucao, 176 * escalaResolucao);
-      if (progresso >= FIM_POSE_P1 && progresso < INICIO_POSE_P2) {
+      if (this.jogadores.length > 1 && progresso >= FIM_POSE_P1 && progresso < INICIO_POSE_P2) {
         this.mover(this.alvoJogador(0), this.alvoJogador(1),
           (progresso - FIM_POSE_P1) / (INICIO_POSE_P2 - FIM_POSE_P1));
-      } else if (progresso >= INICIO_POSE_P2) {
+      } else if (this.jogadores.length > 1 && progresso >= INICIO_POSE_P2) {
         if (this.etapa !== 1) this.apresentar(1);
         if (progresso >= INICIO_RETORNO) {
           this.mover(this.alvoJogador(1), this.alvoLuta(),
@@ -156,6 +164,11 @@ export default class IntroPartida {
         } else this.focar(this.alvoJogador(1));
       }
       if (this.tempo >= this.duracaoContagem && !som?.isPlaying) {
+        if (this.aoFimContagem) {
+          this.interrompida = true;
+          this.aoFimContagem(this);
+          return;
+        }
         this.fight = true;
         this.tempo = 0;
         this.participantes.forEach(j => this.voltarIdle(j));
