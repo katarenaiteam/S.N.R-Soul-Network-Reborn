@@ -978,10 +978,9 @@ consumirUlt() {
       (aceitarPressionado && this.inputDown("dash"));
     if (!comandoApertado) return false;
 
-    const corpo = this.sprite.body;
-    const emMovimento = this.inputDown("esquerda") ||
-      this.inputDown("direita") || Math.abs(corpo.velocity.x) > 20;
-    if (emMovimento) {
+    const direcaoDash = this.inputDown("esquerda") ||
+      this.inputDown("direita");
+    if (direcaoDash) {
       if (this.podeDarDash()) this.maquinaEstados.mudarEstado("dash");
       return true;
     }

@@ -39,6 +39,7 @@ export default class DialogoHistoria {
     this.tempoMovimento = TEMPO_MOVIMENTO_CAMERA;
     this.transicaoParaIntro = false;
     this.ativa = true;
+    this.botoesAtaquePad = [];
 
     this.jogadores = {
       Miku: scene.boss,
@@ -119,7 +120,9 @@ export default class DialogoHistoria {
       const tecla = evento.keyCode;
       if (tecla === Phaser.Input.Keyboard.KeyCodes.SPACE ||
           tecla === Phaser.Input.Keyboard.KeyCodes.ENTER ||
-          tecla === Phaser.Input.Keyboard.KeyCodes.NUMPAD_ENTER) {
+          tecla === Phaser.Input.Keyboard.KeyCodes.NUMPAD_ENTER ||
+          tecla === Phaser.Input.Keyboard.KeyCodes.F ||
+          tecla === Phaser.Input.Keyboard.KeyCodes.NUMPAD_FOUR) {
         this.avancar();
       }
     };
@@ -168,6 +171,7 @@ export default class DialogoHistoria {
 
   atualizar(delta) {
     if (!this.ativa) return;
+    this.verificarAtaqueGamepad();
     this.atualizarDigitacao(delta);
     if (this.transicaoParaIntro) {
       this.tempoMovimento = Math.min(TEMPO_MOVIMENTO_CAMERA, this.tempoMovimento + delta);
@@ -182,6 +186,17 @@ export default class DialogoHistoria {
     if (this.tempoMovimento >= TEMPO_MOVIMENTO_CAMERA) return;
     this.tempoMovimento = Math.min(TEMPO_MOVIMENTO_CAMERA, this.tempoMovimento + delta);
     this.moverCamera(this.cameraDe, this.cameraPara, this.tempoMovimento / TEMPO_MOVIMENTO_CAMERA);
+  }
+
+  verificarAtaqueGamepad() {
+    const pads = this.scene.input.gamepad?.gamepads ?? [];
+    let ataquePressionado = false;
+    for (let indice = 0; indice < pads.length; indice++) {
+      const pressionado = !!pads[indice]?.buttons?.[2]?.pressed;
+      if (pressionado && !this.botoesAtaquePad[indice]) ataquePressionado = true;
+      this.botoesAtaquePad[indice] = pressionado;
+    }
+    if (ataquePressionado) this.avancar();
   }
 
   atualizarDigitacao(delta) {
