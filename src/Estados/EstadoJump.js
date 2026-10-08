@@ -11,20 +11,7 @@ export default class EstadoJump extends EstadoBase {
 
   execute() {
     // Uma tentativa por pressionamento; segurar nao renova a janela no ar.
-    if (this.personagem.inputJustDown("guard")) {
-      this.personagem.maquinaEstados.mudarEstado("guard");
-      return;
-    }
-
-    // 1. Dash no ar
-  if (
-  this.personagem.inputJustDown("dash") &&
-  this.personagem.podeDash &&
-  this.personagem.dashs < this.personagem.maxDash
- ) {
-  this.personagem.maquinaEstados.mudarEstado("dash");
-  return;
- }
+    if (this.personagem.tentarAcaoDashDefesa()) return;
 
     // 2. Pulo Duplo (se apertar W de novo enquanto estiver no ar)
     if (

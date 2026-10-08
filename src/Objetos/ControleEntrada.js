@@ -58,7 +58,6 @@ export default class ControleEntrada {
     const padAtack = this._botaoPadPressionado(pad, 2);
     const padPular = this._botaoPadPressionado(pad, 3);
     const padSpecial = this._botaoPadPressionado(pad, 9);
-    const padGuard = this._botaoPadPressionado(pad, 1);
     const padTaunt = this._botaoPadPressionado(pad, 5);
 
     this.estadoAtual.esquerda = this._teclaDown("esquerda") || padEsquerda;
@@ -68,7 +67,7 @@ export default class ControleEntrada {
     this.estadoAtual.dash = this._teclaDown("dash") || padDash;
     this.estadoAtual.atack = this._teclaDown("atack") || padAtack;
     this.estadoAtual.special = this._teclaDown("special") || padSpecial;
-    this.estadoAtual.guard = this._teclaDown("guard") || padGuard;
+    this.estadoAtual.guard = this.estadoAtual.dash;
     this.estadoAtual.taunt = this._teclaDown("taunt") || padTaunt;
   }
 

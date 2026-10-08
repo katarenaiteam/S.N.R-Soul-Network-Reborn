@@ -23,8 +23,7 @@ export default class EstadoIdle extends EstadoBase {
     }
 
     // 2. Transição para DASH
-    if (this.personagem.inputJustDown("dash") && this.personagem.podeDash) {
-      this.personagem.maquinaEstados.mudarEstado("dash");
+    if (this.personagem.tentarAcaoDashDefesa()) {
       return;
     }
 
@@ -87,9 +86,5 @@ export default class EstadoIdle extends EstadoBase {
       return;
     }
 
-    if (this.personagem.inputDown("guard")) {
-      this.personagem.maquinaEstados.mudarEstado("guard");
-      return;
-    }
   }
 }

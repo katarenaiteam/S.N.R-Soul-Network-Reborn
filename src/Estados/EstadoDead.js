@@ -59,15 +59,7 @@ export default class EstadoDead extends EstadoBase {
       return;
     }
 
-    if (this.personagem.inputJustDown("dash") && this.personagem.podeDash) {
-      this.personagem.maquinaEstados.mudarEstado("dash");
-      return;
-    }
-
-    if (this.personagem.inputDown("guard")) {
-      this.personagem.maquinaEstados.mudarEstado("guard");
-      return;
-    }
+    if (this.personagem.tentarAcaoDashDefesa()) return;
 
     if (this.personagem.inputDown("baixo")) {
       this.personagem.maquinaEstados.mudarEstado("crouch");

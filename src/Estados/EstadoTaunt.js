@@ -51,7 +51,9 @@ export default class EstadoTaunt extends EstadoBase {
   }
 
   verificarInputsAtivos() {
-    const inputs = ["esquerda", "direita", "cima", "baixo", "atack", "special", "dash", "guard"];
+    if (this.personagem.tentarAcaoDashDefesa()) return true;
+
+    const inputs = ["esquerda", "direita", "cima", "baixo", "atack", "special"];
 
     for (const inputKey of inputs) {
       if (this.personagem.inputJustDown(inputKey) || this.personagem.inputDown(inputKey)) {
@@ -59,11 +61,6 @@ export default class EstadoTaunt extends EstadoBase {
         // Ações imediatas
         if (this.personagem.inputJustDown("cima")) {
           this.personagem.pular();
-          return true;
-        }
-
-        if (this.personagem.inputJustDown("dash") && this.personagem.podeDash) {
-          this.personagem.maquinaEstados.mudarEstado("dash");
           return true;
         }
 

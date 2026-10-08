@@ -100,7 +100,6 @@ export default class CenaHistoria extends Phaser.Scene {
       dash: Phaser.Input.Keyboard.KeyCodes.SPACE,
       atack: Phaser.Input.Keyboard.KeyCodes.F,
       special: Phaser.Input.Keyboard.KeyCodes.G,
-      guard: Phaser.Input.Keyboard.KeyCodes.E,
     });
     const controleP1 = new ControleEntrada(this, teclasP1, 0);
 
@@ -124,7 +123,6 @@ export default class CenaHistoria extends Phaser.Scene {
       dash: Phaser.Input.Keyboard.KeyCodes.NUMPAD_ZERO,
       atack: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FOUR,
       special: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FIVE,
-      guard: Phaser.Input.Keyboard.KeyCodes.NUMPAD_SIX,
       taunt: Phaser.Input.Keyboard.KeyCodes.NUMPAD_EIGHT,
       });
       const controleP2 = new ControleEntrada(this, teclasP2, 1);
@@ -428,6 +426,7 @@ this.indicadorCPU = this.criarIndicador(
     jogador.podeDash = true;
     jogador.pulos = 0;
     jogador.dashs = 0;
+    jogador.defesaAereaUsada = false;
     jogador.resetarCooldownsAereos();
   }
 

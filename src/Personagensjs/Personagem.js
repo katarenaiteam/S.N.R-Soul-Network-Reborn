@@ -138,6 +138,7 @@ export default class Personagem {
     // Contadores
     this.pulos = 0;
     this.dashs = 0;
+    this.defesaAereaUsada = false;
 
     // Máquina de Estados (FSM)
     this.maquinaEstados = new GerenciadorEstados();
@@ -685,6 +686,7 @@ consumirUlt() {
     if (noChao && !this.estavaNoChao) {
       this.pulos = 0;
       this.dashs = 0;
+      this.defesaAereaUsada = false;
       this.resetarCooldownsAereos();
       // Perder blocked.down durante o dash horizontal nao e uma queda.
       // Exige deslocamento vertical real antes de tocar o som e comprimir o sprite.
@@ -963,6 +965,30 @@ consumirUlt() {
     
     // SE FOR TECLADO REAL: usa a checagem nativa do Phaser
     return Phaser.Input.Keyboard.JustDown(tecla);
+  }
+
+  tentarAcaoDashDefesa(aceitarPressionado = false) {
+    const comandoApertado = this.inputJustDown("dash") ||
+      (aceitarPressionado && this.inputDown("dash"));
+    if (!comandoApertado) return false;
+
+    const corpo = this.sprite.body;
+    const emMovimento = this.inputDown("esquerda") ||
+      this.inputDown("direita") || Math.abs(corpo.velocity.x) > 20;
+    if (emMovimento) {
+      if (this.podeDarDash()) this.maquinaEstados.mudarEstado("dash");
+      return true;
+    }
+
+    const noChao = corpo.blocked.down || corpo.touching.down;
+    if (
+      this.vidaGuard > 0 &&
+      this.scene.time.now >= this.tempoLiberacaoGuard &&
+      (noChao || !this.defesaAereaUsada)
+    ) {
+      this.maquinaEstados.mudarEstado("guard");
+    }
+    return true;
   }
 
   inputJustUp(nome) {

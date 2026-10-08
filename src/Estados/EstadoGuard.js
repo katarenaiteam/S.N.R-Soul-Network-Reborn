@@ -16,7 +16,15 @@ export default class EstadoGuard extends EstadoBase {
       return;
     }
 
-    this.aerea = !this.personagem.sprite.body.blocked.down;
+    this.aerea = !(
+      this.personagem.sprite.body.blocked.down ||
+      this.personagem.sprite.body.touching.down
+    );
+    if (this.aerea && this.personagem.defesaAereaUsada) {
+      this.sairParaEstadoPadrao();
+      return;
+    }
+    if (this.aerea) this.personagem.defesaAereaUsada = true;
     this.fimParry = agora + (this.aerea ? DURACAO_DEFESA_AEREA_MS : JANELA_PARRY_MS);
     this.parryHabilitado = this.personagem.inputJustDown("guard");
 

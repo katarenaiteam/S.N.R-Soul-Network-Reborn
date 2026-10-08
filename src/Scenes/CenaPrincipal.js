@@ -102,7 +102,6 @@ export default class cenaPrincipal extends Phaser.Scene {
       dash: Phaser.Input.Keyboard.KeyCodes.SPACE,
       atack: Phaser.Input.Keyboard.KeyCodes.F,
       special: Phaser.Input.Keyboard.KeyCodes.G,
-      guard: Phaser.Input.Keyboard.KeyCodes.E,
       taunt: Phaser.Input.Keyboard.KeyCodes.Q,
     });
 
@@ -114,7 +113,6 @@ export default class cenaPrincipal extends Phaser.Scene {
       dash: Phaser.Input.Keyboard.KeyCodes.NUMPAD_ZERO,
       atack: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FOUR,
       special: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FIVE,
-      guard: Phaser.Input.Keyboard.KeyCodes.NUMPAD_SIX,
       taunt: Phaser.Input.Keyboard.KeyCodes.NUMPAD_EIGHT,
     });
 

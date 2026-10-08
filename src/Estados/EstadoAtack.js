@@ -132,7 +132,7 @@ export default class EstadoAtack extends EstadoBase {
 
       // Regra: Se pressionar qualquer botÃ£o de cancelamento, salva a intenÃ§Ã£o
       if (
-        (this.personagem.inputJustDown("dash") && this.personagem.podeDash && this.personagem.dashs < this.personagem.maxDash) ||
+        this.personagem.inputJustDown("dash") ||
         (this.personagem.inputJustDown("cima") && this.personagem.pulos < this.personagem.maxPulos) ||
         this.personagem.inputJustDown("special")
       ) {
@@ -158,10 +158,7 @@ export default class EstadoAtack extends EstadoBase {
           this.personagem.inputJustDown("dash") ||
           (this.intentCancel && this.personagem.inputDown("dash"))
         ) {
-          if (this.personagem.podeDash && this.personagem.dashs < this.personagem.maxDash) {
-            this.personagem.maquinaEstados.mudarEstado("dash");
-            return;
-          }
+          if (this.personagem.tentarAcaoDashDefesa(true)) return;
         }
         
         if (
