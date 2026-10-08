@@ -256,10 +256,10 @@ this.indicadorP2 = this.criarIndicador(
       this.jogador1.sprite,
       this.jogador2.sprite,
     ].flat(Infinity).filter((objeto) =>
-      objeto && typeof objeto === "object" && "cameraFilter" in objeto
+      objeto instanceof Phaser.GameObjects.GameObject
     );
     objetosIgnoradosHUD.forEach((objeto) => this.camHUD.ignore(objeto));
-    if (this.mapaAtual.suportePlataforma) {
+    if (this.mapaAtual.suportePlataforma instanceof Phaser.GameObjects.GameObject) {
       this.camHUD.ignore(this.mapaAtual.suportePlataforma);
     }
 
