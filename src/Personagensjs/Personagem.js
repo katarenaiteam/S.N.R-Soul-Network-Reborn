@@ -985,6 +985,7 @@ consumirUlt() {
       return true;
     }
 
+    const corpo = this.sprite.body;
     const noChao = corpo.blocked.down || corpo.touching.down;
     if (
       this.vidaGuard > 0 &&
