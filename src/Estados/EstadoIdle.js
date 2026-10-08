@@ -9,6 +9,11 @@ export default class EstadoIdle extends EstadoBase {
   }
 
   execute() {
+    if (this.personagem.comandoTauntJustDown()) {
+      this.personagem.maquinaEstados.mudarEstado("taunt");
+      return;
+    }
+
     // 1. Transição para AGACHADO
     // Nao troca para crouch antes de consumir baixo + ataque/special.
     // Caso as teclas cheguem no mesmo frame, a troca antecipada fazia o
@@ -77,12 +82,6 @@ export default class EstadoIdle extends EstadoBase {
     // 8. QUEDA DA PLATAFORMA
     if (!this.personagem.sprite.body.blocked.down && !this.personagem.sprite.body.touching.down) {
       this.personagem.maquinaEstados.mudarEstado("jump");
-      return;
-    }
-
-    // 9. TAUNT E GUARD
-    if (this.personagem.inputJustDown("taunt")) {
-      this.personagem.maquinaEstados.mudarEstado("taunt");
       return;
     }
 

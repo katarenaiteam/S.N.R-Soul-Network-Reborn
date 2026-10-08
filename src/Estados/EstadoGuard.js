@@ -47,6 +47,10 @@ export default class EstadoGuard extends EstadoBase {
       this.sairParaEstadoPadrao();
       return;
     }
+    if (this.personagem.comandoTauntJustDown()) {
+      this.personagem.maquinaEstados.mudarEstado("taunt");
+      return;
+    }
     if (this.aerea && this.personagem.sprite.body.velocity.y > VELOCIDADE_MAXIMA_QUEDA_GUARD) {
       this.personagem.sprite.setVelocityY(VELOCIDADE_MAXIMA_QUEDA_GUARD);
     }

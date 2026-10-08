@@ -967,6 +967,12 @@ consumirUlt() {
     return Phaser.Input.Keyboard.JustDown(tecla);
   }
 
+  comandoTauntJustDown() {
+    return this.inputDown("baixo") &&
+      this.inputDown("guard") &&
+      (this.inputJustDown("baixo") || this.inputJustDown("guard"));
+  }
+
   tentarAcaoDashDefesa(aceitarPressionado = false) {
     const comandoApertado = this.inputJustDown("dash") ||
       (aceitarPressionado && this.inputDown("dash"));

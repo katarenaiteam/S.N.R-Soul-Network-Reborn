@@ -81,17 +81,16 @@ export default class EstadoCrouch extends EstadoBase {
       }
     }
 
+    if (this.personagem.comandoTauntJustDown()) {
+      this.personagem.maquinaEstados.mudarEstado("taunt");
+      return;
+    }
+
     if (this.personagem.tentarAcaoDashDefesa()) return;
 
     if (this.personagem.inputJustDown("cima")) {
       this.personagem.pular();
       return;
-    }
-
-    //taunt <3
-    if (this.personagem.inputJustDown("taunt")) {
-    this.personagem.maquinaEstados.mudarEstado("taunt");
-    return;
     }
 
     // LÓGICA DE LEVANTAR (APENAS QUANDO SOLTA BAIXO E NÃO APERTA MAIS NADA)

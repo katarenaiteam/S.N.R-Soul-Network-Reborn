@@ -8,6 +8,11 @@ export default class EstadoWalk extends EstadoBase {
   }
 
   execute() {
+    if (this.personagem.comandoTauntJustDown()) {
+      this.personagem.maquinaEstados.mudarEstado("taunt");
+      return;
+    }
+
     // Pulo
     if (this.personagem.inputJustDown("cima")) {
       this.personagem.pular();
@@ -75,13 +80,6 @@ export default class EstadoWalk extends EstadoBase {
      }
     }
    
-     //taunt <3
-    if (this.personagem.inputJustDown("taunt")) {
-    this.personagem.maquinaEstados.mudarEstado("taunt");
-    return;
-    }
-    
-
     // Se caiu de uma plataforma sem pular
     if (!this.personagem.sprite.body.blocked.down) {
       this.personagem.maquinaEstados.mudarEstado("jump");
