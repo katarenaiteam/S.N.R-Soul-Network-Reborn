@@ -42,6 +42,7 @@ export default class SlenderMap {
 
         this.plataformas = scene.physics.add.staticGroup();
         this.criarPlataformas();
+        scene.events.once("create", () => scene.camHUD?.ignore(this.imagemPlataforma));
         this.areasLedge = [
             { x: 352, y: 693, largura: 34, altura: 15, direcao: 1 },
             { x: 730, y: 920, largura: 34, altura: 15, direcao: 1 },

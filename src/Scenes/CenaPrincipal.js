@@ -249,7 +249,7 @@ this.indicadorP2 = this.criarIndicador(
 );
 
     // Diga para a câmera de HUD mostrar SOMENTE o HUD e ignorar o jogo/cenário/personagens:
-    this.camHUD.ignore([
+    const objetosIgnoradosHUD = [
       this.sistemaLedge.visualizacao,
       ...(this.mapaAtual.plataformas?.getChildren?.() ?? []),
       this.mapaAtual.imagemPlataforma,
@@ -257,7 +257,10 @@ this.indicadorP2 = this.criarIndicador(
       ...(this.mapaAtual.fundos || [this.mapaAtual.imagemFundo]),
       this.jogador1.sprite,
       this.jogador2.sprite,
-    ].filter(Boolean));
+    ].flat(Infinity).filter((objeto) =>
+      objeto && typeof objeto === "object" && "cameraFilter" in objeto
+    );
+    objetosIgnoradosHUD.forEach((objeto) => this.camHUD.ignore(objeto));
     if (this.mapaAtual.suportePlataforma) {
       this.camHUD.ignore(this.mapaAtual.suportePlataforma);
     }
