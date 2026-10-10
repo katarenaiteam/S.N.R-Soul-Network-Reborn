@@ -5,7 +5,7 @@ export default class MapaTeste {
         this.scene = scene;
 
         if (scene.sound) {
-            this.musica = tocarMusicaSegura(scene, "No_More", { loop: true, volume: 0.1 });
+            this.musica = tocarMusicaSegura(scene, "No_More", { loop: true, volume: 0.0 });
         }
 
         const larguraMundo = 2600;
@@ -13,7 +13,7 @@ export default class MapaTeste {
 
         this.configCamera = {
             limites: { x: 0, y: 0, largura: larguraMundo, altura: alturaMundo },
-            maxZoom: 2.0,
+            maxZoom: 2.2,
             minZoom: 0.9,
             distMinima: 100,
             distMaxima: 1200

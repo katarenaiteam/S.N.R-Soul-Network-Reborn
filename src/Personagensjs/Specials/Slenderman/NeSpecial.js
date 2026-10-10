@@ -85,7 +85,9 @@ export default class NeSpecial {
       if (!this.cartas && Number(frame.textureFrame) >= (this.special.framesCorte ?? 3)) {
         efeito.setAlpha(1);
         this.cartas = true;
-        this.hitboxes.forEach((hitbox) => { hitbox.body.debugBodyColor = 0x00ffff; });
+        this.hitboxes.forEach((hitbox) => {
+          if (hitbox.body) hitbox.body.debugBodyColor = 0x00ffff;
+        });
         // Mantem o corpo para colisao com projeteis, sem atingir personagens.
         this.registros.forEach((registro) => registro.remover());
         this.registrarProjetil();
@@ -117,6 +119,7 @@ export default class NeSpecial {
       (this.special.distanciaProjetilY ?? 0) * progressoY;
     const escala = this.special.escalaProjetil ?? 1;
     this.hitboxes.forEach((hitbox, indice) => {
+      if (!hitbox.active || !hitbox.body) return;
       const caixa = this.special.hitboxesProjetil[indice];
       hitbox.setPosition(
         this.projetil.x + caixa.offsetX * escala * this.direcao,

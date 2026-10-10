@@ -37,6 +37,7 @@ export default class SlenderUlt {
     this.movesSlender = p.body.moves;
     this.movesAlvo = alvo.body?.moves;
     this.gravityAlvo = alvo.body?.allowGravity;
+    this.podeMoverAlvo = this.oponente.podeMover;
     this.updateAlvo = this.oponente.maquinaEstados.update;
     this.visivelSlender = p.visible;
     this.yChaoSlender = p.y;
@@ -68,6 +69,7 @@ export default class SlenderUlt {
 
   iniciarAvanco() {
     const p = this.personagem.sprite;
+    this.liberarOponente();
     p.anims.resume();
     p.body.moves = true;
     p.anims.play("slan-ult1", true);
@@ -77,7 +79,7 @@ export default class SlenderUlt {
     this.xInicial = p.x;
     this.tempoAvanco = this.scene.time.now;
     this.duracaoAvanco = 450;
-    this.distanciaAvanco = 650 * this.dir;
+    this.distanciaAvanco = 500 * this.dir;
     this.avancando = true;
   }
 
@@ -88,7 +90,17 @@ export default class SlenderUlt {
     const alvo = this.oponente?.sprite;
     if (!p?.active || !alvo?.active) return this.finalizar();
     const t = Phaser.Math.Clamp((this.scene.time.now - this.tempoAvanco) / this.duracaoAvanco, 0, 1);
-    const progresso = this.avancandoFinal ? 1 - (1 - t) ** 2 : t;
+    let progressoTempo = t;
+    if (this.avancandoFinal) {
+      if (t <= 0.4) progressoTempo = t;
+      else if (t <= 0.6) progressoTempo = 0.4 + (t - 0.4) * 0.7;
+      else progressoTempo = 0.54 + (t - 0.6) * 1.15;
+      if (t >= 0.4 && !this.slowAvancoFinalAplicado) {
+        this.slowAvancoFinalAplicado = true;
+        this.aplicarSlowAvancoFinal();
+      }
+    }
+    const progresso = this.avancandoFinal ? 1 - (1 - progressoTempo) ** 2 : t;
     p.x = Phaser.Math.Linear(this.xInicial, this.xInicial + this.distanciaAvanco, progresso);
     p.y = this.yChaoSlender;
     if (this.avancandoFinal) return;
@@ -126,6 +138,7 @@ export default class SlenderUlt {
     this.camera.zoomTo(this.camera.zoom * 1.1, 300);
     alvo.body?.setVelocity(0, 0);
     alvo.body && (alvo.body.moves = false);
+    this.oponente.maquinaEstados.update = () => {};
     alvo.setFrame(0);
     this.tocarTv(() => {
       const grab = this.scene.add.sprite(alvo.x, alvo.y, "slan-grab", 0).setOrigin(0.5, 1).setDepth(alvo.depth + 4);
@@ -169,10 +182,6 @@ export default class SlenderUlt {
     const alvo = personagemAlvo.sprite;
     grab.destroy();
     this.efeitos.delete(grab);
-    alvo.body?.setVelocity(0, 0);
-    alvo.body && (alvo.body.moves = this.movesAlvo ?? true);
-    alvo.body?.setAllowGravity(this.gravityAlvo ?? true);
-    if (this.oponente.maquinaEstados && this.updateAlvo) this.oponente.maquinaEstados.update = this.updateAlvo;
     const lado = 1;
     p.setVisible(true);
     p.setPosition(alvo.x - lado * 80, this.yChaoSlender);
@@ -188,8 +197,9 @@ export default class SlenderUlt {
       this.tempoAvanco = this.scene.time.now;
       p.y = this.yChaoSlender;
       this.duracaoAvanco = 180;
-      this.distanciaAvanco = lado * 150;
+      this.distanciaAvanco = lado * 175;
       this.avancandoFinal = true;
+      this.slowAvancoFinalAplicado = false;
       this.criarCorte(alvo, 1);
       this.agendar(180, () => {
         if (this.cancelada) return;
@@ -200,10 +210,55 @@ export default class SlenderUlt {
             personagemAlvo.corrupcaoSlender.adicionar(100);
           }
           if (personagemAlvo.maquinaEstados?.mudarEstado("atordoado") === false) personagemAlvo.tocarAnimacao?.("stun", true);
+          this.camera.shake(130, 0.006);
           this.finalizar();
         });
       });
     });
+  }
+
+  liberarOponente() {
+    const alvo = this.oponente;
+    const sprite = alvo?.sprite;
+    if (sprite?.body) {
+      sprite.body.moves = true;
+      sprite.body.enable = true;
+      sprite.body.setAllowGravity(this.gravityAlvo ?? true);
+      sprite.body.setVelocity(0, 0);
+      sprite.body.updateFromGameObject();
+    }
+    alvo.podeMover = true;
+    if (alvo?.maquinaEstados) {
+      if (this.updateAlvo) alvo.maquinaEstados.update = this.updateAlvo;
+      if (alvo.maquinaEstados.estadoAtual?.nome !== "dead") {
+        const direcao = Number(alvo.inputDown("direita")) - Number(alvo.inputDown("esquerda"));
+        const noChao = sprite?.body?.blocked?.down;
+        const estado = noChao ? (direcao ? "walk" : "idle") : "jump";
+        alvo.maquinaEstados.mudarEstado(estado);
+        if (direcao) sprite?.body?.setVelocityX(direcao * alvo.velocidade);
+      }
+    }
+    sprite?.anims?.resume();
+    alvo?.sincronizarHurtbox?.();
+  }
+
+  aplicarSlowAvancoFinal() {
+    const spriteSlender = this.personagem.sprite;
+    if (spriteSlender?.anims) {
+      this.timeScaleSlenderOriginal = spriteSlender.anims.timeScale;
+      spriteSlender.anims.timeScale *= 0.65;
+    }
+    this.agendar(70, () => {
+      this.restaurarImpactoFinal();
+    });
+  }
+
+  restaurarImpactoFinal() {
+    const spriteSlender = this.personagem.sprite;
+    if (spriteSlender?.anims && this.timeScaleSlenderOriginal !== undefined) {
+      spriteSlender.anims.timeScale = this.timeScaleSlenderOriginal;
+      this.timeScaleSlenderOriginal = undefined;
+    }
   }
 
   criarHitboxAtaque(alvo, quantidade, direcao, aoAcertar) {
@@ -354,6 +409,7 @@ export default class SlenderUlt {
     if (p?.body) { p.body.moves = this.movesSlender ?? true; p.body.setAllowGravity(true); }
     p?.setVisible(this.visivelSlender ?? true);
     if (alvo?.body) { alvo.body.moves = this.movesAlvo ?? true; alvo.body.setAllowGravity(this.gravityAlvo ?? true); }
+    if (this.oponente) this.oponente.podeMover = this.podeMoverAlvo;
     if (this.oponente?.maquinaEstados && this.updateAlvo) this.oponente.maquinaEstados.update = this.updateAlvo;
     this.restaurarFundoUltimate();
     this.scene.atualizarCamera = this.funcaoCameraOriginal;
@@ -367,6 +423,7 @@ export default class SlenderUlt {
   finalizar() {
     if (this.cancelada) return;
     this.cancelada = true;
+    this.restaurarImpactoFinal();
     this.timers.forEach((t) => t.remove(false));
     this.timers.clear();
     this.efeitos.forEach((e) => e.destroy());
@@ -381,6 +438,7 @@ export default class SlenderUlt {
   cancelar() {
     if (this.cancelada) return;
     this.cancelada = true;
+    this.restaurarImpactoFinal();
     this.timers.forEach((t) => t.remove(false));
     this.timers.clear();
     this.efeitos.forEach((e) => e.destroy());
@@ -391,6 +449,7 @@ export default class SlenderUlt {
     this.hitboxes.clear();
     if (this.personagem.sprite?.body) { this.personagem.sprite.body.moves = this.movesSlender ?? true; this.personagem.sprite.body.setAllowGravity(true); }
     if (this.oponente?.sprite?.body) { this.oponente.sprite.body.moves = this.movesAlvo ?? true; this.oponente.sprite.body.setAllowGravity(this.gravityAlvo ?? true); }
+    if (this.oponente) this.oponente.podeMover = this.podeMoverAlvo;
     if (this.oponente?.maquinaEstados && this.updateAlvo) this.oponente.maquinaEstados.update = this.updateAlvo;
     this.personagem.sprite?.setVisible(this.visivelSlender ?? true);
     this.restaurarFundoUltimate();

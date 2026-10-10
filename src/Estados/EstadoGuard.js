@@ -2,7 +2,7 @@ import EstadoBase from "./EstadoBase.js";
 
 const JANELA_PARRY_MS = 120;
 const DURACAO_DEFESA_AEREA_MS = 300;
-const BLOQUEIO_MOVIMENTO_PARRY_MS = 400;
+const BLOQUEIO_MOVIMENTO_PARRY_MS = 500;
 const VELOCIDADE_MAXIMA_QUEDA_GUARD = 120;
 
 export default class EstadoGuard extends EstadoBase {

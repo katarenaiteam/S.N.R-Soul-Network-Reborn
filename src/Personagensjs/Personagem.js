@@ -218,15 +218,7 @@ export default class Personagem {
 
   podeDefender(origem = null) {
     if (this.maquinaEstados.estadoAtual?.nome !== "guard" || this.vidaGuard <= 0) return false;
-    if (!this.maquinaEstados.estadoAtual.defesaAtiva()) return false;
-    const frente = this.sprite.flipX ? -1 : 1;
-    // A direcao de chegada continua valida quando a hitbox atravessa o centro.
-    if (Number.isFinite(origem?.direcao) && origem.direcao !== 0) {
-      return Math.sign(origem.direcao) === -frente;
-    }
-    const oponente = this.scene.jogador1 === this ? this.scene.jogador2 : this.scene.jogador1;
-    const x = origem?.x ?? oponente?.sprite?.x;
-    return Number.isFinite(x) && (x - this.sprite.x) * frente > 0;
+    return this.maquinaEstados.estadoAtual.defesaAtiva();
   }
 
   atualizarEfeitoGuard() {

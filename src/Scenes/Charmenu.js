@@ -184,7 +184,7 @@ export const PERSONAGENS = [
   },
 
   {
-    id: "TH",
+    id: "TH30",
     icon: "th-icon",
     banner: "TH_baner",
 

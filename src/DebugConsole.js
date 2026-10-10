@@ -124,7 +124,7 @@ export function instalarComandosDebug(game) {
     },
 
     matarBoss() {
-      const scene = ["CenaHistoria", "CenaHistoria2"]
+      const scene = ["CenaHistoria", "CenaHistoria2", "CenaHistoria3"]
         .map(chave => game.scene.getScene(chave))
         .find(cena => cena?.scene.isActive());
       if (!scene) {

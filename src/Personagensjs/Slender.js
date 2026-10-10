@@ -784,8 +784,8 @@ export default class Slenderman extends Personagem {
         propriedades: {
           dano: 12,
           tipoSomImpacto: "heavy",
-          knockbackX: 400,
-          knockbackY: -500,
+          knockbackX: 390,
+          knockbackY: -440,
         },
       },
     };

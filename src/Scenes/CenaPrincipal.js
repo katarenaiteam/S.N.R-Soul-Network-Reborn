@@ -12,6 +12,7 @@ import Miku from "../Personagensjs/Miku.js";
 import Ken from "../Personagensjs/Ken.js";
 import Slenderman from "../Personagensjs/Slender.js";
 import Pingu from "../Personagensjs/Pingu.js";
+import TH30 from "../Personagensjs/TH30.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import SistemaPlataformasAtravessaveis from "../Objetos/SistemaPlataformasAtravessaveis.js";
 import SistemaLedge from "../Objetos/SistemaLedge.js";
@@ -110,8 +111,8 @@ export default class cenaPrincipal extends Phaser.Scene {
       cima: Phaser.Input.Keyboard.KeyCodes.UP,
       baixo: Phaser.Input.Keyboard.KeyCodes.DOWN,
       dash: Phaser.Input.Keyboard.KeyCodes.NUMPAD_ZERO,
-      atack: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FOUR,
-      special: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FIVE,
+      atack: Phaser.Input.Keyboard.KeyCodes.J,
+      special: Phaser.Input.Keyboard.KeyCodes.K,
     });
 
     const controleP1 = new ControleEntrada(this, teclasP1, 0);
@@ -415,6 +416,8 @@ this.indicadorP2 = this.criarIndicador(
         return new Slenderman(this, x, y, teclas, minDano, maxDano, controle);
         case "Pingu":
         return new Pingu(this, x, y, teclas, minDano, maxDano, controle);
+        case "TH30":
+        return new TH30(this, x, y, teclas, minDano, maxDano, controle);
       default:
         return new Ken(this, x, y, teclas, minDano, maxDano, controle);
     }

@@ -3,6 +3,7 @@ import SlenderMap from "../Mapasjs/SlenderMap.js";
 import Slenderman_IA from "../Objetos/Slenderman_IA.js";
 import DialogoHistoria from "../Objetos/DialogoHistoria.js";
 import IntroPartida from "../Objetos/IntroPartida.js";
+import CutsceneFinalSlenderman from "../Objetos/CutsceneFinalSlenderman.js";
 
 const FALAS_FJ = [
   { personagem: "FJ", retrato: "FJ_N", texto: "..." },
@@ -128,5 +129,7 @@ export default class CenaHistoria3 extends CenaHistoria {
     this.mapaAtual.iniciarMusica();
   }
 
-  aoVencerHistoria() {}
+  aoVencerHistoria() {
+    this.cutsceneFinalSlenderman = new CutsceneFinalSlenderman(this);
+  }
 }
