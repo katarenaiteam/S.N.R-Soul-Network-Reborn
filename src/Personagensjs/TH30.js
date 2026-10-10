@@ -198,7 +198,7 @@ this.nomePersonagem = "TH30";
         ],
       },
 
-      // Getup (Ken_getup - 105px de altura)
+      
       getup: {
         largura: 65,
         altura: 100,
