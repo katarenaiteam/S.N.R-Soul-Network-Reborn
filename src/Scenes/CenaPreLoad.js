@@ -8,6 +8,7 @@ export default class CenaPreload extends Phaser.Scene {
   }
 
   preload() {
+    this.load.maxParallelDownloads = 6;
     this.transicaoStartAtiva = false;
     this.podeAssinar = false;
     this.assinando = false;
@@ -46,8 +47,8 @@ export default class CenaPreload extends Phaser.Scene {
 
     let logLines = ["IDE0: LOADING GAME ASSETS..."];
 
-    this.load.on("fileprogress", (file) => {
-      logLines.push(`IDE0: ATTACHING ${file.key.toUpperCase()}... [OK]`);
+    this.load.on("filecomplete", (key) => {
+      logLines.push(`IDE0: ATTACHING ${key.toUpperCase()}... [OK]`);
       if (logLines.length > 16) logLines.shift();
       if (this.logText) this.logText.setText(logLines.join("\n"));
     });
