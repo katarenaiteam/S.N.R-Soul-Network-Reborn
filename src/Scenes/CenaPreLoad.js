@@ -8,7 +8,6 @@ export default class CenaPreload extends Phaser.Scene {
   }
 
   preload() {
-    this.load.maxParallelDownloads = 6;
     this.transicaoStartAtiva = false;
     this.podeAssinar = false;
     this.assinando = false;
@@ -92,36 +91,36 @@ export default class CenaPreload extends Phaser.Scene {
     //sons
     this.load.audio("mao-select", "assets/Menus/Char_menu/Audio/mao-select.wav");
     // - ficha
-    this.load.image("P1maoCficha", "/assets/Menus/Char_menu/Sprites/ficha/P1maoCficha.png");
-    this.load.image("P1maoSficha", "/assets/Menus/Char_menu/Sprites/ficha/P1maoSficha.png");
-    this.load.image("P1_ficha", "/assets/Menus/Char_menu/Sprites/ficha/P1_ficha.png");
-    this.load.image("P2maoCficha", "/assets/Menus/Char_menu/Sprites/ficha/P2maoCficha.png");
-    this.load.image("P2maoSficha", "/assets/Menus/Char_menu/Sprites/ficha/P2maoSficha.png");
-    this.load.image("P2_ficha", "/assets/Menus/Char_menu/Sprites/ficha/P2_ficha.png");
+    this.load.image("P1maoCficha", "./assets/Menus/Char_menu/Sprites/ficha/P1maoCficha.png");
+    this.load.image("P1maoSficha", "./assets/Menus/Char_menu/Sprites/ficha/P1maoSficha.png");
+    this.load.image("P1_ficha", "./assets/Menus/Char_menu/Sprites/ficha/P1_ficha.png");
+    this.load.image("P2maoCficha", "./assets/Menus/Char_menu/Sprites/ficha/P2maoCficha.png");
+    this.load.image("P2maoSficha", "./assets/Menus/Char_menu/Sprites/ficha/P2maoSficha.png");
+    this.load.image("P2_ficha", "./assets/Menus/Char_menu/Sprites/ficha/P2_ficha.png");
     // - baner
-    this.load.image("Aig_baner", "/assets/Menus/Char_menu/Sprites/baners/Aig_baner.png");
-    this.load.image("FJ_baner", "/assets/Menus/Char_menu/Sprites/baners/FJ_baner.png");
-    this.load.image("GK_baner", "/assets/Menus/Char_menu/Sprites/baners/GK_baner.png");
-    this.load.image("Ken_baner", "/assets/Menus/Char_menu/Sprites/baners/Ken_baner.png");
-    this.load.image("Miku_baner", "/assets/Menus/Char_menu/Sprites/baners/Miku_baner.png");
-    this.load.image("Pin_baner", "/assets/Menus/Char_menu/Sprites/baners/Pin_baner.png");
-    this.load.image("Slen_baner", "/assets/Menus/Char_menu/Sprites/baners/Slen_baner.png");
-    this.load.image("Spy_baner", "/assets/Menus/Char_menu/Sprites/baners/Spy_baner.png");
-    this.load.image("Stor_baner", "/assets/Menus/Char_menu/Sprites/baners/Stor_baner.png");
-    this.load.image("TH_baner", "/assets/Menus/Char_menu/Sprites/baners/TH_baner.png");
+    this.load.image("Aig_baner", "./assets/Menus/Char_menu/Sprites/baners/Aig_baner.png");
+    this.load.image("FJ_baner", "./assets/Menus/Char_menu/Sprites/baners/FJ_baner.png");
+    this.load.image("GK_baner", "./assets/Menus/Char_menu/Sprites/baners/GK_baner.png");
+    this.load.image("Ken_baner", "./assets/Menus/Char_menu/Sprites/baners/Ken_baner.png");
+    this.load.image("Miku_baner", "./assets/Menus/Char_menu/Sprites/baners/Miku_baner.png");
+    this.load.image("Pin_baner", "./assets/Menus/Char_menu/Sprites/baners/Pin_baner.png");
+    this.load.image("Slen_baner", "./assets/Menus/Char_menu/Sprites/baners/Slen_baner.png");
+    this.load.image("Spy_baner", "./assets/Menus/Char_menu/Sprites/baners/Spy_baner.png");
+    this.load.image("Stor_baner", "./assets/Menus/Char_menu/Sprites/baners/Stor_baner.png");
+    this.load.image("TH_baner", "./assets/Menus/Char_menu/Sprites/baners/TH_baner.png");
     // - icon
-    this.load.image("aigis-icon", "/assets/Menus/Char_menu/Sprites/icons/aigis-icon.png");
-    this.load.image("fj-icon", "/assets/Menus/Char_menu/Sprites/icons/fj-icon.png");
-    this.load.image("goku-icon", "/assets/Menus/Char_menu/Sprites/icons/goku-icon.png");
-    this.load.image("ken-icon", "/assets/Menus/Char_menu/Sprites/icons/ken-icon.png");
-    this.load.image("miku-icon", "/assets/Menus/Char_menu/Sprites/icons/miku-icon.png");
-    this.load.image("slender-icon", "/assets/Menus/Char_menu/Sprites/icons/slender-icon.png");
-    this.load.image("spider-icon", "/assets/Menus/Char_menu/Sprites/icons/spider-icon.png");
-    this.load.image("storm-icon", "/assets/Menus/Char_menu/Sprites/icons/storm-icon.png");
-    this.load.image("th-icon", "/assets/Menus/Char_menu/Sprites/icons/th-icon.png");
-    this.load.image("pingu-icon", "/assets/Menus/Char_menu/Sprites/icons/pingu-icon.png");
+    this.load.image("aigis-icon", "./assets/Menus/Char_menu/Sprites/icons/aigis-icon.png");
+    this.load.image("fj-icon", "./assets/Menus/Char_menu/Sprites/icons/fj-icon.png");
+    this.load.image("goku-icon", "./assets/Menus/Char_menu/Sprites/icons/goku-icon.png");
+    this.load.image("ken-icon", "./assets/Menus/Char_menu/Sprites/icons/ken-icon.png");
+    this.load.image("miku-icon", "./assets/Menus/Char_menu/Sprites/icons/miku-icon.png");
+    this.load.image("slender-icon", "./assets/Menus/Char_menu/Sprites/icons/slender-icon.png");
+    this.load.image("spider-icon", "./assets/Menus/Char_menu/Sprites/icons/spider-icon.png");
+    this.load.image("storm-icon", "./assets/Menus/Char_menu/Sprites/icons/storm-icon.png");
+    this.load.image("th-icon", "./assets/Menus/Char_menu/Sprites/icons/th-icon.png");
+    this.load.image("pingu-icon", "./assets/Menus/Char_menu/Sprites/icons/pingu-icon.png");
 
-    this.load.image("space-to", "/assets/Menus/Char_menu/Sprites/space-to.png");
+    this.load.image("space-to", "./assets/Menus/Char_menu/Sprites/space-to.png");
     
     this.load.image("thumb_skytowers", "assets/cenarios/MapaSkytowers/Sprites/thumb_skytowers.png");
     this.load.image("thumb_cidade", "assets/cenarios/MapaCidade/Sprites/thumb_cidade.png");
@@ -131,7 +130,7 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("thumb_slen", "assets/cenarios/SlenMap/thumb_slen.png");
 
     //versus
-   this.load.image("Vs-back", "/assets/Menus/Vs/Vs-back.png");
+   this.load.image("Vs-back", "./assets/Menus/Vs/Vs-back.png");
    this.load.spritesheet("Vss", "./assets/Menus/Vs/Vss.png", { frameWidth: 320, frameHeight: 240 });
   }
 
