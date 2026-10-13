@@ -538,8 +538,24 @@ const assetsTH30 = [
   (scene, queued) => queueAsset(scene, queued, "texture", "th_taunt", () => { scene.load.spritesheet("th_taunt", "assets/personagens/Th30/Sprites/th_taunt.png", { frameWidth: 147, frameHeight: 170 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "th_crouch", () => { scene.load.spritesheet("th_crouch", "assets/personagens/Th30/Sprites/th_crouch.png", { frameWidth: 107, frameHeight: 124 }); }),
 // atacks
-
-
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_atack1", () => { scene.load.spritesheet("th_atack1", "assets/personagens/Th30/Sprites/th_atack1.png", { frameWidth: 176, frameHeight: 133 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_atack2", () => { scene.load.spritesheet("th_atack2", "assets/personagens/Th30/Sprites/th_atack2.png", { frameWidth: 130, frameHeight: 151 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_atack3", () => { scene.load.spritesheet("th_atack3", "assets/personagens/Th30/Sprites/th_atack3.png", { frameWidth: 111, frameHeight: 188 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_sideAtack", () => { scene.load.spritesheet("th_sideAtack", "assets/personagens/Th30/Sprites/th_sideAtack.png", { frameWidth: 157, frameHeight: 130 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_downAtack", () => { scene.load.spritesheet("th_downAtack", "assets/personagens/Th30/Sprites/th_downAtack.png", { frameWidth: 224, frameHeight: 102 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_neutralAir", () => { scene.load.spritesheet("th_neutralAir", "assets/personagens/Th30/Sprites/th_neutralAir.png", { frameWidth: 161, frameHeight: 190 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_sideAir", () => { scene.load.spritesheet("th_sideAir", "assets/personagens/Th30/Sprites/th_sideAir.png", { frameWidth: 163, frameHeight: 128 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_upAir", () => { scene.load.spritesheet("th_upAir", "assets/personagens/Th30/Sprites/th_upAir.png", { frameWidth: 198, frameHeight: 183 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_downAir", () => { scene.load.spritesheet("th_downAir", "assets/personagens/Th30/Sprites/th_downAir.png", { frameWidth: 128, frameHeight: 176 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_neSpecial", () => { scene.load.spritesheet("th_neSpecial", "assets/personagens/Th30/Sprites/th_neSpecial.png", { frameWidth: 122, frameHeight: 148 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_AdoSpecial", () => { scene.load.spritesheet("th_AdoSpecial", "assets/personagens/Th30/Sprites/th_AdoSpecial.png", { frameWidth: 103, frameHeight: 100 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_sideS1", () => { scene.load.spritesheet("th_sideS1", "assets/personagens/Th30/Sprites/th_sideS1.png", { frameWidth: 207, frameHeight: 201 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_sideS2", () => { scene.load.spritesheet("th_sideS2", "assets/personagens/Th30/Sprites/th_sideS2.png", { frameWidth: 185, frameHeight: 188 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_dive", () => { scene.load.spritesheet("th_dive", "assets/personagens/Th30/Sprites/th_dive.png", { frameWidth: 113, frameHeight: 149 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_spike", () => { scene.load.spritesheet("th_spike", "assets/personagens/Th30/Sprites/th_spike.png", { frameWidth: 162, frameHeight: 169 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_soup", () => { scene.load.spritesheet("th_soup", "assets/personagens/Th30/Sprites/th_soup.png", { frameWidth: 116, frameHeight: 18 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_emerge", () => { scene.load.spritesheet("th_emerge", "assets/personagens/Th30/Sprites/th_emerge.png", { frameWidth: 118, frameHeight: 166 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "th_proj", () => { scene.load.spritesheet("th_proj", "assets/personagens/Th30/Sprites/th_proj.png", { frameWidth: 108, frameHeight: 124 }); }),
 
   //(scene, queued) => queueAsset(scene, queued, "audio", " ", () => { scene.load.audio("pingu-intro", "assets/personagens/Pingu/Audio/pingu-intro.wav"); }),
 ];
@@ -631,7 +647,7 @@ export function carregarAssetsVersus(scene, dados) {
 export function carregarAssetsHistoria(scene) {
   const queued = new Set();
   carregarGrupo(scene, queued, assetscommon);
-  for (const pack of [assetsFJ, assetsSpiderMan, assetsMiku, assetsKen, assetsSlenderman, assetsPingu]) {
+  for (const pack of [assetsFJ, assetsSpiderMan, assetsMiku, assetsKen, assetsSlenderman, assetsPingu, assetsTH30]) {
     carregarGrupo(scene, queued, pack);
   }
   carregarGrupo(scene, queued, assetsMikuMap);

@@ -14,14 +14,14 @@ export default class EstadoIdle extends EstadoBase {
       return;
     }
 
+    const apertouSpecialAgora = this.personagem.inputJustDown("special");
+    const apertouAtaqueAgora = this.personagem.inputJustDown("atack");
+
     // 1. Transição para AGACHADO
-    // Nao troca para crouch antes de consumir baixo + ataque/special.
-    // Caso as teclas cheguem no mesmo frame, a troca antecipada fazia o
-    // JustDown da acao ser perdido no frame seguinte.
     if (
       this.personagem.inputDown("baixo") &&
-      !this.personagem.inputJustDown("special") &&
-      !this.personagem.inputJustDown("atack")
+      !apertouSpecialAgora &&
+      !apertouAtaqueAgora
     ) {
       this.personagem.maquinaEstados.mudarEstado("crouch");
       return;
@@ -39,9 +39,9 @@ export default class EstadoIdle extends EstadoBase {
     }
 
     // ⚡ 4. ULTIMATE
-    const apertouAtack = this.personagem.inputJustDown("atack") || this.personagem.inputDown("atack");
-    const apertouSpecial = this.personagem.inputJustDown("special") || this.personagem.inputDown("special");
-    const intencaoUlt = (this.personagem.inputJustDown("atack") || this.personagem.inputJustDown("special")) && apertouAtack && apertouSpecial;
+    const apertouAtack = apertouAtaqueAgora || this.personagem.inputDown("atack");
+    const apertouSpecial = apertouSpecialAgora || this.personagem.inputDown("special");
+    const intencaoUlt = (apertouAtaqueAgora || apertouSpecialAgora) && apertouAtack && apertouSpecial;
 
     const podeUsar = typeof this.personagem.podeUsarUlt === "function" 
       ? this.personagem.podeUsarUlt() 
@@ -54,7 +54,7 @@ export default class EstadoIdle extends EstadoBase {
     }
 
     // 5. SPECIAL (Se a Ult não executou, tenta o Especial)
-    if (this.personagem.inputJustDown("special")) {
+    if (apertouSpecialAgora) {
       const tipoSpecial = this.personagem.obterTipoSpecial ? this.personagem.obterTipoSpecial() : "neutro";
 
       if (this.personagem.podeUsarSpecial(tipoSpecial)) {
@@ -64,7 +64,7 @@ export default class EstadoIdle extends EstadoBase {
     }
 
     // 6. ATAQUE NORMAL (Se a Ult não executou, tenta o Ataque)
-    if (this.personagem.inputJustDown("atack")) {
+    if (apertouAtaqueAgora) {
       const tipoAtaque = this.personagem.obterTipoAtaque ? this.personagem.obterTipoAtaque() : "neutro1";
 
       if (this.personagem.podeUsarAtaque(tipoAtaque)) {

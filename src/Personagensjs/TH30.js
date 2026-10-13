@@ -1,4 +1,9 @@
 import Personagem from "./Personagem.js";
+import TH30NeSpecial from "./Specials/TH30/NeSpecial.js";
+import TH30SideSpecial from "./Specials/TH30/SideSpecial.js";
+import TH30DoSpecial from "./Specials/TH30/DoSpecial.js";
+import TH30AupSpecial from "./Specials/TH30/AupSpecial.js";
+import TH30AdownSpecial from "./Specials/TH30/AdownSpecial.js";
 
 
 export default class TH30 extends Personagem {
@@ -61,8 +66,8 @@ this.nomePersonagem = "TH30";
         offsetY: 12,
         escala: 1,
         hurtboxes: [
-          { largura: 50, altura: 60, offsetX: 0, offsetY: -70 },
-          { largura: 67, altura: 35, offsetX: 0, offsetY: -18 },
+          { largura: 45, altura: 60, offsetX: 5, offsetY: -70 },
+          { largura: 60, altura: 35, offsetX: 5, offsetY: -18 },
         ],
       },
 
@@ -73,20 +78,21 @@ this.nomePersonagem = "TH30";
         offsetY: -11,
         escala: 1,
         hurtboxes: [
-          { largura: 50, altura: 60, offsetX: 0, offsetY: -70 },
+          { largura: 55, altura: 68, offsetX: 29, offsetY: -70 },
           { largura: 60, altura: 35, offsetX: 0, offsetY: -18 },
         ],
       },
 
       jump: {
+        offsetVisualY: 10,
         largura: 65,
         altura: 120,
-        offsetX: 20,
+        offsetX: 21,
         offsetY: 68,
         escala: 1,
         hurtboxes: [
-          { largura: 45, altura: 70, offsetX: 0, offsetY: -90 },
-          { largura: 30, altura: 50, offsetX: -5, offsetY: -25 },
+          { largura: 45, altura: 70, offsetX: 7, offsetY: -90 },
+          { largura: 30, altura: 50, offsetX: 7, offsetY: -25 },
         ],
       },
 
@@ -96,29 +102,29 @@ this.nomePersonagem = "TH30";
         largura: 80,
         altura: 60,
         offsetX: 11,
-        offsetY: 60,
+        offsetY: 62,
         escala: 1,
         hurtboxes: [
-          { largura: 65, altura: 60, offsetX: 0, offsetY: -35 },
+          { largura: 60, altura: 70, offsetX: -5, offsetY: -40 },
         ],
       },
 
       stun: {
         largura: 65,
         altra: 60,
-        offsetX: 5,
+        offsetX: 32,
         offsetY: 0,
         escuala: 1,
         hurtboxes: [
-          { largura: 65, altura: 100, offsetX: 0, offsetY: -55 },
+          { largura: 75, altura: 70, offsetX: 20, offsetY: -40 },
         ],
       },
 
       dash: {
         largura: 70,
-        altura: 80,
+        altura: 120,
         offsetX: 30,
-        offsetY: 43,
+        offsetY: 5,
         escala: 1,
         hurtboxes: [
            ],
@@ -131,65 +137,78 @@ this.nomePersonagem = "TH30";
         offsetY: 12,
         escala: 1,
         hurtboxes: [
-          { largura: 45, altura: 50, offsetX: -5, offsetY: -75 },
-          { largura: 50, altura: 50, offsetX: -5, offsetY: -25 },
+          { largura: 45, altura: 65, offsetX: -5, offsetY: -85 },
+          { largura: 55, altura: 50, offsetX: -5, offsetY: -25 },
+        ],
+      },
+
+      taunt: {
+        largura: 65,
+        altura: 120,
+        offsetX: 46,
+        offsetY: 47,
+        escala: 1,
+        hurtboxes: [
+          { largura: 45, altura: 65, offsetX: -5, offsetY: -85 },
+          { largura: 55, altura: 50, offsetX: -5, offsetY: -25 },
         ],
       },
 
         dano: {
   largura: 65,
   altura: 120,
-  offsetX: 10,
+  offsetX: 30,
   offsetY: 10,
   escala: 1,
   hurtboxes: [
-    { largura: 50, altura: 65, offsetX: -10, offsetY: -60 }, // Tronco inclinado
-    { largura: 50, altura: 30, offsetX: 0, offsetY: -15 },   // Pernas
+    { largura: 50, altura: 65, offsetX: -5, offsetY: -80 }, // Tronco inclinado
+    { largura: 50, altura: 30, offsetX: 15, offsetY: -25 },   // Pernas
   ],
 },
 
       danoUp: {
         largura: 65,
         altura: 120,
-        offsetX: 0,
-        offsetY: 5,
+        offsetX: 40,
+        offsetY: 50,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 70, offsetX: 20, offsetY: -80 },
-          { largura: 45, altura: 40, offsetX: 0, offsetY: -15 },
+          { largura: 70, altura: 60, offsetX: -30, offsetY: -80 },
+          { largura: 45, altura: 40, offsetX: 20, offsetY: -30 },
         ],
       },
 
       danoSide: {
         largura: 65,
         altura: 100,
-        offsetX: 0,
-        offsetY: 5,
+        offsetX: 40,
+        offsetY: 45,
         escala: 1,
         hurtboxes: [
-          { largura: 65, altura: 55, offsetX: -15, offsetY: -90 }, // Tronco inclinado
-          { largura: 50, altura: 45, offsetX: 30, offsetY: -70 },   // Pernas
+          { largura: 70, altura: 60, offsetX: -30, offsetY: -80 },
+          { largura: 45, altura: 40, offsetX: 20, offsetY: -30 },
         ],
       },
 
       danoDown: {
         largura: 65,
         altura: 100,
-        offsetX: 0,
-        offsetY: 35,
+        offsetX: 40,
+        offsetY: 55,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 65, offsetX: -10, offsetY: -60 }, 
-          { largura: 50, altura: 45, offsetX: 0, offsetY: -10 },
+          { largura: 70, altura: 60, offsetX: -10, offsetY: -70 },
+      
         ],
       },
 
-      // Dead (Ken_dead - 76px de altura)
+ 
       dead: {
+        offsetVisualY: 20,
         largura: 80,
         altura: 33,
-        offsetX: 49,
-        offsetY: 40,
+        offsetX: 35,
+        offsetY: 50,
         escala: 1,
         hurtboxes: [
           { largura: 100, altura: 34, offsetX: -10, offsetY: -18 },
@@ -203,16 +222,17 @@ this.nomePersonagem = "TH30";
         largura: 65,
         altura: 100,
         offsetX: 30,
-        offsetY: 2,
+        offsetY: 64,
         escala: 1,
         hurtboxes: [],
       },
 
       atack1: {
+        offsetVisualX:25,
         largura: 65,
         altura: 120,
-        offsetX: 41,
-        offsetY: -10,
+        offsetX: 60,
+        offsetY: 12,
         escala: 1,
         hurtboxes: [
           { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
@@ -223,8 +243,8 @@ this.nomePersonagem = "TH30";
       atack2: {
         largura: 65,
         altura: 120,
-        offsetX: 61,
-        offsetY: -10,
+        offsetX: 37,
+        offsetY: 30,
         escala: 1,
         hurtboxes: [
           { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
@@ -235,25 +255,24 @@ this.nomePersonagem = "TH30";
       atack3: {
         largura: 65,
         altura: 120,
-        offsetX: 70,
-        offsetY: 0,
+        offsetX: 28,
+        offsetY: 67,
         escala: 1,
         hurtboxes: [
           { largura: 45, altura: 60, offsetX: 0, offsetY: -70 },
-          { largura: 35, altura: 35, offsetX: 17, offsetY: -18 },
+          { largura: 45, altura: 35, offsetX: 5, offsetY: -18 },
         ],
       },
 
       neutralAir: {
-  
+        offsetVisualY: 10,
         largura: 65,
         altura: 120,
-        offsetX: 22,
-        offsetY: -5,
+        offsetX: 52,
+        offsetY: 68,
         escala: 1,
         hurtboxes: [
           { largura: 50, altura: 55, offsetX: 1, offsetY: -85 },
-          { largura: 60, altura: 25, offsetX: -4, offsetY: -40 },
         ],
       },
 
@@ -261,52 +280,120 @@ this.nomePersonagem = "TH30";
     
         largura: 65,
         altura: 120,
-        offsetX: 30,
-        offsetY: 0,
+        offsetX: 51,
+        offsetY: 9,
         escala: 1,
-        hurtboxes: [{ largura: 60, altura: 100, offsetX: -20, offsetY: -50 }],
+        hurtboxes: [{ largura: 60, altura: 100, offsetX: 10, offsetY: -50 }],
+      },
+
+      sideS2: {
+        largura: 65,
+        altura: 120,
+        offsetX: 64,
+        offsetY: 66,
+        escala: 1,
+        hurtboxes: [
+          { largura: 55, altura: 75, offsetX: 0, offsetY: -82 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -35 },
+        ],
       },
 
       downAtack: {
+        offsetVisualX:15,
         largura: 65,
         altura: 60,
-        offsetX: 36,
-        offsetY: 12,
+        offsetX: 85,
+        offsetY: 37,
         escala: 1,
-        hurtboxes: [{ largura: 50, altura: 60, offsetX: -10, offsetY: -30 }],
+        hurtboxes: [{ largura: 60, altura: 65, offsetX: -40, offsetY: -35 }],
       },
 
       sideAir: {
         largura: 65,
         altura: 120,
-        offsetX: 25,
-        offsetY: -11,
+        offsetX: 53,
+        offsetY: 7,
         escala: 1,
-        hurtboxes: [{ largura: 55, altura: 80, offsetX: -20, offsetY: -65 }],
+        hurtboxes: [{ largura: 55, altura: 80, offsetX: 10, offsetY: -65 }],
       },
 
       upAir: {  
+        offsetVisualX:20,
         largura: 65,
         altura: 120,
-        offsetX: 19,
-        offsetY: -5,
+        offsetX: 72,
+        offsetY: 60,
         escala: 1,
-        hurtboxes: [{ largura: 45, altura: 80, offsetX: -20, offsetY: -70 }],
+        hurtboxes: [{ largura: 55, altura: 110, offsetX: -15, offsetY: -70 }],
       },
 
       downAir: {
         largura: 65,
         altura: 120,
-        offsetX: 12,
-        offsetY: 12,
+        offsetX: 35,
+        offsetY: 58,
         escala: 1,
-        hurtboxes: [{ largura: 60, altura: 80, offsetX: -10, offsetY: -70 }],
+        hurtboxes: [{ largura: 60, altura: 80, offsetX: -5, offsetY: -90 }],
       },
-    };
 
-    // Frame de intro 92x108; idle 78x111, ambos ancorados pelos pes.
-    this.configAnimacoes.intro = {
-      ...this.configAnimacoes.idle, offsetX: 7, offsetY: -13,
+      neSpecial: {  
+        offsetVisualY:0,
+        largura: 65,
+        altura: 120,
+        offsetX: 33,
+        offsetY: 26,
+        escala: 1,
+        hurtboxes: [{ largura: 45, altura: 120, offsetX: 0, offsetY: -60 }],
+      },
+
+      intro: {
+        largura: 65,
+        altura: 120,
+        offsetX: 7,
+        offsetY: -13,
+        escala: 1,
+        hurtboxes: [
+          { largura: 45, altura: 60, offsetX: 5, offsetY: -70 },
+          { largura: 60, altura: 35, offsetX: 5, offsetY: -18 },
+        ],
+      },
+
+      dive: {
+        offsetVisualY: 5,
+        largura: 65,
+        altura: 120,
+        offsetX: 24,
+        offsetY: 29,
+        escala: 1,
+        hurtboxes: [
+          
+          { largura: 55, altura: 40, offsetX: 5, offsetY: -30 },
+        ],
+      },
+
+      spike: {
+        largura: 65,
+        altura: 120,
+        offsetX: 48,
+        offsetY: 49,
+        escala: 1,
+        hurtboxes: [
+          { largura: 45, altura: 60, offsetX: 5, offsetY: -70 },
+          { largura: 60, altura: 35, offsetX: 5, offsetY: -18 },
+        ],
+      },
+
+      AdoSpecial: {
+        largura: 65,
+        altura: 100,
+        offsetX: 19,
+        offsetY: 0,
+        escala: 1,
+        hurtboxes: [
+          { largura: 45, altura: 55, offsetX: 5, offsetY: -68 },
+          { largura: 55, altura: 30, offsetX: 5, offsetY: -30 },
+        ],
+      },
     };
 
   //  this.sons = {
@@ -320,10 +407,10 @@ this.nomePersonagem = "TH30";
     // ============================ tabela de golpes =====================================
     this.golpes = {
       neutro1: {
-        animacao: "ken_atack1",
-        frameHitbox: 2,
-        offsetX: 40,
-        offsetY: -80,
+        animacao: "th_atack1",
+        frameHitbox: 4,
+        offsetX: 50,
+        offsetY: -75,
         largura: 75,
         altura: 20,
         cooldown: 700,
@@ -351,14 +438,14 @@ this.nomePersonagem = "TH30";
       },
 
       neutro2: {
-        animacao: "ken_atack2",
+        animacao: "th_atack2",
 
         frameHitbox: 2,
 
-        offsetX: 40,
-        offsetY: -80,
-        largura: 73,
-        altura: 25,
+        offsetX: 45,
+        offsetY: -30,
+        largura: 25,
+        altura: 65,
         duracao: 400,
         cancelavel: true,
         propriedades: {
@@ -376,14 +463,14 @@ this.nomePersonagem = "TH30";
       },
 
       neutro3: {
-        animacao: "ken_atack3",
+        animacao: "th_atack3",
 
         frameHitbox: 3,
 
         offsetX: 50,
         offsetY: -72,
-        largura: 80,
-        altura: 36,
+        largura: 35,
+        altura: 80,
         duracao: 600,
         cancelavel: true,
 
@@ -407,11 +494,11 @@ this.nomePersonagem = "TH30";
       },
 
       side: {
-        animacao: "ken_sideAtack",
+        animacao: "th_sideAtack",
         frameHitbox: 4,
         offsetX: 40,
-        offsetY: -57,
-        largura: 80,
+        offsetY: -65,
+        largura: 75,
         altura: 25,
         cooldown: 900,
         duracao: 500,
@@ -423,6 +510,7 @@ this.nomePersonagem = "TH30";
         ],
 
         propriedades: {
+          travarMovimentoAir: true,
           tipoSomImpacto: "heavy",
           dano: 12,
           knockbackX: 630,
@@ -431,12 +519,12 @@ this.nomePersonagem = "TH30";
         },
       },
      agachado: {
-        animacao: "ken_downAtack",
+        animacao: "th_downAtack",
         frameHitbox: 3,
-        offsetX: 26,
-        offsetY: -20,
-        largura: 70,
-        altura: 25,
+        offsetX: 35,
+        offsetY: -40,
+        largura: 100,
+        altura: 35,
         cooldown: 900,
         duracao: 400,
         cancelavel: true,
@@ -451,17 +539,16 @@ this.nomePersonagem = "TH30";
           knockbackX: 90,
           knockbackY: -400,
           tumbling: true,
-          knockbackFixo: true,
         },
       },
 
         air_neutro: {
-        animacao: "ken_neutralAir",
+        animacao: "th_neutralAir",
         frameHitbox: 3,
-        offsetX: 48,
-        offsetY: -85,
-        largura: 70,
-        altura: 25,
+        offsetX: 0,
+        offsetY: -115,
+        largura: 130,
+        altura: 35,
         cooldown: 900,
         duracao: 350,
          finalizarAoTocarChao: true,
@@ -484,12 +571,12 @@ this.nomePersonagem = "TH30";
 
 
       air_side: {
-        animacao: "ken_sideAir",
+        animacao: "th_sideAir",
         frameHitbox: 3,
         offsetX: 26,
-        offsetY: -50,
-        largura: 75,
-        altura: 30,
+        offsetY: -80,
+        largura: 35,
+        altura: 50,
         cooldown: 900,
         duracao: 600,
          finalizarAoTocarChao: true,
@@ -509,12 +596,12 @@ this.nomePersonagem = "TH30";
         },
       },
       air_cima: {
-        animacao: "ken_upAir",
+        animacao: "th_upAir",
         frameHitbox: 3,
-        offsetX: 20,
+        offsetX: 30,
         offsetY: -84,
-        largura: 70,
-        altura: 30,
+        largura: 30,
+        altura: 80,
         cooldown: 900,
         duracao: 600,
          finalizarAoTocarChao: true,
@@ -535,7 +622,7 @@ this.nomePersonagem = "TH30";
         },
       },
       air_agachado: {
-        animacao: "ken_downAir",
+        animacao: "th_downAir",
         frameHitbox: 3,
         offsetX: 35,
         offsetY: -15,
@@ -579,7 +666,143 @@ this.nomePersonagem = "TH30";
     }
 
     // specials
-    //this.specials = {};
+    this.specials = {
+      lado: {
+        animacao: "th_sideS2",
+        logica: TH30SideSpecial,
+        duracao: 1800,
+        cooldown: 1800,
+        cancelavel: false,
+        hitboxes: {
+          3: { largura: 60, altura: 45, offsetX: 50, offsetY: -95 },
+          6: { largura: 60, altura: 55, offsetX: 45, offsetY: -95 },
+          10: { largura: 60, altura: 65, offsetX: 50, offsetY: -105 },
+          14: { largura: 60, altura: 105, offsetX: 25, offsetY: -120 },
+          21: { largura: 145, altura: 120, offsetX: 20, offsetY: -100 },
+        },
+        propriedades: {
+          tipoSomImpacto: "heavy",
+          dano: 25,
+          knockbackX: 400,
+          knockbackY: -500,
+          tumbling: true,
+        },
+      },
+      agachado: {
+        animacao: "th_dive",
+        logica: TH30DoSpecial,
+        duracao: 8500,
+        cooldown: 1600,
+        cancelavel: false,
+        hitbox: {
+          largura: 140,
+          altura: 130,
+          offsetX: 0,
+          offsetY: -70,
+        },
+        propriedades: {
+          travarMovimentoAir: true,
+          tipoSomImpacto: "heavy",
+          dano: 14,
+          knockbackX: 120,
+          knockbackY: -350,
+          tumbling: true,
+        },
+      },
+      neutro: {
+        animacao: "th_neSpecial",
+        logica: TH30NeSpecial,
+        duracao: 700,
+        cooldown: 1200,
+        cancelavel: false,
+        velocidadeProjetil: 1100,
+        tempoMaximoProjetil: 5000,
+        escalaProjetil: 1,
+        alphaProjetil: 1,
+        quadroProjetil: 5,
+        offsetProjetilX: 24,
+        offsetProjetilY: -68,
+        offsetEfeitoX: 80,
+        offsetEfeitoY: -68,
+        escalaEfeito: 1.1,
+        larguraProjetil: 40,
+        alturaProjetil: 36,
+        propriedades: {
+          dano: 10,
+          knockbackX: 360,
+          knockbackY: -200,
+          tipoSomImpacto: "heavy",
+        },
+      },
+      air_cima: {
+        animacao: "th_AdoSpecial",
+        logica: TH30AupSpecial,
+        cooldown: 2200,
+        cancelavel: false,
+        hitbox: {
+          largura: 90,
+          altura: 100,
+          offsetX: 0,
+          offsetY: -80,
+        },
+        propriedades: {
+          travarMovimentoAir: true,
+          tipoSomImpacto: "heavy",
+          dano: 10,
+          knockbackX: 260,
+          knockbackY: -520,
+          tumbling: true,
+        },
+      },
+      air_agachado: {
+        animacao: "th_AdoSpecial_down",
+        logica: TH30AdownSpecial,
+        cooldown: 2200,
+        cancelavel: false,
+        hitbox: {
+          largura: 90,
+          altura: 100,
+          offsetX: 0,
+          offsetY: 20,
+        },
+        propriedades: {
+          travarMovimentoAir: true,
+          tipoSomImpacto: "heavy",
+          dano: 10,
+          knockbackX: 260,
+          knockbackY: 520,
+          tumbling: true,
+        },
+      },
+    };
+    this.specials.air_lado = {
+      ...this.specials.lado,
+      animacao: "th_sideS2_air",
+      chaveCooldown: "lado",
+      multiplicadorAvanco: 2.4,
+      propriedades: {
+        ...this.specials.lado.propriedades,
+        travarMovimentoAir: true,
+      },
+    };
+    this.specials.air_neutro = {
+      ...this.specials.neutro,
+      animacao: "th_neSpecial_air",
+      chaveCooldown: "neutro",
+      duracao: 400,
+      quantidadeProjeteis: 3,
+      velocidadesProjetilY: [-220, 0, 220],
+      velocidadeProjetil: 650,
+      tempoMaximoProjetil: 300,
+      escalaProjetil: 1.15,
+      larguraProjetil: 42,
+      alturaProjetil: 42,
+      offsetCorpoProjetilY: 41,
+      propriedades: {
+        ...this.specials.neutro.propriedades,
+        travarMovimentoAir: true,
+      },
+    };
 
 
     //this.ult = {};
@@ -620,6 +843,33 @@ if (!scene.anims.exists("punch_effect3")) {
 }
 
 // personagem
+
+if (!scene.anims.exists("th_dive")) {
+  scene.anims.create({
+    key: "th_dive",
+    frames: scene.anims.generateFrameNumbers("th_dive", { start: 0, end: 10 }),
+    frameRate: 24,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("th_soup_loop")) {
+  scene.anims.create({
+    key: "th_soup_loop",
+    frames: scene.anims.generateFrameNumbers("th_soup", { start: 0, end: 5 }),
+    frameRate: 10,
+    repeat: -1,
+  });
+}
+
+if (!scene.anims.exists("th_spike")) {
+  scene.anims.create({
+    key: "th_spike",
+    frames: scene.anims.generateFrameNumbers("th_spike", { start: 0, end: 15 }),
+    frameRate: 24,
+    repeat: 0,
+  });
+}
 
     if (scene.anims.exists("th_idle")) return;
 
@@ -719,7 +969,7 @@ if (!scene.anims.exists("punch_effect3")) {
       key: "th_taunt",
       frames: scene.anims.generateFrameNumbers("th_taunt", {
         start: 0,
-        end: 13,
+        end: 9,
       }),
       frameRate: 12,
       repeat: 0,
@@ -751,7 +1001,7 @@ if (!scene.anims.exists("punch_effect3")) {
 
 scene.anims.create({
   key: "th_danoDown",
-  frames: scene.anims.generateFrameNumbers("th_hurt2", { start: 2, end: 3 }),
+  frames: scene.anims.generateFrameNumbers("th_hurt1", { start: 3, end: 5 }),
   frameRate: 12,
   repeat: 0,
 });
@@ -774,6 +1024,147 @@ scene.anims.create({
   key: "th_stun",
   frames: scene.anims.generateFrameNumbers("th_stun", { start: 0, end: 3 }),
   frameRate: 8,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "th_atack1",
+  frames: scene.anims.generateFrameNumbers("th_atack1", { start: 0, end: 6 }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "th_atack2",
+  frames: scene.anims.generateFrameNumbers("th_atack2", { start: 0, end: 3 }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "th_atack3",
+  frames: scene.anims.generateFrameNumbers("th_atack3", { start: 0, end: 8 }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "th_sideAtack",
+  frames: scene.anims.generateFrameNumbers("th_sideAtack", { start: 0, end: 6 }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "th_downAtack",
+  frames: scene.anims.generateFrameNumbers("th_downAtack", { start: 0, end: 7 }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "th_AdoSpecial",
+  frames: scene.anims.generateFrameNumbers("th_AdoSpecial", { start: 0, end: 7 }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+if (!scene.anims.exists("th_AdoSpecial_down")) {
+  scene.anims.create({
+    key: "th_AdoSpecial_down",
+    frames: scene.anims.generateFrameNumbers("th_AdoSpecial", { start: 0, end: 11 }),
+    frameRate: 12,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("th_neSpecial")) {
+  scene.anims.create({
+    key: "th_neSpecial",
+    frames: scene.anims.generateFrameNumbers("th_neSpecial", { start: 0, end: 8 }),
+    frameRate: 16,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("th_neSpecial_air")) {
+  scene.anims.create({
+    key: "th_neSpecial_air",
+    frames: scene.anims.generateFrameNumbers("th_neSpecial", { start: 0, end: 8 }),
+    frameRate: 24,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("th_sideS2")) {
+  scene.anims.create({
+    key: "th_sideS2",
+    frames: scene.anims.generateFrameNumbers("th_sideS2", { start: 0, end: 21 })
+      .map((frame) => ({
+        ...frame,
+        duration: frame.frame === 10 || frame.frame === 21 ? 180 : 55,
+      })),
+    frameRate: 18,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("th_sideS2_air")) {
+  scene.anims.create({
+    key: "th_sideS2_air",
+    frames: scene.anims.generateFrameNumbers("th_sideS2", { start: 0, end: 21 })
+      .map((frame) => ({
+        ...frame,
+        duration: frame.frame === 10 || frame.frame === 21 ? 90 : 35,
+      })),
+    frameRate: 18,
+    repeat: 0,
+  });
+}
+
+if (!scene.anims.exists("th_proj_voo")) {
+  scene.anims.create({
+    key: "th_proj_voo",
+    frames: scene.anims.generateFrameNumbers("th_proj", { start: 0, end: 17 }),
+    frameRate: 18,
+    repeat: -1,
+  });
+}
+
+if (!scene.anims.exists("th_proj_explosao")) {
+  scene.anims.create({
+    key: "th_proj_explosao",
+    frames: scene.anims.generateFrameNumbers("th_proj", { start: 18, end: 24 }),
+    frameRate: 18,
+    repeat: 0,
+  });
+}
+
+scene.anims.create({
+  key: "th_neutralAir",
+  frames: scene.anims.generateFrameNumbers("th_neutralAir", { start: 0, end: 4 }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "th_sideAir",
+  frames: scene.anims.generateFrameNumbers("th_sideAir", { start: 0, end: 7}),
+  frameRate: 12,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "th_upAir",
+  frames: scene.anims.generateFrameNumbers("th_upAir", { start: 0, end: 5 }),
+  frameRate: 12,
+  repeat: 0,
+});
+
+scene.anims.create({
+  key: "th_downAir",
+  frames: scene.anims.generateFrameNumbers("th_downAir", { start: 0, end: 12 }),
+  frameRate: 12,
   repeat: 0,
 });
 

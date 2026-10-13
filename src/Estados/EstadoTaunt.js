@@ -53,7 +53,7 @@ export default class EstadoTaunt extends EstadoBase {
   verificarInputsAtivos() {
     if (this.personagem.tentarAcaoDashDefesa()) return true;
 
-    const inputs = ["esquerda", "direita", "cima", "baixo", "atack", "special"];
+    const inputs = ["esquerda", "direita", "cima", "atack", "special"];
 
     for (const inputKey of inputs) {
       if (this.personagem.inputJustDown(inputKey) || this.personagem.inputDown(inputKey)) {
@@ -77,12 +77,7 @@ export default class EstadoTaunt extends EstadoBase {
           return true;
         }
 
-        // Direcionais/Abaixar
-        if (this.personagem.inputDown("baixo")) {
-          this.personagem.maquinaEstados.mudarEstado("crouch");
-          return true;
-        }
-
+        // Direcionais
         if (this.personagem.inputDown("esquerda") || this.personagem.inputDown("direita")) {
           this.personagem.maquinaEstados.mudarEstado("walk");
           return true;
