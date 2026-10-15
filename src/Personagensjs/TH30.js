@@ -4,6 +4,7 @@ import TH30SideSpecial from "./Specials/TH30/SideSpecial.js";
 import TH30DoSpecial from "./Specials/TH30/DoSpecial.js";
 import TH30AupSpecial from "./Specials/TH30/AupSpecial.js";
 import TH30AdownSpecial from "./Specials/TH30/AdownSpecial.js";
+import TH30Ult from "./Ult/TH30Ult.js";
 
 
 export default class TH30 extends Personagem {
@@ -124,7 +125,7 @@ this.nomePersonagem = "TH30";
         largura: 70,
         altura: 120,
         offsetX: 30,
-        offsetY: 5,
+        offsetY: 3,
         escala: 1,
         hurtboxes: [
            ],
@@ -222,7 +223,7 @@ this.nomePersonagem = "TH30";
         largura: 65,
         altura: 100,
         offsetX: 30,
-        offsetY: 64,
+        offsetY: 70,
         escala: 1,
         hurtboxes: [],
       },
@@ -378,7 +379,7 @@ this.nomePersonagem = "TH30";
         offsetY: 49,
         escala: 1,
         hurtboxes: [
-          { largura: 45, altura: 60, offsetX: 5, offsetY: -70 },
+        
           { largura: 60, altura: 35, offsetX: 5, offsetY: -18 },
         ],
       },
@@ -386,12 +387,23 @@ this.nomePersonagem = "TH30";
       AdoSpecial: {
         largura: 65,
         altura: 100,
-        offsetX: 19,
+        offsetX: 23,
         offsetY: 0,
         escala: 1,
         hurtboxes: [
           { largura: 45, altura: 55, offsetX: 5, offsetY: -68 },
           { largura: 55, altura: 30, offsetX: 5, offsetY: -30 },
+        ],
+      },
+      AupSpecial: {
+        largura: 65,
+        altura: 100,
+        offsetX: 23,
+        offsetY: 0,
+        escala: 1,
+        hurtboxes: [
+          { largura: 45, altura: 55, offsetX: 5, offsetY: -78 },
+          { largura: 55, altura: 30, offsetX: 5, offsetY: -40 },
         ],
       },
     };
@@ -409,12 +421,12 @@ this.nomePersonagem = "TH30";
       neutro1: {
         animacao: "th_atack1",
         frameHitbox: 4,
-        offsetX: 50,
+        offsetX: 55,
         offsetY: -75,
         largura: 75,
         altura: 20,
         cooldown: 700,
-        duracao: 350,
+        duracao: 300,
         cancelavel: true,
 
          vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
@@ -428,13 +440,13 @@ this.nomePersonagem = "TH30";
           knockbackX: 20,
           knockbackY: -20,
           knockbackFixo: true,
-          hitstunFrames: 25,
+          hitstunFrames: 35,
           hitsSemDecay: 3
         },
 
         comboProximo: "neutro2",
         comboJanelaInicio: 100,
-        comboJanelaFim: 350,
+        comboJanelaFim: 300,
       },
 
       neutro2: {
@@ -444,7 +456,7 @@ this.nomePersonagem = "TH30";
 
         offsetX: 45,
         offsetY: -30,
-        largura: 25,
+        largura: 35,
         altura: 65,
         duracao: 400,
         cancelavel: true,
@@ -454,7 +466,7 @@ this.nomePersonagem = "TH30";
           knockbackX: 40,
           knockbackY: -30,
           knockbackFixo: true,
-          hitstunFrames: 25,
+          hitstunFrames: 30,
         },
 
         comboProximo: "neutro3",
@@ -468,7 +480,7 @@ this.nomePersonagem = "TH30";
         frameHitbox: 3,
 
         offsetX: 50,
-        offsetY: -72,
+        offsetY: -92,
         largura: 35,
         altura: 80,
         duracao: 600,
@@ -485,10 +497,10 @@ this.nomePersonagem = "TH30";
         propriedades: {
            tipoSomImpacto: "heavy",
           dano: 8,
-          knockbackX: 490,
-          knockbackY: -434,
+          knockbackX: 350,
+          knockbackY: -494,
           tumbling: true,
-          hitstunMinFrames:25,
+          hitstunMinFrames:35,
           
         },
       },
@@ -498,7 +510,7 @@ this.nomePersonagem = "TH30";
         frameHitbox: 4,
         offsetX: 40,
         offsetY: -65,
-        largura: 75,
+        largura: 67,
         altura: 25,
         cooldown: 900,
         duracao: 500,
@@ -508,6 +520,18 @@ this.nomePersonagem = "TH30";
            ],
           },
         ],
+
+         movimento: {
+    inicio: 80,
+    fim: 900,
+    x: {
+      de: 500,
+      para: 600,
+    },
+   
+
+    curva: "easeOut",
+  },
 
         propriedades: {
           travarMovimentoAir: true,
@@ -736,6 +760,7 @@ this.nomePersonagem = "TH30";
       },
       air_cima: {
         animacao: "th_AdoSpecial",
+        configuracaoAnimacao: "AupSpecial",
         logica: TH30AupSpecial,
         cooldown: 2200,
         cancelavel: false,
@@ -756,14 +781,15 @@ this.nomePersonagem = "TH30";
       },
       air_agachado: {
         animacao: "th_AdoSpecial_down",
+        configuracaoAnimacao: "AdoSpecial",
         logica: TH30AdownSpecial,
         cooldown: 2200,
         cancelavel: false,
         hitbox: {
-          largura: 90,
-          altura: 100,
+          largura: 65,
+          altura: 120,
           offsetX: 0,
-          offsetY: 20,
+          offsetY: 35,
         },
         propriedades: {
           travarMovimentoAir: true,
@@ -778,6 +804,7 @@ this.nomePersonagem = "TH30";
     this.specials.air_lado = {
       ...this.specials.lado,
       animacao: "th_sideS2_air",
+      configuracaoAnimacao: "sideS2",
       chaveCooldown: "lado",
       multiplicadorAvanco: 2.4,
       propriedades: {
@@ -805,12 +832,17 @@ this.nomePersonagem = "TH30";
     };
 
 
-    //this.ult = {};
+    this.ult = { animacao: "th_taunt", logica: TH30Ult };
 
   }
 
   //animaçoes====================================================
 
+
+  update() {
+    super.update();
+    this.transformacaoTH30?.atualizar();
+  }
 
   static criarAnimacoes(scene) {
 
@@ -1016,7 +1048,7 @@ scene.anims.create({
      scene.anims.create({
      key: "th_getup",
      frames: scene.anims.generateFrameNumbers("th_getup", { start: 0, end: 13 }),
-     frameRate: 18,
+     frameRate: 25,
      repeat: 0,
    });
 
