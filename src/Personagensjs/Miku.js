@@ -536,7 +536,7 @@ this.vfxAtaqueNormal = {
           tipoSomImpacto: "heavy",
           dano: 12,
           knockbackX: 770,
-          knockbackY: -40,        //-560
+          knockbackY: -560,        //-560
           tumbling: true,
         },
       },

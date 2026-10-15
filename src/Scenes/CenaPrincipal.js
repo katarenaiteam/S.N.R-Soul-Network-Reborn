@@ -114,8 +114,8 @@ export default class cenaPrincipal extends Phaser.Scene {
       cima: Phaser.Input.Keyboard.KeyCodes.UP,
       baixo: Phaser.Input.Keyboard.KeyCodes.DOWN,
       dash: Phaser.Input.Keyboard.KeyCodes.NUMPAD_ZERO,
-      atack: Phaser.Input.Keyboard.KeyCodes.J,
-      special: Phaser.Input.Keyboard.KeyCodes.K,
+      atack: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FOUR,
+      special: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FIVE,
     });
 
     const controleP1 = new ControleEntrada(this, teclasP1, 0);

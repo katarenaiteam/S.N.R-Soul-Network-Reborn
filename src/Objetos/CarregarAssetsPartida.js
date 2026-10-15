@@ -573,6 +573,9 @@ const assetsMapaTeste = [
 const assetsCidade = [
   (scene, queued) => queueAsset(scene, queued, "texture", "cidade", () => { scene.load.spritesheet("cidade", "assets/cenarios/MapaCidade/Sprites/cidade.png", { frameWidth: 960, frameHeight: 320 }); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "ClockTower", () => { scene.load.audio("ClockTower", "assets/cenarios/MapaCidade/Ost/ClockTower.mp3"); }),
+ (scene, queued) => queueAsset(scene, queued, "texture", " ", () => { scene.load.spritesheet(" ", "assets/cenarios/MapaCidade/Sprites/.png", { frameWidth: 960, frameHeight: 320 }); }),
+
+
 ];
 const assetsMikuMap = [
   (scene, queued) => queueAsset(scene, queued, "texture", "show-back", () => { scene.load.spritesheet("show-back", "assets/cenarios/MikuShow/show-back.png", { frameWidth: 1920, frameHeight: 1080 }); }),
