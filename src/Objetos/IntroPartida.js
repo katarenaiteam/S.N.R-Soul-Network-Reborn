@@ -14,6 +14,7 @@ export default class IntroPartida {
     this.scene = scene;
     this.ativa = true;
     this.tempo = 0;
+    this.tempoDecorridoEtapa = 0;
     this.etapa = -1;
     this.finaisAnimacao = new Map();
     this.jogadores = opcoes.jogadores ?? [scene.jogador1, scene.jogador2];
@@ -153,9 +154,24 @@ export default class IntroPartida {
       this.participantes.forEach(j => this.sincronizarCorpo(j));
       return;
     }
-    // Usa o delta da cena: em alguns navegadores o áudio pode ficar marcado
-    // como tocando sem avançar o seek, o que prendia a intro nessa etapa.
-    this.tempo += Math.min(Math.max(delta, 0), 50);
+    const indiceSom = this.fight ? 1 : 0;
+    const som = this.sons[indiceSom];
+    const duracaoEtapa = this.fight ? this.duracaoFight : this.duracaoContagem;
+    this.tempoDecorridoEtapa += delta;
+
+    // Acompanhe o áudio durante a reprodução para manter a duração original.
+    if (som?.isPlaying && Number.isFinite(som.seek)) {
+      this.tempo = Math.max(0, som.seek * 1000);
+    } else {
+      this.tempo += delta;
+    }
+
+    // Se o navegador deixar o áudio preso como "tocando", libera a sequência
+    // depois da duração da faixa com uma margem de segurança.
+    if (som?.isPlaying && this.tempoDecorridoEtapa >= duracaoEtapa + 1500) {
+      som.stop();
+      this.tempo = duracaoEtapa;
+    }
     if (!this.fight) {
       const progresso = this.tempo / this.duracaoContagem;
       const escalaResolucao = this.scene.scale.width / 1920;
@@ -171,7 +187,7 @@ export default class IntroPartida {
             (progresso - INICIO_RETORNO) / (FIM_RETORNO - INICIO_RETORNO));
         } else this.focar(this.alvoJogador(1));
       }
-      if (this.tempo >= this.duracaoContagem) {
+      if (this.tempo >= this.duracaoContagem && !som?.isPlaying) {
         if (this.aoFimContagem) {
           this.interrompida = true;
           this.aoFimContagem(this);
@@ -179,16 +195,16 @@ export default class IntroPartida {
         }
         this.fight = true;
         this.tempo = 0;
+        this.tempoDecorridoEtapa = 0;
         this.participantes.forEach(j => this.voltarIdle(j));
         this.sons[1]?.play();
         this.visual.setTexture("Fight", 0).setDisplaySize(630 * escalaResolucao, 198 * escalaResolucao);
       }
     } else {
-      const progresso = Math.min(this.tempo / this.duracaoFight, 1);
+      const progresso = this.tempo / this.duracaoFight;
       this.visual.setFrame(Math.min(9, Math.floor(progresso * 10)));
       this.focar(this.alvoLuta());
-      // Mantém o último quadro do letreiro visível antes de liberar a luta.
-      if (this.tempo >= this.duracaoFight + 150) this.finalizar();
+      if (progresso >= 1 && !som?.isPlaying) this.finalizar();
     }
     // A fisica esta pausada, mas os frames das animacoes continuam trocando.
     if (this.ativa) this.participantes.forEach(j => this.sincronizarCorpo(j));
