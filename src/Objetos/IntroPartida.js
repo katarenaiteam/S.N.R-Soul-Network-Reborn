@@ -155,7 +155,7 @@ export default class IntroPartida {
     }
     // Usa o delta da cena: em alguns navegadores o áudio pode ficar marcado
     // como tocando sem avançar o seek, o que prendia a intro nessa etapa.
-    this.tempo += delta;
+    this.tempo += Math.min(Math.max(delta, 0), 50);
     if (!this.fight) {
       const progresso = this.tempo / this.duracaoContagem;
       const escalaResolucao = this.scene.scale.width / 1920;
@@ -184,10 +184,11 @@ export default class IntroPartida {
         this.visual.setTexture("Fight", 0).setDisplaySize(630 * escalaResolucao, 198 * escalaResolucao);
       }
     } else {
-      const progresso = this.tempo / this.duracaoFight;
+      const progresso = Math.min(this.tempo / this.duracaoFight, 1);
       this.visual.setFrame(Math.min(9, Math.floor(progresso * 10)));
       this.focar(this.alvoLuta());
-      if (progresso >= 1) this.finalizar();
+      // Mantém o último quadro do letreiro visível antes de liberar a luta.
+      if (this.tempo >= this.duracaoFight + 150) this.finalizar();
     }
     // A fisica esta pausada, mas os frames das animacoes continuam trocando.
     if (this.ativa) this.participantes.forEach(j => this.sincronizarCorpo(j));
