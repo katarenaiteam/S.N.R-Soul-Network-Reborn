@@ -23,8 +23,12 @@ export default class IntroPartida {
     this.aoFimContagem = opcoes.aoFimContagem;
     this.sons = ["narrador-3-2-1", "narrador-fight"].map(chave =>
       scene.cache.audio.exists(chave) ? scene.sound.add(chave) : null);
-    this.duracaoContagem = (this.sons[0]?.duration || 3) * 1000;
-    this.duracaoFight = (this.sons[1]?.duration || 1) * 1000;
+    const duracaoAudio = (som, fallback) =>
+      Number.isFinite(som?.duration) && som.duration > 0
+        ? som.duration * 1000
+        : fallback;
+    this.duracaoContagem = duracaoAudio(this.sons[0], 3000);
+    this.duracaoFight = duracaoAudio(this.sons[1], 1000);
     this.sons.forEach((som, indice) => som?.once("complete", () => {
       this.tempo = indice === 0 ? this.duracaoContagem : this.duracaoFight;
       this.atualizar(0);
@@ -149,10 +153,9 @@ export default class IntroPartida {
       this.participantes.forEach(j => this.sincronizarCorpo(j));
       return;
     }
-    const som = this.sons[this.fight ? 1 : 0];
-    // Usa o relogio do audio quando disponivel; sem audio, usa o da cena.
-    if (som?.isPlaying && Number.isFinite(som.seek)) this.tempo = som.seek * 1000;
-    else this.tempo += delta;
+    // Usa o delta da cena: em alguns navegadores o áudio pode ficar marcado
+    // como tocando sem avançar o seek, o que prendia a intro nessa etapa.
+    this.tempo += delta;
     if (!this.fight) {
       const progresso = this.tempo / this.duracaoContagem;
       const escalaResolucao = this.scene.scale.width / 1920;
@@ -168,7 +171,7 @@ export default class IntroPartida {
             (progresso - INICIO_RETORNO) / (FIM_RETORNO - INICIO_RETORNO));
         } else this.focar(this.alvoJogador(1));
       }
-      if (this.tempo >= this.duracaoContagem && !som?.isPlaying) {
+      if (this.tempo >= this.duracaoContagem) {
         if (this.aoFimContagem) {
           this.interrompida = true;
           this.aoFimContagem(this);
@@ -184,7 +187,7 @@ export default class IntroPartida {
       const progresso = this.tempo / this.duracaoFight;
       this.visual.setFrame(Math.min(9, Math.floor(progresso * 10)));
       this.focar(this.alvoLuta());
-      if (progresso >= 1 && !som?.isPlaying) this.finalizar();
+      if (progresso >= 1) this.finalizar();
     }
     // A fisica esta pausada, mas os frames das animacoes continuam trocando.
     if (this.ativa) this.participantes.forEach(j => this.sincronizarCorpo(j));

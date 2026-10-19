@@ -451,7 +451,8 @@ export default class Charmenu extends Phaser.Scene {
     }
 
     const todosSelecionados = this.todosSelecionados();
-    if (todosSelecionados && !this.todosSelecionadosAnterior) {
+    const terminouSelecao = todosSelecionados && !this.todosSelecionadosAnterior;
+    if (terminouSelecao) {
       // O mesmo botão do controle pode confirmar o personagem. Exige uma
       // nova pressionada depois de os dois jogadores terminarem a seleção.
       this.puloAnteriorP1 = !!this.controleP1.pad?.buttons?.[2]?.pressed;
@@ -460,7 +461,7 @@ export default class Charmenu extends Phaser.Scene {
     this.todosSelecionadosAnterior = todosSelecionados;
     this.atualizarAvisoAvancar(todosSelecionados);
 
-    if (todosSelecionados && this.apertouAvancar()) {
+    if (todosSelecionados && !terminouSelecao && this.apertouAvancar()) {
       this.avancar();
     }
 
@@ -920,6 +921,13 @@ export default class Charmenu extends Phaser.Scene {
       Phaser.Input.Keyboard.JustDown(
         this.teclaAvancar
       )
+    ) {
+      return true;
+    }
+
+    if (
+      this.controleP1.acabouDeApertar("atack") ||
+      this.controleP2.acabouDeApertar("atack")
     ) {
       return true;
     }

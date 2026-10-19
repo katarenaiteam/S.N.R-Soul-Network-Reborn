@@ -31,6 +31,7 @@ export default class CenaGameOver extends Phaser.Scene {
     const escala = largura / 1920;
     this.cameras.main.setBackgroundColor("#05050a");
     this.conteudo = this.add.container(0, 0);
+    this.ataqueControleAnterior = [false, false];
 
     if (!this.resultado.vencedor || !this.resultado.perdedor) {
       this.criarMenuSemResultado(largura, altura, escala);
@@ -238,7 +239,21 @@ export default class CenaGameOver extends Phaser.Scene {
     this.bloqueado = false;
     this.input.keyboard.once("keydown-ENTER", () => this.reiniciarPartida());
     this.input.keyboard.once("keydown-F", () => this.reiniciarPartida());
+    this.input.keyboard.once("keydown-J", () => this.reiniciarPartida());
     this.input.keyboard.once("keydown-SPACE", () => this.reiniciarPartida());
+  }
+
+  update() {
+    const gamepads = this.input.gamepad?.gamepads ?? [];
+    let ataqueNovo = false;
+
+    for (let indice = 0; indice < 2; indice += 1) {
+      const pressionado = !!gamepads[indice]?.buttons?.[2]?.pressed;
+      if (pressionado && !this.ataqueControleAnterior[indice]) ataqueNovo = true;
+      this.ataqueControleAnterior[indice] = pressionado;
+    }
+
+    if (!this.bloqueado && ataqueNovo) this.reiniciarPartida();
   }
 
   criarRetratoRecortado(sprite, largura, altura) {
@@ -319,6 +334,7 @@ export default class CenaGameOver extends Phaser.Scene {
     this.bloqueado = false;
     this.input.keyboard.once("keydown-ENTER", () => this.reiniciarPartida());
     this.input.keyboard.once("keydown-F", () => this.reiniciarPartida());
+    this.input.keyboard.once("keydown-J", () => this.reiniciarPartida());
     this.input.keyboard.once("keydown-SPACE", () => this.reiniciarPartida());
   }
 
