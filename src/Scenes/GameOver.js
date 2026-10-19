@@ -242,17 +242,6 @@ export default class CenaGameOver extends Phaser.Scene {
   }
 
   criarRetratoRecortado(sprite, largura, altura) {
-    const chave = "gameover-retrato-perdedor";
-    if (this.textures.exists(chave)) this.textures.remove(chave);
-
-    const canvas = document.createElement("canvas");
-    canvas.width = largura;
-    canvas.height = altura;
-    const contexto = canvas.getContext("2d");
-    const texture = this.textures.addCanvas(chave, canvas);
-    const retrato = this.add.image(0, 0, chave).setOrigin(0, 0).setDepth(4);
-    this.conteudo.add(retrato);
-
     const pontos = [
       [largura * 0.045, altura * 0.697],
       [largura * 0.168, altura * 0.616],
@@ -260,44 +249,19 @@ export default class CenaGameOver extends Phaser.Scene {
       [largura * 0.440, altura * 0.931],
       [largura * 0.046, altura * 0.956],
     ];
-    const desenhar = () => {
-      const frame = sprite.frame;
-      const origem = sprite.texture.getSourceImage();
-      contexto.clearRect(0, 0, largura, altura);
-      contexto.save();
-      contexto.beginPath();
-      contexto.moveTo(pontos[0][0], pontos[0][1]);
-      for (let indice = 1; indice < pontos.length; indice += 1) {
-        contexto.lineTo(pontos[indice][0], pontos[indice][1]);
-      }
-      contexto.closePath();
-      contexto.clip();
-      contexto.imageSmoothingEnabled = false;
-      contexto.drawImage(
-        origem,
-        frame.cutX,
-        frame.cutY,
-        frame.cutWidth,
-        frame.cutHeight,
-        sprite.x - sprite.displayOriginX * sprite.scaleX,
-        sprite.y - sprite.displayOriginY * sprite.scaleY,
-        frame.cutWidth * sprite.scaleX,
-        frame.cutHeight * sprite.scaleY,
-      );
-      contexto.restore();
-      texture.refresh();
-    };
+    const graficoMascara = this.make.graphics({ x: 0, y: 0, add: false });
+    graficoMascara
+      .fillStyle(0xffffff, 1)
+      .fillPoints(pontos.map(([x, y]) => ({ x, y })), true);
+    const mascara = graficoMascara.createGeometryMask();
+    sprite.setMask(mascara).setDepth(4).setVisible(true);
 
-    sprite.setVisible(false);
-    desenhar();
-    sprite.on("animationupdate", desenhar);
-    sprite.on("animationcomplete", desenhar);
     this.events.once("shutdown", () => {
-      sprite.off("animationupdate", desenhar);
-      sprite.off("animationcomplete", desenhar);
-      if (this.textures.exists(chave)) this.textures.remove(chave);
+      sprite.clearMask(false);
+      mascara.destroy();
+      graficoMascara.destroy();
     });
-    return retrato;
+    return sprite;
   }
 
   medirAreaVisivel(definicao, textura, limiteY) {

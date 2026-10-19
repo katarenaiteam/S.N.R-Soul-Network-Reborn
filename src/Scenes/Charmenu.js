@@ -249,6 +249,7 @@ export default class Charmenu extends Phaser.Scene {
 
     this.puloAnteriorP1 = false;
     this.puloAnteriorP2 = false;
+    this.todosSelecionadosAnterior = false;
   }
 
   // ============================================================
@@ -450,6 +451,13 @@ export default class Charmenu extends Phaser.Scene {
     }
 
     const todosSelecionados = this.todosSelecionados();
+    if (todosSelecionados && !this.todosSelecionadosAnterior) {
+      // O mesmo botão do controle pode confirmar o personagem. Exige uma
+      // nova pressionada depois de os dois jogadores terminarem a seleção.
+      this.puloAnteriorP1 = !!this.controleP1.pad?.buttons?.[2]?.pressed;
+      this.puloAnteriorP2 = !!this.controleP2.pad?.buttons?.[2]?.pressed;
+    }
+    this.todosSelecionadosAnterior = todosSelecionados;
     this.atualizarAvisoAvancar(todosSelecionados);
 
     if (todosSelecionados && this.apertouAvancar()) {

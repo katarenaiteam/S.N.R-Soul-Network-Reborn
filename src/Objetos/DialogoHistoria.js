@@ -7,12 +7,12 @@ const FALAS = [
   {
     personagem: "Miku",
     retrato: "Mk_N",
-    texto: "Jurei a mim mesma que venceria este torneio e me tornaria a princesa número um de todos os mundos.",
+    texto: "Jurei a mim mesma que venceria este torneio e governaria esse mundo.",
   },
   {
     personagem: "Miku",
     retrato: "Mk_N",
-    texto: "Quando finalmente eu ascender, trarei paz a esse mundo através da minha música.",
+    texto: "Quando eu ascender, trarei paz a esse mundo através da minha música.",
   },
   {
     personagem: "FJ",

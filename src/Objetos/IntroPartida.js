@@ -45,13 +45,18 @@ export default class IntroPartida {
     });
     this.focar(this.alvoJogador(0));
     this.iniciar = () => {
+      if (this.iniciada) return;
       this.iniciada = true;
       this.visual.setVisible(true);
-      this.sons[0]?.play();
+      if (!scene.sound.locked) this.sons[0]?.play();
       this.apresentar(0);
     };
-    // Espera o desbloqueio para a imagem nunca correr na frente da voz.
-    if (scene.sound.locked) scene.sound.once("unlocked", this.iniciar);
+    // Alguns navegadores no Raspberry mantêm o áudio bloqueado após a
+    // transição. Não deixe a física pausada esperando indefinidamente.
+    if (scene.sound.locked) {
+      scene.sound.once("unlocked", this.iniciar);
+      this.inicioSemAudio = scene.time.delayedCall(1500, this.iniciar);
+    }
     else this.iniciar();
     this.encerrar = () => this.destruir();
     scene.events.once("shutdown", this.encerrar);
@@ -205,6 +210,7 @@ export default class IntroPartida {
     this.finaisAnimacao.clear();
     this.scene.camJogo.useBounds = this.limitarCamera;
     this.scene.sound.off("unlocked", this.iniciar);
+    this.inicioSemAudio?.remove();
     this.scene.events.off("shutdown", this.encerrar);
     this.scene.input.keyboard.off("keydown-ESC", this.pular);
     this.sons.forEach(som => som?.destroy());
