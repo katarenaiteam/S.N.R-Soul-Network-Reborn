@@ -53,10 +53,10 @@ export default class ControleEntrada {
      }
     }
 
-    const padDash = this._botaoPadPressionado(pad, 1);
-    const padAtack = this._botaoPadPressionado(pad, 2);
+    const padDash = this._botaoPadPressionado(pad, 2);
+    const padAtack = this._botaoPadPressionado(pad, 9);
     const padPular = this._botaoPadPressionado(pad, 3);
-    const padSpecial = this._botaoPadPressionado(pad, 9);
+    const padSpecial = this._botaoPadPressionado(pad, 1);
 
     this.estadoAtual.esquerda = this._teclaDown("esquerda") || padEsquerda;
     this.estadoAtual.direita = this._teclaDown("direita") || padDireita;
