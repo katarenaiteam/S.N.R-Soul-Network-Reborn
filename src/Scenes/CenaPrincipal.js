@@ -48,7 +48,7 @@ export default class cenaPrincipal extends Phaser.Scene {
     encerrarOutrasCenas(this);
     this.events.once("shutdown", () => {
       this.sound.stopAll();
-      limparAssetsPartida(this);
+      if (!this.preservarAssetsGameOver) limparAssetsPartida(this);
     });
     this.cameras.main.fadeIn(350, 0, 0, 0);
     prepararTexturaTeia(this);

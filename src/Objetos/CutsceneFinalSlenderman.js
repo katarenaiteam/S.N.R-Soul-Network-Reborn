@@ -209,7 +209,12 @@ export default class CutsceneFinalSlenderman {
         sprite.setVisible(false);
         this.scene.cameras.main.once("camerafadeoutcomplete", () => {
           this.scene.sound.stopAll();
-          this.scene.scene.start("CenaCreditos");
+          this.scene.manterAssetsParaHistoria2 = true;
+          this.scene.scene.start("CenaEscolhaFinal", {
+            p1: this.scene.escolhaP1,
+            p2: this.scene.escolhaP2,
+            numPlayers: this.scene.numPlayers,
+          });
         });
         this.scene.cameras.main.fadeOut(900, 0, 0, 0);
       } });

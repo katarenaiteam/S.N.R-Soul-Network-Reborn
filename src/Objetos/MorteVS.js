@@ -331,7 +331,14 @@ export default class MorteVS {
     const fim = this.loteTV.some(e => (e.numero === 1 ? this.scene.vidasP1 : this.scene.vidasP2) <= 0);
     if (fim) {
       this.scene.sound.stopAll();
-      this.scene.scene.start("CenaGameOver");
+      const p1Perdeu = this.scene.vidasP1 <= 0;
+      const vencedor = p1Perdeu ? this.scene.jogador2 : this.scene.jogador1;
+      const perdedor = p1Perdeu ? this.scene.jogador1 : this.scene.jogador2;
+      this.scene.preservarAssetsGameOver = true;
+      this.scene.scene.start("CenaGameOver", {
+        vencedor: { id: p1Perdeu ? this.scene.escolhaP2 : this.scene.escolhaP1, nome: vencedor.nomePersonagem },
+        perdedor: { id: p1Perdeu ? this.scene.escolhaP1 : this.scene.escolhaP2, nome: perdedor.nomePersonagem },
+      });
       return;
     }
     for (const e of this.loteTV) {

@@ -157,7 +157,11 @@ const assetscommon = [
   (scene, queued) => queueAsset(scene, queued, "audio", "glass", () => { scene.load.audio("glass", "assets/efeitos/out-effect/glass.mp3"); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "glitch-sound", () => { scene.load.audio("glitch-sound", "assets/efeitos/out-effect/glitch-sound.mp3"); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "tv-static", () => { scene.load.audio("tv-static", "assets/efeitos/out-effect/tv-static.mp3"); }),
-  
+  (scene, queued) => queueAsset(scene, queued, "texture", "victoryFundo", () => { scene.load.image("victoryFundo", "assets/Menus/Game_Over/victoryFundo.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "second", () => { scene.load.image("second", "assets/Menus/Game_Over/second.png" ); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "vitEfect", () => { scene.load.spritesheet("vitEfect", "assets/Menus/Game_Over/vitEfect.png", { frameWidth: 800, frameHeight: 450, }); }),
+
+
 
 
 ];
@@ -573,7 +577,7 @@ const assetsMapaTeste = [
 const assetsCidade = [
   (scene, queued) => queueAsset(scene, queued, "texture", "cidade", () => { scene.load.spritesheet("cidade", "assets/cenarios/MapaCidade/Sprites/cidade.png", { frameWidth: 960, frameHeight: 320 }); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "ClockTower", () => { scene.load.audio("ClockTower", "assets/cenarios/MapaCidade/Ost/ClockTower.mp3"); }),
- (scene, queued) => queueAsset(scene, queued, "texture", " ", () => { scene.load.spritesheet(" ", "assets/cenarios/MapaCidade/Sprites/.png", { frameWidth: 960, frameHeight: 320 }); }),
+ //(scene, queued) => queueAsset(scene, queued, "texture", " ", () => { scene.load.spritesheet(" ", "assets/cenarios/MapaCidade/Sprites/.png", { frameWidth: 960, frameHeight: 320 }); }),
 
 
 ];
@@ -606,6 +610,8 @@ const assetsstory = [
   (scene, queued) => queueAsset(scene, queued, "texture", "puppet", () => { scene.load.image("puppet", "assets/Hud/dialogo/Miku/puppet.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Mk_deaf", () => { scene.load.spritesheet("Mk_deaf", "assets/personagens/Miku/Sprites/Mk_deaf.png", { frameWidth: 169, frameHeight: 163 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_N", () => { scene.load.image("FJ_N", "assets/Hud/dialogo/FJ/FJ-N.png"); }),
+    (scene, queued) => queueAsset(scene, queued, "texture", "FJ_true", () => { scene.load.image("FJ_true", "assets/Hud/dialogo/FJ/FJ_true.png"); }),
+
   (scene, queued) => queueAsset(scene, queued, "texture", "Pg_ok", () => { scene.load.image("Pg_ok", "assets/Hud/dialogo/Pingu/Pg_ok.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Pg_N", () => { scene.load.image("Pg_N", "assets/Hud/dialogo/Pingu/Pg_N.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Pg_mid", () => { scene.load.image("Pg_mid", "assets/Hud/dialogo/Pingu/Pg_mid.png"); }),
@@ -617,7 +623,16 @@ const assetsstory = [
  // (scene, queued) => queueAsset(scene, queued, "texture", "S2", () => { scene.load.image("S2", "assets/Hud/dialogo/Slan/S2.png"); }),
  // (scene, queued) => queueAsset(scene, queued, "texture", "S3", () => { scene.load.image("S3", "assets/Hud/dialogo/Slan/S3.png"); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "suspiro", () => { scene.load.audio("suspiro", "assets/Hud/dialogo/Slan/suspiro.mp3"); }),
+    (scene, queued) => queueAsset(scene, queued, "audio", "ding", () => { scene.load.audio("ding", "assets/Hud/dialogo/FJ/ding.mp3"); }),
+
   (scene, queued) => queueAsset(scene, queued, "audio", "jumpscare", () => { scene.load.audio("jumpscare", "assets/Hud/dialogo/Slan/jumpscare.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Chris", () => { scene.load.image("Chris", "assets/Hud/dialogo/Chris/Chris.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Chris2", () => { scene.load.image("Chris2", "assets/Hud/dialogo/Chris/Chris2.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Chris3", () => { scene.load.image("Chris3", "assets/Hud/dialogo/Chris/Chris3.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Chris3.1", () => { scene.load.image("Chris3.1", "assets/Hud/dialogo/Chris/Chris3.1.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Chris23", () => { scene.load.image("Chris23", "assets/Hud/dialogo/Chris/Chris23.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Chris32", () => { scene.load.image("Chris32", "assets/Hud/dialogo/Chris/Chris32.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "venceu", () => { scene.load.image("venceu", "assets/Hud/dialogo/Chris/venceu.png"); }),
 ];
 const personagens = {
   FJ: assetsFJ,

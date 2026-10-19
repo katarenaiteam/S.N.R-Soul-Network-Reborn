@@ -109,7 +109,7 @@ export default class FJ extends Personagem {
 
 
 
-this.nomePersonagem = "Frederick Johnson";
+this.nomePersonagem = "FJ";
     this.tauntPausaFinal = 0; // Encerra o taunt sem segurar o último frame.
     //============================= hitboxes ========================================
    
@@ -265,7 +265,7 @@ this.nomePersonagem = "Frederick Johnson";
         largura: 250,
         altura: 400,
         offsetX: 100,
-        offsetY: 100,
+        offsetY: 60,
         escala: 0.33,
         hurtboxes: [
           { largura: 60, altura: 65, offsetX: -10, offsetY: -60 }, 

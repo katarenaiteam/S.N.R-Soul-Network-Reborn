@@ -5,7 +5,7 @@ const ACELERACAO_SUBTERRANEA = 2400;
 const DESACELERACAO_SUBTERRANEA = 3000;
 const TEMPO_MAXIMO_SUBTERRANEO = 5000;
 const PRIMEIRO_FRAME_ATAQUE = 8;
-const ULTIMO_FRAME_ATAQUE = 11;
+const ULTIMO_FRAME_ATAQUE = 10;
 
 export default class TH30DoSpecial {
   constructor(personagem, special, estado) {
@@ -206,6 +206,7 @@ export default class TH30DoSpecial {
     this.scene.physics.add.existing(this.hitbox);
     this.hitbox.body.setAllowGravity(false);
     this.hitbox.body.setImmovable(true);
+    this.hitbox.body.debugBodyColor = 0xff0000;
     this.scene.camHUD?.ignore(this.hitbox);
     this.registroAtaque = registrarAtaqueEspecial(this, this.hitbox, {
       categoria: "corpo",

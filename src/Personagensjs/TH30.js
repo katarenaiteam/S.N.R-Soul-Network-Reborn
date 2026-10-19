@@ -125,7 +125,7 @@ this.nomePersonagem = "TH30";
         largura: 70,
         altura: 120,
         offsetX: 30,
-        offsetY: 3,
+        offsetY: 2.5,
         escala: 1,
         hurtboxes: [
            ],
@@ -304,7 +304,7 @@ this.nomePersonagem = "TH30";
         largura: 65,
         altura: 60,
         offsetX: 85,
-        offsetY: 37,
+        offsetY: 39,
         escala: 1,
         hurtboxes: [{ largura: 60, altura: 65, offsetX: -40, offsetY: -35 }],
       },
@@ -423,7 +423,7 @@ this.nomePersonagem = "TH30";
         frameHitbox: 4,
         offsetX: 55,
         offsetY: -75,
-        largura: 75,
+        largura: 85,
         altura: 20,
         cooldown: 700,
         duracao: 300,
@@ -454,9 +454,9 @@ this.nomePersonagem = "TH30";
 
         frameHitbox: 2,
 
-        offsetX: 45,
+        offsetX: 40,
         offsetY: -30,
-        largura: 35,
+        largura: 45,
         altura: 65,
         duracao: 400,
         cancelavel: true,
@@ -479,8 +479,8 @@ this.nomePersonagem = "TH30";
 
         frameHitbox: 3,
 
-        offsetX: 50,
-        offsetY: -92,
+        offsetX: 30,
+        offsetY: -132,
         largura: 35,
         altura: 80,
         duracao: 600,
@@ -522,11 +522,11 @@ this.nomePersonagem = "TH30";
         ],
 
          movimento: {
-    inicio: 80,
-    fim: 900,
+    inicio: 20,
+    fim: 200,
     x: {
-      de: 500,
-      para: 600,
+      de: 450,
+      para: 550,
     },
    
 
@@ -546,9 +546,9 @@ this.nomePersonagem = "TH30";
         animacao: "th_downAtack",
         frameHitbox: 3,
         offsetX: 35,
-        offsetY: -40,
-        largura: 100,
-        altura: 35,
+        offsetY: -48,
+        largura: 140,
+        altura: 38,
         cooldown: 900,
         duracao: 400,
         cancelavel: true,
@@ -560,9 +560,10 @@ this.nomePersonagem = "TH30";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 90,
-          knockbackY: -400,
+          knockbackX: 350,
+          knockbackY: -200,
           tumbling: true,
+          hitstunMinFrames:35,
         },
       },
 
@@ -570,9 +571,9 @@ this.nomePersonagem = "TH30";
         animacao: "th_neutralAir",
         frameHitbox: 3,
         offsetX: 0,
-        offsetY: -115,
-        largura: 130,
-        altura: 35,
+        offsetY: -135,
+        largura: 150,
+        altura: 30,
         cooldown: 900,
         duracao: 350,
          finalizarAoTocarChao: true,
@@ -589,7 +590,7 @@ this.nomePersonagem = "TH30";
           knockbackY: -450,
           tumbling: false,
           knockbackFixo: true,
-          hitstunMinFrames:26,
+          hitstunMinFrames:30,
         },
       },
 
@@ -597,10 +598,10 @@ this.nomePersonagem = "TH30";
       air_side: {
         animacao: "th_sideAir",
         frameHitbox: 3,
-        offsetX: 26,
-        offsetY: -80,
-        largura: 35,
-        altura: 50,
+        offsetX: 56,
+        offsetY: -70,
+        largura: 40,
+        altura: 60,
         cooldown: 900,
         duracao: 600,
          finalizarAoTocarChao: true,
@@ -623,9 +624,9 @@ this.nomePersonagem = "TH30";
         animacao: "th_upAir",
         frameHitbox: 3,
         offsetX: 30,
-        offsetY: -84,
-        largura: 30,
-        altura: 80,
+        offsetY: -122,
+        largura: 60,
+        altura: 100,
         cooldown: 900,
         duracao: 600,
          finalizarAoTocarChao: true,
@@ -642,12 +643,13 @@ this.nomePersonagem = "TH30";
           dano: 12,
           knockbackX: 182,
           knockbackY: -490,
+           hitstunMinFrames:25,
           tumbling: true,
         },
       },
       air_agachado: {
         animacao: "th_downAir",
-        frameHitbox: 3,
+        frameHitbox: 2,
         offsetX: 35,
         offsetY: -15,
         largura: 60,
@@ -667,14 +669,14 @@ this.nomePersonagem = "TH30";
 
          movimento: {
     inicio: 80,
-    fim: 900,
+    fim: 500,
     x: {
-      de: 500,
-      para: 600,
+      de: 700,
+      para: 500,
     },
     y: {
-      de: 550,
-      para: 1000,
+      de: 750,
+      para: 590,
     },
 
     curva: "easeOut",
@@ -685,6 +687,7 @@ this.nomePersonagem = "TH30";
           knockbackX: 112,
           knockbackY: 500,
           quiqueChaoY: 350,
+          hitstunMinFrames:35,
         },
       },
     }
@@ -765,10 +768,10 @@ this.nomePersonagem = "TH30";
         cooldown: 2200,
         cancelavel: false,
         hitbox: {
-          largura: 90,
-          altura: 100,
+          largura: 80,
+          altura: 70,
           offsetX: 0,
-          offsetY: -80,
+          offsetY: -60,
         },
         propriedades: {
           travarMovimentoAir: true,
@@ -786,10 +789,10 @@ this.nomePersonagem = "TH30";
         cooldown: 2200,
         cancelavel: false,
         hitbox: {
-          largura: 65,
-          altura: 120,
+          largura: 75,
+          altura: 70,
           offsetX: 0,
-          offsetY: 35,
+          offsetY: -45,
         },
         propriedades: {
           travarMovimentoAir: true,
@@ -806,7 +809,7 @@ this.nomePersonagem = "TH30";
       animacao: "th_sideS2_air",
       configuracaoAnimacao: "sideS2",
       chaveCooldown: "lado",
-      multiplicadorAvanco: 2.4,
+      multiplicadorAvanco: 2.5,
       propriedades: {
         ...this.specials.lado.propriedades,
         travarMovimentoAir: true,
@@ -820,7 +823,7 @@ this.nomePersonagem = "TH30";
       quantidadeProjeteis: 3,
       velocidadesProjetilY: [-220, 0, 220],
       velocidadeProjetil: 650,
-      tempoMaximoProjetil: 300,
+      tempoMaximoProjetil: 350,
       escalaProjetil: 1.15,
       larguraProjetil: 42,
       alturaProjetil: 42,
@@ -897,7 +900,7 @@ if (!scene.anims.exists("th_soup_loop")) {
 if (!scene.anims.exists("th_spike")) {
   scene.anims.create({
     key: "th_spike",
-    frames: scene.anims.generateFrameNumbers("th_spike", { start: 0, end: 15 }),
+    frames: scene.anims.generateFrameNumbers("th_spike", { start: 8, end: 10 }),
     frameRate: 24,
     repeat: 0,
   });
@@ -1062,7 +1065,7 @@ scene.anims.create({
 scene.anims.create({
   key: "th_atack1",
   frames: scene.anims.generateFrameNumbers("th_atack1", { start: 0, end: 6 }),
-  frameRate: 12,
+  frameRate: 18,
   repeat: 0,
 });
 
@@ -1182,7 +1185,7 @@ scene.anims.create({
 scene.anims.create({
   key: "th_sideAir",
   frames: scene.anims.generateFrameNumbers("th_sideAir", { start: 0, end: 7}),
-  frameRate: 12,
+  frameRate: 16,
   repeat: 0,
 });
 

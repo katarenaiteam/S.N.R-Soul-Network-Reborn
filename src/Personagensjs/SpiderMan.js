@@ -58,7 +58,7 @@ export default class SpiderMan extends Personagem {
 };
 
     //============================= hitboxes ========================================
-    this.nomePersonagem = "Homem Aranha";
+    this.nomePersonagem = "Spider Man";
     this.configAnimacoes = {
       idle: {
         largura: 85,
@@ -814,7 +814,8 @@ export default class SpiderMan extends Personagem {
           dano: 11,
           knockbackX: 84,
           knockbackY: -560,
-          tumbling: true
+          tumbling: true,
+           hitstunMinFrames:23,
         },
       },
     };

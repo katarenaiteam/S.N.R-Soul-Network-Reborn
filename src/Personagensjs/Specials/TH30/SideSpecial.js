@@ -97,6 +97,7 @@ export default class TH30SideSpecial {
     this.scene.physics.add.existing(this.hitbox);
     this.hitbox.body.setAllowGravity(false);
     this.hitbox.body.setImmovable(true);
+    this.hitbox.body.debugBodyColor = 0xff0000;
     this.scene.camHUD?.ignore(this.hitbox);
     this.ataque = registrarAtaqueEspecial(this, this.hitbox, {
       categoria: "corpo",

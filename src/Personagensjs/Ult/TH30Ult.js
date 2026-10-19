@@ -26,8 +26,8 @@ export default class TH30Ult {
     const sprite = this.personagem.sprite;
     this.scene.atualizarCamera = () => {};
     this.camera.stopFollow();
-    this.ativarFundoUltimate();
     this.ocultarCenario();
+    this.ativarFundoUltimate();
     this.physicsPausadaAntes = this.scene.physics.world.isPaused;
     this.scene.physics.pause();
     this.estadoAlvo = {
@@ -53,16 +53,23 @@ export default class TH30Ult {
   }
 
   ativarFundoUltimate() {
-    if (!this.scene.textures.exists("ultimateback1")) return;
+    const texturasFundo = ["ultimateback1", "ultimateback2", "ultimateback3", "ultimateback4"];
+    if (texturasFundo.some((textura) => !this.scene.textures.exists(textura))) return;
     const fundoFase = this.scene.mapaAtual?.imagemFundo;
     this.fundoFase = fundoFase;
-    this.fundoFaseVisivel = fundoFase?.visible ?? true;
-    if (!this.scene.anims.exists("th30_ultimateback")) this.scene.anims.create({
-      key: "th30_ultimateback",
-      frames: gerarQuadrosUltimateBackground(this.scene),
-      frameRate: 36,
-      repeat: -1,
-    });
+    const visibilidadeOriginal = this.visibilidadeCenario
+      .find(({ objeto }) => objeto === fundoFase)?.visible;
+    this.fundoFaseVisivel = visibilidadeOriginal ?? fundoFase?.visible ?? true;
+    if (!this.scene.anims.exists("th30_ultimateback")) {
+      const frames = gerarQuadrosUltimateBackground(this.scene);
+      if (frames.length === 0) return;
+      this.scene.anims.create({
+        key: "th30_ultimateback",
+        frames,
+        frameRate: 36,
+        repeat: -1,
+      });
+    }
     this.fundoUlt = this.scene.add.sprite(0, 0, "ultimateback1", 0)
       .setDepth((fundoFase?.depth ?? -100) + 1).setScrollFactor(1);
     this.fundoUlt.play("th30_ultimateback");
@@ -129,6 +136,7 @@ export default class TH30Ult {
     sprite.body.setAllowGravity(false);
     personagem.aplicarConfiguracao("idle");
     personagem.sprite.anims.play(`${personagem.prefixoAnim}idle`, true);
+    personagem.sprite.setTint(0x399cff);
     this.transformacaoAtiva = true;
     this.tweenEmergencia = this.scene.tweens.add({
       targets: sprite,
@@ -141,7 +149,7 @@ export default class TH30Ult {
         sprite.body.setAllowGravity(true);
         personagem.podeMover = true;
         personagem.podeAtacar = true;
-        this.timerForma = this.scene.time.delayedCall(35000, () => this.restaurarForma());
+        this.timerForma = this.scene.time.delayedCall(30000, () => this.restaurarForma());
         this.estadoFSM.finalizarUlt();
       },
     });
@@ -149,12 +157,18 @@ export default class TH30Ult {
 
   atualizar() {
     this.ajustarFundoUltimate();
-    if (this.camposOriginais && this.personagem.maquinaEstados.estadoAtual?.nome === "dead") this.restaurarForma();
+    if (!this.camposOriginais) return;
+    if (this.personagem.maquinaEstados.estadoAtual?.nome === "dead") {
+      this.restaurarForma();
+      return;
+    }
+    if (this.transformacaoAtiva) this.personagem.sprite.setTint(0x399cff);
   }
 
   restaurarForma() {
-    if (!this.camposOriginais || this.finalizada) return;
+    if (!this.camposOriginais) return;
     this.tweenEmergencia?.stop();
+    this.timerForma?.remove();
     const personagem = this.personagem;
     const cargaRestante = personagem.ultCarga > 0;
     for (const campo of CAMPOS_COPIADOS) personagem[campo] = this.camposOriginais[campo];

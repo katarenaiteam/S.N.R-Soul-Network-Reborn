@@ -13,6 +13,13 @@ body {
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'SmashBros';
+  src: url('../assets/Menus/Game_Over/super_smash.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* 2. Classe invisível para pré-carregamento */
 .font-loader {
   font-family: 'RetroFont';

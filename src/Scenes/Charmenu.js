@@ -316,7 +316,7 @@ export default class Charmenu extends Phaser.Scene {
       yoyo: true,
       repeat: 2,
       onComplete: () => {
-        this.icons.forEach((i) => i.setAlpha(1));
+        this.icons.forEach((icon) => icon.setAlpha(1));
       }
     });
   }

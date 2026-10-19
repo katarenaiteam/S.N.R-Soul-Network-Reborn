@@ -152,12 +152,15 @@ export default class DialogoHistoria {
 
   mostrarFala() {
     const fala = this.falas[this.indice];
-    this.retrato.setTexture(fala.retrato);
+    if (fala.retrato) this.retrato.setTexture(fala.retrato).setVisible(true);
+    else this.retrato.setVisible(false);
     this.textoCompleto = fala.texto;
     this.caracteresTexto = Array.from(this.textoCompleto);
     this.tempoDigitacao = 0;
+    this.aoTerminarDigitacao = fala.aoTerminarDigitacao ?? null;
     this.digitando = this.digitarTexto && this.caracteresTexto.length > 0;
     this.texto.setText(this.digitando ? "" : this.textoCompleto);
+    if (!this.digitando) this.concluirDigitacao();
     fala.aoMostrar?.();
 
     this.cameraDe = {
@@ -207,7 +210,15 @@ export default class DialogoHistoria {
       Math.floor(this.tempoDigitacao / INTERVALO_DIGITACAO),
     );
     this.texto.setText(this.caracteresTexto.slice(0, quantidade).join(""));
-    if (quantidade >= this.caracteresTexto.length) this.digitando = false;
+    if (quantidade >= this.caracteresTexto.length) this.concluirDigitacao();
+  }
+
+  concluirDigitacao() {
+    if (!this.digitando && !this.aoTerminarDigitacao) return;
+    this.digitando = false;
+    const callback = this.aoTerminarDigitacao;
+    this.aoTerminarDigitacao = null;
+    callback?.();
   }
 
   moverCamera(de, para, progresso) {
@@ -222,10 +233,10 @@ export default class DialogoHistoria {
   }
 
   avancar() {
-    if (!this.ativa || this.tempoMovimento < TEMPO_MOVIMENTO_CAMERA) return;
+    if (!this.ativa || this.bloquearAvanco || this.tempoMovimento < TEMPO_MOVIMENTO_CAMERA) return;
     if (this.digitando) {
       this.texto.setText(this.textoCompleto);
-      this.digitando = false;
+      this.concluirDigitacao();
       return;
     }
     this.indice++;
@@ -268,7 +279,7 @@ export default class DialogoHistoria {
       [this.scene.indicadorP1, this.scene.indicadorP2, this.scene.indicadorCPU]
         .filter(Boolean)
         .forEach(indicador => indicador.setVisible(true));
-      this.scene.physics.world.resume();
+      this.scene.physics?.world?.resume?.();
     }
   }
 }

@@ -30,6 +30,7 @@ export default class TH30AdownSpecial {
     this.estado = estado;
     this.finalizado = false;
     this.impulsoAplicado = false;
+    this.saiuDoChao = false;
     this.indiceHitAtivo = -1;
     this.hitbox = null;
     this.registroHitbox = null;
@@ -70,6 +71,7 @@ export default class TH30AdownSpecial {
     this.scene.physics.add.existing(this.hitbox);
     this.hitbox.body.setAllowGravity(false);
     this.hitbox.body.setImmovable(true);
+    this.hitbox.body.debugBodyColor = 0xff0000;
     this.scene.camHUD?.ignore(this.hitbox);
     this.registroHitbox = registrarAtaqueEspecial(this, this.hitbox, {
       categoria: "corpo",
@@ -115,6 +117,12 @@ export default class TH30AdownSpecial {
       this.cancelar();
       return;
     }
+    const corpo = this.personagem.sprite.body;
+    if (!corpo.blocked.down && !corpo.touching.down) this.saiuDoChao = true;
+    if (this.saiuDoChao && (corpo.blocked.down || corpo.touching.down)) {
+      this.aoCompletarAnimacao();
+      return;
+    }
     this.atualizarPosicaoHitbox();
   }
 
@@ -128,6 +136,7 @@ export default class TH30AdownSpecial {
   aoCompletarAnimacao() {
     if (this.finalizado) return;
     this.finalizado = true;
+    this.personagem.sprite?.off("animationupdate", this.aoAtualizarAnimacao);
     this.destruirHitbox();
     if (this.alvoParaProjeteis && !this.projeteisCriados) {
       this.projeteisCriados = true;

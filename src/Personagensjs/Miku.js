@@ -644,6 +644,7 @@ this.vfxAtaqueNormal = {
           dano: 12,
           knockbackX: 0,
           knockbackY: -560,
+           hitstunMinFrames:23,
           tumbling: true,
         },
       },

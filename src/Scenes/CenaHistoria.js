@@ -365,6 +365,7 @@ this.indicadorCPU = this.criarIndicador(
     if (this.partidaEncerrada || jogador.eliminado || jogador.processandoQueda) return;
     const entrada = this.participantes.find(item => item.jogador === jogador);
     if (!entrada || this[entrada.vidas] <= 0) return;
+    jogador.transformacaoTH30?.restaurarForma();
     jogador.processandoQueda = true;
     this[entrada.vidas] = Math.max(0, this[entrada.vidas] - 1);
     jogador.vidas = this[entrada.vidas];
