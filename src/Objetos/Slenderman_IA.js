@@ -3,6 +3,22 @@ import Miku_IA from "./Miku_IA.js";
 const clamp = (valor, minimo, maximo) => Math.max(minimo, Math.min(maximo, valor));
 
 export default class Slenderman_IA extends Miku_IA {
+  reagirAoDano(bot, time) {
+    const estado = bot.maquinaEstados.estadoAtual;
+    if (estado?.nome !== "dano") return false;
+    this.ctrl.soltarTudo();
+    if (time - estado.tempoInicial >= estado.duracaoStun && !bot.sprite.body.blocked.down) {
+      const lista = this.plataformas();
+      this.recuperar(bot, lista, time);
+      // O estado de dano só encerra o tumbling ao receber JustDown.
+      // Pular também dá uma chance de voltar à arena quando o lançamento
+      // deixou o personagem abaixo da borda de uma plataforma.
+      this.ctrl.pulsar("cima", 90);
+      this.proximaRecuperacao = time + 65;
+    }
+    return true;
+  }
+
   escolherRota(bot, alvo, lista) {
     const inicio = this.apoio(bot, lista);
     const fim = this.pisoDoAlvo(alvo, lista);
@@ -69,14 +85,23 @@ export default class Slenderman_IA extends Miku_IA {
       const margem = body.width / 2 + 24;
       const centroDestino = (destino.left + destino.right) / 2;
       const direcao = Math.sign(centroDestino - bot.sprite.x) || 1;
-      const xSaida = vao > 70
+      const plataformaAcimaBloqueando = destino.top < suporte.top - 35 &&
+        destino.right > suporte.left + margem && destino.left < suporte.right - margem;
+      const xSaida = plataformaAcimaBloqueando
+        ? [destino.left - margem, destino.right + margem]
+          .map(x => clamp(x, suporte.left + margem, suporte.right - margem))
+          .sort((a, b) => Math.abs(a - bot.sprite.x) - Math.abs(b - bot.sprite.x))[0]
+        : vao > 70
         ? (direcao > 0 ? suporte.right - margem : suporte.left + margem)
         : clamp(centroDestino, suporte.left + margem, suporte.right - margem);
       this.mover(xSaida);
 
       if (Math.abs(bot.sprite.x - xSaida) < 22) {
-        const xPouso = clamp(centroDestino, destino.left + margem, destino.right - margem);
-        this.mover(centroDestino);
+        const xPouso = plataformaAcimaBloqueando
+          ? clamp(bot.sprite.x < centroDestino ? destino.left + margem : destino.right - margem,
+            destino.left + margem, destino.right - margem)
+          : clamp(centroDestino, destino.left + margem, destino.right - margem);
+        this.mover(xPouso);
         if (this.pular(bot, time)) {
           this.saltoPendente = { origem: suporte, destino, xPouso, inicio: time };
         }
@@ -85,5 +110,11 @@ export default class Slenderman_IA extends Miku_IA {
     }
 
     return super.navegar(bot, alvo, lista, time);
+  }
+
+  update(time, delta) {
+    const bot = this.ctrl.bot;
+    if (bot?.sprite?.active && this.reagirAoDano(bot, time)) return;
+    super.update(time, delta);
   }
 }

@@ -3,15 +3,23 @@ export function criarHudPartida(jogador, personagem, x, y, ladoDireito) {
     const larguraRetrato = 440;
     const alturaRetrato = larguraRetrato * (650 / 800);
     const retratoPorPersonagem = {
-      SpiderMan: "Sp_portrait",
-      Miku: "Miku_portrait",
-      Ken: "Ken_portrait",
-      FJ: "FJ_portrait",
-      Slenderman: "Slan_portrait",
-      Pingu: "Pingu_portrait"
+      SpiderMan: "Sp",
+      Miku: "Miku",
+      Ken: "Ken",
+      FJ: "FJ",
+      Slenderman: "Slan",
+      Pingu: "Pingu",
+      TH30: "Th",
     };
     const hud = this.add.container(x, y).setScrollFactor(0).setDepth(1000);
-    const chaveRetrato = retratoPorPersonagem[personagem];
+    const prefixoRetrato = retratoPorPersonagem[personagem];
+    const varianteRetrato = jogador === this.jogador1 ? "" :
+      jogador === this.jogador2 ? "2" : "3";
+    const chaveRetrato = prefixoRetrato && (
+      this.textures.exists(`${prefixoRetrato}_portrait${varianteRetrato}`)
+        ? `${prefixoRetrato}_portrait${varianteRetrato}`
+        : `${prefixoRetrato}_portrait`
+    );
 
     if (chaveRetrato) {
       const retrato = this.add.image(0, 0, chaveRetrato)

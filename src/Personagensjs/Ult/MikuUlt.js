@@ -25,7 +25,7 @@ const RAIO = {
   espessuraAumentada: 480,
   espessuraHitbox: 60,
   espessuraHitboxAumentada: 180,
-  tempoExpansao: 700,
+  tempoExpansao: 900,
 
   anguloMin: -35,
   anguloMax: 35,
@@ -108,6 +108,7 @@ export default class MikuUlt {
     this.timers = new Set();
 
     this.musicasFaseMutadas = [];
+    this.alvosDaUlt = [];
   }
 
   mutarMusicaFase() {
@@ -161,6 +162,9 @@ restaurarMusicaFase() {
   executar() {
  
      this.cancelada = false;
+  this.alvosDaUlt = this.obterAlvos();
+  this.ultimoHit.clear();
+  this.bloqueioMultihit.clear();
   this.fase = "intro";
 
     // ============================================================
@@ -664,9 +668,9 @@ this.pose2?.setFlipX(
       return;
     }
 
-    const alvos = this.obterAlvos();
-    if (alvos.length > 0 && !alvos.some((alvo) =>
-      !alvo.eliminado && alvo.sprite?.active && (alvo.vidas === undefined || alvo.vidas > 0)
+    if (this.alvosDaUlt.length > 0 && !this.alvosDaUlt.some((alvo) =>
+      !alvo.eliminado && !alvo.emMorteVS && alvo.sprite?.active &&
+      (alvo.vidas === undefined || alvo.vidas > 0)
     )) {
       this.finalizarComFade();
       return;
@@ -1047,6 +1051,7 @@ if (agora < bloqueadoAte) {
     const espessura =
       this.hitboxRaio.height;
 
+    alvo.sincronizarHurtbox?.();
     const hurtboxes =
       alvo.grupoHurtbox
         ?.getChildren?.() ?? [];
@@ -1063,37 +1068,26 @@ if (agora < bloqueadoAte) {
       const cy =
         b.top + b.height / 2;
 
-      const dx =
-        cx - origem.x;
-
-      const dy =
-        cy - origem.y;
-
-      const frente =
-        dx * ux + dy * uy;
-
-      const lado =
-        Math.abs(
-          dx * nx + dy * ny
-        );
-
-      const metadeX = b.width / 2;
-      const metadeY = b.height / 2;
-      const projecaoFrente = Math.abs(ux) * metadeX + Math.abs(uy) * metadeY;
-      const projecaoLado = Math.abs(nx) * metadeX + Math.abs(ny) * metadeY;
       const meio = this.hitboxRaio.width / 2;
       const centroRaioX = origem.x + ux * meio;
       const centroRaioY = origem.y + uy * meio;
+      const dx = cx - centroRaioX;
+      const dy = cy - centroRaioY;
+      const metadeX = b.width / 2;
+      const metadeY = b.height / 2;
+      const meiaComprimento = meio;
+      const meiaEspessura = espessura / 2;
 
-      return (
-        frente >= -projecaoFrente &&
-        frente <=
-          this.hitboxRaio.width + projecaoFrente &&
-        lado <=
-          espessura / 2 + projecaoLado &&
-        Math.abs(cx - centroRaioX) <= metadeX + Math.abs(ux) * meio + Math.abs(nx) * espessura / 2 &&
-        Math.abs(cy - centroRaioY) <= metadeY + Math.abs(uy) * meio + Math.abs(ny) * espessura / 2
-      );
+      // Separating Axis Theorem: compara o retangulo rotacionado do raio
+      // com a hurtbox axis-aligned nos quatro eixos relevantes.
+      return Math.abs(dx * ux + dy * uy) <=
+          meiaComprimento + Math.abs(ux) * metadeX + Math.abs(uy) * metadeY &&
+        Math.abs(dx * nx + dy * ny) <=
+          meiaEspessura + Math.abs(nx) * metadeX + Math.abs(ny) * metadeY &&
+        Math.abs(dx) <=
+          metadeX + Math.abs(ux) * meiaComprimento + Math.abs(nx) * meiaEspessura &&
+        Math.abs(dy) <=
+          metadeY + Math.abs(uy) * meiaComprimento + Math.abs(ny) * meiaEspessura;
     });
   }
 
@@ -1642,6 +1636,7 @@ if (agora < bloqueadoAte) {
     );
 
     this.plataformas = [];
+    this.alvosDaUlt = [];
     this.restaurarMusicaFase();
   }
 

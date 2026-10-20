@@ -42,19 +42,15 @@ export default class SistemaLedge {
     ));
     this.contatos.set(personagem, atuais);
     const agora = personagem.scene.time.now;
-    const estado = personagem.maquinaEstados.estadoAtual?.nome;
-    if (body.blocked.down || estado !== "jump" ||
+    if (body.blocked.down ||
         agora < (this.cooldowns.get(personagem) ?? 0)) return;
 
     const area = [...atuais].find(item => !anteriores.has(item));
     if (!area) return;
-    const direcao = area.direcao ?? (personagem.sprite.flipX ? -1 : 1);
-    const impulsoX = direcao * Math.abs(area.impulsoHorizontal ?? 120);
-    if (!personagem.maquinaEstados.mudarEstado("crouch", { ledge: true, impulsoX })) return;
+    if (!personagem.maquinaEstados.mudarEstado("crouch", { ledge: true })) return;
     personagem.pulos = Math.max(0, personagem.pulos - 1);
     personagem.isTumbling = false;
-    personagem.sprite.setFlipX(direcao < 0);
-    personagem.sprite.setVelocityX(impulsoX);
+    personagem.sprite.setVelocityX(0);
     personagem.sprite.setVelocityY(-Math.abs(area.impulso ?? 360));
     personagem.aplicarSquashPouso(1.3);
     this.cooldowns.set(personagem, agora + 600);

@@ -12,7 +12,8 @@ import { gerarQuadrosUltimateBackground } from "../../Objetos/QuadrosUltimateBac
 
 const HITBOX_MERGULHO = { largura: 130, altura: 180, offsetY: -100 };
 const HITBOX_EXPLOSAO = { largura: 230, altura: 120, offsetY: -60 };
-const DANO_EXPLOSAO = 90;
+const DANO_EXPLOSAO = 80;
+const DURACAO_HITBOX_EXPLOSAO = 700;
 
 export default class FJUlt {
   constructor(personagem, config, estadoFSM) {
@@ -33,6 +34,7 @@ export default class FJUlt {
     this.estadoAlvoCarregado = null;
     this.fundoUlt = null;
     this.hurtboxesHabilitadas = new Map();
+    this.colisoesFisicasOriginais = null;
   }
 
   executar() {
@@ -129,6 +131,20 @@ export default class FJUlt {
     this.hurtboxesHabilitadas.clear();
   }
 
+  desativarColisoesFisicas() {
+    const checkCollision = this.personagem.sprite?.body?.checkCollision;
+    if (!checkCollision || this.colisoesFisicasOriginais) return;
+    this.colisoesFisicasOriginais = { ...checkCollision };
+    checkCollision.none = true;
+  }
+
+  restaurarColisoesFisicas() {
+    const checkCollision = this.personagem.sprite?.body?.checkCollision;
+    if (!checkCollision || !this.colisoesFisicasOriginais) return;
+    Object.assign(checkCollision, this.colisoesFisicasOriginais);
+    this.colisoesFisicasOriginais = null;
+  }
+
   iniciarTelaVermelha() {
     if (this.cancelada) return;
     const cam = this.scene.cameras.main;
@@ -186,6 +202,7 @@ export default class FJUlt {
     const body = sprite.body;
     this.restaurarCenario();
     if (!this.physicsPausadaAntes) this.scene.physics.resume();
+    this.desativarColisoesFisicas();
     const cam = this.scene.cameras.main;
     cam.setZoom(this.zoomOriginal);
     cam.setScroll(this.scrollOriginal.x, this.scrollOriginal.y);
@@ -300,6 +317,7 @@ export default class FJUlt {
         body.setVelocity(0, DESCIDA_LEVITACAO / (TEMPO_VOO / 1000));
         body.setAllowGravity(false);
         body.setGravityY(0);
+        this.restaurarColisoesFisicas();
         this.subindoUlt = false;
         this.emVoo = true;
         this.fimVoo = this.scene.time.now + TEMPO_VOO;
@@ -388,6 +406,12 @@ export default class FJUlt {
       aoAtingirAlvo: (alvo) => this.danificarNaExplosao(alvo, hitbox),
     });
     this.hitboxExplosao = hitbox;
+    this.agendar(DURACAO_HITBOX_EXPLOSAO, () => {
+      this.registroExplosao?.remover();
+      this.registroExplosao = null;
+      this.hitboxExplosao?.destroy();
+      this.hitboxExplosao = null;
+    });
     this.liberarAlvoCarregado();
   }
 
@@ -559,6 +583,7 @@ export default class FJUlt {
     this.sprites.clear();
     this.restaurarCenario();
     this.restaurarHurtboxes();
+    this.restaurarColisoesFisicas();
     this.scene.atualizarCamera = this.funcaoCameraOriginal;
     const cam = this.scene.cameras.main;
     if (cam?.active) {

@@ -24,7 +24,8 @@ export default class IntroMovie extends Phaser.Scene {
     this.criarAviso();
 
     this.teclaEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-    this.input.keyboard.on("keydown-ESC", this.pular, this);
+    this.input.keyboard.on("keydown", this.pular, this);
+    this.puloPadAnterior = false;
     this.video.addEventListener("ended", this.aoTerminarVideo);
     this.events.once("shutdown", this.limparVideo, this);
 
@@ -36,7 +37,7 @@ export default class IntroMovie extends Phaser.Scene {
 
   criarVideo() {
     this.video = document.createElement("video");
-    this.video.src = "assets/Menus/IntroMovie/historia-hold.mp4";
+    this.video.src = "assets/Hud/dialogo/inicio/intross.mp4";
     this.video.autoplay = true;
     this.video.playsInline = true;
     this.video.preload = "auto";
@@ -52,15 +53,24 @@ export default class IntroMovie extends Phaser.Scene {
   criarAviso() {
     this.aviso = document.createElement("div");
     this.aviso.textContent = "CARREGANDO HISTÓRIA...";
-    this.aviso.style.cssText = "position:fixed;left:50%;bottom:5vh;transform:translateX(-50%);color:#8cffaa;font:24px monospace;text-shadow:0 0 8px #28ff88;z-index:9999;white-space:nowrap";
+    this.aviso.style.cssText = "position:fixed;left:50%;top:5vh;transform:translateX(-50%);color:#8cffaa;font:24px monospace;text-shadow:0 0 8px #28ff88;z-index:9999;white-space:nowrap";
     document.body.appendChild(this.aviso);
   }
 
   aoCarregarAssets() {
     if (this.assetsProntos) return;
     this.assetsProntos = true;
-    this.aviso.textContent = "PRESSIONE ESC PARA PULAR";
+    this.aviso.textContent = "PRESSIONE QUALQUER BOTÃO PARA PULAR";
     if (this.videoTerminou) this.irParaSelecaoDePersonagem();
+  }
+
+  update() {
+    const pads = this.input.gamepad?.gamepads ?? [];
+    const algumBotaoPressionado = pads.some((pad) =>
+      pad?.buttons?.some((botao) => !!botao?.pressed)
+    );
+    if (algumBotaoPressionado && !this.puloPadAnterior) this.pular();
+    this.puloPadAnterior = algumBotaoPressionado;
   }
 
   aoTerminarVideo = () => {
@@ -83,6 +93,6 @@ export default class IntroMovie extends Phaser.Scene {
     this.video?.pause();
     this.video?.remove();
     this.aviso?.remove();
-    this.input.keyboard.off("keydown-ESC", this.pular, this);
+    this.input.keyboard.off("keydown", this.pular, this);
   }
 }

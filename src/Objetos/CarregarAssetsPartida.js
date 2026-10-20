@@ -79,11 +79,34 @@ const assetscommon = [
   (scene, queued) => queueAsset(scene, queued, "texture", "CPU-ind", () => { scene.load.image("CPU-ind", "assets/Hud/CPU-ind.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "CPU-indV", () => { scene.load.image("CPU-indV", "assets/Hud/CPU-indV.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Sp_portrait", () => { scene.load.image("Sp_portrait", "assets/Hud/Portrait/Sp_portrait.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Sp_portrait2", () => { scene.load.image("Sp_portrait2", "assets/Hud/Portrait/Sp_portrait2.png"); }),
+
+
   (scene, queued) => queueAsset(scene, queued, "texture", "Miku_portrait", () => { scene.load.image("Miku_portrait", "assets/Hud/Portrait/Miku_portrait.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Miku_portrait2", () => { scene.load.image("Miku_portrait2", "assets/Hud/Portrait/Miku_portrait2.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Miku_portrait3", () => { scene.load.image("Miku_portrait3", "assets/Hud/Portrait/Miku_portrait3.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Ken_portrait", () => { scene.load.image("Ken_portrait", "assets/Hud/Portrait/Ken_portrait.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Ken_portrait2", () => { scene.load.image("Ken_portrait2", "assets/Hud/Portrait/Ken_portrait2.png"); }),
+
+
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_portrait", () => { scene.load.image("FJ_portrait", "assets/Hud/Portrait/FJ_portrait.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "FJ_portrait2", () => { scene.load.image("FJ_portrait2", "assets/Hud/Portrait/FJ_portrait2.png"); }),
+  
+
+
+
   (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_portrait", () => { scene.load.image("Pingu_portrait", "assets/Hud/Portrait/Pingu_portrait.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_portrait2", () => { scene.load.image("Pingu_portrait2", "assets/Hud/Portrait/Pingu_portrait2.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_portrait3", () => { scene.load.image("Pingu_portrait3", "assets/Hud/Portrait/Pingu_portrait3.png"); }),
+
+
   (scene, queued) => queueAsset(scene, queued, "texture", "Slan_portrait", () => { scene.load.image("Slan_portrait", "assets/Hud/Portrait/Slan_portrait.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Slan_portrait2", () => { scene.load.image("Slan_portrait2", "assets/Hud/Portrait/Slan_portrait2.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Slan_portrait3", () => { scene.load.image("Slan_portrait3", "assets/Hud/Portrait/Slan_portrait3.png"); }),
+
+  (scene, queued) => queueAsset(scene, queued, "texture", "Th_portrait", () => { scene.load.image("Th_portrait", "assets/Hud/Portrait/Th_portrait.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Th_portrait2", () => { scene.load.image("Th_portrait2", "assets/Hud/Portrait/Th_portrait2.png"); }),
+
   (scene, queued) => queueAsset(scene, queued, "texture", "0.png", () => { scene.load.image("0.png", "assets/Hud/DamagePercentage/0-19_/0.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "1.png", () => { scene.load.image("1.png", "assets/Hud/DamagePercentage/0-19_/1.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "2.png", () => { scene.load.image("2.png", "assets/Hud/DamagePercentage/0-19_/2.png"); }),
@@ -160,9 +183,6 @@ const assetscommon = [
   (scene, queued) => queueAsset(scene, queued, "texture", "victoryFundo", () => { scene.load.image("victoryFundo", "assets/Menus/Game_Over/victoryFundo.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "second", () => { scene.load.image("second", "assets/Menus/Game_Over/second.png" ); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "vitEfect", () => { scene.load.spritesheet("vitEfect", "assets/Menus/Game_Over/vitEfect.png", { frameWidth: 800, frameHeight: 450, }); }),
-
-
-
 
 ];
 const assetsFJ = [
@@ -633,6 +653,12 @@ const assetsstory = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Chris23", () => { scene.load.image("Chris23", "assets/Hud/dialogo/Chris/Chris23.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Chris32", () => { scene.load.image("Chris32", "assets/Hud/dialogo/Chris/Chris32.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "venceu", () => { scene.load.image("venceu", "assets/Hud/dialogo/Chris/venceu.png"); }),
+  
+
+
+
+
+
 ];
 const personagens = {
   FJ: assetsFJ,

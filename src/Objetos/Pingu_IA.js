@@ -186,17 +186,27 @@ export default class Pingu_IA extends Miku_IA {
       const margem = body.width / 2 + 24;
       const centroDestino = (destino.left + destino.right) / 2;
       const dir = Math.sign(centroDestino - bot.sprite.x) || 1;
-      const xAlvo = vao > 70
+      const plataformaAcimaBloqueando = destino.top < suporte.top - 35 &&
+        destino.right > suporte.left + margem && destino.left < suporte.right - margem;
+      const xAlvo = plataformaAcimaBloqueando
+        ? [destino.left - margem, destino.right + margem]
+          .map(x => clamp(x, suporte.left + margem, suporte.right - margem))
+          .sort((a, b) => Math.abs(a - bot.sprite.x) - Math.abs(b - bot.sprite.x))[0]
+        : vao > 70
         ? (dir > 0 ? suporte.right - margem : suporte.left + margem)
         : clamp(centroDestino, suporte.left + margem, suporte.right - margem);
       this.mover(xAlvo);
       if (Math.abs(bot.sprite.x - xAlvo) < 22) {
-        this.mover(centroDestino);
+        const xPouso = plataformaAcimaBloqueando
+          ? clamp(bot.sprite.x < centroDestino ? destino.left + margem : destino.right - margem,
+            destino.left + margem, destino.right - margem)
+          : clamp(centroDestino, destino.left + margem, destino.right - margem);
+        this.mover(xPouso);
         if (this.pular(bot, time)) {
           this.saltoPendente = {
             origem: suporte,
             destino,
-            xPouso: clamp(centroDestino, destino.left + margem, destino.right - margem),
+            xPouso,
             inicio: time,
           };
         }
@@ -212,6 +222,8 @@ export default class Pingu_IA extends Miku_IA {
       super.update(time, delta);
       return;
     }
+
+    if (this.reagirAoDano(bot, time)) return;
 
     const alvo = this.definirAlvo();
     this.ctrl.alvo = alvo;
@@ -266,5 +278,18 @@ export default class Pingu_IA extends Miku_IA {
       this.proximaDecisao = Math.min(this.proximaDecisao, time + 65);
     }
     super.update(time, delta);
+  }
+
+  reagirAoDano(bot, time) {
+    const estado = bot.maquinaEstados.estadoAtual;
+    if (estado?.nome !== "dano") return false;
+    this.ctrl.soltarTudo();
+    if (time - estado.tempoInicial >= estado.duracaoStun && !bot.sprite.body.blocked.down) {
+      this.recuperar(bot, this.plataformas(), time);
+      // JustDown tira o Pingu do tumbling; o pulo ajuda a alcançar a arena.
+      this.ctrl.pulsar("cima", 90);
+      this.proximaRecuperacao = time + 65;
+    }
+    return true;
   }
 }

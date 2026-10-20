@@ -508,9 +508,9 @@ this.vfxAtaqueNormal = {
       side: {
         animacao: "miku_sideAtack",
         frameHitbox: 3,
-        offsetX: 47,
+        offsetX: 17,
         offsetY: -60,
-        largura: 53,
+        largura: 83,
         altura: 50,
         cooldown: 900,
         duracao: 540,
