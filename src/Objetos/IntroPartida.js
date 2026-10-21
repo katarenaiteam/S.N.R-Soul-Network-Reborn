@@ -74,8 +74,21 @@ export default class IntroPartida {
 
   alvoJogador(indice) {
     const sprite = this.jogadores[indice].sprite;
-    return { x: sprite.x, y: sprite.y - 55,
-      zoom: (this.scene.mapaAtual.configCamera?.maxZoom ?? 2) * (this.scene.scale.width / 1920) };
+    const zoom = (this.scene.mapaAtual.configCamera?.maxZoom ?? 2)
+      * (this.scene.scale.width / 1920);
+    const alvo = { x: sprite.x, y: sprite.y - 55, zoom };
+    const lim = this.scene.mapaAtual.configCamera?.limites;
+    if (!lim) return alvo;
+
+    const metadeX = this.scene.camJogo.width / zoom / 2;
+    const metadeY = this.scene.camJogo.height / zoom / 2;
+    return {
+      ...alvo,
+      x: metadeX * 2 >= lim.largura ? lim.x + lim.largura / 2
+        : Phaser.Math.Clamp(alvo.x, lim.x + metadeX, lim.x + lim.largura - metadeX),
+      y: metadeY * 2 >= lim.altura ? lim.y + lim.altura / 2
+        : Phaser.Math.Clamp(alvo.y, lim.y + metadeY, lim.y + lim.altura - metadeY),
+    };
   }
 
   alvoLuta() {

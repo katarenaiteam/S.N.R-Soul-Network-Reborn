@@ -283,7 +283,7 @@ this.vfxAtaqueNormal = {
         ],
       },
       downAtack: {
-        largura: 85, altura: 170, offsetX: 198, offsetY: 209, escala: 0.34,
+        largura: 85, altura: 170, offsetX: 198, offsetY: 209, offsetVisualY: -1, escala: 0.34,
         hurtboxes: [
           { largura: 50, altura: 70, offsetX: 0, offsetY: -90 },
         ],
@@ -508,9 +508,9 @@ this.vfxAtaqueNormal = {
       side: {
         animacao: "miku_sideAtack",
         frameHitbox: 3,
-        offsetX: 17,
+        offsetX: 35,
         offsetY: -60,
-        largura: 83,
+        largura: 75,
         altura: 50,
         cooldown: 900,
         duracao: 540,

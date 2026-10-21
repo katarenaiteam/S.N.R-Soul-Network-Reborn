@@ -304,7 +304,7 @@ this.nomePersonagem = "TH30";
         largura: 65,
         altura: 60,
         offsetX: 85,
-        offsetY: 39,
+        offsetY: 39.5,
         escala: 1,
         hurtboxes: [{ largura: 60, altura: 65, offsetX: -40, offsetY: -35 }],
       },
@@ -526,7 +526,7 @@ this.nomePersonagem = "TH30";
     fim: 200,
     x: {
       de: 450,
-      para: 550,
+      para: 150,
     },
    
 

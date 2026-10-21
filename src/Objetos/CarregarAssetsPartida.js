@@ -183,6 +183,7 @@ const assetscommon = [
   (scene, queued) => queueAsset(scene, queued, "texture", "victoryFundo", () => { scene.load.image("victoryFundo", "assets/Menus/Game_Over/victoryFundo.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "second", () => { scene.load.image("second", "assets/Menus/Game_Over/second.png" ); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "vitEfect", () => { scene.load.spritesheet("vitEfect", "assets/Menus/Game_Over/vitEfect.png", { frameWidth: 800, frameHeight: 450, }); }),
+  
 
 ];
 const assetsFJ = [
@@ -619,7 +620,13 @@ const assetsSlenderMap = [
   (scene, queued) => queueAsset(scene, queued, "texture", "slen-back2", () => { scene.load.spritesheet("slen-back2", "assets/cenarios/SlenMap/slen-back2.png", { frameWidth: 960, frameHeight: 541 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "slen-plat", () => { scene.load.image("slen-plat", "assets/cenarios/SlenMap/slen-plat.png"); }),
    (scene, queued) => queueAsset(scene, queued, "audio", "backTv", () => { scene.load.audio("backTv", "assets/Hud/dialogo/Slan/backTv.mp3"); }),
+];
+const assetsFinalMap = [
 
+(scene, queued) => queueAsset(scene, queued, "texture", "moldura", () => { scene.load.image("moldura", "assets/cenarios/finalmap/moldura.png"); }),
+(scene, queued) => queueAsset(scene, queued, "texture", "crio", () => { scene.load.image("crio", "assets/cenarios/finalmap/crio.png"); }),
+(scene, queued) => queueAsset(scene, queued, "texture", "frente", () => { scene.load.image("frente", "assets/cenarios/finalmap/frente.png"); }),
+(scene, queued) => queueAsset(scene, queued, "texture", "fundo", () => { scene.load.image("fundo", "assets/cenarios/finalmap/fundo.png"); }),
 ];
 const assetsstory = [
   (scene, queued) => queueAsset(scene, queued, "audio", "Sayonara", () => { scene.load.audio("Sayonara", "assets/cenarios/MikuShow/Sayonara.wav"); }),
@@ -678,7 +685,7 @@ export function carregarAssetsVersus(scene, dados) {
     if (!nome) continue;
     carregarGrupo(scene, queued, personagens[nome] || assetsKen);
   }
-  const mapas = { Cidade: assetsCidade, MapaTeste: assetsMapaTeste, MikuMap: assetsMikuMap, SkyTowers: assetsSkyTowers, Ice:assetsIce, SlenderMap:assetsSlenderMap };
+  const mapas = { Cidade: assetsCidade, MapaTeste: assetsMapaTeste, MikuMap: assetsMikuMap, SkyTowers: assetsSkyTowers, Ice:assetsIce, SlenderMap:assetsSlenderMap, FinalMap:assetsFinalMap };
   const mapa = typeof dados.mapa === "string" ? dados.mapa : dados.ClasseMapa?.name;
   if (mapa === "Ice" && scene.textures.exists("ice-back")) {
     const texturaIce = scene.textures.get("ice-back");
@@ -698,5 +705,7 @@ export function carregarAssetsHistoria(scene) {
   carregarGrupo(scene, queued, assetsIce);
   carregarGrupo(scene, queued, assetsSlenderMap);
   carregarGrupo(scene, queued, assetsstory);
+  carregarGrupo(scene, queued, assetsFinalMap);
+
   return queued.size;
 }

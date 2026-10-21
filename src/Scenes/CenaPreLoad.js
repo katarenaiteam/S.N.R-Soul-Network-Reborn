@@ -128,6 +128,18 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("thumb_mikushow", "assets/cenarios/MikuShow/thumb_mikushow.png");
     this.load.image("thumb_ice", "assets/cenarios/Ice/thumb_ice.png");
     this.load.image("thumb_slen", "assets/cenarios/SlenMap/thumb_slen.png");
+    this.load.image("thumb_final", "assets/cenarios/finalmap/thumb_final.png");
+
+    this.load.audio("narrador-fj", "assets/efeitos/char-names/narrador-fj.mp3");
+    this.load.audio("narrador-ken", "assets/efeitos/char-names/narrador-ken.mp3");
+    this.load.audio("narrador-miku", "assets/efeitos/char-names/narrador-miku.mp3");
+    this.load.audio("narrador-spiderman", "assets/efeitos/char-names/narrador-spiderman.mp3");
+    this.load.audio("narrador-pingu", "assets/efeitos/char-names/narrador-pingu.mp3");
+    this.load.audio("narrador-slenderman", "assets/efeitos/char-names/narrador-slenderman.mp3");
+    this.load.audio("narrador-goku", "assets/efeitos/char-names/narrador-goku.mp3");
+    this.load.audio("narrador-storm", "assets/efeitos/char-names/narrador-storm.mp3");
+    this.load.audio("narrador-th30", "assets/efeitos/char-names/narrador-th30.mp3");
+    this.load.audio("narrador-wins", "assets/efeitos/char-names/narrador-wins.mp3");
 
     //versus
    this.load.image("Vs-back", "/assets/Menus/Vs/Vs-back.png");

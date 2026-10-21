@@ -12,6 +12,19 @@ const apresentacaoPersonagens = {
   Madotsuki: { nome: "MADOTSUKI", taunt: "ken_taunt", stun: "ken_stun" },
 };
 
+const AUDIO_NOME_VENCEDOR = {
+  FJ: "narrador-fj",
+  Frederick: "narrador-fj",
+  SpiderMan: "narrador-spiderman",
+  Miku: "narrador-miku",
+  Ken: "narrador-ken",
+  Slenderman: "narrador-slenderman",
+  Pingu: "narrador-pingu",
+  TH30: "narrador-th30",
+  Goku: "narrador-goku",
+  Storm: "narrador-storm",
+};
+
 export default class CenaGameOver extends Phaser.Scene {
   constructor() {
     super({ key: "CenaGameOver" });
@@ -236,11 +249,26 @@ export default class CenaGameOver extends Phaser.Scene {
     this.conteudo.add([nome, wins]);
 
     this.tweens.add({ targets: [quadro, retratoPerdedor, nome, wins], alpha: 1, duration: 450 });
+    this.tocarVozVencedor(this.resultado.vencedor?.id);
     this.bloqueado = false;
     this.input.keyboard.once("keydown-ENTER", () => this.reiniciarPartida());
     this.input.keyboard.once("keydown-F", () => this.reiniciarPartida());
     this.input.keyboard.once("keydown-J", () => this.reiniciarPartida());
     this.input.keyboard.once("keydown-SPACE", () => this.reiniciarPartida());
+  }
+
+  tocarVozVencedor(idPersonagem) {
+    const audioNome = AUDIO_NOME_VENCEDOR[idPersonagem];
+    if (!audioNome || !this.cache.audio.exists(audioNome)) {
+      if (this.cache.audio.exists("narrador-wins")) this.sound.play("narrador-wins");
+      return;
+    }
+
+    const voz = this.sound.add(audioNome);
+    voz.once("complete", () => {
+      if (this.cache.audio.exists("narrador-wins")) this.sound.play("narrador-wins");
+    });
+    voz.play();
   }
 
   update() {

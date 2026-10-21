@@ -4,7 +4,9 @@ import { gerarQuadrosUltimateBackground } from "../../Objetos/QuadrosUltimateBac
 const CAMPOS_COPIADOS = [
   "nomePersonagem", "prefixoAnim", "configAnimacoes", "golpes", "specials",
   "ult", "velocidade", "forcaPulo", "maxPulos", "maxDash", "sons",
+  "acertosSpecialStun",
 ];
+const METODOS_COPIADOS = ["aplicarDanoSpecialStun", "obterIndicadorHabilidade"];
 
 export default class TH30Ult {
   constructor(personagem, _config, estadoFSM) {
@@ -115,11 +117,20 @@ export default class TH30Ult {
     this.ultEstaCarregadaOriginal = personagem.ultEstaCarregada;
     this.spriteOriginal = { textura: personagem.sprite.texture.key, frame: personagem.sprite.frame.name };
     this.escalaOriginal = { x: personagem.sprite.scaleX, y: personagem.sprite.scaleY };
+    this.metodosOriginais = new Map(METODOS_COPIADOS.map((metodo) => [
+      metodo,
+      Object.getOwnPropertyDescriptor(personagem, metodo),
+    ]));
     const escalaConfigurada = this.alvo.configAnimacoes?.idle?.escala;
     const escalaAlvo = escalaConfigurada
       ? { x: escalaConfigurada, y: escalaConfigurada }
       : { x: this.alvo.sprite.scaleX, y: this.alvo.sprite.scaleY };
     for (const campo of CAMPOS_COPIADOS) personagem[campo] = this.alvo[campo];
+    for (const metodo of METODOS_COPIADOS) {
+      if (typeof this.alvo[metodo] === "function") {
+        personagem[metodo] = this.alvo[metodo].bind(personagem);
+      }
+    }
     personagem.sprite.setScale(escalaAlvo.x, escalaAlvo.y);
     personagem.sprite.setTint(0x399cff);
     personagem.ultCarga = personagem.ultCargaMax * 0.9;
@@ -158,10 +169,6 @@ export default class TH30Ult {
   atualizar() {
     this.ajustarFundoUltimate();
     if (!this.camposOriginais) return;
-    if (this.personagem.maquinaEstados.estadoAtual?.nome === "dead") {
-      this.restaurarForma();
-      return;
-    }
     if (this.transformacaoAtiva) this.personagem.sprite.setTint(0x399cff);
   }
 
@@ -170,15 +177,28 @@ export default class TH30Ult {
     this.tweenEmergencia?.stop();
     this.timerForma?.remove();
     const personagem = this.personagem;
+    const body = personagem.sprite.body;
+    const baseCorpoAntes = body?.bottom;
     const cargaRestante = personagem.ultCarga > 0;
     for (const campo of CAMPOS_COPIADOS) personagem[campo] = this.camposOriginais[campo];
+    for (const [metodo, descriptor] of this.metodosOriginais ?? []) {
+      if (descriptor) Object.defineProperty(personagem, metodo, descriptor);
+      else delete personagem[metodo];
+    }
+    this.metodosOriginais = null;
     personagem.ultEstaCarregada = this.ultEstaCarregadaOriginal;
     personagem.sprite.clearTint();
     personagem.sprite.setScale(this.escalaOriginal.x, this.escalaOriginal.y);
     personagem.ultCarga = cargaRestante ? personagem.ultCargaMax * 0.5 : 0;
     personagem.transformacaoTH30 = null;
     personagem.sprite.setTexture(this.spriteOriginal.textura, this.spriteOriginal.frame);
-    if (personagem.maquinaEstados.estadoAtual?.nome !== "dead") personagem.tocarAnimacao("idle");
+    personagem.tocarAnimacao(
+      personagem.maquinaEstados.estadoAtual?.nome === "dead" ? "dead" : "idle"
+    );
+    if (body && Number.isFinite(baseCorpoAntes)) {
+      personagem.sprite.y += baseCorpoAntes - body.bottom;
+      body.updateFromGameObject();
+    }
     this.camposOriginais = null;
     this.finalizarUlt();
   }

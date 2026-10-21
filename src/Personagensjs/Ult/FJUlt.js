@@ -232,6 +232,16 @@ export default class FJUlt {
         ? pisoPrincipal.body.top - alturaVisivel * 1.2
         : cam.scrollY - alturaVisivel * 0.2,
     };
+    const margem = 70 * (this.scene.scale.width / 1920);
+    const zoomMapaAjustado = limitesArena
+      ? Math.min(
+        (cam.width - margem * 2) / limitesArena.largura,
+        (cam.height - margem * 2) / limitesArena.altura,
+      )
+      : this.zoomOriginal * 0.65;
+    const zoomSubida = Math.min(this.zoomOriginal, zoomMapaAjustado * 1.45);
+    cam.pan(this.alvoVoo.x, this.alvoVoo.y, 850, "Cubic.easeInOut");
+    cam.zoomTo(zoomSubida, 850);
     this.subindoUlt = true;
   }
 

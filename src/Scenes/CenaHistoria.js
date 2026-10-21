@@ -124,6 +124,8 @@ export default class CenaHistoria extends Phaser.Scene {
       dash: Phaser.Input.Keyboard.KeyCodes.NUMPAD_ZERO,
       atack: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FOUR,
       special: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FIVE,
+      atackAlternativo: Phaser.Input.Keyboard.KeyCodes.J,
+      specialAlternativo: Phaser.Input.Keyboard.KeyCodes.K,
       });
       const controleP2 = new ControleEntrada(this, teclasP2, 1);
 

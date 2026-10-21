@@ -204,6 +204,18 @@ export const PERSONAGENS = [
   }
 ];
 
+const AUDIO_NOME_PERSONAGEM = {
+  FJ: "narrador-fj",
+  SpiderMan: "narrador-spiderman",
+  Pingu: "narrador-pingu",
+  Storm: "narrador-storm",
+  Miku: "narrador-miku",
+  Ken: "narrador-ken",
+  Slenderman: "narrador-slenderman",
+  Goku: "narrador-goku",
+  TH30: "narrador-th30",
+};
+
 const VELOCIDADE_MAO = 900;
 const ESCALA_MAO = 0.22;
 const ESCALA_FICHA = 0.17;
@@ -846,6 +858,8 @@ export default class Charmenu extends Phaser.Scene {
     if (!jogador.hover) return;
 
     jogador.selecionado = jogador.hover;
+    const audioNome = AUDIO_NOME_PERSONAGEM[jogador.selecionado.id];
+    if (audioNome && this.cache.audio.exists(audioNome)) this.sound.play(audioNome);
 
     jogador.ficha = this.add
       .image(

@@ -4,8 +4,6 @@ export default class EstadoDead extends EstadoBase {
   enter() {
     this.personagem.sprite.setVelocityX(0);
     this.levantando = false;
-    this.personagem.transformacaoTH30?.restaurarForma();
-
     // Toca a animação do personagem caído no chão
     this.personagem.tocarAnimacao("dead");
   }

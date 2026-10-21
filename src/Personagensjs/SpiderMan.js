@@ -703,7 +703,7 @@ export default class SpiderMan extends Personagem {
   animacao: "spy_downAir",
   frameHitbox: 2,
   offsetX: 34,
-  offsetY: -30,
+  offsetY: -25,
   largura: 60,
   altura: 70,
   cooldown: 500,

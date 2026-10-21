@@ -5,6 +5,7 @@ import MapaTeste from "../Mapasjs/MapaTeste.js";
 import MikuMap from "../Mapasjs/MikuMap.js";
 import Ice from "../Mapasjs/Ice.js";
 import SlenderMap from "../Mapasjs/SlenderMap.js";
+import FinalMap from "../Mapasjs/Final.js";
 import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 
 export default class CenaSelecaoMapa extends Phaser.Scene {
@@ -53,6 +54,7 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
       { id: "MikuMap", nome: "MikuMap", classe: MikuMap, chaveSprite: "thumb_mikushow" },
       { id: "SlenderMap", nome: "SlenderMap", classe: SlenderMap, chaveSprite: "thumb_slen" },
       { id: "Ice", nome: "Ice", classe: Ice, chaveSprite: "thumb_ice" },
+      { id: "FinalMap", nome: "FinalMap", classe: FinalMap, chaveSprite: "thumb_final" },
     ];
 
     this.indiceOpcao = 0; // Começa no primeiro mapa

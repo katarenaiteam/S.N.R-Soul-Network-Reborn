@@ -63,8 +63,10 @@ export default class ControleEntrada {
     this.estadoAtual.cima = this._teclaDown("cima") || padCima || padPular;
     this.estadoAtual.baixo = baixoAgora;
     this.estadoAtual.dash = this._teclaDown("dash") || padDash;
-    this.estadoAtual.atack = this._teclaDown("atack") || padAtack;
-    this.estadoAtual.special = this._teclaDown("special") || padSpecial;
+    this.estadoAtual.atack = this._teclaDown("atack") ||
+      this._teclaDown("atackAlternativo") || padAtack;
+    this.estadoAtual.special = this._teclaDown("special") ||
+      this._teclaDown("specialAlternativo") || padSpecial;
     this.estadoAtual.guard = this.estadoAtual.dash;
   }
 

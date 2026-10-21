@@ -132,7 +132,7 @@ this.nomePersonagem = "FJ";
         largura: 250,
         altura: 400,
         offsetX: 145,
-        offsetY: -80,
+        offsetY: -84.5,
         escala: 0.33,
         hurtboxes: [
            { largura: 50, altura: 20, offsetX: 30, offsetY: -77 },

@@ -78,7 +78,7 @@ export default class cenaPrincipal extends Phaser.Scene {
 
    // O mapa Cidade usa coordenadas ate 2600x1400. O limite antigo de
    // 1920x640 deixava toda a luta principal fora do mundo fisico.
-   const limitesMundo = this.mapaAtual.configCamera?.limites;
+   const limitesMundo = this.mapaAtual.limitesFisicos ?? this.mapaAtual.configCamera?.limites;
    if (limitesMundo) {
      this.physics.world.setBounds(
        limitesMundo.x,
@@ -116,6 +116,8 @@ export default class cenaPrincipal extends Phaser.Scene {
       dash: Phaser.Input.Keyboard.KeyCodes.NUMPAD_ZERO,
       atack: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FOUR,
       special: Phaser.Input.Keyboard.KeyCodes.NUMPAD_FIVE,
+      atackAlternativo: Phaser.Input.Keyboard.KeyCodes.J,
+      specialAlternativo: Phaser.Input.Keyboard.KeyCodes.K,
     });
 
     const controleP1 = new ControleEntrada(this, teclasP1, 0);
@@ -803,6 +805,8 @@ this.indicadorP2 = this.criarIndicador(
 }
 
   processarQueda(jogador, pontoRespawn, numJogador) {
+    if (this.mortesVS.pendentes.has(jogador) || jogador.eliminado) return;
+    jogador.transformacaoTH30?.restaurarForma();
     if (!this.mortesVS.iniciar(jogador, pontoRespawn, numJogador)) return;
     jogador.ganharCargaUltPorMorte();
     // Desconta a vida do jogador correspondente
