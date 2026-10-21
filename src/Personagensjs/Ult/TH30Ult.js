@@ -13,9 +13,7 @@ export default class TH30Ult {
     this.personagem = personagem;
     this.scene = personagem.scene;
     this.estadoFSM = estadoFSM;
-    this.alvo = obterAlvosCombate(personagem)
-      .filter((alvo) => alvo?.sprite?.active && alvo.maquinaEstados)
-      .sort((a, b) => Math.abs(a.sprite.x - personagem.sprite.x) - Math.abs(b.sprite.x - personagem.sprite.x))[0];
+    this.alvo = this.obterAlvo();
     this.camera = this.scene.cameras.main;
     this.cameraOriginal = { x: this.camera.scrollX, y: this.camera.scrollY, zoom: this.camera.zoom };
     this.atualizarCameraOriginal = this.scene.atualizarCamera;
@@ -23,8 +21,31 @@ export default class TH30Ult {
     this.finalizada = false;
   }
 
+  obterAlvo() {
+    const candidatos = [
+      ...obterAlvosCombate(this.personagem),
+      ...(this.scene.participantes ?? []).map(({ jogador }) => jogador),
+      this.scene.jogador1,
+      this.scene.jogador2,
+      this.scene.jogador3,
+      this.scene.jogador4,
+      this.scene.boss,
+    ];
+    return [...new Set(candidatos)]
+      .filter((alvo) => alvo && alvo !== this.personagem && !alvo.eliminado &&
+        alvo.sprite?.active && alvo.maquinaEstados)
+      .sort((a, b) => Math.abs(a.sprite.x - this.personagem.sprite.x) -
+        Math.abs(b.sprite.x - this.personagem.sprite.x))[0] ?? null;
+  }
+
+  cancelarSemAlvo() {
+    this.personagem.ultCarga = this.personagem.ultCargaMax;
+    this.finalizarUlt();
+  }
+
   executar() {
-    if (!this.alvo) return this.finalizarUlt();
+    this.alvo = this.obterAlvo();
+    if (!this.alvo) return this.cancelarSemAlvo();
     const sprite = this.personagem.sprite;
     this.scene.atualizarCamera = () => {};
     this.camera.stopFollow();
@@ -110,7 +131,9 @@ export default class TH30Ult {
   }
 
   transformar() {
-    if (this.finalizada || !this.alvo?.sprite?.active) return this.finalizarUlt();
+    if (this.finalizada) return;
+    this.alvo = this.obterAlvo();
+    if (!this.alvo) return this.cancelarSemAlvo();
     const personagem = this.personagem;
     this.limparCenarioUltimate();
     this.camposOriginais = Object.fromEntries(CAMPOS_COPIADOS.map((campo) => [campo, personagem[campo]]));

@@ -240,7 +240,8 @@ export default class FJUlt {
       )
       : this.zoomOriginal * 0.65;
     const zoomSubida = Math.min(this.zoomOriginal, zoomMapaAjustado * 1.45);
-    cam.pan(this.alvoVoo.x, this.alvoVoo.y, 850, "Cubic.easeInOut");
+    const centroCameraOriginalY = this.scrollOriginal.y + cam.height / (2 * this.zoomOriginal);
+    cam.pan(this.alvoVoo.x, centroCameraOriginalY, 850, "Cubic.easeInOut");
     cam.zoomTo(zoomSubida, 850);
     this.subindoUlt = true;
   }
