@@ -189,6 +189,7 @@ export default class CenaHistoria extends Phaser.Scene {
       const y = 1080 - 358 * escalaHUD - 20;
       entrada.hud = criarHudPartida.call(this, jogador, entrada.escolha, x, y, direita);
       entrada.hud.setScale(escalaHUD);
+      if (jogador === this.boss && this.esconderBarraUltBoss) entrada.hud.barraUlt?.setVisible(false);
       entrada.textoVidas = this.add.text(direita ? -420 : 10, 155,
         entrada.rotulo + ' - VIDAS: ' + jogador.vidas,
         { fontSize: '28px', color: direita ? '#ff6666' : '#ffffff', fontStyle: 'bold' });
@@ -329,7 +330,7 @@ this.indicadorCPU = this.criarIndicador(
         jogador.atualizarCargaUlt(delta);
         jogador.update();
       }
-      atualizarBarraUlt.call(this, jogador, entrada.hud);
+      if (!(jogador === this.boss && this.esconderBarraUltBoss)) atualizarBarraUlt.call(this, jogador, entrada.hud);
     }
  
       this.sistemaPlataformasAtravessaveis.atualizar();
@@ -461,12 +462,12 @@ this.indicadorCPU = this.criarIndicador(
   }
 
   calcularAlvoCamera() {
+    const config = this.mapaAtual.configCamera;
     const sprites = this.participantes
       .filter(({ jogador }) => !jogador.eliminado && jogador.sprite.active)
       .map(({ jogador }) => jogador.sprite);
     if (!sprites.length) return null;
     const cam = this.camJogo;
-    const config = this.mapaAtual.configCamera;
     const minX = Math.min(...sprites.map(p => p.x));
     const maxX = Math.max(...sprites.map(p => p.x));
     const minY = Math.min(...sprites.map(p => p.y));
@@ -476,10 +477,7 @@ this.indicadorCPU = this.criarIndicador(
     const distMax = config.distMaxima ?? 1200;
     const fator = Phaser.Math.Clamp((distancia - distMin) / Math.max(1, distMax - distMin), 0, 1);
     const escalaResolucao = this.scale.width / 1920;
-    const zoomDistancia = Phaser.Math.Linear(config.maxZoom ?? 2, config.minZoom ?? 1, fator) * escalaResolucao;
-    // Mantem a curva do versus, abrindo mais quando necessario para o cooperativo.
-    const zoom = Math.min(zoomDistancia, cam.width / (maxX - minX + 260),
-      cam.height * 0.76 / (maxY - minY + 280));
+    const zoom = Phaser.Math.Linear(config.maxZoom ?? 2, config.minZoom ?? 1, fator) * escalaResolucao;
     return { ...this.limitarCentroCamera((minX + maxX) / 2, (minY + maxY) / 2, zoom), zoom };
   }
 
@@ -496,17 +494,14 @@ this.indicadorCPU = this.criarIndicador(
   }
 
   atualizarCamera(delta = 1000 / 60) {
+    if (this.mortesVS?.pendentes.size || this.mortesVS?.tvAtiva) return;
     const alvo = this.calcularAlvoCamera();
     if (!alvo) return;
     const cam = this.camJogo;
-    // Mesma suavidade do versus a 60 FPS, independente da taxa de quadros.
-    const quadros = Math.min(delta, 100) / (1000 / 60);
-    const suavidadeZoom = 1 - Math.pow(0.95, quadros);
-    const suavidadePosicao = 1 - Math.pow(0.9, quadros);
-    const zoom = Phaser.Math.Linear(cam.zoom, alvo.zoom, suavidadeZoom);
+    cam.zoom = Phaser.Math.Linear(cam.zoom, alvo.zoom, 0.05);
     const centro = this.limitarCentroCamera(
-      Phaser.Math.Linear(cam.midPoint.x, alvo.x, suavidadePosicao),
-      Phaser.Math.Linear(cam.midPoint.y, alvo.y, suavidadePosicao), zoom);
-    cam.setZoom(zoom).centerOn(centro.x, centro.y);
+      Phaser.Math.Linear(cam.midPoint.x, alvo.x, 0.1),
+      Phaser.Math.Linear(cam.midPoint.y, alvo.y, 0.1), cam.zoom);
+    cam.centerOn(centro.x, centro.y);
   }
 }

@@ -41,7 +41,6 @@ export default class FinalMap {
             distMinima: 100,
             distMaxima: 1200
         };
-
         // 2. LIMITES DE MORTE
         this.limitesArena = {
             minX: 100,

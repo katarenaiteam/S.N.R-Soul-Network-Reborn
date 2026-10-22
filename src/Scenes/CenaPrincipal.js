@@ -9,6 +9,7 @@ import MikuMap from "../Mapasjs/MikuMap.js";
 import Ice from "../Mapasjs/Ice.js";
 import SlenderMap from "../Mapasjs/SlenderMap.js";
 import SkyTowers from "../Mapasjs/SkyTowers.js";
+import FinalMap from "../Mapasjs/Final.js";
 import FJ from "../Personagensjs/Frederick.js";
 import SpiderMan from "../Personagensjs/SpiderMan.js";
 import Miku from "../Personagensjs/Miku.js";
@@ -20,7 +21,7 @@ import ControleEntrada from "../Objetos/ControleEntrada.js";
 import SistemaPlataformasAtravessaveis from "../Objetos/SistemaPlataformasAtravessaveis.js";
 import SistemaLedge from "../Objetos/SistemaLedge.js";
 import IntroPartida from "../Objetos/IntroPartida.js";
-import { prepararTexturaTeia, limparAssetsPartida } from "../Objetos/CarregarAssetsPartida.js";
+import { prepararTexturaTeia, limparAssetsPartida, carregarAssetsVersus } from "../Objetos/CarregarAssetsPartida.js";
 import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 import ChuvaMikuLoja from "../Objetos/ChuvaMikuLoja.js";
 import LojaEspectador from "../Objetos/LojaEspectador.js";
@@ -38,10 +39,18 @@ export default class cenaPrincipal extends Phaser.Scene {
     this.escolhaP2 = dados.p2 || "Madotsuki";
     this.posicoesIniciaisEspectador = dados.posicoesIniciais ?? null;
 
-    const mapas = { Cidade: MapaCidade, MapaTeste, MikuMap, SlenderMap, Ice, SkyTowers };
+    const mapas = { Cidade: MapaCidade, MapaTeste, MikuMap, SlenderMap, Ice, SkyTowers, FinalMap };
     this.ClasseMapa = dados.ClasseMapa || mapas[dados.mapa] || MapaCidade;
     this.modoEspectador = dados.espectador === true;
 
+  }
+
+  preload() {
+    carregarAssetsVersus(this, {
+      p1: this.escolhaP1,
+      p2: this.escolhaP2,
+      mapa: this.ClasseMapa?.name,
+    });
   }
 
   create() {

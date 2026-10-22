@@ -40,6 +40,10 @@ export default class TH30_IA extends Miku_IA {
   }
 
   update(time, delta) {
+    if (this.ctrl.scene.poseAuraTH30Ativa) {
+      this.ctrl.soltarTudo();
+      return;
+    }
     const bot = this.ctrl.bot;
     const estado = bot?.maquinaEstados?.estadoAtual;
     if (estado?.nome === "special") {

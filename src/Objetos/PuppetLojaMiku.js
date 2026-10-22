@@ -4,8 +4,10 @@ import {
 } from "./SistemaCombateEspecial.js";
 
 export default class PuppetLojaMiku {
-  constructor(scene) {
+  constructor(scene, opcoes = {}) {
     this.scene = scene;
+    this.aliada = opcoes.aliada === true;
+    this.limpezaSeguraTH30 = opcoes.limpezaSeguraTH30 === true;
     this.dono = scene.personagemAmbientalLoja ??= {
       scene,
       nomePersonagem: "Miku",
@@ -18,8 +20,14 @@ export default class PuppetLojaMiku {
 
     const x = (scene.mapaAtual.spawnsIniciais.p1.x + scene.mapaAtual.spawnsIniciais.p2.x) / 2;
     const y = Math.min(scene.mapaAtual.spawnsIniciais.p1.y, scene.mapaAtual.spawnsIniciais.p2.y) - 250;
+    if (opcoes.criarAnimacao && !scene.anims.exists("miku_puppet_move")) scene.anims.create({
+      key: "miku_puppet_move",
+      frames: scene.anims.generateFrameNumbers("Miku_puppet", { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1,
+    });
     this.sprite = scene.physics.add.sprite(x, y, "Miku_puppet", 0);
-    this.sprite.setOrigin(0.5, 1).setScale(1.8).setDepth(20).play("miku_puppet_move");
+    this.sprite.setOrigin(0.5, 1).setScale(this.aliada ? 1.2 : 1.8).setDepth(20).play("miku_puppet_move");
     this.sprite.body.setSize(58, 88);
     this.sprite.body.setOffset(51, 58);
     this.sprite.body.debugShowBody = false;
@@ -153,7 +161,8 @@ export default class PuppetLojaMiku {
     this.colliderMapa?.destroy();
     this.colliderMapa = null;
     if (this.hurtbox?.body) this.hurtbox.body.enable = false;
-    this.grupoHurtbox?.clear(true, true);
+    if (this.limpezaSeguraTH30) this.hurtbox?.destroy();
+    else this.grupoHurtbox?.clear(true, true);
     this.grupoHurtbox = null;
     this.hurtbox = null;
     this.scene.alvosAtaqueExtras = (this.scene.alvosAtaqueExtras ?? []).filter(

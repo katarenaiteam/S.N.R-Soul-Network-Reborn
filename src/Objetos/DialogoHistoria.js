@@ -117,6 +117,7 @@ export default class DialogoHistoria {
     this.container.add([fundoPainel, caixa, this.retrato, this.texto]);
 
     this.aoTeclar = evento => {
+      if (evento.repeat) return;
       const tecla = evento.keyCode;
       if (tecla === Phaser.Input.Keyboard.KeyCodes.SPACE ||
           tecla === Phaser.Input.Keyboard.KeyCodes.ENTER ||
@@ -239,6 +240,7 @@ export default class DialogoHistoria {
       this.concluirDigitacao();
       return;
     }
+    if (this.falas[this.indice].aoAvancar?.() === true) return;
     this.indice++;
     if (this.indice >= this.falas.length) {
       if (!this.prepararPersonagens) {

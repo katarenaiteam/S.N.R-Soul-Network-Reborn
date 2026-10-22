@@ -13,7 +13,7 @@ function obterIdEfeito(prefixo) {
 }
 
 export class RaioLoja {
-  constructor(scene, x, y) {
+  constructor(scene, x, y, opcoes = {}) {
     this.scene = scene;
     this.x = x;
     this.y = y;
@@ -39,7 +39,19 @@ export class RaioLoja {
     const limites = scene.limitesArena;
     const topo = limites.minY ?? limites.topo;
     this.sprite.y = topo - 330;
-    this.sprite.play("loja-raio");
+    if (opcoes.animacaoCompletaTH30) {
+      this.sprite.play("loja-raio");
+    } else {
+      this.sprite.anims.stop();
+      this.sprite.setFrame(0);
+      this.animacaoQuadros = scene.time.addEvent({
+        delay: 1000 / 14,
+        repeat: 5,
+        callback: () => {
+          if (this.sprite?.active) this.sprite.setFrame(Number(this.sprite.frame.name) + 1);
+        },
+      });
+    }
     this.tween = scene.tweens.add({
       targets: this.sprite,
       y: y - 120,
@@ -98,6 +110,7 @@ export class RaioLoja {
     this.scene.events.off("shutdown", this.aoEncerrar);
     this.tween?.stop();
     this.timer?.remove(false);
+    this.animacaoQuadros?.remove(false);
     this.ataque?.remover();
     this.hitbox?.destroy();
     this.sprite?.destroy();

@@ -581,6 +581,7 @@ const assetsTH30 = [
   (scene, queued) => queueAsset(scene, queued, "texture", "th_soup", () => { scene.load.spritesheet("th_soup", "assets/personagens/Th30/Sprites/th_soup.png", { frameWidth: 116, frameHeight: 18 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "th_emerge", () => { scene.load.spritesheet("th_emerge", "assets/personagens/Th30/Sprites/th_emerge.png", { frameWidth: 118, frameHeight: 166 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "th_proj", () => { scene.load.spritesheet("th_proj", "assets/personagens/Th30/Sprites/th_proj.png", { frameWidth: 108, frameHeight: 124 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "pose-aura", () => { scene.load.spritesheet("pose-aura", "assets/personagens/Th30/Sprites/pose-aura.png", { frameWidth: 120, frameHeight: 217 }); }),
 
   //(scene, queued) => queueAsset(scene, queued, "audio", " ", () => { scene.load.audio("pingu-intro", "assets/personagens/Pingu/Audio/pingu-intro.wav"); }),
 ];
