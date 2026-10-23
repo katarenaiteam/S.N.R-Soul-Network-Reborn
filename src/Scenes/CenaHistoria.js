@@ -59,14 +59,30 @@ export default class CenaHistoria extends Phaser.Scene {
   }
   aoPerderHistoria() {
     this.sound.stopAll();
-    this.scene.start("CenaGameOver");
+    const perdedores = (this.participantes ?? [])
+      .filter(({ jogador }) => jogador !== this.boss)
+      .map(({ jogador, escolha }) => ({
+        id: escolha,
+        nome: jogador.nomePersonagem,
+      }));
+    const resultado = {
+      vencedor: {
+        id: this.inimigoNome,
+        nome: this.boss?.nomePersonagem ?? this.inimigoNome,
+      },
+      perdedor: perdedores[0],
+      perdedores,
+      historia: true,
+    };
+    this.manterAssetsGameOver = true;
+    this.scene.start("CenaGameOver", resultado);
   }
 
   create() {
     encerrarOutrasCenas(this);
     this.events.once("shutdown", () => {
       this.sound.stopAll();
-      if (!this.manterAssetsParaHistoria2) limparAssetsPartida(this);
+      if (!this.manterAssetsParaHistoria2 && !this.manterAssetsGameOver) limparAssetsPartida(this);
     });
     this.cameras.main.fadeIn(350, 0, 0, 0);
     prepararTexturaTeia(this);

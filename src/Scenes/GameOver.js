@@ -227,16 +227,27 @@ export default class CenaGameOver extends Phaser.Scene {
       .setAlpha(0);
     this.conteudo.add(quadro);
 
-    const spritePerdedor = this.adicionarPersonagemAnimado(
-      infoPerdedor.stun,
-      largura * 0.245,
-      altura * 0.84,
-      altura * 0.40,
-      4,
-      { larguraMaxima: largura * 0.38, centralizar: true },
-    );
-    const retratoPerdedor = this.criarRetratoRecortado(spritePerdedor, largura, altura);
-    retratoPerdedor.setAlpha(0);
+    const perdedores = Array.isArray(this.resultado.perdedores) && this.resultado.perdedores.length
+      ? this.resultado.perdedores
+      : [perdedor];
+    const retratosPerdedores = perdedores.map((personagem, indice) => {
+      const info = apresentacaoPersonagens[personagem.id] || infoPerdedor;
+      const emDupla = perdedores.length > 1;
+      const x = emDupla
+        ? largura * (indice === 0 ? 0.15 : 0.35)
+        : largura * 0.245;
+      const sprite = this.adicionarPersonagemAnimado(
+        info.stun,
+        x,
+        altura * 0.84,
+        altura * 0.40,
+        4,
+        { larguraMaxima: largura * 0.38, centralizar: true },
+      );
+      const retrato = this.criarRetratoRecortado(sprite, largura, altura);
+      retrato?.setAlpha(0);
+      return retrato;
+    }).filter(Boolean);
 
     const estiloNome = {
       fontFamily: "SmashBros, Georgia, serif",
@@ -250,7 +261,7 @@ export default class CenaGameOver extends Phaser.Scene {
     }).setAlpha(0);
     this.conteudo.add([nome, wins]);
 
-    this.tweens.add({ targets: [quadro, retratoPerdedor, nome, wins], alpha: 1, duration: 450 });
+    this.tweens.add({ targets: [quadro, ...retratosPerdedores, nome, wins], alpha: 1, duration: 450 });
     this.tocarVozVencedor(this.resultado.vencedor?.id);
     this.bloqueado = false;
     this.input.keyboard.once("keydown-ENTER", () => this.reiniciarPartida());

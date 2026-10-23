@@ -51,8 +51,7 @@ export default class CenaHistoria2 extends CenaHistoria {
     }
     this.boss.maquinaEstados.mudarEstado("taunt");
     this.time.delayedCall(2200, () => {
-      this.sound.stopAll();
-      this.scene.start("CenaGameOver");
+      super.aoPerderHistoria();
     });
   }
 
