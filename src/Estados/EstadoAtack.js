@@ -441,6 +441,10 @@ export default class EstadoAtack extends EstadoBase {
       golpe.largura,
       golpe.altura
     );
+    this.personagem.scene.mapaAtual?.registrarGolpeNoTeto?.(
+      this.hitboxAtual,
+      golpe.propriedades?.dano ?? 0
+    );
 
     if (primeiraHitbox) {
       this.personagem.tocarSomSorteado(

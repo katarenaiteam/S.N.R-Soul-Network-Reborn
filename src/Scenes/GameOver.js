@@ -37,7 +37,9 @@ export default class CenaGameOver extends Phaser.Scene {
   create() {
     encerrarOutrasCenas(this);
     const mqtt = this.registry.get("clienteMQTT");
-    if (mqtt?.papel === "host") mqtt.clearState();
+    this.events.once("shutdown", () => {
+      if (mqtt?.papel === "host") mqtt.clearState();
+    });
 
     const largura = this.scale.width;
     const altura = this.scale.height;

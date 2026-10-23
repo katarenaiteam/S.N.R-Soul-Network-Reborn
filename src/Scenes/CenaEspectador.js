@@ -5,6 +5,7 @@ const ROTAS_ESPECTADOR = {
   "selecao-mapa": "CenaSelecaoMapa",
   "preload-versus": "CenaPreloadVersus",
   partida: "cenaPrincipal",
+  "game-over": "CenaGameOver",
 };
 const TEMPO_MAXIMO_ESTADO_MS = 30000;
 const TEMPO_VALIDACAO_ESTADO_MS = 1500;
@@ -167,7 +168,7 @@ export default class CenaEspectador extends Phaser.Scene {
 
     if (destino === this.cenaReplicada) return;
 
-    this.pararCenaReplicada();
+    this.pararCenaReplicada(destino === "CenaGameOver");
     this.cenaReplicada = destino;
     const dados = this.dadosDaCena(estado, destino);
     this.scene.launch(destino, dados);
@@ -175,6 +176,9 @@ export default class CenaEspectador extends Phaser.Scene {
   }
 
   dadosDaCena(estado, destino) {
+    if (destino === "CenaGameOver") {
+      return { ...estado.dados, espectador: true };
+    }
     if (destino === "cenaPrincipal" || destino === "CenaPreloadVersus") {
       return {
         p1: estado.dados?.personagens?.p1 ?? estado.dados?.p1,
@@ -187,8 +191,11 @@ export default class CenaEspectador extends Phaser.Scene {
     return { ...estado.dados, espectador: true };
   }
 
-  pararCenaReplicada() {
+  pararCenaReplicada(preservarAssetsGameOver = false) {
     if (this.cenaReplicada && this.scene.isActive(this.cenaReplicada)) {
+      if (preservarAssetsGameOver) {
+        this.scene.get(this.cenaReplicada).preservarAssetsGameOver = true;
+      }
       this.scene.stop(this.cenaReplicada);
     }
     this.cenaReplicada = null;

@@ -1,4 +1,5 @@
 import EstadoBase from "../Estados/EstadoBase.js";
+import { publicarEstadoVersus } from "./PublicarEstadoVersus.js";
 
 const TEMPO_CODIGOS = 2000;
 const LETRAS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコ";
@@ -334,11 +335,19 @@ export default class MorteVS {
       const p1Perdeu = this.scene.vidasP1 <= 0;
       const vencedor = p1Perdeu ? this.scene.jogador2 : this.scene.jogador1;
       const perdedor = p1Perdeu ? this.scene.jogador1 : this.scene.jogador2;
+      const resultado = {
+        vencedor: {
+          id: p1Perdeu ? this.scene.escolhaP2 : this.scene.escolhaP1,
+          nome: vencedor.nomePersonagem,
+        },
+        perdedor: {
+          id: p1Perdeu ? this.scene.escolhaP1 : this.scene.escolhaP2,
+          nome: perdedor.nomePersonagem,
+        },
+      };
+      publicarEstadoVersus(this.scene, "game-over", resultado);
       this.scene.preservarAssetsGameOver = true;
-      this.scene.scene.start("CenaGameOver", {
-        vencedor: { id: p1Perdeu ? this.scene.escolhaP2 : this.scene.escolhaP1, nome: vencedor.nomePersonagem },
-        perdedor: { id: p1Perdeu ? this.scene.escolhaP1 : this.scene.escolhaP2, nome: perdedor.nomePersonagem },
-      });
+      this.scene.scene.start("CenaGameOver", resultado);
       return;
     }
     for (const e of this.loteTV) {

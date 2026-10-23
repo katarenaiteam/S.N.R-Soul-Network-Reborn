@@ -95,7 +95,7 @@ export default class Pingu extends Personagem {
         largura: 30,
         altura: 45,
         offsetX: 5,
-        offsetY: -5,
+        offsetY: -10,  //-8
         escala: 1,
         hurtboxes: [
         ],
@@ -273,7 +273,7 @@ export default class Pingu extends Personagem {
         ],
       },
 
-      neSpecial: { offsetVisualY: 14, offsetVisualX: -4, largura: 30, altura: 70, offsetX: 21, offsetY: 16, escala: 1,
+      neSpecial: { offsetVisualY: 14, offsetVisualX: -4, largura: 30, altura: 70, offsetX: 21, offsetY: 18, escala: 1,  //17
         hurtboxes: [
           { largura: 30, altura: 55, offsetX: -4, offsetY: -40 }, 
         ],

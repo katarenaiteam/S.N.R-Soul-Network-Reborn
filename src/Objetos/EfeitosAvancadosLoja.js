@@ -17,7 +17,7 @@ export class RaioLoja {
     this.scene = scene;
     this.x = x;
     this.y = y;
-    this.dono = obterDonoAmbiental(scene);
+    this.dono = opcoes.dono ?? obterDonoAmbiental(scene);
     this.alvosAtingidos = new Set();
     this.encerrado = false;
     this.sprite = scene.physics.add.sprite(x, 0, "Loja_raio", 0)

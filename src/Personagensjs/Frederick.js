@@ -181,7 +181,7 @@ this.nomePersonagem = "FJ";
         largura: 250,
         altura: 400,
         offsetX: 142,
-        offsetY: -80,
+        offsetY: -81,
         escala: 0.33,
         hurtboxes: [],
       },
@@ -190,7 +190,7 @@ this.nomePersonagem = "FJ";
         largura: 250,
         altura: 400,
         offsetX: 138,
-        offsetY: -49, // Mantem a base do corpo na mesma altura do idle.
+        offsetY: -47,  //-49
         escala: 0.33,
         hurtboxes: [
           { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
@@ -455,7 +455,7 @@ this.nomePersonagem = "FJ";
         largura: 250,
         altura: 400,
         offsetX: 140,
-        offsetY: 23,
+        offsetY: 15, // 23
         escala: 0.33,
         hurtboxes: [
           { largura: 55, altura: 60, offsetX: 0, offsetY: -70 },

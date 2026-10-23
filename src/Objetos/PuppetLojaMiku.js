@@ -161,8 +161,11 @@ export default class PuppetLojaMiku {
     this.colliderMapa?.destroy();
     this.colliderMapa = null;
     if (this.hurtbox?.body) this.hurtbox.body.enable = false;
-    if (this.limpezaSeguraTH30) this.hurtbox?.destroy();
-    else this.grupoHurtbox?.clear(true, true);
+    if (this.limpezaSeguraTH30 || !this.grupoHurtbox || !this.hurtbox) {
+      this.hurtbox?.destroy();
+    } else {
+      this.grupoHurtbox.remove(this.hurtbox, true, true);
+    }
     this.grupoHurtbox = null;
     this.hurtbox = null;
     this.scene.alvosAtaqueExtras = (this.scene.alvosAtaqueExtras ?? []).filter(

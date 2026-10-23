@@ -604,6 +604,7 @@ this.indicadorP2 = this.criarIndicador(
       efeitoMorteVS: this.eventoMorteVS,
       efeitoTVMorte: this.eventoTVMorte,
       audiosLoja: this.eventosAudioLoja ?? [],
+      estadoMapa: this.mapaAtual.obterEstadoEspectador?.() ?? null,
       visuais,
     });
   }
@@ -650,6 +651,7 @@ this.indicadorP2 = this.criarIndicador(
     this.mortesVS?.reproduzirEfeitoEspectador(dados.efeitoMorteVS);
     this.mortesVS?.reproduzirTVEspectador(dados.efeitoTVMorte);
     this.reproduzirAudioLojaEspectador(dados.audiosLoja);
+    this.mapaAtual.aplicarEstadoEspectador?.(dados.estadoMapa);
     this.sincronizarVisuaisReplicados(dados.visuais ?? []);
 
     this.vidasP1 = dados.vidasP1;

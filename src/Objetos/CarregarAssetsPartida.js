@@ -625,6 +625,8 @@ const assetsSlenderMap = [
 const assetsFinalMap = [
 
 (scene, queued) => queueAsset(scene, queued, "texture", "moldura", () => { scene.load.image("moldura", "assets/cenarios/finalmap/moldura.png"); }),
+(scene, queued) => queueAsset(scene, queued, "texture", "moldura-broke", () => { scene.load.image("moldura-broke", "assets/cenarios/finalmap/moldura-broke.png"); }),
+(scene, queued) => queueAsset(scene, queued, "texture", "broke-part", () => { scene.load.image("broke-part", "assets/cenarios/finalmap/broke-part.png"); }),
 (scene, queued) => queueAsset(scene, queued, "texture", "crio", () => { scene.load.image("crio", "assets/cenarios/finalmap/crio.png"); }),
 (scene, queued) => queueAsset(scene, queued, "texture", "frente", () => { scene.load.image("frente", "assets/cenarios/finalmap/frente.png"); }),
 (scene, queued) => queueAsset(scene, queued, "texture", "fundo", () => { scene.load.image("fundo", "assets/cenarios/finalmap/fundo.png"); }),

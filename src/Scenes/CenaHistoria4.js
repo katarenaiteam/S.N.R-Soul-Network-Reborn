@@ -83,7 +83,14 @@ export default class CenaHistoria4 extends CenaHistoria {
 
   tocarPoseAuraTH30(aoConcluir, restaurarBoss = true) {
     const boss = this.boss;
-    if (this.poseAuraTH30Ativa || !boss?.sprite?.active) return;
+    const estadoBoss = boss?.maquinaEstados?.estadoAtual?.nome;
+    if (
+      this.poseAuraTH30Ativa ||
+      !boss?.sprite?.active ||
+      boss.emMorteVS ||
+      boss.eliminado ||
+      !["idle", "walk", "jump"].includes(estadoBoss)
+    ) return;
     this.poseAuraTH30Ativa = true;
     this.botIA.soltarTudo();
     this.limparAcao(boss);
@@ -137,6 +144,10 @@ export default class CenaHistoria4 extends CenaHistoria {
   }
 
   trocarFundoTH30() {
+    if (!this.primeiraTrocaFundoTH30Feita) {
+      this.primeiraTrocaFundoTH30Feita = true;
+      this.mapaAtual?.quebrarTeto?.();
+    }
     const opcoes = ["miku", "pingu", "slender"].filter((fase) => fase !== this.faseFundoTH30);
     const fase = Phaser.Utils.Array.GetRandom(opcoes);
     this.faseFundoTH30 = fase;
@@ -241,8 +252,9 @@ export default class CenaHistoria4 extends CenaHistoria {
     const x = boss.x;
     const y = boss.y;
     const lancarDupla = distancia => {
-      new RaioLoja(this, x - distancia, y, { animacaoCompletaTH30: true });
-      new RaioLoja(this, x + distancia, y, { animacaoCompletaTH30: true });
+      const opcoes = { animacaoCompletaTH30: true, dono: this.boss };
+      new RaioLoja(this, x - distancia, y, opcoes);
+      new RaioLoja(this, x + distancia, y, opcoes);
     };
     lancarDupla(120);
     this.time.delayedCall(500, () => {
