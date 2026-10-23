@@ -288,11 +288,11 @@ export default class CenaGameOver extends Phaser.Scene {
 
   criarRetratoRecortado(sprite, largura, altura) {
     const pontos = [
-      [largura * 0.045, altura * 0.697],
-      [largura * 0.168, altura * 0.616],
-      [largura * 0.428, altura * 0.642],
-      [largura * 0.440, altura * 0.931],
-      [largura * 0.046, altura * 0.956],
+      [largura * 0.045, altura * 0.737],
+      [largura * 0.163, altura * 0.615],
+      [largura * 0.431, altura * 0.633],
+      [largura * 0.444, altura * 0.935],
+      [largura * 0.047, altura * 0.958],
     ];
     const graficoMascara = this.make.graphics({ x: 0, y: 0, add: false });
     graficoMascara

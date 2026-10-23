@@ -161,10 +161,13 @@ export default class PuppetLojaMiku {
     this.colliderMapa?.destroy();
     this.colliderMapa = null;
     if (this.hurtbox?.body) this.hurtbox.body.enable = false;
-    if (this.limpezaSeguraTH30 || !this.grupoHurtbox || !this.hurtbox) {
+    const grupoHurtbox = this.grupoHurtbox;
+    const filhosHurtbox = grupoHurtbox?.children;
+    if (filhosHurtbox?.has?.(this.hurtbox)) {
+      if (this.limpezaSeguraTH30) this.hurtbox.destroy();
+      else grupoHurtbox.remove(this.hurtbox, true, true);
+    } else if (!grupoHurtbox || filhosHurtbox) {
       this.hurtbox?.destroy();
-    } else {
-      this.grupoHurtbox.remove(this.hurtbox, true, true);
     }
     this.grupoHurtbox = null;
     this.hurtbox = null;
