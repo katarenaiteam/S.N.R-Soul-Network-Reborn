@@ -83,7 +83,7 @@ export default class CenaStart extends Phaser.Scene {
     });
 
     // Submenu para quantidade de jogadores no modo História
-    this.textoNumPlayers = this.add.text(this.scale.width / 2, this.scale.height * 0.76, "1 JOGADOR", { fontFamily: "RetroFont, monospace", fontSize: `${28 * (this.scale.width / 1920)}px`, fill: "#8cffaa", letterSpacing: 5 * (this.scale.width / 1920) }).setOrigin(0.5);
+    this.textoNumPlayers = this.add.text(this.scale.width / 2, this.scale.height * 0.76, "EM BREVE", { fontFamily: "RetroFont, monospace", fontSize: `${28 * (this.scale.width / 1920)}px`, color: "#8cffaa", letterSpacing: 5 * (this.scale.width / 1920) }).setOrigin(0.5);
     this.textoNumPlayers.setVisible(false);
     this.conteudoMenu.add(this.textoNumPlayers);
 
@@ -342,9 +342,9 @@ export default class CenaStart extends Phaser.Scene {
     this.animarConfirmacao(() => {
       if (opcao.id === "story") {
         this.mqtt?.clearState();
-        this.emSelecaoPlayers = true;
         this.textoNumPlayers.setVisible(true);
-        this.cursorSelecao.setVisible(false);
+        this.cameras.main.shake(180, 0.003);
+        this.time.delayedCall(1000, () => this.textoNumPlayers?.setVisible(false));
         this.bloqueado = false;
       } else if (opcao.id === "credits") {
         this.mqtt?.clearState();

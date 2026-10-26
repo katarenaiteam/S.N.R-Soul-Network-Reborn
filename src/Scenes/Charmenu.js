@@ -5,7 +5,7 @@ import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 export const PERSONAGENS = [
   {
     id: "Aigis",
-    icon: "aigis-icon",
+    icon: "aigis-icon-block",
     banner: "Aig_baner",
 
     bannerConfig: {
@@ -25,7 +25,7 @@ export const PERSONAGENS = [
 
   {
     id: "FJ",
-    icon: "fj-icon",
+    icon: "fj-icon-block",
     banner: "FJ_baner",
 
     bannerConfig: {
@@ -85,7 +85,7 @@ export const PERSONAGENS = [
 
   {
     id: "Storm",
-    icon: "storm-icon",
+    icon: "storm-icon-block",
     banner: "Stor_baner",
 
     bannerConfig: {
@@ -165,7 +165,7 @@ export const PERSONAGENS = [
 
   {
     id: "Goku",
-    icon: "goku-icon",
+    icon: "goku-icon-block",
     banner: "GK_baner",
 
     bannerConfig: {
@@ -185,7 +185,7 @@ export const PERSONAGENS = [
 
   {
     id: "TH30",
-    icon: "th-icon",
+    icon: "th-icon-block",
     banner: "TH_baner",
 
     bannerConfig: {
@@ -855,7 +855,7 @@ export default class Charmenu extends Phaser.Scene {
   // ============================================================
 
   confirmar(jogador) {
-    if (!jogador.hover) return;
+    if (!jogador.hover || jogador.hover.icon.endsWith("-block")) return;
 
     jogador.selecionado = jogador.hover;
     const audioNome = AUDIO_NOME_PERSONAGEM[jogador.selecionado.id];

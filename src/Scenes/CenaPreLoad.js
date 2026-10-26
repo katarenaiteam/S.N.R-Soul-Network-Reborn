@@ -120,6 +120,18 @@ export default class CenaPreload extends Phaser.Scene {
     this.load.image("th-icon", "/assets/Menus/Char_menu/Sprites/icons/th-icon.png");
     this.load.image("pingu-icon", "/assets/Menus/Char_menu/Sprites/icons/pingu-icon.png");
 
+    this.load.image("aigis-icon-block", "/assets/Menus/Char_menu/Sprites/icons/aigis-icon-block.png");
+    this.load.image("fj-icon-block", "/assets/Menus/Char_menu/Sprites/icons/fj-icon-block.png");
+    this.load.image("goku-icon-block", "/assets/Menus/Char_menu/Sprites/icons/goku-icon-block.png");
+    this.load.image("storm-icon-block", "/assets/Menus/Char_menu/Sprites/icons/storm-icon-block.png");
+    this.load.image("th-icon-block", "/assets/Menus/Char_menu/Sprites/icons/th-icon-block.png");
+  
+      
+
+
+
+
+
     this.load.image("space-to", "/assets/Menus/Char_menu/Sprites/space-to.png");
     
     this.load.image("thumb_skytowers", "assets/cenarios/MapaSkytowers/Sprites/thumb_skytowers.png");

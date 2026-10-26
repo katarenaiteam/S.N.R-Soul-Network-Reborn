@@ -1,11 +1,9 @@
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import Cidade from "../Mapasjs/Cidade.js";
-import MapaTeste from "../Mapasjs/MapaTeste.js";
 import MikuMap from "../Mapasjs/MikuMap.js";
 import Ice from "../Mapasjs/Ice.js";
 import SlenderMap from "../Mapasjs/SlenderMap.js";
-import FinalMap from "../Mapasjs/Final.js";
 import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 
 export default class CenaSelecaoMapa extends Phaser.Scene {
@@ -50,11 +48,9 @@ export default class CenaSelecaoMapa extends Phaser.Scene {
     // 2. ARRAY DOS MAPAS COM AS SUAS RESPECTIVAS IMAGENS (SPRITES/PREVIEWS)
     this.mapas = [
       { id: "cidade", nome: "Cidade", classe: Cidade, chaveSprite: "thumb_cidade" },
-      { id: "mapaTeste", nome: "Mapa Teste", classe: MapaTeste, chaveSprite: "thumb_teste" },
       { id: "MikuMap", nome: "MikuMap", classe: MikuMap, chaveSprite: "thumb_mikushow" },
       { id: "SlenderMap", nome: "SlenderMap", classe: SlenderMap, chaveSprite: "thumb_slen" },
       { id: "Ice", nome: "Ice", classe: Ice, chaveSprite: "thumb_ice" },
-      { id: "FinalMap", nome: "FinalMap", classe: FinalMap, chaveSprite: "thumb_final" },
     ];
 
     this.indiceOpcao = 0; // Começa no primeiro mapa
