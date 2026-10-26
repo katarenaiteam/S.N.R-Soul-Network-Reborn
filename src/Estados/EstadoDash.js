@@ -3,7 +3,10 @@ import EstadoBase from "./EstadoBase.js";
 
 export default class EstadoDash extends EstadoBase {
   enter() {
-    const iniciouNoChao = this.personagem.sprite.body.blocked.down;
+    const iniciouNoChao = this.personagem.sprite.body.blocked.down ||
+      this.personagem.sprite.body.touching.down;
+    this.dashComecouNoChao = iniciouNoChao;
+    this.ataqueEstavaPressionado = false;
     this.personagem.tocarSomSorteado(this.personagem.sons.dash, { volume: 0.5 });
     // Registra o tempo do dash atual
     this.personagem.tempoUltimoDash = this.personagem.scene.time.now;
@@ -63,6 +66,28 @@ export default class EstadoDash extends EstadoBase {
   }
 
   execute() {
+    const ataquePressionado = this.personagem.inputDown("atack");
+    const iniciouAtaque = ataquePressionado && !this.ataqueEstavaPressionado;
+    this.ataqueEstavaPressionado = ataquePressionado;
+
+    if (iniciouAtaque) {
+      const horizontal = this.personagem.inputDown("esquerda") ||
+        this.personagem.inputDown("direita");
+      const vertical = this.personagem.inputDown("cima") ||
+        this.personagem.inputDown("baixo");
+      const tipoAtaque = vertical
+        ? null
+        : horizontal
+          ? (this.dashComecouNoChao ? "side" : "air_side")
+          : (this.dashComecouNoChao ? "neutro1" : null);
+
+      if (tipoAtaque && this.personagem.golpes?.[tipoAtaque] &&
+          this.personagem.podeUsarAtaque(tipoAtaque)) {
+        this.personagem.maquinaEstados.mudarEstado("atack", { tipo: tipoAtaque });
+        return;
+      }
+    }
+
     // Mantém a velocidade constante durante o dash sem interferência externa
     if (this.personagem.estaEmDash) {
       let direcao = this.personagem.sprite.flipX ? -1 : 1;

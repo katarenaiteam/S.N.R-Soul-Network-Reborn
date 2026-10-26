@@ -17,7 +17,7 @@ export default class PinguAneSpecial {
   }
 
   executar() {
-    this.personagem.tocarSomSorteado("pingu-nunut", { volume: this.personagem.sons.volumeVoz });
+    this.personagem.tocarSomSorteado("pingu-bazuka", { volume: this.personagem.sons.volumeVoz });
     const sprite = this.personagem.sprite;
     this.direcao = sprite.flipX ? -1 : 1;
     sprite.on("animationupdate", this.aoAtualizarAnimacao);
@@ -52,6 +52,8 @@ export default class PinguAneSpecial {
   criarProjetil() {
     const lutador = this.personagem.sprite;
     if (this.cancelado || !lutador?.active) return;
+
+    this.personagem.tocarSomSorteado("pingu-bas", { volume: this.personagem.sons.volumeVoz });
 
     const x = lutador.x + this.special.offsetProjetilX * this.direcao;
     const y = lutador.y + this.special.offsetProjetilY;
@@ -101,6 +103,7 @@ export default class PinguAneSpecial {
 
   acertarAlvo(alvo) {
     if (this.finalizando || !this.projetil?.active) return;
+    this.personagem.tocarSomSorteado("pingu-explosao", { volume: 0.6 });
     const direcao = this.projetil.flipX ? -1 : 1;
     const estavaCongelado = alvo.congelamentoPingu?.congelado;
     const bloqueado = alvo.receberDano(this.special.propriedades.dano, this.special.propriedades, {

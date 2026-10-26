@@ -10,6 +10,9 @@ export default class NeSpecial {
     this.hitboxes = [];
     this.registros = [];
     this.finalizado = false;
+    this.atrasoAgendado = false;
+    this.timerCorte = null;
+    this.timerFadeCorte = null;
     this.cartas = false;
     this.alvosAtingidos = new Set();
     this.aoAtualizarPose = this.aoAtualizarPose.bind(this);
@@ -26,12 +29,26 @@ export default class NeSpecial {
   aoAtualizarPose(animacao, frame) {
     if (this.finalizado || this.projetil || animacao?.key !== this.special.animacao) return;
     if (Number(frame?.textureFrame) < this.special.frameProjetil) return;
-    this.criarProjetil();
+    if (this.atrasoAgendado) return;
+    this.atrasoAgendado = true;
+    const atraso = this.special.atrasoCorteMs ?? 0;
+    if (atraso > 0) {
+      this.timerCorte = this.scene.time.delayedCall(atraso, () => {
+        this.timerCorte = null;
+        if (!this.finalizado) this.criarProjetil();
+      });
+    } else {
+      this.criarProjetil();
+    }
   }
 
   criarProjetil() {
     const sprite = this.personagem.sprite;
     sprite.off("animationupdate", this.aoAtualizarPose);
+    this.personagem.tocarSomSorteado(
+      ["slan_slash1", "slan_slash2", "slan_slash3"],
+      { volume: 0.45 },
+    );
     const efeito = this.scene.add.sprite(
       sprite.x + this.special.offsetProjetilX * this.direcao,
       sprite.y + this.special.offsetProjetilY,
@@ -47,22 +64,7 @@ export default class NeSpecial {
     efeito.setFlipX(this.direcao < 0);
     efeito.setDepth(sprite.depth + 1);
     this.scene.camHUD?.ignore(efeito);
-    const escala = this.special.escalaProjetil ?? 1;
-    for (const caixa of this.special.hitboxesProjetil) {
-      const hitbox = this.scene.add.zone(
-        efeito.x + caixa.offsetX * escala * this.direcao,
-        efeito.y + caixa.offsetY * escala,
-        caixa.largura * escala,
-        caixa.altura * escala,
-      );
-      this.scene.physics.add.existing(hitbox);
-      hitbox.body.setAllowGravity(false);
-      hitbox.body.setImmovable(true);
-      hitbox.body.debugBodyColor = 0xff0000;
-      this.scene.camHUD?.ignore(hitbox);
-      this.hitboxes.push(hitbox);
-    }
-
+    this.criarHitboxes(0xff0000);
     this.registrarProjetil();
     efeito.on("animationupdate", (animacao, frame) => {
       const framesCorte = this.special.framesCorte ?? 3;
@@ -73,21 +75,29 @@ export default class NeSpecial {
       ) {
         this.corteAlongado = true;
         efeito.anims.pause();
-        this.scene.tweens.add({
-          targets: efeito,
-          alpha: 0,
-          duration: this.special.duracaoCorteExtraMs,
-          onComplete: () => {
-            if (efeito.active) efeito.anims.resume();
+        this.timerFadeCorte = this.scene.time.delayedCall(
+          this.special.duracaoPausaCorteMs ?? 350,
+          () => {
+            this.timerFadeCorte = null;
+            if (this.finalizado || !efeito.active) return;
+            this.corteDesaparecendo = true;
+            this.removerRegistrosAtaque();
+            this.destruirHitboxes();
+            this.tweenFadeCorte = this.scene.tweens.add({
+              targets: efeito,
+              alpha: 0,
+              duration: this.special.duracaoVisualCorteMs ?? this.special.duracaoCorteExtraMs,
+            });
+            efeito.anims.resume();
           },
-        });
+        );
       }
-      if (!this.cartas && Number(frame.textureFrame) >= (this.special.framesCorte ?? 3)) {
+      if (!this.cartas && Number(frame.textureFrame) >= framesCorte) {
+        this.tweenFadeCorte?.stop();
+        this.tweenFadeCorte = null;
         efeito.setAlpha(1);
         this.cartas = true;
-        this.hitboxes.forEach((hitbox) => {
-          if (hitbox.body) hitbox.body.debugBodyColor = 0x00ffff;
-        });
+        this.criarHitboxes(0x00ffff);
         // Mantem o corpo para colisao com projeteis, sem atingir personagens.
         this.registros.forEach((registro) => registro.remover());
         this.registrarProjetil();
@@ -139,6 +149,29 @@ export default class NeSpecial {
     }));
   }
 
+  criarHitboxes(cor) {
+    const escala = this.special.escalaProjetil ?? 1;
+    for (const caixa of this.special.hitboxesProjetil) {
+      const hitbox = this.scene.add.zone(
+        this.projetil.x + caixa.offsetX * escala * this.direcao,
+        this.projetil.y + caixa.offsetY * escala,
+        caixa.largura * escala,
+        caixa.altura * escala,
+      );
+      this.scene.physics.add.existing(hitbox);
+      hitbox.body.setAllowGravity(false);
+      hitbox.body.setImmovable(true);
+      hitbox.body.debugBodyColor = cor;
+      this.scene.camHUD?.ignore(hitbox);
+      this.hitboxes.push(hitbox);
+    }
+  }
+
+  destruirHitboxes() {
+    this.hitboxes.forEach((hitbox) => hitbox.destroy());
+    this.hitboxes = [];
+  }
+
   acertar(alvo) {
     if (this.finalizado || this.cartas || this.alvosAtingidos.has(alvo)) return;
     this.alvosAtingidos.add(alvo);
@@ -148,8 +181,6 @@ export default class NeSpecial {
       x: this.projetil.x,
       y: this.projetil.y,
     });
-    const som = this.personagem.sons?.[propriedades.tipoSomImpacto];
-    if (som) this.personagem.tocarSomSorteado(som, { volume: 0.15 });
   }
 
   destruirProjetil() {
@@ -158,9 +189,18 @@ export default class NeSpecial {
     this.finalizar();
   }
 
+  removerRegistrosAtaque() {
+    this.registros.forEach((registro) => registro.remover());
+    this.registros = [];
+  }
+
   finalizar() {
     if (this.finalizado) return;
     this.finalizado = true;
+    this.timerCorte?.remove();
+    this.timerCorte = null;
+    this.timerFadeCorte?.remove();
+    this.timerFadeCorte = null;
     this.registros.forEach((registro) => registro.remover());
     this.registros = [];
     this.hitboxes.forEach((hitbox) => hitbox.destroy());

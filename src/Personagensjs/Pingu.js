@@ -285,7 +285,7 @@ export default class Pingu extends Personagem {
         ],
       },
 
-      AneSpecial: { largura: 30, altura: 70, offsetX: 27, offsetY: 20, escala: 1,
+      AneSpecial: { largura: 30, altura: 70, offsetX: 27, offsetY: 18, escala: 1,
         hurtboxes: [
           { largura: 30, altura: 55, offsetX: 0, offsetY: -30 },
         ],
@@ -346,7 +346,7 @@ export default class Pingu extends Personagem {
 
     this.sons = {
       ...this.sons,
-      vozAtaque: [ "pingu-attack1", "pingu-attack2", "pingu-attack3", "pingu-attack4"],
+      vozAtaque: [ "pingu-attack3", "pingu-attack4"],
       vozDanoNormal: ["pingu-hurt2", "pingu-hurt3", "pingu-hurt4"],
       vozDanoForte: ["pingu-hurt3", "pingu-hurt1"],
       volumeVoz: 0.2,

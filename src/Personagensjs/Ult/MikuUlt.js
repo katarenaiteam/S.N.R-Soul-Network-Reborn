@@ -1001,6 +1001,9 @@ if (agora < bloqueadoAte) {
   );
 
       this.personagem.estadoInvencible?.aoAcertarAtaque();
+      if (this.scene.cache.audio.exists("punch1")) {
+        this.scene.sound.play("punch1", { volume: 0.75 });
+      }
       alvo.receberDano(
         RAIO.danoFinal,
 

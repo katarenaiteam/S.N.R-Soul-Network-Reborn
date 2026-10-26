@@ -229,7 +229,7 @@ export default class CenaGameOver extends Phaser.Scene {
 
     const perdedores = Array.isArray(this.resultado.perdedores) && this.resultado.perdedores.length
       ? this.resultado.perdedores
-      : [perdedor];
+      : [this.resultado.perdedor || {}];
     const retratosPerdedores = perdedores.map((personagem, indice) => {
       const info = apresentacaoPersonagens[personagem.id] || infoPerdedor;
       const emDupla = perdedores.length > 1;
@@ -254,14 +254,35 @@ export default class CenaGameOver extends Phaser.Scene {
       fontSize: `${Math.min(220 * escala, largura * 0.16)}px`,
       color: "#000000",
     };
+    const deslocamentoDestaque = 3 * escala;
+    const estiloDestaque = { ...estiloNome, color: "#ffffff" };
+    const nomeDestaque = this.add.text(
+      55 * escala - deslocamentoDestaque,
+      62 * escala + deslocamentoDestaque,
+      infoVencedor.nome,
+      estiloDestaque,
+    ).setAlpha(0);
+    const winsDestaque = this.add.text(
+      105 * escala - deslocamentoDestaque,
+      340 * escala + deslocamentoDestaque,
+      "WINS",
+      {
+        ...estiloDestaque,
+        fontSize: `${Math.min(190 * escala, largura * 0.145)}px`,
+      },
+    ).setAlpha(0);
     const nome = this.add.text(55 * escala, 62 * escala, infoVencedor.nome, estiloNome).setAlpha(0);
     const wins = this.add.text(105 * escala, 340 * escala, "WINS", {
       ...estiloNome,
       fontSize: `${Math.min(190 * escala, largura * 0.145)}px`,
     }).setAlpha(0);
-    this.conteudo.add([nome, wins]);
+    this.conteudo.add([nomeDestaque, winsDestaque, nome, wins]);
 
-    this.tweens.add({ targets: [quadro, ...retratosPerdedores, nome, wins], alpha: 1, duration: 450 });
+    this.tweens.add({
+      targets: [quadro, ...retratosPerdedores, nomeDestaque, winsDestaque, nome, wins],
+      alpha: 1,
+      duration: 450,
+    });
     this.tocarVozVencedor(this.resultado.vencedor?.id);
     this.bloqueado = false;
     this.input.keyboard.once("keydown-ENTER", () => this.reiniciarPartida());
@@ -309,12 +330,20 @@ export default class CenaGameOver extends Phaser.Scene {
     graficoMascara
       .fillStyle(0xffffff, 1)
       .fillPoints(pontos.map(([x, y]) => ({ x, y })), true);
-    const mascara = graficoMascara.createGeometryMask();
-    sprite.setMask(mascara).setDepth(4).setVisible(true);
+    const camadaRecorte = this.add.container(0, 0);
+    this.conteudo.remove(sprite);
+    camadaRecorte.add(sprite.setDepth(4).setVisible(true));
+    camadaRecorte.enableFilters();
+    const filtroMascara = camadaRecorte.filters.external.addMask(
+      graficoMascara,
+      false,
+      this.cameras.main,
+      "world",
+    );
+    this.conteudo.add(camadaRecorte);
 
     this.events.once("shutdown", () => {
-      sprite.clearMask(false);
-      mascara.destroy();
+      camadaRecorte.filters?.external?.remove(filtroMascara);
       graficoMascara.destroy();
     });
     return sprite;

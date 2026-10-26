@@ -19,6 +19,7 @@ export default class PinguAupSpecial {
   }
 
   executar() {
+    this.personagem.tocarSomSorteado("pingu-shoryuken", { volume: this.personagem.sons.volumeVoz });
     const sprite = this.personagem.sprite;
     this.direcao = sprite.flipX ? -1 : 1;
     sprite.setVelocityX(0);

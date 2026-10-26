@@ -25,6 +25,7 @@ export default class PinguUlt {
     this.fundoUlt = null;
     this.focaChegando = null;
     this.focaDancando = null;
+    this.somDanca = null;
   }
 
   executar() {
@@ -47,6 +48,9 @@ export default class PinguUlt {
     this.esconderCenario();
     this.ativarFundoUltimate();
     this.scene.physics.pause();
+
+    this.personagem.tocarSomSorteado("pingu-intro", { volume: this.personagem.sons.volumeVoz });
+    this.personagem.tocarSomSorteado("pingu-ult", { volume: this.personagem.sons.volumeVoz });
 
     sprite.body.setVelocity(0, 0);
     sprite.body.setAllowGravity(false);
@@ -206,6 +210,8 @@ export default class PinguUlt {
     const sprite = this.personagem.sprite;
     sprite.anims.play("pingu_dance", true);
     this.personagem.aplicarConfiguracao("dance");
+    this.somDanca = this.scene.sound.add("pingu-ult2", { volume: this.personagem.sons.volumeVoz, loop: true });
+    this.somDanca.play();
 
     this.tocarDancaFoca(sprite.x + 115, sprite.y);
 
@@ -303,6 +309,10 @@ export default class PinguUlt {
     if (!this.projeteis.has(registro)) return;
     const x = registro.sprite.x;
     const y = plataforma?.body?.top ?? registro.sprite.y;
+    const plataformas = this.scene.mapaAtual?.plataformas
+      || this.scene.plataformas
+      || this.scene.chao;
+    this.personagem.tocarSomSorteado("pingu-ultbrake", { volume: 0.45 });
     this.removerProjetil(registro);
 
     [-1, 0, 1].forEach((direcao) => {
@@ -318,6 +328,17 @@ export default class PinguUlt {
       this.scene.camHUD?.ignore(fragmento);
 
       const pedaco = this.registrarProjetil(fragmento, 25, true);
+      if (plataformas) {
+        pedaco.colisor = this.scene.physics.add.collider(
+          fragmento,
+          plataformas,
+          () => {
+            if (!this.projeteis.has(pedaco)) return;
+            this.personagem.tocarSomSorteado("pingu-ultbrake", { volume: 0.45 });
+            this.removerProjetil(pedaco);
+          },
+        );
+      }
       pedaco.timer = this.agendar(850, () => this.removerProjetil(pedaco));
       this.scene.tweens.add({
         targets: fragmento,
@@ -342,6 +363,7 @@ export default class PinguUlt {
 
   acertarComMeteoro(registro, alvo) {
     if (!this.projeteis.has(registro) || !alvo?.sprite?.active) return;
+    this.personagem.tocarSomSorteado("pingu-ultbrake", { volume: 0.45 });
     const direcao = alvo.sprite.x < registro.sprite.x ? -1 : 1;
     alvo.receberDano(registro.dano, {
       tipoSomImpacto: "heavy",
@@ -385,6 +407,9 @@ export default class PinguUlt {
     this.agendar(620, () => {
       this.scene.atualizarCamera = this.funcaoCameraOriginal;
       this.scene.atualizarCamera?.();
+      this.somDanca?.stop();
+      this.somDanca?.destroy();
+      this.somDanca = null;
       this.finalizada = true;
       this.estadoFSM.finalizarUlt();
     });
@@ -429,6 +454,9 @@ export default class PinguUlt {
     if (this.cancelada || this.finalizada) return;
     this.cancelada = true;
     this.finalizada = true;
+    this.somDanca?.stop();
+    this.somDanca?.destroy();
+    this.somDanca = null;
     this.eventoMeteoros?.remove(false);
     this.eventoMeteoros = null;
     this.projeteis.forEach((registro) => this.removerProjetil(registro));

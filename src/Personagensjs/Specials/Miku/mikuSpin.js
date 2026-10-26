@@ -203,6 +203,10 @@ export default class MikuSpin {
     if (!alvo) return;
     this.alvo = null;
 
+    if (this.scene.cache.audio.exists("punch1")) {
+      this.scene.sound.play("punch1", { volume: 0.65 });
+    }
+
     const propriedades = this.special.propriedades ?? {};
     alvo.receberDano(
       propriedades.dano ?? 18,

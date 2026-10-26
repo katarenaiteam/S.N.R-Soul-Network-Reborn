@@ -107,6 +107,9 @@ const assetscommon = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Th_portrait", () => { scene.load.image("Th_portrait", "assets/Hud/Portrait/Th_portrait.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Th_portrait2", () => { scene.load.image("Th_portrait2", "assets/Hud/Portrait/Th_portrait2.png"); }),
 
+  (scene, queued) => queueAsset(scene, queued, "texture", "Gk_portrait", () => { scene.load.image("Gk_portrait", "assets/Hud/Portrait/Gk_portrait.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Gk_portrait2", () => { scene.load.image("Gk_portrait2", "assets/Hud/Portrait/Gk_portrait2.png"); }),
+
   (scene, queued) => queueAsset(scene, queued, "texture", "0.png", () => { scene.load.image("0.png", "assets/Hud/DamagePercentage/0-19_/0.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "1.png", () => { scene.load.image("1.png", "assets/Hud/DamagePercentage/0-19_/1.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "2.png", () => { scene.load.image("2.png", "assets/Hud/DamagePercentage/0-19_/2.png"); }),
@@ -485,6 +488,10 @@ const assetsSlenderman = [
   (scene, queued) => queueAsset(scene, queued, "texture", "slan-grab2", () => { scene.load.spritesheet("slan-grab2", "assets/personagens/Slenderman/Sprites/ult/slan-grab2.png", { frameWidth: 70, frameHeight: 123 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "slan-ult5", () => { scene.load.spritesheet("slan-ult5", "assets/personagens/Slenderman/Sprites/ult/slan-ult5.png", { frameWidth: 130, frameHeight: 139 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "pages1", () => { scene.load.spritesheet("pages1", "assets/personagens/Slenderman/Sprites/ult/pages1.png", { frameWidth: 283, frameHeight: 352 }); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "slan_slash1", () => { scene.load.audio("slan_slash1", "assets/personagens/Slenderman/Audio/slan_slash/slan_slash1.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "slan_slash2", () => { scene.load.audio("slan_slash2", "assets/personagens/Slenderman/Audio/slan_slash/slan_slash2.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "slan_slash3", () => { scene.load.audio("slan_slash3", "assets/personagens/Slenderman/Audio/slan_slash/slan_slash3.wav"); }),
+
 ];
 const assetsPingu = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_intro", () => { scene.load.spritesheet("Pingu_intro", "assets/personagens/Pingu/Sprites/Pingu_intro.png", { frameWidth: 81, frameHeight: 90 }); }),
@@ -537,14 +544,24 @@ const assetsPingu = [
   (scene, queued) => queueAsset(scene, queued, "audio", "pingu-hurt3", () => { scene.load.audio("pingu-hurt3", "assets/personagens/Pingu/Audio/pingu-hurt3.wav"); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "pingu-hurt4", () => { scene.load.audio("pingu-hurt4", "assets/personagens/Pingu/Audio/pingu-hurt4.wav"); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "pingu-taunt", () => { scene.load.audio("pingu-taunt", "assets/personagens/Pingu/Audio/pingu-taunt.wav"); }),
-  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-attack1", () => { scene.load.audio("pingu-attack1", "assets/personagens/Pingu/Audio/pingu-attack1.wav"); }),
-  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-attack2", () => { scene.load.audio("pingu-attack2", "assets/personagens/Pingu/Audio/pingu-attack2.wav"); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "pingu-attack3", () => { scene.load.audio("pingu-attack3", "assets/personagens/Pingu/Audio/pingu-attack3.wav"); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "pingu-attack4", () => { scene.load.audio("pingu-attack4", "assets/personagens/Pingu/Audio/pingu-attack4.wav"); }),
-  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-nunut", () => { scene.load.audio("pingu-nunut", "assets/personagens/Pingu/Audio/nunut.wav"); }),
-  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-Asi", () => { scene.load.audio("pingu-Asi", "assets/personagens/Pingu/Audio/pingu-Asi.wav"); }),
-  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-Ado", () => { scene.load.audio("pingu-Ado", "assets/personagens/Pingu/Audio/pingu-Ado.wav"); }),
-  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-deaf", () => { scene.load.audio("pingu-deaf", "assets/personagens/Pingu/Audio/pingu-deaf.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-aspin", () => { scene.load.audio("pingu-aspin", "assets/personagens/Pingu/Audio/pingu-aspin.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-ball", () => { scene.load.audio("pingu-ball", "assets/personagens/Pingu/Audio/pingu-ball.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-bas", () => { scene.load.audio("pingu-bas", "assets/personagens/Pingu/Audio/pingu-bas.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-bazuka", () => { scene.load.audio("pingu-bazuka", "assets/personagens/Pingu/Audio/pingu-bazuka.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-cong", () => { scene.load.audio("pingu-cong", "assets/personagens/Pingu/Audio/pingu-cong.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-dspin", () => { scene.load.audio("pingu-dspin", "assets/personagens/Pingu/Audio/pingu-dspin.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-explosao", () => { scene.load.audio("pingu-explosao", "assets/personagens/Pingu/Audio/pingu-explosao.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-helicoptero", () => { scene.load.audio("pingu-helicoptero", "assets/personagens/Pingu/Audio/pingu-helicoptero.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-shoryuken", () => { scene.load.audio("pingu-shoryuken", "assets/personagens/Pingu/Audio/pingu-shoryuken.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-simpac", () => { scene.load.audio("pingu-simpac", "assets/personagens/Pingu/Audio/pingu-simpac.wav.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-spin", () => { scene.load.audio("pingu-spin", "assets/personagens/Pingu/Audio/pingu-spin.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-throw", () => { scene.load.audio("pingu-throw", "assets/personagens/Pingu/Audio/pingu-throw.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-ult", () => { scene.load.audio("pingu-ult", "assets/personagens/Pingu/Audio/pingu-ult.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-ult2", () => { scene.load.audio("pingu-ult2", "assets/personagens/Pingu/Audio/pingu-ult2.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-ultbrake", () => { scene.load.audio("pingu-ultbrake", "assets/personagens/Pingu/Audio/pingu-ultbrake.wav"); }),
+
 
 ];
 const assetsTH30 = [
@@ -585,13 +602,42 @@ const assetsTH30 = [
 
   //(scene, queued) => queueAsset(scene, queued, "audio", " ", () => { scene.load.audio("pingu-intro", "assets/personagens/Pingu/Audio/pingu-intro.wav"); }),
 ];
+const assetsGoku = [
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_intro", () => { scene.load.spritesheet("gk_intro", "assets/personagens/Goku/Sprites/gk_intro.png", { frameWidth: 134, frameHeight: 99 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_idle", () => { scene.load.spritesheet("gk_idle", "assets/personagens/Goku/Sprites/gk_idle.png", { frameWidth: 88, frameHeight: 95 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_jump", () => { scene.load.spritesheet("gk_jump", "assets/personagens/Goku/Sprites/gk_jump.png", { frameWidth: 87, frameHeight: 135 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_walk", () => { scene.load.spritesheet("gk_walk", "assets/personagens/Goku/Sprites/gk_walk.png", { frameWidth: 91, frameHeight: 108 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_crouch1", () => { scene.load.spritesheet("gk_crouch1", "assets/personagens/Goku/Sprites/gk_crouch1.png", { frameWidth: 82, frameHeight: 95 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_crouch2", () => { scene.load.spritesheet("gk_crouch2", "assets/personagens/Goku/Sprites/gk_crouch2.png", { frameWidth: 100, frameHeight: 96 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_dash", () => { scene.load.spritesheet("gk_dash", "assets/personagens/Goku/Sprites/gk_dash.png", { frameWidth: 142, frameHeight: 99 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_guard", () => { scene.load.spritesheet("gk_guard", "assets/personagens/Goku/Sprites/gk_guard.png", { frameWidth: 85, frameHeight: 90 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_stun", () => { scene.load.spritesheet("gk_stun", "assets/personagens/Goku/Sprites/gk_stun.png", { frameWidth: 105, frameHeight: 110 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_hurt", () => { scene.load.spritesheet("gk_hurt", "assets/personagens/Goku/Sprites/gk_hurt.png", { frameWidth: 114, frameHeight: 97 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_fly", () => { scene.load.spritesheet("gk_fly", "assets/personagens/Goku/Sprites/gk_fly.png", { frameWidth: 143, frameHeight: 174 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_taunt", () => { scene.load.spritesheet("gk_taunt", "assets/personagens/Goku/Sprites/gk_taunt.png", { frameWidth: 92, frameHeight: 91 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_fly1", () => { scene.load.spritesheet("gk_fly1", "assets/personagens/Goku/Sprites/gk_fly1.png", { frameWidth: 105, frameHeight: 129 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_getup", () => { scene.load.spritesheet("gk_getup", "assets/personagens/Goku/Sprites/gk_getup.png", { frameWidth: 144, frameHeight: 113 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_dead", () => { scene.load.spritesheet("gk_dead", "assets/personagens/Goku/Sprites/gk_dead.png", { frameWidth: 154, frameHeight: 72 }); }),
+  //golpes
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_atack1", () => { scene.load.spritesheet("gk_atack1", "assets/personagens/Goku/Sprites/gk_atack1.png", { frameWidth: 116, frameHeight: 102 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_atack2", () => { scene.load.spritesheet("gk_atack2", "assets/personagens/Goku/Sprites/gk_atack2.png", { frameWidth: 132, frameHeight: 102 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_atack3", () => { scene.load.spritesheet("gk_atack3", "assets/personagens/Goku/Sprites/gk_atack3.png", { frameWidth: 156, frameHeight: 113 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_sideAtack", () => { scene.load.spritesheet("gk_sideAtack", "assets/personagens/Goku/Sprites/gk_sideAtack.png", { frameWidth: 123, frameHeight: 102 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_downAtack", () => { scene.load.spritesheet("gk_downAtack", "assets/personagens/Goku/Sprites/gk_downAtack.png", { frameWidth: 151, frameHeight: 91 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_neutralAir", () => { scene.load.spritesheet("gk_neutralAir", "assets/personagens/Goku/Sprites/gk_neutralAir.png", { frameWidth: 108, frameHeight: 113 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_sideAir", () => { scene.load.spritesheet("gk_sideAir", "assets/personagens/Goku/Sprites/gk_sideAir.png", { frameWidth: 179, frameHeight: 122 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_upAir", () => { scene.load.spritesheet("gk_upAir", "assets/personagens/Goku/Sprites/gk_upAir.png", { frameWidth: 131, frameHeight: 123 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_downAir", () => { scene.load.spritesheet("gk_downAir", "assets/personagens/Goku/Sprites/gk_downAir.png", { frameWidth: 144, frameHeight: 130 }); }),
+
+
+];
 
 const assetsIce = [
   (scene, queued) => queueAsset(scene, queued, "texture", "ice-back", () => { scene.load.spritesheet("ice-back", "assets/cenarios/Ice/ice-back.png", { frameWidth: 640, frameHeight: 389 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "ice-plat", () => { scene.load.image("ice-plat", "assets/cenarios/Ice/ice-plat.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "ice-trans", () => { scene.load.image("ice-trans", "assets/cenarios/Ice/ice-trans.png"); }),
  
-]
+];
 const assetsMapaTeste = [
   (scene, queued) => queueAsset(scene, queued, "texture", "backtest", () => { scene.load.spritesheet("backtest", "assets/cenarios/MapaTest/backtest.png", { frameWidth: 1200, frameHeight: 600 }); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "No_More", () => { scene.load.audio("No_More", "assets/cenarios/MapaTest/No_More.mp3"); }),
@@ -679,6 +725,7 @@ const personagens = {
   Slenderman: assetsSlenderman,
   Pingu: assetsPingu,
   TH30: assetsTH30,
+  Goku: assetsGoku
 };
 
 export function carregarAssetsVersus(scene, dados) {

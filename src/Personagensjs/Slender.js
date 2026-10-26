@@ -1,6 +1,7 @@
 import Personagem from "./Personagem.js";
 import NeSpecial from "./Specials/Slenderman/NeSpecial.js";
 import DoSpecial from "./Specials/Slenderman/DoSpecial.js";
+import AupSpecial from "./Specials/Slenderman/AupSpecial.js";
 import SlenderUlt from "./Ult/SlenderUlt.js";
 
 export default class Slenderman extends Personagem {
@@ -126,7 +127,7 @@ export default class Slenderman extends Personagem {
         largura: 50,
         altura: 120,
         offsetX: 15,
-        offsetY: 0,
+        offsetY: 0.5,
         escala: 1,
         hurtboxes: [
       
@@ -710,6 +711,7 @@ export default class Slenderman extends Personagem {
       agachado: {
         animacao: "slan_doSpecial",
         logica: DoSpecial,
+        atrasoCorteMs: 60,
         duracao: 875,
         cooldown: 1100,
         cortes: [
@@ -740,13 +742,16 @@ export default class Slenderman extends Personagem {
       lado: {
         animacao: "slan_siSpecial",
         logica: NeSpecial,
+        atrasoCorteMs: 60,
         duracao: 600,
         cooldown: 1100,
         frameProjetil: 2,
         texturaProjetil: "Slan_siSpecial-efect",
         animacaoProjetil: "slan_siSpecial-efect",
         multiplicadorVelocidadeAnimacaoProjetil: 0.8,
-        duracaoCorteExtraMs: 600,
+        duracaoCorteExtraMs: 350,
+        duracaoPausaCorteMs: 350,
+        duracaoVisualCorteMs: 600,
         framesCorte: 2,
         escalaProjetil: 1,
         offsetProjetilX: 20,
@@ -768,10 +773,13 @@ export default class Slenderman extends Personagem {
       neutro: {
         animacao: "slan_neSpecial",
         logica: NeSpecial,
+        atrasoCorteMs: 30,
         duracao: 700,
         cooldown: 1100,
         multiplicadorVelocidadeAnimacaoProjetil: 0.8,
-        duracaoCorteExtraMs: 600,
+        duracaoCorteExtraMs: 350,
+        duracaoPausaCorteMs: 350,
+        duracaoVisualCorteMs: 600,
         framesCorte: 3,
         frameProjetil: 1,
         escalaProjetil: 1,
@@ -793,11 +801,17 @@ export default class Slenderman extends Personagem {
    
     this.specials.air_cima = {
       animacao: "slan_AupSpecial",
+      logica: AupSpecial,
       duracao: 900,
       cooldown: 2500,
+      hitbox: { largura: 88, altura: 60, offsetX: 8, offsetY: -88 },
       propriedades: {
-        impulsoX: 350,
-        impulsoY: -800,
+        dano: 12,
+        tipoSomImpacto: "heavy",
+        knockbackX: 120,
+        knockbackY: -380,
+        impulsoX: 280,
+        impulsoY: -700,
         travarMovimentoAir: true,
         velocidadeMaxQueda: 100,
       },
@@ -819,6 +833,7 @@ export default class Slenderman extends Personagem {
     this.specials.air_neutro = {
       ...this.specials.lado,
       animacao: "slan_AneSpecial",
+      atrasoCorteMs: 30,
       duracao: 500,
       frameProjetil: 2,
       texturaProjetil: "Slan_AneSpecial-efect",
@@ -835,6 +850,7 @@ export default class Slenderman extends Personagem {
     this.specials.air_agachado = {
       ...this.specials.lado,
       animacao: "slan_AdoSpecial",
+      atrasoCorteMs: 60,
       duracao: 688,
       frameProjetil: 3,
       texturaProjetil: "Slan_AdoSpecial-efect",

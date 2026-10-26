@@ -18,7 +18,7 @@ export default class PinguAdoSpecial {
   }
 
   executar() {
-    this.personagem.tocarSomSorteado("pingu-Ado", { volume: this.personagem.sons.volumeVoz });
+    this.personagem.tocarSomSorteado("pingu-dspin", { volume: this.personagem.sons.volumeVoz });
     const sprite = this.personagem.sprite;
     this.direcao = sprite.flipX ? -1 : 1;
     sprite.setVelocity(0, 0);
@@ -103,6 +103,7 @@ export default class PinguAdoSpecial {
       direcao: this.direcao,
       atacante: this.personagem,
     });
+    this.personagem.tocarSomSorteado(this.personagem.sons?.heavy, { volume: 0.15 });
     this.iniciarQuique();
   }
 

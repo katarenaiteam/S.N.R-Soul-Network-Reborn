@@ -20,7 +20,7 @@ export default class PinguAsiSpecial {
   executar() {
     if (this.iniciado) return;
     this.iniciado = true;
-    this.personagem.tocarSomSorteado("pingu-Asi", { volume: this.personagem.sons.volumeVoz });
+    this.personagem.tocarSomSorteado("pingu-helicoptero", { volume: this.personagem.sons.volumeVoz });
     this.inicio = this.scene.time.now;
 
     const esquerda = this.personagem.inputDown("esquerda");
@@ -116,6 +116,7 @@ export default class PinguAsiSpecial {
       direcao: this.direcao,
       atacante: this.personagem,
     });
+    this.personagem.tocarSomSorteado(this.personagem.sons?.heavy, { volume: 0.15 });
     this.finalizar();
   }
 

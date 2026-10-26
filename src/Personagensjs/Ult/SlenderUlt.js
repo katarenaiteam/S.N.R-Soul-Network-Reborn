@@ -160,6 +160,10 @@ export default class SlenderUlt {
 
   tocarCorteContinuo(alvo, indice) {
     if (this.cancelada || indice >= 42) return;
+    this.personagem.tocarSomSorteado(
+      ["slan_slash1", "slan_slash2", "slan_slash3"],
+      { volume: 0.4 },
+    );
     this.criarCorte(alvo.sprite, indice);
     this.criarHitboxAtaque(alvo, 2, this.dir);
     this.agendar(120, () => this.tocarCorteContinuo(alvo, indice + 1));

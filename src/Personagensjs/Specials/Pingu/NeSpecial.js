@@ -16,7 +16,7 @@ export default class PinguNeSpecial {
   }
 
   executar() {
-    this.personagem.tocarSomSorteado("pingu-nunut", { volume: this.personagem.sons.volumeVoz });
+    this.personagem.tocarSomSorteado("pingu-bazuka", { volume: this.personagem.sons.volumeVoz });
     const sprite = this.personagem.sprite;
     sprite.on("animationupdate", this.aoAtualizarPose);
     this.aoAtualizarPose(sprite.anims.currentAnim, sprite.anims.currentFrame);
@@ -48,6 +48,7 @@ export default class PinguNeSpecial {
     if (!sprite?.active) return;
 
     const direcao = sprite.flipX ? -1 : 1;
+    this.personagem.tocarSomSorteado("pingu-bas", { volume: this.personagem.sons.volumeVoz });
     const projetil = this.scene.physics.add.sprite(
       sprite.x + this.special.offsetProjetilX * direcao,
       sprite.y + this.special.offsetProjetilY,
@@ -93,6 +94,7 @@ export default class PinguNeSpecial {
 
   acertarAlvo(registro, alvo, direcao) {
     if (!registro.projetil.active) return;
+    this.personagem.tocarSomSorteado("pingu-explosao", { volume: 0.6 });
     alvo.receberDano(this.special.propriedades.dano, this.special.propriedades, {
       x: registro.projetil.x,
       direcao,

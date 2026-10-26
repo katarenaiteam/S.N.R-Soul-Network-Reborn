@@ -362,7 +362,7 @@ this.vfxAtaqueNormal = {
       vozAtaque: ["sing1", "sing2", "sing3", "sing4", "sing5", "sing6", "sing7"],
       vozDanoNormal: ["hurt1", "hurt2", "hurt4"],
       vozDanoForte: ["hurt3", "hurt4", "hurt5"],
-      volumeVoz: 0.4,
+      volumeVoz: 0.32,
     };
 
    //   this.sons = {
@@ -404,6 +404,7 @@ this.vfxAtaqueNormal = {
           knockbackY: 0,
           knockbackFixo: true,
           hitstunFrames: 25,
+         // tumbling: true
         },
 
         comboProximo: "neutro2",

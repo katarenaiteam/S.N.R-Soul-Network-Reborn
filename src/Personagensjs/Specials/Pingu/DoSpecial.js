@@ -38,6 +38,7 @@ export default class PinguDoSpecial {
     sprite.setVelocityX(0);
     sprite.anims.play("pingu_doCharg", true);
     this.personagem.aplicarConfiguracao("doCharg");
+    this.personagem.tocarSomSorteado("pingu-spin", { volume: this.personagem.sons.volumeVoz });
     sprite.anims.timeScale = this.velocidadeGiro;
   }
 
@@ -112,6 +113,7 @@ export default class PinguDoSpecial {
     sprite.anims.timeScale = 1;
     sprite.anims.play("pingu_doLaunch", true);
     this.personagem.aplicarConfiguracao("doLaunch");
+    this.personagem.tocarSomSorteado("pingu-aspin", { volume: this.personagem.sons.volumeVoz });
     sprite.once("animationcomplete-pingu_doLaunch", this.aoCompletarLaunch);
     this.velocidadeAvanco = this.special.impulsoXInicial + this.special.impulsoXMaximo * progresso;
     this.limiteVelocidadeAvanco = this.velocidadeAvanco;

@@ -22,6 +22,7 @@ export default class PinguSiSpecial {
 
   executar() {
     const sprite = this.personagem.sprite;
+    this.personagem.tocarSomSorteado("pingu-throw", { volume: this.personagem.sons.volumeVoz });
     sprite.setVelocityX(0);
     sprite.on("animationupdate", this.aoAtualizarAnimacao);
     sprite.once(`animationcomplete-${this.special.animacao}`, this.aoCompletarAnimacao);
@@ -52,6 +53,8 @@ export default class PinguSiSpecial {
   criarProjetil(enxurrada) {
     const sprite = this.personagem.sprite;
     if (!sprite?.active) return;
+
+    this.personagem.tocarSomSorteado("pingu-ball", { volume: 0.4 });
 
     const direcao = sprite.flipX ? -1 : 1;
     const offsetY = this.special.offsetsYProjetil[
@@ -92,7 +95,10 @@ export default class PinguSiSpecial {
     this.projeteis.add(registro);
     registro.ataque = registrarAtaqueEspecial(this, projetil, {
       categoria: "projetil",
-      aoColidir: () => this.finalizarProjetil(registro),
+      aoColidir: () => {
+        this.tocarImpactoProjetil();
+        this.finalizarProjetil(registro);
+      },
       aoColidirProjetil: (outroAtaque) => {
         let projeteis = this.projeteisPorAlvo.get(outroAtaque);
         if (!projeteis) {
@@ -112,7 +118,10 @@ export default class PinguSiSpecial {
       registro.colisor = this.scene.physics.add.collider(
         projetil,
         plataformas,
-        () => this.finalizarProjetil(registro),
+        () => {
+          this.tocarImpactoProjetil();
+          this.finalizarProjetil(registro);
+        },
       );
     }
 
@@ -126,6 +135,7 @@ export default class PinguSiSpecial {
     if (!registro.projetil.active) return;
     const quantidadeAcertos = (this.acertosPorAlvo.get(alvo) ?? 0) + 1;
     this.acertosPorAlvo.set(alvo, quantidadeAcertos);
+    this.tocarImpactoProjetil();
     alvo.receberDano(propriedades.dano, {
       ...propriedades,
       naoInterromperEstado: quantidadeAcertos < this.special.projeteisParaQuebrar,
@@ -138,6 +148,10 @@ export default class PinguSiSpecial {
       atacante: this.personagem,
     });
     this.finalizarProjetil(registro);
+  }
+
+  tocarImpactoProjetil() {
+    this.personagem.tocarSomSorteado("pingu-simpac", { volume: 0.5 });
   }
 
   finalizarProjetil(registro) {
