@@ -636,6 +636,8 @@ const assetsIce = [
   (scene, queued) => queueAsset(scene, queued, "texture", "ice-back", () => { scene.load.spritesheet("ice-back", "assets/cenarios/Ice/ice-back.png", { frameWidth: 640, frameHeight: 389 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "ice-plat", () => { scene.load.image("ice-plat", "assets/cenarios/Ice/ice-plat.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "ice-trans", () => { scene.load.image("ice-trans", "assets/cenarios/Ice/ice-trans.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "pingu-fight-music", () => { scene.load.audio("pingu-fight-music", "assets/cenarios/Ice/pingu-fight-music.mp3"); }),
+
  
 ];
 const assetsMapaTeste = [
@@ -645,7 +647,7 @@ const assetsMapaTeste = [
 const assetsCidade = [
   (scene, queued) => queueAsset(scene, queued, "texture", "cidade", () => { scene.load.spritesheet("cidade", "assets/cenarios/MapaCidade/Sprites/cidade.png", { frameWidth: 960, frameHeight: 320 }); }),
   (scene, queued) => queueAsset(scene, queued, "audio", "ClockTower", () => { scene.load.audio("ClockTower", "assets/cenarios/MapaCidade/Ost/ClockTower.mp3"); }),
- //(scene, queued) => queueAsset(scene, queued, "texture", " ", () => { scene.load.spritesheet(" ", "assets/cenarios/MapaCidade/Sprites/.png", { frameWidth: 960, frameHeight: 320 }); }),
+ (scene, queued) => queueAsset(scene, queued, "texture", "plat-cidade", () => { scene.load.image("plat-cidade", "assets/cenarios/MapaCidade/Sprites/plat-cidade.png"); }),
 
 
 ];

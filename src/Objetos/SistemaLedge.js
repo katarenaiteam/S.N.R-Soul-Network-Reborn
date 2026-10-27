@@ -33,7 +33,6 @@ export default class SistemaLedge {
       if (personagem) this.contatos.delete(personagem);
       return;
     }
-    const anteriores = this.contatos.get(personagem) ?? new Set();
     const atuais = new Set(this.areas.filter(area =>
       body.right > area.x - area.largura / 2 &&
       body.left < area.x + area.largura / 2 &&
@@ -45,8 +44,10 @@ export default class SistemaLedge {
     if (body.blocked.down ||
         agora < (this.cooldowns.get(personagem) ?? 0)) return;
 
-    const area = [...atuais].find(item => !anteriores.has(item));
+    const area = atuais.values().next().value;
     if (!area) return;
+    const estadoAtual = personagem.maquinaEstados?.estadoAtual?.nome;
+    if (estadoAtual !== "jump" && estadoAtual !== "dash") return;
     if (!personagem.maquinaEstados.mudarEstado("crouch", { ledge: true })) return;
     personagem.pulos = Math.max(0, personagem.pulos - 1);
     personagem.isTumbling = false;

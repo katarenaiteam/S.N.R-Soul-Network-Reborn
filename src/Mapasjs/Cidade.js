@@ -35,8 +35,8 @@ export default class Cidade {
 
         // 3. SPAWNS INICIAIS E RESPAWNS
         this.spawnsIniciais = {
-            p1: { x: 1000, y: 870 },
-            p2: { x: 1600, y: 870 }
+            p1: { x: 1000, y: 835 },
+            p2: { x: 1600, y: 835 }
         };
 
         this.spawnsRespawn = {
@@ -48,10 +48,10 @@ export default class Cidade {
         this.criarPlataformas();
         // Areas de recuperacao: centro x/y, largura e altura em pixels.
         this.areasLedge = [
-            { x: 860, y: 915, largura: 30, altura: 35, direcao: 1 },
-            { x: 1740, y: 910, largura: 30, altura: 35, direcao: -1 },
-            { x: 2045, y: 640, largura: 40, altura: 50, direcao: -1 },
-            { x: 555, y: 500, largura: 40, altura: 50, direcao: 1 },
+            { x: 860, y: 890, largura: 30, altura: 35, direcao: 1 },
+            { x: 1740, y: 890, largura: 30, altura: 35, direcao: -1 },
+            { x: 2105, y: 640, largura: 40, altura: 50, direcao: -1 },
+            { x: 490, y: 612, largura: 40, altura: 50, direcao: 1 },
         ];
 
         // 4. ANIMAÇÃO DE FUNDO
@@ -71,24 +71,30 @@ export default class Cidade {
         this.imagemFundo.play("tocarFundoCidade");
     }
 
-    // Método para plataformas em blocos sem sprite (Cores Sólidas)
-    adicionarPlataformaBloco(x, y, largura, altura, cor = 0xff0000) {
-        // Cria o formato geométrico do retângulo
-        const p = this.scene.add.rectangle(x, y, largura, altura, cor);
-        p.setOrigin(0.5, 0.5);
-        
-        // Ativa física estática
-        this.scene.physics.add.existing(p, true);
-        this.plataformas.add(p);
+    
+     adicionarPlataformaSprite(x, y, chaveImagem, larguraPixels, alturaPixels) {
+    const p = this.plataformas.create(x, y, chaveImagem);
+    p.setOrigin(0.5, 0.5);
+    p.setDisplaySize(larguraPixels, alturaPixels);
 
-        return p;
-    }
+    // 1. Reduz o corpo físico para a metade da altura
+    const metadeAltura = alturaPixels / 2;
+    p.body.setSize(larguraPixels, metadeAltura);
+
+    // 2. O truque para StaticBody: define a posição exata da caixa física
+    // O topo do hitbox (body.y) vai começar exatamente no centro da imagem Y
+    p.body.x = x - (larguraPixels / 2);
+    p.body.y = y - (alturaPixels / 3);
+
+    return p;
+}
 
     // 6. PLATAFORMAS POSICIONADAS NO PADRÃO DO NOVO MUNDO
     criarPlataformas() {
-        this.adicionarPlataformaBloco(1300, 900, 900, 60); // Plataforma principal
-        this.adicionarPlataformaBloco(1800, 650, 450, 60);
-        this.adicionarPlataformaBloco(800, 500, 450, 60);
+        this.adicionarPlataformaSprite(1300, 900, 'plat-cidade', 900, 120); // Plataforma principal
+
+        this.adicionarPlataformaSprite(1900, 650, 'plat-cidade', 450, 120);
+        this.adicionarPlataformaSprite(700, 625, 'plat-cidade', 450, 120);
     
     }
 }

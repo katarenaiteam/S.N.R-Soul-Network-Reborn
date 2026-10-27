@@ -249,7 +249,7 @@ export default class Pingu extends Personagem {
         ],
       },
 
-      downAtack: {offsetVisualY: 50, largura: 30, altura: 40, offsetX: 80, offsetY: 104, escala: 1,
+      downAtack: {offsetVisualY: 50, largura: 30, altura: 40, offsetX: 80, offsetY: 103, escala: 1,
         hurtboxes: [
           { largura: 60, altura: 30, offsetX: -10, offsetY: -15 }, 
         ],
@@ -285,7 +285,7 @@ export default class Pingu extends Personagem {
         ],
       },
 
-      AneSpecial: { largura: 30, altura: 70, offsetX: 27, offsetY: 18, escala: 1,
+      AneSpecial: { largura: 30, altura: 70, offsetX: 27, offsetY: 17, escala: 1,
         hurtboxes: [
           { largura: 30, altura: 55, offsetX: 0, offsetY: -30 },
         ],
@@ -297,7 +297,7 @@ export default class Pingu extends Personagem {
         ],
       },
 
-      doSpecial: {offsetVisualY: 2, offsetVisualX: 11, largura: 30, altura: 40, offsetX: 28, offsetY: 48, escala: 1,
+      doSpecial: {offsetVisualY: 2, offsetVisualX: 11, largura: 30, altura: 40, offsetX: 28, offsetY: 45, escala: 1,
         hurtboxes: [
           { largura: 30, altura: 40, offsetX: 0, offsetY: -22 },
         ],
@@ -323,13 +323,13 @@ export default class Pingu extends Personagem {
         ],
       },
 
-      AupSpecial: { largura: 30, altura: 70, offsetX: 6, offsetY: 20, escala: 1,
+      AupSpecial: { largura: 30, altura: 70, offsetX: 20, offsetY: 36, escala: 1,
         hurtboxes: [
-          { largura: 30, altura: 55, offsetX: 5, offsetY: -55 }, 
+          { largura: 30, altura: 55, offsetX: 10, offsetY: -50 }, 
         ],
       },
 
-      AdoSpecial: { offsetVisualY: -5, largura: 40, altura: 40, offsetX: 15, offsetY: 25, escala: 1,
+      AdoSpecial: { offsetVisualY: -5, largura: 30, altura: 70, offsetX: 20, offsetY: 21, escala: 1,
         hurtboxes: [
           { largura: 35, altura: 35, offsetX: -5, offsetY: -23 },
         ],

@@ -333,8 +333,8 @@ this.nomePersonagem = "Ken";
        AneSpecial: {
        largura: 85,
         altura: 120,
-        offsetX: 25,
-        offsetY: -13,
+        offsetX: 27,
+        offsetY: -11,
         escala: 1,
         hurtboxes: [
           { largura: 55, altura: 55, offsetX: 0, offsetY: -70 },
