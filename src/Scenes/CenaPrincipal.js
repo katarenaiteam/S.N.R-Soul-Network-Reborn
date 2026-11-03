@@ -1,6 +1,6 @@
 import MorteVS from "../Objetos/MorteVS.js";
 import { criarIndicador, atualizarIndicador } from "../Objetos/IndicadorPersonagem.js";
-import { criarHudPartida, atualizarBarraUlt } from "../Objetos/HudPartida.js";
+import { criarHudPartida, atualizarBarraUlt, atualizarIndicadorVidas } from "../Objetos/HudPartida.js";
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 //import * as Phaser from "phaser";
 import MapaCidade from "../Mapasjs/Cidade.js";
@@ -55,6 +55,7 @@ export default class cenaPrincipal extends Phaser.Scene {
   }
 
   create() {
+    this.atualizarCameraPadrao = this.atualizarCamera;
     encerrarOutrasCenas(this);
     this.events.once("shutdown", () => {
       this.sound.stopAll();
@@ -102,6 +103,9 @@ export default class cenaPrincipal extends Phaser.Scene {
     // --- CONTROLE DE VIDAS ---
     this.vidasP1 = 3;
     this.vidasP2 = 3;
+    this.tempoRestanteVersus = 180000;
+    this.partidaFinalizada = false;
+    this.fimPorTempoPendente = false;
 
 
     // --- PLATAFORMAS ESTÁTICAS ---
@@ -178,11 +182,7 @@ if (!this.anims.exists("miku_puppet_move")) {
       false,
     );
     this.hudP1_Nome.setScale(escalaResolucao);
-
-      // Texto para exibir as Vidas do P1
-    this.hudP1_Vidas = this.add.text(290 * escalaResolucao, 840 * escalaResolucao, `VIDAS: ${this.vidasP1}`, { fontSize: `${32 * escalaResolucao}px`, fill: "#e2d8d9", fontStyle: "bold" })
-      .setScrollFactor(0)
-      .setDepth(1100);
+    atualizarIndicadorVidas({ vidas: this.vidasP1 }, this.hudP1_Nome);
 
     // 3. Cria a HUD do P2 na DIREITA
     this.hudP2_Nome = this.criarHudPartida(
@@ -193,11 +193,14 @@ if (!this.anims.exists("miku_puppet_move")) {
       true,
     );
     this.hudP2_Nome.setScale(escalaResolucao);
+    atualizarIndicadorVidas({ vidas: this.vidasP2 }, this.hudP2_Nome);
 
-      this.hudP2_Vidas = this.add.text(this.scale.width - 80 * escalaResolucao, 840 * escalaResolucao, `VIDAS: ${this.vidasP2}`, { fontSize: `${32 * escalaResolucao}px`, fill: "#e2d8d9", fontStyle: "bold" })
-        .setOrigin(1, 0)
-        .setScrollFactor(0)
-        .setDepth(1100);
+    this.textoTempoVersus = this.add.text(
+      this.scale.width / 2,
+      28 * escalaResolucao,
+      "03:00",
+      { fontSize: `${38 * escalaResolucao}px`, color: "#ffffff", fontStyle: "bold", stroke: "#000000", strokeThickness: 5 * escalaResolucao },
+    ).setOrigin(0.5, 0).setScrollFactor(0).setDepth(1200).setVisible(false);
 
 
     // --- criar barra ---
@@ -221,7 +224,7 @@ if (!this.anims.exists("miku_puppet_move")) {
       this.anims.create({
         key: "TVefect",
         frames: this.anims.generateFrameNumbers("TVefect"),
-        frameRate: 8,
+        frameRate: 13.333333,
         repeat: 0,
       });
     }
@@ -244,8 +247,7 @@ if (!this.anims.exists("miku_puppet_move")) {
    this.camJogo.ignore([
     this.jogador1.textoDano,
     this.jogador2.textoDano,
-    this.hudP1_Vidas,
-    this.hudP2_Vidas,
+    this.textoTempoVersus,
     this.hudP1_Nome,
     this.hudP2_Nome
   ].filter((objeto) => objeto && typeof objeto === "object" && "cameraFilter" in objeto));
@@ -366,10 +368,10 @@ this.indicadorP2 = this.criarIndicador(
           } else if (pedido.efeito === "life") {
             if (pedido.jogador === 1) {
               this.vidasP1 += 1;
-              this.hudP1_Vidas?.setText(`VIDAS: ${this.vidasP1}`);
+              atualizarIndicadorVidas({ vidas: this.vidasP1 }, this.hudP1_Nome);
             } else {
               this.vidasP2 += 1;
-              this.hudP2_Vidas?.setText(`VIDAS: ${this.vidasP2}`);
+              atualizarIndicadorVidas({ vidas: this.vidasP2 }, this.hudP2_Nome);
             }
             this.reproduzirAudioLoja("shop-life", idPedido);
           }
@@ -462,6 +464,17 @@ this.indicadorP2 = this.criarIndicador(
       this.publicarEstadoMQTT(time);
       return;
     }
+    if (!this.modoEspectador && !this.partidaFinalizada) {
+      this.tempoRestanteVersus = Math.max(0, this.tempoRestanteVersus - delta);
+      this.atualizarTextoTempoVersus();
+      if (this.tempoRestanteVersus <= 0) {
+        this.fimPorTempoPendente = true;
+        if (this.podeFinalizarPartidaPorTempo()) {
+          this.finalizarPartidaPorTempo();
+          return;
+        }
+      }
+    }
     this.sistemaLedge.atualizarVisualizacao(this);
     this.sistemaLedge.atualizar(this.jogador1);
     this.sistemaLedge.atualizar(this.jogador2);
@@ -511,6 +524,58 @@ this.indicadorP2 = this.criarIndicador(
     this.verificarMorte(this.jogador1, this.pontoRespawnP1, 1);
     this.verificarMorte(this.jogador2, this.pontoRespawnP2, 2);
     this.publicarEstadoMQTT(time);
+  }
+
+  atualizarTextoTempoVersus() {
+    const segundos = Math.ceil(this.tempoRestanteVersus / 1000);
+    const minutos = Math.floor(segundos / 60);
+    const restoSegundos = segundos % 60;
+    this.textoTempoVersus?.setText(
+      `${String(minutos).padStart(2, "0")}:${String(restoSegundos).padStart(2, "0")}`,
+    );
+    const tempoDecorrido = 180000 - this.tempoRestanteVersus;
+    const visivel = tempoDecorrido < 7000 || this.tempoRestanteVersus <= 60000;
+    this.textoTempoVersus?.setVisible(visivel);
+  }
+
+  podeFinalizarPartidaPorTempo() {
+    if (this.ultEmAndamento) return false;
+    if ([this.jogador1, this.jogador2].some((jogador) =>
+      jogador?.maquinaEstados?.estadoAtual?.nome === "ult")) return false;
+    if (this.atualizarCamera !== this.atualizarCameraPadrao) return false;
+
+    const camera = this.cameras.main;
+    return !camera.zoomEffect?.isRunning &&
+      !camera.panEffect?.isRunning &&
+      !camera.rotateToEffect?.isRunning;
+  }
+
+  finalizarPartidaPorTempo() {
+    if (this.partidaFinalizada) return;
+    this.partidaFinalizada = true;
+
+    const p1TemMaisVidas = this.vidasP1 > this.vidasP2;
+    const p2TemMaisVidas = this.vidasP2 > this.vidasP1;
+    const danoP1 = Number(this.jogador1.porcentagemDano) || 0;
+    const danoP2 = Number(this.jogador2.porcentagemDano) || 0;
+    const p1Venceu = p1TemMaisVidas || (!p2TemMaisVidas && (danoP1 <= danoP2));
+    const vencedor = p1Venceu ? this.jogador1 : this.jogador2;
+    const perdedor = p1Venceu ? this.jogador2 : this.jogador1;
+    const resultado = {
+      vencedor: {
+        id: p1Venceu ? this.escolhaP1 : this.escolhaP2,
+        nome: vencedor.nomePersonagem,
+      },
+      perdedor: {
+        id: p1Venceu ? this.escolhaP2 : this.escolhaP1,
+        nome: perdedor.nomePersonagem,
+      },
+    };
+
+    this.sound.stopAll();
+    publicarEstadoVersus(this, "game-over", resultado);
+    this.preservarAssetsGameOver = true;
+    this.scene.start("CenaGameOver", resultado);
   }
 
   publicarEstadoMQTT(tempo, forcar = false) {
@@ -599,6 +664,7 @@ this.indicadorP2 = this.criarIndicador(
       },
       vidasP1: this.vidasP1,
       vidasP2: this.vidasP2,
+      tempoRestanteVersus: this.tempoRestanteVersus,
       camera: {
         x: this.cameras.main.midPoint.x,
         y: this.cameras.main.midPoint.y,
@@ -659,8 +725,12 @@ this.indicadorP2 = this.criarIndicador(
 
     this.vidasP1 = dados.vidasP1;
     this.vidasP2 = dados.vidasP2;
-    this.hudP1_Vidas?.setText(`VIDAS: ${this.vidasP1}`);
-    this.hudP2_Vidas?.setText(`VIDAS: ${this.vidasP2}`);
+    if (Number.isFinite(dados.tempoRestanteVersus)) {
+      this.tempoRestanteVersus = dados.tempoRestanteVersus;
+      this.atualizarTextoTempoVersus();
+    }
+    atualizarIndicadorVidas({ vidas: this.vidasP1 }, this.hudP1_Nome);
+    atualizarIndicadorVidas({ vidas: this.vidasP2 }, this.hudP2_Nome);
     this.atualizarBarraUlt(this.jogador1, this.hudP1_Nome);
     this.atualizarBarraUlt(this.jogador2, this.hudP2_Nome);
 
@@ -826,10 +896,10 @@ this.indicadorP2 = this.criarIndicador(
     // Desconta a vida do jogador correspondente
     if (numJogador === 1) {
       this.vidasP1--;
-      this.hudP1_Vidas.setText(`VIDAS: ${this.vidasP1}`);
+      atualizarIndicadorVidas({ vidas: this.vidasP1 }, this.hudP1_Nome);
     } else {
       this.vidasP2--;
-      this.hudP2_Vidas.setText(`VIDAS: ${this.vidasP2}`);
+      atualizarIndicadorVidas({ vidas: this.vidasP2 }, this.hudP2_Nome);
     }
 
   }

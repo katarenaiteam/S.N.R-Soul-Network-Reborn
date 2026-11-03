@@ -1,7 +1,7 @@
 import IntroPartida from "../Objetos/IntroPartida.js";
 import MorteVS from "../Objetos/MorteVS.js";
 import { criarIndicador, atualizarIndicador } from "../Objetos/IndicadorPersonagem.js";
-import { criarHudPartida, atualizarBarraUlt } from "../Objetos/HudPartida.js";
+import { criarHudPartida, atualizarBarraUlt, atualizarIndicadorVidas } from "../Objetos/HudPartida.js";
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
 import MikuMap from "../Mapasjs/MikuMap.js";
 import FJ from "../Personagensjs/Frederick.js";
@@ -11,6 +11,7 @@ import Pingu from "../Personagensjs/Pingu.js";
 import Slenderman from "../Personagensjs/Slender.js";
 import Miku from "../Personagensjs/Miku.js";
 import TH30 from "../Personagensjs/TH30.js";
+import Goku from "../Personagensjs/Goku.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import BotController from "../Objetos/BotController.js";
 import Miku_IA from "../Objetos/Miku_IA.js";
@@ -205,11 +206,10 @@ export default class CenaHistoria extends Phaser.Scene {
       const y = 1080 - 358 * escalaHUD - 20;
       entrada.hud = criarHudPartida.call(this, jogador, entrada.escolha, x, y, direita);
       entrada.hud.setScale(escalaHUD);
-      if (jogador === this.boss && this.esconderBarraUltBoss) entrada.hud.barraUlt?.setVisible(false);
-      entrada.textoVidas = this.add.text(direita ? -420 : 10, 155,
-        entrada.rotulo + ' - VIDAS: ' + jogador.vidas,
-        { fontSize: '28px', color: direita ? '#ff6666' : '#ffffff', fontStyle: 'bold' });
-      entrada.hud.add(entrada.textoVidas);
+      if (jogador === this.boss && this.esconderBarraUltBoss) {
+        entrada.hud.barraUlt?.setVisible(false);
+        entrada.hud.barraCarregada?.setVisible(false);
+      }
       this.containerHUD.add(entrada.hud);
     });
 
@@ -229,7 +229,7 @@ export default class CenaHistoria extends Phaser.Scene {
       this.anims.create({
         key: "TVefect",
         frames: this.anims.generateFrameNumbers("TVefect"),
-        frameRate: 8,
+        frameRate: 13.333333,
         repeat: 0,
       });
     }
@@ -315,6 +315,8 @@ this.indicadorCPU = this.criarIndicador(
               return new Pingu(this, x, y, teclas, minDano, maxDano, controle);
               case "TH30":
               return new TH30(this, x, y, teclas, minDano, maxDano, controle);
+              case "Goku":
+              return new Goku(this, x, y, teclas, minDano, maxDano, controle);
             default:
               return new Ken(this, x, y, teclas, minDano, maxDano, controle);
     }
@@ -389,7 +391,7 @@ this.indicadorCPU = this.criarIndicador(
     this[entrada.vidas] = Math.max(0, this[entrada.vidas] - 1);
     jogador.vidas = this[entrada.vidas];
     jogador.ganharCargaUltPorMorte();
-    entrada.textoVidas.setText(entrada.rotulo + (jogador.vidas ? ' - VIDAS: ' + jogador.vidas : ' - ELIMINADO'));
+    atualizarIndicadorVidas(jogador, entrada.hud);
     this.limparAcao(jogador);
     this.mortesVS.iniciar(jogador, spawn ?? entrada.spawn, entrada.vidas);
     if (jogador.vidas === 0) {

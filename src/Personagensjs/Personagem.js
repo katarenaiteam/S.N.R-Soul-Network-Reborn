@@ -240,6 +240,25 @@ export default class Personagem {
   receberDano(quantidade, propriedades = {}, origem = null) {
     if (this.invulneravel) return true;
 
+    if (
+      this.carregandoKi &&
+      (
+        origem?.projetil ||
+        origem?.tipo === "projetil" ||
+        propriedades.projetil ||
+        !origem?.atacante ||
+        (origem.velocidadeX === undefined && origem.velocidadeY === undefined)
+      )
+    ) {
+      propriedades = {
+        ...propriedades,
+        knockbackX: 0,
+        knockbackY: 0,
+        knockbackFixo: true,
+        naoInterromperEstado: true,
+      };
+    }
+
     const atacante =
       this.scene.jogador1 === this
         ? this.scene.jogador2
@@ -298,6 +317,9 @@ export default class Personagem {
 
     //. LÓGICA PADRÃO DE DANO (Quando toma golpe sem escudo):
     this.porcentagemDano += quantidade;
+    if (quantidade > 0 && !propriedades.semCargaKi) {
+      origem?.atacante?.adicionarCargaKiPorDano?.(quantidade);
+    }
     const danoDeSlenderman = atacante?.nomePersonagem === "Slanderman" || atacante?.nomePersonagem === "Slenderman";
     if (quantidade > 0 && (propriedades.corrupcaoSlender > 0 || danoDeSlenderman)) {
       this.corrupcaoSlender.adicionar(propriedades.corrupcaoSlender || 5);
@@ -946,6 +968,17 @@ consumirUlt() {
   }
 
   inputJustDown(nome) {
+    if (nome === "special" && this.bloquearSpecialAteSoltar) {
+      if (!this.inputDown("special")) {
+        this.bloquearSpecialAteSoltar = false;
+      } else {
+        const tecla = this.teclas?.[nome];
+        if (!this.controle && tecla && !tecla.isVirtual) {
+          Phaser.Input.Keyboard.JustDown(tecla);
+        }
+        return false;
+      }
+    }
     if (this.controle) return this.controle.acabouDeApertar(nome);
     const tecla = this.teclas?.[nome];
     if (!tecla) return false;

@@ -9,6 +9,7 @@ const apresentacaoPersonagens = {
   Slenderman: { nome: "SLENDERMAN", taunt: "slan_taunt", stun: "slan_stun" },
   Pingu: { nome: "PINGU", taunt: "pingu_taunt", stun: "pingu_stun" },
   TH30: { nome: "TH30", taunt: "th_taunt", stun: "th_stun" },
+  Goku: { nome: "GOKU", taunt: "gk_taunt", stun: "gk_stun" },
   Madotsuki: { nome: "MADOTSUKI", taunt: "ken_taunt", stun: "ken_stun" },
 };
 

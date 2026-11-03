@@ -1,4 +1,9 @@
 import Personagem from "./Personagem.js";
+import GokuDoSpecial from "./Specials/Goku/DoSpecial.js";
+import GokuNeSpecial from "./Specials/Goku/NeSpecial.js";
+import GokuAsiSpecial from "./Specials/Goku/AsiSpecial.js";
+import GokuAupSpecial from "./Specials/Goku/AupSpecial.js";
+import GokuAdoSpecial from "./Specials/Goku/AdoSpecial.js";
 
 
 export default class Goku extends Personagem {
@@ -61,9 +66,9 @@ export default class Goku extends Personagem {
         offsetY: -7,
         escala: 1,
         hurtboxes: [
-          { largura: 30, altura: 30, offsetX: 20, offsetY: -75 },
-          { largura: 50, altura: 20, offsetX: 22, offsetY: -48 }, // Tronco/cabeça
-          { largura: 80, altura: 35, offsetX: 0, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 35, altura: 30, offsetX: 10, offsetY: -75 },
+          { largura: 60, altura: 20, offsetX: 2, offsetY: -48 }, // Tronco/cabeça
+          { largura: 80, altura: 35, offsetX: -2, offsetY: -18 }, // Agachado / pernas abertas
         ],
       },
 
@@ -74,8 +79,8 @@ export default class Goku extends Personagem {
         offsetY: 6,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 45, offsetX: -10, offsetY: -60 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 55, altura: 45, offsetX: 6, offsetY: -60 }, // Tronco/cabeça
+          { largura: 60, altura: 35, offsetX: 6, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
 
@@ -86,8 +91,8 @@ export default class Goku extends Personagem {
         offsetY: 32,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 70, offsetX: 0, offsetY: -90 }, // Tronco/cabeça
-          { largura: 30, altura: 50, offsetX: -20, offsetY: -25 }, // parte de baixo parecida
+          { largura: 60, altura: 70, offsetX: -4, offsetY: -75 }, // Tronco/cabeça
+          { largura: 40, altura: 50, offsetX: 0, offsetY: -25 }, // parte de baixo parecida
         ],
       },
 
@@ -110,8 +115,32 @@ export default class Goku extends Personagem {
         offsetY: -8,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 25, offsetX: 0, offsetY: -35 }, // fechadinho
-          { largura: 75, altura: 25, offsetX: 0, offsetY: -20 },
+          { largura: 30, altura: 35, offsetX: -7, offsetY: -55 }, // fechadinho
+          { largura: 75, altura: 35, offsetX: 0, offsetY: -20 },
+        ],
+      },
+
+      crouch2: {
+        largura: 85,
+        altura: 100,
+        offsetX: -1,
+        offsetY: -8,
+        escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 35, offsetX: -7, offsetY: -55 },
+          { largura: 75, altura: 35, offsetX: 0, offsetY: -20 },
+        ],
+      },
+
+      crouch3: {
+        largura: 85,
+        altura: 100,
+        offsetX: -1,
+        offsetY: -8,
+        escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 35, offsetX: -7, offsetY: -55 },
+          { largura: 75, altura: 35, offsetX: 0, offsetY: -20 },
         ],
       },
 
@@ -122,9 +151,9 @@ export default class Goku extends Personagem {
       offsetY: -12,
       escala: 1,
       hurtboxes: [
-          { largura: 55, altura: 55, offsetX: -15, offsetY: -65 }, // Tronco/cabeça
-          { largura: 60, altura: 10, offsetX: -15, offsetY: -32 },
-          { largura: 85, altura: 15, offsetX: -5, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 35, altura: 30, offsetX: 10, offsetY: -75 },
+          { largura: 60, altura: 20, offsetX: 2, offsetY: -48 }, // Tronco/cabeça
+          { largura: 80, altura: 35, offsetX: -2, offsetY: -18 }, // Agachado / pernas abertas
      ]
       },
 
@@ -135,8 +164,8 @@ export default class Goku extends Personagem {
       offsetY: -11,
       escala: 1,
       hurtboxes: [
-          { largura: 55, altura: 60, offsetX: -5, offsetY: -70 }, // Tronco/cabeça
-          { largura: 55, altura: 35, offsetX: -5, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 30, altura: 35, offsetX: 20, offsetY: -50 }, // Tronco/cabeça
+          { largura: 80, altura: 35, offsetX: -5, offsetY: -18 }, // Agachado / pernas abertas
      ]
       },
       stun: {
@@ -147,7 +176,7 @@ export default class Goku extends Personagem {
         escala: 1,
         hurtboxes: [
           
-          { largura: 65, altura: 75, offsetX: -10, offsetY: -42 }, // Agachado / pernas abertas
+          { largura: 65, altura: 70, offsetX: -12, offsetY: -38 }, // Agachado / pernas abertas
         ],
       },
 
@@ -158,8 +187,8 @@ export default class Goku extends Personagem {
         offsetY: -5,
         escala: 1,
         hurtboxes: [
-          { largura: 55, altura: 60, offsetX: 0, offsetY: -70 }, // Tronco/cabeça
-          { largura: 60, altura: 35, offsetX: -10, offsetY: -18 }, // Agachado / pernas juntas
+          { largura: 55, altura: 60, offsetX: -10, offsetY: -70 }, // Tronco/cabeça
+          { largura: 70, altura: 35, offsetX: -5, offsetY: -18 }, // Agachado / pernas juntas
         ],
       },
 
@@ -167,7 +196,7 @@ export default class Goku extends Personagem {
         largura: 85,
         altura: 100,
         offsetX: 5,
-        offsetY: 20,
+        offsetY: 30,
         escala: 1,
         hurtboxes: [
            { largura: 55, altura: 60, offsetX: 0, offsetY: -95 }, // Tronco/cabeça
@@ -178,11 +207,11 @@ export default class Goku extends Personagem {
         largura: 85,
         altura: 100,
         offsetX: 0,
-        offsetY: 0,
+        offsetY: 10,
         escala: 1,
         hurtboxes: [
-           { largura: 55, altura: 60, offsetX: 0, offsetY: -90 }, 
-          { largura: 55, altura: 35, offsetX: 0, offsetY: -45 }, 
+           { largura: 55, altura: 60, offsetX: -10, offsetY: -90 }, 
+          { largura: 55, altura: 35, offsetX: -10, offsetY: -45 }, 
         ], 
       },
       danoSide: {
@@ -192,7 +221,7 @@ export default class Goku extends Personagem {
         offsetY: 20,
         escala: 1,
         hurtboxes: [
-           { largura: 60, altura: 55, offsetX: 0, offsetY: -75 },  
+           { largura: 60, altura: 55, offsetX: -15, offsetY: -85 },  
         ],
       },
       dead: {
@@ -202,8 +231,8 @@ export default class Goku extends Personagem {
         offsetY: 27, // Ajustado para compensar a folha de 52px de altura
         escala: 1,
         hurtboxes: [
-          { largura: 50, altura: 15, offsetX: -10, offsetY: -35 },
-          { largura: 90, altura: 20, offsetX: 0, offsetY: -15 },
+          { largura: 40, altura: 15, offsetX: 0, offsetY: -35 },
+          { largura: 110, altura: 20, offsetX: 0, offsetY: -15 },
         ],
       },
       getup: {
@@ -218,86 +247,322 @@ export default class Goku extends Personagem {
         ],
       },
 
-      atack1: { largura: 85, altura: 100, offsetX: 12, offsetY: 0, escala: 1,
+      intro: {
+        largura: 85,
+        altura: 100,
+        offsetX: 13,
+        offsetY: 29,
+        escala: 1,
         hurtboxes: [
-          { largura: 30, altura: 30, offsetX: 20, offsetY: -75 },
-          { largura: 50, altura: 20, offsetX: 22, offsetY: -48 }, // Tronco/cabeça
-          { largura: 80, altura: 35, offsetX: 0, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 35, altura: 30, offsetX: 10, offsetY: -75 },
+          { largura: 60, altura: 20, offsetX: 2, offsetY: -48 },
+          { largura: 80, altura: 35, offsetX: -2, offsetY: -18 },
         ],
       },
 
-      atack2: { largura: 85, altura: 100, offsetX: 20, offsetY: 0, escala: 1,
+      atack1: { offsetVisualX:9, largura: 85, altura: 100, offsetX: 14, offsetY: 0, escala: 1,
         hurtboxes: [
-          { largura: 30, altura: 30, offsetX: 20, offsetY: -75 },
-          { largura: 50, altura: 20, offsetX: 22, offsetY: -48 }, // Tronco/cabeça
-          { largura: 80, altura: 35, offsetX: 0, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 35, altura: 30, offsetX: 10, offsetY: -75 },
+          { largura: 60, altura: 20, offsetX: 2, offsetY: -48 }, // Tronco/cabeça
+          { largura: 80, altura: 35, offsetX: -2, offsetY: -18 }, // Agachado / pernas abertas
         ],
       },
 
-      atack3: { largura: 85, altura: 100, offsetX: 35, offsetY: 10, escala: 1,
+      atack2: { offsetVisualX:10, largura: 85, altura: 100, offsetX: 21, offsetY: 0, escala: 1,
         hurtboxes: [
-          { largura: 30, altura: 30, offsetX: 20, offsetY: -75 },
-          { largura: 50, altura: 20, offsetX: 22, offsetY: -48 }, // Tronco/cabeça
-          { largura: 80, altura: 35, offsetX: 0, offsetY: -18 }, // Agachado / pernas abertas
+          { largura: 35, altura: 30, offsetX: 10, offsetY: -75 },
+          { largura: 60, altura: 20, offsetX: 2, offsetY: -48 }, // Tronco/cabeça
+          { largura: 80, altura: 35, offsetX: -2, offsetY: -18 }, // Agachado / pernas abertas
+        ],
+      },
+
+      atack3: { offsetVisualX:6, largura: 85, altura: 100, offsetX: 34, offsetY: 10, escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 30, offsetX: -10, offsetY: -75 },
+          { largura: 50, altura: 20, offsetX: 0, offsetY: -48 }, // Tronco/cabeça
+          { largura: 30, altura: 35, offsetX: 5, offsetY: -18 }, // Agachado / pernas abertas
         ],
       },
 
       neutralAir: {
         largura: 85,
         altura: 100,
-        offsetX: 0,
-        offsetY: 0,
+        offsetX: 12,
+        offsetY: 9,
         escala: 1,
         hurtboxes: [
-          { largura: 60, altura: 45, offsetX: -20, offsetY: -60 }, // Tronco/cabeça
-          { largura: 70, altura: 45, offsetX: 0, offsetY: -35 }, // perna dano
+          { largura: 50, altura: 45, offsetX: -10, offsetY: -80 }, // Tronco/cabeça
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -35 }, // perna dano
         ],
       },
 
       sideAtack: {
         largura: 85,
         altura: 100,
-        offsetX: 0,
+        offsetX: 4,
         offsetY: 0,
         escala: 1,
         hurtboxes: [{ largura: 60, altura: 80, offsetX: -20, offsetY: -40 }],
       },
 
       downAtack: {
+        offsetVisualX:12,
+        offsetVisualY:3,
         largura: 85,
         altura: 100,
         offsetX: 30,
-        offsetY: -13,
+        offsetY: -12,
         escala: 1,
-        hurtboxes: [{ largura: 80, altura: 45, offsetX: 0, offsetY: -30 }],
+        hurtboxes: [
+          { largura: 30, altura: 35, offsetX: -1, offsetY: -70 },
+          { largura: 70, altura: 45, offsetX: 0, offsetY: -30 },
+         
+        ],
+                  
       },
 
       sideAir: {
         largura: 85,
         altura: 100,
-        offsetX: 30,
-        offsetY: 10,
+        offsetX: 42,
+        offsetY: 18,
         escala: 1,
-        hurtboxes: [{ largura: 65, altura: 60, offsetX: -15, offsetY: -40 }],
+        hurtboxes: [{ largura: 55, altura: 90, offsetX: -15, offsetY: -70 }],
       },
 
       upAir: {  
         largura: 85,
         altura: 100,
-        offsetX: 30,
-        offsetY: 10,
+        offsetX: 25,
+        offsetY: 18,
         escala: 1,
-        hurtboxes: [{ largura: 60, altura: 70, offsetX: -5, offsetY: -50 }],
+        hurtboxes: [{ largura: 50, altura: 90, offsetX: -5, offsetY: -70 }],
       },
 
+      AupSpecial: {
+        largura: 85,
+        altura: 100,
+        offsetX: 0,
+        offsetY: 18,
+        escala: 1,
+        hurtboxes: [
+          { largura: 48, altura: 46, offsetX: 0, offsetY: -76 },
+          { largura: 62, altura: 40, offsetX: 0, offsetY: -34 },
+        ],
+      },
+
+      AdoSpecial: {
+        largura: 85,
+        altura: 100,
+        offsetX: 8,
+        offsetY: 20,
+        escala: 1,
+        hurtboxes: [
+          { largura: 48, altura: 42, offsetX: 0, offsetY: -76 },
+          { largura: 62, altura: 38, offsetX: 0, offsetY: -34 },
+        ],
+      },
+
+      downAir: {  
+        largura: 85,
+        altura: 100,
+        offsetX: 25,
+        offsetY: 25,
+        escala: 1,
+        hurtboxes: [{ largura: 50, altura: 90, offsetX: -5, offsetY: -70 }],
+      },
+
+      Asi_Special: {
+        largura: 85,
+        altura: 100,
+        offsetX: 0,
+        offsetY: 12,
+        escala: 1,
+        hurtboxes: [
+          { largura: 48, altura: 42, offsetX: 0, offsetY: -76 },
+          { largura: 62, altura: 36, offsetX: 0, offsetY: -34 },
+        ],
+      },
+
+      neSpecial: {
+        largura: 85,
+        altura: 100,
+        offsetX: -1,
+        offsetY: 0,
+        escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 35, offsetX: -7, offsetY: -55 },
+          { largura: 75, altura: 35, offsetX: 0, offsetY: -20 },
+        ],
+      },
+
+      kamecharg: {
+        largura: 85,
+        altura: 100,
+        offsetX: 1,
+        offsetY: 0,
+        escala: 1,
+        hurtboxes: [
+          { largura: 35, altura: 30, offsetX: 10, offsetY: -75 },
+          { largura: 60, altura: 20, offsetX: 2, offsetY: -48 },
+          { largura: 80, altura: 35, offsetX: -2, offsetY: -18 },
+        ],
+      },
+
+      kamelauch: {
+        largura: 85,
+        altura: 100,
+        offsetX: -1,
+        offsetY: 0,
+        escala: 1,
+        hurtboxes: [{ largura: 60, altura: 80, offsetX: -20, offsetY: -40 }],
+      },
+
+      kamelauch_loop: {
+        largura: 85,
+        altura: 100,
+        offsetX: -1,
+        offsetY: 0,
+        escala: 1,
+        hurtboxes: [{ largura: 60, altura: 80, offsetX: -20, offsetY: -40 }],
+      },
+
+      kib1: {
+        largura: 85,
+        altura: 100,
+        offsetX: -1,
+        offsetY: -3,
+        escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 35, offsetX: -7, offsetY: -55 },
+          { largura: 75, altura: 35, offsetX: 0, offsetY: -20 },
+        ],
+      },
+
+      kib2: {
+        largura: 85,
+        altura: 100,
+        offsetX: 4,
+        offsetY: 0,
+        escala: 1,
+        hurtboxes: [{ largura: 60, altura: 80, offsetX: -20, offsetY: -40 }],
+      },
+
+      kib3: {
+        largura: 85,
+        altura: 100,
+        offsetX: 2,
+        offsetY: -3,
+        escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 35, offsetX: -7, offsetY: -55 },
+          { largura: 75, altura: 35, offsetX: 0, offsetY: -20 },
+        ],
+      },
+
+      doSpecial: {
+        largura: 85,
+        altura: 100,
+        offsetX: 0,
+        offsetY: 9,
+        escala: 1,
+        hurtboxes: [
+          { largura: 42, altura: 32, offsetX: 0, offsetY: -82 },
+          { largura: 62, altura: 40, offsetX: 0, offsetY: -48 },
+          { largura: 76, altura: 30, offsetX: 0, offsetY: -16 },
+        ],
+      },
 
     
    };
 
-    // Frame de intro 126x134; idle 200x200. Preserva corpo e escala no mundo.
-    this.configAnimacoes.intro = {
-      ...this.configAnimacoes.idle, offsetX: 13, offsetY: 29,
+    this.specials = {
+      agachado: {
+        animacao: "gk_doSpecial_inicio",
+        configuracaoAnimacao: "doSpecial",
+        logica: GokuDoSpecial,
+        cooldown: 500,
+        taxaCargaPorMs: 0.026,
+      },
+      neutro: {
+        animacao: "gk_idle",
+        logica: GokuNeSpecial,
+        chaveCooldown: "gokuNe",
+        cooldown: 0,
+        custoKiBall: 6,
+        custoKamehameha: 30,
+        cooldownKamehameha: 500,
+        esperaKamehameha: 220,
+        intervaloKiBall: 1800,
+        cooldownKiBall: 1400,
+        danoKiBall: 6,
+        velocidadeKiBall: 700,
+        alcanceKiBall: 1100,
+        danoBaseKamehameha: 20,
+        alcanceBaseKamehameha: 480,
+        alcancePorCargaKamehameha: 130,
+        knockbackBaseKamehameha: 860,
+        knockbackPorCargaKamehameha: 90,
+        larguraKamehamehaPorCarga: 0.08,
+        animacoes: {
+          kiBall: ["gk_kib1", "gk_kib2", "gk_kib3"],
+          preparacaoKame: "gk_neSpecial",
+          cargaKame: "gk_kamecharg",
+          lancamentoKame: "gk_kamelauch",
+          loopLancamentoKame: "gk_kamelauch_loop",
+        },
+        propriedades: { travarMovimentoAir: true },
+        logicaPropriedades: {
+          tipoSomImpacto: "heavy",
+          knockbackY: -150,
+          tumbling: true,
+        },
+      },
+      air_neutro: {
+        animacao: "gk_idle",
+        logica: GokuNeSpecial,
+        propriedades: { velocidadeAerea: 100 },
+        chaveCooldown: "gokuNe",
+        cooldown: 0,
+        custoKiBall: 6,
+        custoKamehameha: 30,
+        cooldownKamehameha: 500,
+        esperaKamehameha: 220,
+        intervaloKiBall: 1800,
+        cooldownKiBall: 1400,
+        danoKiBall: 6,
+        velocidadeKiBall: 700,
+        alcanceKiBall: 1100,
+        danoBaseKamehameha: 20,
+        alcanceBaseKamehameha: 480,
+        alcancePorCargaKamehameha: 130,
+        knockbackBaseKamehameha: 860,
+        knockbackPorCargaKamehameha: 90,
+        larguraKamehamehaPorCarga: 0.08,
+        animacoes: {
+          kiBall: ["gk_kib1", "gk_kib2", "gk_kib3"],
+          preparacaoKame: "gk_neSpecial",
+          cargaKame: "gk_kamecharg",
+          lancamentoKame: "gk_kamelauch",
+          loopLancamentoKame: "gk_kamelauch_loop",
+        },
+        logicaPropriedades: {
+          tipoSomImpacto: "heavy",
+          knockbackY: -150,
+          tumbling: true,
+        },
+      },
+      air_lado: GokuAsiSpecial.configuracao,
+      air_cima: GokuAupSpecial.configuracao,
+      air_agachado: GokuAdoSpecial.configuracao,
     };
+    this.cargaKi = 0;
+    this.cargaKiMaxima = 100;
+    this.tempoCargaKi = 0;
+    this.sequenciaKiBall = 0;
+    this.ultimaKiBallAte = 0;
+    this.cooldownKiBallAte = 0;
+    this.cooldownKamehamehaAte = 0;
 
   //  this.sons = {
   //    ...this.sons,
@@ -516,7 +781,7 @@ export default class Goku extends Personagem {
   altura: 70,
   cooldown: 500,
 
-  duracao: 1000,
+  duracao: 600,
 
   vfxAcerto: [{ escolherUm: [ "punch1", "punch2", "punch3", 
            ],
@@ -530,20 +795,20 @@ export default class Goku extends Personagem {
   atrasoFinalizacaoAcerto: 30,
 
   movimento: {
-    inicio: 30,
-    fim: 900,
+    inicio: 10,
+    fim: 300,
 
     x: {
-      de: 80,
-      para: 80,
+      de: 70,
+      para: 70,
     },
 
     y: {
-      de: 800,
-      para: 1200,
+      de: 120,
+      para: 180,
     },
 
-    curva: "easeOut",
+    curva: "easeIn",
   },
 
   propriedades: {
@@ -551,7 +816,7 @@ export default class Goku extends Personagem {
     dano: 11,
     knockbackX: 40,
     knockbackY: 560,
-    quiqueChaoY: 350,
+    quiqueChaoY: 400,
     hitstunMinFrames:24,
   },
 },
@@ -638,7 +903,69 @@ export default class Goku extends Personagem {
   }
 
   //animaçoes====================================================
+  adicionarCargaKiPorDano(dano) {
+    this.cargaKi = Math.min(this.cargaKiMaxima, this.cargaKi + Math.max(0, dano) * 0.7);
+  }
+
+  podeUsarSpecial(tipoSpecial) {
+    const neutro = tipoSpecial === "neutro" || tipoSpecial === "air_neutro";
+    if (!neutro) return super.podeUsarSpecial(tipoSpecial);
+    const agora = this.scene.time.now;
+    if (agora - this.ultimaKiBallAte > this.specials.neutro.intervaloKiBall) {
+      this.sequenciaKiBall = 0;
+    }
+    return super.podeUsarSpecial(tipoSpecial) &&
+      this.cargaKi >= this.specials.neutro.custoKiBall;
+  }
+
+  registrarUsoSpecialAereo(tipoSpecial) {
+    if (tipoSpecial === "air_neutro") return;
+    super.registrarUsoSpecialAereo(tipoSpecial);
+  }
+
+  registrarUsoNeutroAereoConfirmado() {
+    super.registrarUsoSpecialAereo("air_neutro");
+  }
+
+  consumirCargaKi(percentual) {
+    const quantidade = Math.max(0, Number(percentual) || 0);
+    if (this.cargaKi < quantidade) return false;
+    this.cargaKi -= quantidade;
+    return true;
+  }
+
   static criarAnimacoes(scene) {
+
+    const animacoesKi = [
+      ["gk_doSpecial_inicio", "gk_doSpecial", 0, 5, 18, 0],
+      ["gk_doSpecial_loop", "gk_doSpecial", 6, 8, 12, -1],
+      ["goku_charge_inicio", "charge_1", 0, 5, 12, 0],
+      ["goku_charge_loop", "charge_1", 6, 12, 12, -1],
+      ["goku_charge_fim", "charge_2", 0, 7, 12, 0],
+      ["goku_charge_dust", "charge_dust", 0, 8, 16, 0],
+      ["gk_neSpecial", "gk_neSpecial", 0, 3, 12, 0],
+      ["gk_AupSpecial", "gk_AupSpecial", 0, 8, 16, 0],
+      ["gk_AdoSpecial", "gk_AdoSpecial", 0, 7, 16, 0],
+      ["gk_Asi_Special", "gk_AsiSpecial", 0, 2, 12, -1],
+      ["goku_nuvem", "nuvem", 0, 7, 12, -1],
+      ["gk_kamecharg", "gk_kamecharg", 0, 15, 16, -1],
+      ["gk_kamelauch", "gk_kamelauch", 0, 7, 16, 0],
+      ["gk_kamelauch_loop", "gk_kamelauch", 6, 7, 16, -1],
+      ["gk_kib1", "gk_kib1", 0, 6, 12, 0],
+      ["gk_kib2", "gk_kib2", 0, 5, 12, 0],
+      ["gk_kib3", "gk_kib3", 0, 6, 12, 0],
+      ["goku_kib", "kib", 0, 5, 16, -1],
+      ["goku_kib_exp", "kib_exp", 0, 5, 16, 0],
+      ["goku_kame_base", "kame_base", 0, 2, 12, -1],
+      ["goku_kame_caule", "kame_caule", 0, 2, 12, -1],
+      ["goku_kame_point", "kame_point", 0, 3, 12, -1],
+      ["goku_kame_charg", "kame_charg", 0, 8, 14, -1],
+      ["goku_kame_aura", "kame_aura", 0, 8, 14, -1],
+    ];
+    animacoesKi.forEach(([key, textura, start, end, frameRate, repeat]) => {
+      if (scene.anims.exists(key)) return;
+      scene.anims.create({ key, frames: scene.anims.generateFrameNumbers(textura, { start, end }), frameRate, repeat });
+    });
 
    // efeitos anim
   if (!scene.anims.exists("punch_effect")) {

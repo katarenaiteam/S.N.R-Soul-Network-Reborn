@@ -5,7 +5,7 @@ import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
 export const PERSONAGENS = [
   {
     id: "Aigis",
-    icon: "aigis-icon-block",
+    icon: "aigis-icon",
     banner: "Aig_baner",
 
     bannerConfig: {
@@ -25,7 +25,7 @@ export const PERSONAGENS = [
 
   {
     id: "FJ",
-    icon: "fj-icon-block",
+    icon: "fj-icon",
     banner: "FJ_baner",
 
     bannerConfig: {
@@ -165,7 +165,7 @@ export const PERSONAGENS = [
 
   {
     id: "Goku",
-    icon: "goku-icon-block",
+    icon: "goku-icon",
     banner: "GK_baner",
 
     bannerConfig: {
@@ -185,7 +185,7 @@ export const PERSONAGENS = [
 
   {
     id: "TH30",
-    icon: "th-icon-block",
+    icon: "th-icon",
     banner: "TH_baner",
 
     bannerConfig: {

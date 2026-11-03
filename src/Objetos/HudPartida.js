@@ -10,6 +10,7 @@ export function criarHudPartida(jogador, personagem, x, y, ladoDireito) {
       Slenderman: "Slan",
       Pingu: "Pingu",
       TH30: "Th",
+      Goku: "Gk",
     };
     const hud = this.add.container(x, y).setScrollFactor(0).setDepth(1000);
     const prefixoRetrato = retratoPorPersonagem[personagem];
@@ -29,6 +30,15 @@ export function criarHudPartida(jogador, personagem, x, y, ladoDireito) {
       hud.retrato = retrato;
     }
 
+    if (personagem === "Goku" && this.textures.exists("Gk_portrait-bar")) {
+      const barraKi = this.add.image(0, 0, "Gk_portrait-bar", 0)
+        .setOrigin(ladoDireito ? 1 : 0, 0)
+        .setDisplaySize(larguraRetrato, alturaRetrato);
+      hud.add(barraKi);
+      hud.barraKi = barraKi;
+      hud.frameKiAtual = -1;
+    }
+
     // A arte fica no rodape do frame de 800x650: use a mesma escala
     // do retrato para que a barra nao seja desenhada abaixo da tela.
     const barraUlt = this.add.sprite(0, 0, "ultbar1", 0)
@@ -38,6 +48,28 @@ export function criarHudPartida(jogador, personagem, x, y, ladoDireito) {
     hud.add(barraUlt);
     hud.barraUlt = barraUlt;
     hud.frameUltAtual = 0;
+
+    const indicadorVidas = this.add.sprite(0, 0, "vidas_portrait", 0)
+      .setOrigin(ladoDireito ? 1 : 0, 0)
+      .setDisplaySize(larguraRetrato, alturaRetrato);
+    hud.add(indicadorVidas);
+    hud.indicadorVidas = indicadorVidas;
+    atualizarIndicadorVidas(jogador, hud);
+
+    const barraCarregada = this.add.sprite(0, 0, "Charged", 0)
+      .setOrigin(ladoDireito ? 1 : 0, 0)
+      .setDisplaySize(larguraRetrato, alturaRetrato)
+      .setVisible(false);
+    hud.add(barraCarregada);
+    hud.barraCarregada = barraCarregada;
+    if (!this.anims.exists("ult_carregada")) {
+      this.anims.create({
+        key: "ult_carregada",
+        frames: this.anims.generateFrameNumbers("Charged", { start: 0, end: 5 }),
+        frameRate: 8,
+        repeat: -1,
+      });
+    }
 
     const habilidade = jogador.obterIndicadorHabilidade?.();
     if (habilidade) {
@@ -89,14 +121,38 @@ export function criarHudPartida(jogador, personagem, x, y, ladoDireito) {
 
     jogador.textoDano = hud;
     hud.setText(0);
+    hud.bringToTop(indicadorVidas);
     return hud;
   }
 
 
 export function atualizarBarraUlt(jogador, hud) {
   atualizarIndicadorHabilidade(jogador, hud);
+  if (hud?.barraKi) {
+    const progressoKi = Phaser.Math.Clamp(
+      (jogador.cargaKi ?? 0) / (jogador.cargaKiMaxima ?? 100), 0, 1,
+    );
+    // O ultimo quadro da spritesheet (23) esta vazio; 22 e a barra completa.
+    const frameKi = Math.floor(progressoKi * 22);
+    if (hud.frameKiAtual !== frameKi) {
+      hud.frameKiAtual = frameKi;
+      hud.barraKi.setFrame(frameKi);
+    }
+  }
   if (!jogador || !hud?.barraUlt) {
     return;
+  }
+
+  const carregada = jogador.ultCarga >= jogador.ultCargaMax;
+  if (hud.barraCarregada) {
+    hud.barraUlt.setVisible(!carregada);
+    hud.barraCarregada.setVisible(carregada);
+    if (carregada && !hud.barraCarregada.anims.isPlaying) {
+      hud.barraCarregada.play("ult_carregada");
+    } else if (!carregada && hud.barraCarregada.anims.isPlaying) {
+      hud.barraCarregada.stop();
+      hud.barraCarregada.setFrame(0);
+    }
   }
 
   const progresso = Phaser.Math.Clamp(
@@ -128,6 +184,12 @@ export function atualizarBarraUlt(jogador, hud) {
   } else {
     hud.barraUlt.setFrame(frameParte);
   }
+}
+
+export function atualizarIndicadorVidas(jogador, hud) {
+  if (!hud?.indicadorVidas) return;
+  const vidas = Phaser.Math.Clamp(Math.floor(jogador?.vidas ?? 0), 0, 3);
+  hud.indicadorVidas.setFrame(3 - vidas);
 }
 
 export function atualizarIndicadorHabilidade(jogador, hud) {

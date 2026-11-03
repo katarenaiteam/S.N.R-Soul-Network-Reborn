@@ -45,7 +45,9 @@ export default class EstadoSpecial extends EstadoBase {
     this.personagem.registrarUsoSpecialAereo(tipoSpecialEfetivo);
 
     // Inicia Cooldown especificamente da chave resolvida
-    this.personagem.iniciarCooldownSpecial(tipoSpecialEfetivo);
+    if (!this.specialAtual.iniciarCooldownAoFinalizar) {
+      this.personagem.iniciarCooldownSpecial(tipoSpecialEfetivo);
+    }
 
     // ===================================
     // GRAVIDADE E IMPULSOS (EXPORTADO DO ATAQUE)
@@ -214,9 +216,11 @@ export default class EstadoSpecial extends EstadoBase {
     if (
       !noChao &&
       !this.specialAtual?.propriedades?.impulsoX &&
-      !this.specialAtual?.propriedades?.travarMovimentoAir
+      !this.specialAtual?.propriedades?.travarMovimentoAir &&
+      !this.logicaSpecial?.bloqueiaMovimentoLateral?.()
     ) {
-      const vel = this.personagem.velocidade;
+      const vel = this.specialAtual?.propriedades?.velocidadeAerea ??
+        this.personagem.velocidade;
 
       if (this.personagem.inputDown("esquerda")) {
         this.personagem.sprite.setVelocityX(-vel);

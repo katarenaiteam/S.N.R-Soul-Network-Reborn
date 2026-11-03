@@ -186,7 +186,9 @@ const assetscommon = [
   (scene, queued) => queueAsset(scene, queued, "texture", "victoryFundo", () => { scene.load.image("victoryFundo", "assets/Menus/Game_Over/victoryFundo.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "second", () => { scene.load.image("second", "assets/Menus/Game_Over/second.png" ); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "vitEfect", () => { scene.load.spritesheet("vitEfect", "assets/Menus/Game_Over/vitEfect.png", { frameWidth: 800, frameHeight: 450, }); }),
-  
+    (scene, queued) => queueAsset(scene, queued, "texture", "vidas_portrait", () => { scene.load.spritesheet("vidas_portrait", "assets/Hud/Portrait/vidas_portrait.png", { frameWidth: 800, frameHeight: 650, }); }),
+    (scene, queued) => queueAsset(scene, queued, "texture", "Charged", () => { scene.load.spritesheet("Charged", "assets/Hud/Portrait/05. 100 Charged.png", { frameWidth: 800, frameHeight: 650, }); }),
+
 
 ];
 const assetsFJ = [
@@ -603,6 +605,7 @@ const assetsTH30 = [
   //(scene, queued) => queueAsset(scene, queued, "audio", " ", () => { scene.load.audio("pingu-intro", "assets/personagens/Pingu/Audio/pingu-intro.wav"); }),
 ];
 const assetsGoku = [
+  (scene, queued) => queueAsset(scene, queued, "texture", "Gk_portrait-bar", () => { scene.load.spritesheet("Gk_portrait-bar", "assets/personagens/Goku/Sprites/Gk_portrait-bar.png", { frameWidth: 800, frameHeight: 650}); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "gk_intro", () => { scene.load.spritesheet("gk_intro", "assets/personagens/Goku/Sprites/gk_intro.png", { frameWidth: 134, frameHeight: 99 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "gk_idle", () => { scene.load.spritesheet("gk_idle", "assets/personagens/Goku/Sprites/gk_idle.png", { frameWidth: 88, frameHeight: 95 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "gk_jump", () => { scene.load.spritesheet("gk_jump", "assets/personagens/Goku/Sprites/gk_jump.png", { frameWidth: 87, frameHeight: 135 }); }),
@@ -625,10 +628,32 @@ const assetsGoku = [
   (scene, queued) => queueAsset(scene, queued, "texture", "gk_sideAtack", () => { scene.load.spritesheet("gk_sideAtack", "assets/personagens/Goku/Sprites/gk_sideAtack.png", { frameWidth: 123, frameHeight: 102 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "gk_downAtack", () => { scene.load.spritesheet("gk_downAtack", "assets/personagens/Goku/Sprites/gk_downAtack.png", { frameWidth: 151, frameHeight: 91 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "gk_neutralAir", () => { scene.load.spritesheet("gk_neutralAir", "assets/personagens/Goku/Sprites/gk_neutralAir.png", { frameWidth: 108, frameHeight: 113 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_downAir", () => { scene.load.spritesheet("gk_downAir", "assets/personagens/Goku/Sprites/gk_downAir.png", { frameWidth: 144, frameHeight: 130 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "gk_sideAir", () => { scene.load.spritesheet("gk_sideAir", "assets/personagens/Goku/Sprites/gk_sideAir.png", { frameWidth: 179, frameHeight: 122 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "gk_upAir", () => { scene.load.spritesheet("gk_upAir", "assets/personagens/Goku/Sprites/gk_upAir.png", { frameWidth: 131, frameHeight: 123 }); }),
-  (scene, queued) => queueAsset(scene, queued, "texture", "gk_downAir", () => { scene.load.spritesheet("gk_downAir", "assets/personagens/Goku/Sprites/gk_downAir.png", { frameWidth: 144, frameHeight: 130 }); }),
-
+  //specials
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_AdoSpecial", () => { scene.load.spritesheet("gk_AdoSpecial", "assets/personagens/Goku/Sprites/atacks/gk_AdoSpecial.png", { frameWidth: 127, frameHeight: 122 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_AsiSpecial", () => { scene.load.spritesheet("gk_AsiSpecial", "assets/personagens/Goku/Sprites/atacks/gk_AsiSpecial.png", { frameWidth: 104, frameHeight: 94 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "nuvem", () => { scene.load.spritesheet("nuvem", "assets/personagens/Goku/Sprites/atacks/nuvem.png", { frameWidth: 149, frameHeight: 59 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_AupSpecial", () => { scene.load.spritesheet("gk_AupSpecial", "assets/personagens/Goku/Sprites/atacks/gk_Aupspecial.png", { frameWidth: 145, frameHeight: 173 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_neSpecial", () => { scene.load.spritesheet("gk_neSpecial", "assets/personagens/Goku/Sprites/atacks/gk_neSpecial.png", { frameWidth: 111, frameHeight: 102 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_kamecharg", () => { scene.load.spritesheet("gk_kamecharg", "assets/personagens/Goku/Sprites/atacks/gk_kamecharg.png", { frameWidth: 111, frameHeight: 102 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_kamelauch", () => { scene.load.spritesheet("gk_kamelauch", "assets/personagens/Goku/Sprites/atacks/gk_kamelauch.png", { frameWidth: 111, frameHeight: 102 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "kame_charg", () => { scene.load.spritesheet("kame_charg", "assets/personagens/Goku/Sprites/atacks/kame_charg.png", { frameWidth: 34, frameHeight: 34 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "kame_aura", () => { scene.load.spritesheet("kame_aura", "assets/personagens/Goku/Sprites/atacks/kame_aura.png", { frameWidth: 124, frameHeight: 106 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "kame_base", () => { scene.load.spritesheet("kame_base", "assets/personagens/Goku/Sprites/atacks/kame_base.png", { frameWidth: 88, frameHeight: 102 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "kame_caule", () => { scene.load.spritesheet("kame_caule", "assets/personagens/Goku/Sprites/atacks/kame_caule.png", { frameWidth: 85, frameHeight: 54 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "kame_point", () => { scene.load.spritesheet("kame_point", "assets/personagens/Goku/Sprites/atacks/kame_point.png", { frameWidth: 131, frameHeight: 134 }); }),
+  //(scene, queued) => queueAsset(scene, queued, "texture", "gk_", () => { scene.load.spritesheet("gk_", "assets/personagens/Goku/Sprites/atacks/gk_.png", { frameWidth: , frameHeight: }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_kib1", () => { scene.load.spritesheet("gk_kib1", "assets/personagens/Goku/Sprites/atacks/gk_kib1.png", { frameWidth: 119, frameHeight: 100 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_kib2", () => { scene.load.spritesheet("gk_kib2", "assets/personagens/Goku/Sprites/atacks/gk_kib2.png", { frameWidth: 114, frameHeight: 102 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_kib3", () => { scene.load.spritesheet("gk_kib3", "assets/personagens/Goku/Sprites/atacks/gk_kib3.png", { frameWidth: 119, frameHeight: 100 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "kib", () => { scene.load.spritesheet("kib", "assets/personagens/Goku/Sprites/atacks/kib.png", { frameWidth: 39, frameHeight: 49 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "kib_exp", () => { scene.load.spritesheet("kib_exp", "assets/personagens/Goku/Sprites/atacks/kib_exp.png", { frameWidth: 61, frameHeight: 63 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "gk_doSpecial", () => { scene.load.spritesheet("gk_doSpecial", "assets/personagens/Goku/Sprites/atacks/gk_doSpecial.png", { frameWidth: 84, frameHeight: 113 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "charge_1", () => { scene.load.spritesheet("charge_1", "assets/personagens/Goku/Sprites/atacks/charge_1.png", { frameWidth: 161, frameHeight: 323 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "charge_2", () => { scene.load.spritesheet("charge_2", "assets/personagens/Goku/Sprites/atacks/charge_2.png", { frameWidth: 106, frameHeight: 352 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "charge_dust", () => { scene.load.spritesheet("charge_dust", "assets/personagens/Goku/Sprites/atacks/charge_dust.png", { frameWidth: 249, frameHeight: 111 }); }),
 
 ];
 
@@ -711,6 +736,11 @@ const assetsstory = [
   (scene, queued) => queueAsset(scene, queued, "texture", "Chris23", () => { scene.load.image("Chris23", "assets/Hud/dialogo/Chris/Chris23.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Chris32", () => { scene.load.image("Chris32", "assets/Hud/dialogo/Chris/Chris32.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "venceu", () => { scene.load.image("venceu", "assets/Hud/dialogo/Chris/venceu.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "1", () => { scene.load.image("1", "assets/Hud/dialogo/end1/1.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "plateia", () => { scene.load.audio("plateia", "assets/Hud/dialogo/end1/plateia.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "gulp", () => { scene.load.audio("gulp", "assets/Hud/dialogo/end1/gulp.mp3"); }),
+
+
   
 
 
@@ -750,7 +780,7 @@ export function carregarAssetsVersus(scene, dados) {
 export function carregarAssetsHistoria(scene) {
   const queued = new Set();
   carregarGrupo(scene, queued, assetscommon);
-  for (const pack of [assetsFJ, assetsSpiderMan, assetsMiku, assetsKen, assetsSlenderman, assetsPingu, assetsTH30]) {
+  for (const pack of [assetsFJ, assetsSpiderMan, assetsMiku, assetsKen, assetsSlenderman, assetsPingu, assetsTH30, assetsGoku]) {
     carregarGrupo(scene, queued, pack);
   }
   carregarGrupo(scene, queued, assetsMikuMap);

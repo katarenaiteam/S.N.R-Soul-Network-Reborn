@@ -59,6 +59,8 @@ export default class CenaEscolhaFinal extends Phaser.Scene {
     ).setDepth(-10);
     this.fundoVitoria = this.add.image(0, 0, "venceu")
       .setOrigin(0).setDisplaySize(this.scale.width, this.scale.height).setDepth(-9);
+    this.somPlateia = this.sound.add("plateia", { loop: true, volume: 1 });
+    this.somPlateia.play();
     this.cameras.main.fadeIn(1600, 0, 0, 0);
 
     this.chris = this.add.image(this.scale.width / 2, this.scale.height * 0.52, "Chris")
@@ -85,6 +87,7 @@ export default class CenaEscolhaFinal extends Phaser.Scene {
       this.tweens.add({ targets: this.chris, alpha: 1, duration: 1100, ease: "Sine.Out" });
       this.mostrarFalaInicial();
     });
+    this.events.once("shutdown", this.limparVideoFinal, this);
   }
 
   update(_time, delta) {
@@ -197,6 +200,10 @@ export default class CenaEscolhaFinal extends Phaser.Scene {
 
   avancarDialogo() {
     if (this.completarDigitacao()) return;
+    if (this.etapa === "aceite") {
+      this.iniciarFinalAceito();
+      return;
+    }
     if (this.etapa === "abertura") {
       this.indiceFala += 1;
       if (this.indiceFala < FALAS_INICIAIS.length) {
@@ -249,7 +256,20 @@ export default class CenaEscolhaFinal extends Phaser.Scene {
     this.tv.once("animationcomplete", () => {
       this.tv.destroy();
       this.sound.stopByKey("tv-static");
-      this.fundoVitoria.setVisible(false);
+      this.tweens.add({
+        targets: this.fundoVitoria,
+        alpha: 0,
+        duration: 500,
+        onComplete: () => {
+          this.fundoVitoria.setVisible(false);
+        },
+      });
+      this.tweens.add({
+        targets: this.somPlateia,
+        volume: 0,
+        duration: 500,
+        onComplete: () => this.somPlateia.stop(),
+      });
       this.chris.setDepth(5);
       this.texto.setDepth(8);
       this.criarChuvaMatrix();
@@ -360,9 +380,57 @@ export default class CenaEscolhaFinal extends Phaser.Scene {
   }
 
   aceitarDestino() {
-    this.etapa = "fim";
-    this.escreverTexto("Excelente. Sabia que você não iria me decepcionar.\nO futuro será glorioso para você.",
-      () => this.time.delayedCall(2500, () => this.scene.start("CenaCreditos")));
+    this.etapa = "aceite";
+    this.ajudaEscolha.setVisible(false);
+    this.rotuloEsquerdo?.destroy();
+    this.rotuloDireito?.destroy();
+    this.escreverTexto("Excelente. Sabia que você não iria me decepcionar.\nO futuro será glorioso para você.", () => {
+      this.maoEsquerda?.destroy();
+      this.maoDireita?.destroy();
+      this.chris.setTexture("1");
+      this.ajustarChris(0.68);
+      this.escreverTexto("Vamos minha criança, pegue a");
+    });
+  }
+
+  iniciarFinalAceito() {
+    this.etapa = "transicao";
+    this.cameras.main.once("camerafadeoutcomplete", () => {
+      this.texto.setVisible(false);
+      this.chris.setVisible(false);
+      const gulp = this.sound.add("gulp");
+      gulp.once("complete", () => this.reproduzirVideoFinal());
+      gulp.play();
+    });
+    this.cameras.main.fadeOut(1200, 0, 0, 0);
+  }
+
+  reproduzirVideoFinal() {
+    const video = document.createElement("video");
+    this.videoFinal = video;
+    video.src = "assets/Hud/dialogo/end1/end1.mp4";
+    video.autoplay = true;
+    video.playsInline = true;
+    video.preload = "auto";
+    video.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;object-fit:contain;background:#000;z-index:10000";
+    video.addEventListener("ended", this.aoTerminarVideoFinal);
+    video.addEventListener("error", this.aoTerminarVideoFinal);
+    document.body.appendChild(video);
+    video.play().catch(() => this.aoTerminarVideoFinal());
+  }
+
+  aoTerminarVideoFinal = () => {
+    this.limparVideoFinal();
+    this.scene.start("CenaPreload");
+  };
+
+  limparVideoFinal() {
+    if (!this.videoFinal) return;
+    this.videoFinal.removeEventListener("ended", this.aoTerminarVideoFinal);
+    this.videoFinal.removeEventListener("error", this.aoTerminarVideoFinal);
+    this.videoFinal.pause();
+    this.videoFinal.remove();
+    this.videoFinal = null;
   }
 
   recusarDestino() {
