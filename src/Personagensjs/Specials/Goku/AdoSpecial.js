@@ -13,7 +13,6 @@ export default class GokuAdoSpecial {
     this.hitbox = null;
     this.registroAtaque = null;
     this.alvosAtingidos = new Set();
-    this.alvoCarregado = null;
     this.gravidadeOriginal = true;
     this.corpoAnterior = null;
     this.aoAtualizarAnimacao = this.aoAtualizarAnimacao.bind(this);
@@ -108,122 +107,12 @@ export default class GokuAdoSpecial {
 
   acertar(alvo) {
     if (this.finalizado || this.alvosAtingidos.has(alvo) || alvo.invulneravel) return;
-    if (this.alvoCarregado && this.alvoCarregado.alvo !== alvo) return;
     this.alvosAtingidos.add(alvo);
     alvo.receberDano(this.special.propriedades.dano, this.special.propriedades, {
       x: this.personagem.sprite.x,
       direcao: this.direcao,
       atacante: this.personagem,
     });
-
-    if (alvo.sprite?.body && !alvo.sprite.body.blocked.down) {
-      this.prenderAlvo(alvo);
-    }
-  }
-
-  prenderAlvo(alvo) {
-    const sprite = alvo.sprite;
-    const body = sprite.body;
-    this.alvoCarregado = {
-      alvo,
-      moves: body.moves,
-      gravidade: body.allowGravity,
-      velocidadeX: body.velocity.x,
-      animacaoPausada: sprite.anims.isPaused,
-      atualizarEstado: alvo.maquinaEstados?.update,
-    };
-    body.moves = false;
-    body.setAllowGravity(false);
-    body.setVelocity(0, 0);
-    sprite.anims.pause();
-    if (alvo.maquinaEstados) alvo.maquinaEstados.update = () => {};
-    if (!this.posicionarAlvoCarregado()) this.encerrarNaParede();
-  }
-
-  posicionarAlvoCarregado() {
-    const carregado = this.alvoCarregado;
-    if (!carregado?.alvo.sprite?.active) return;
-    const spriteGoku = this.personagem.sprite;
-    const spriteAlvo = carregado.alvo.sprite;
-    const destinoX = spriteGoku.x + this.special.offsetAlvoX * this.direcao;
-    const destinoY = spriteGoku.y - this.special.offsetAlvoY;
-    if (!this.caminhoAlvoLivre(spriteAlvo, destinoX, destinoY)) return false;
-    spriteAlvo.setPosition(destinoX, destinoY);
-    spriteAlvo.body.updateFromGameObject();
-    carregado.alvo.sincronizarHurtbox?.();
-    return true;
-  }
-
-  caminhoAlvoLivre(spriteAlvo, destinoX, destinoY) {
-    const body = spriteAlvo.body;
-    const deslocamentoX = destinoX - spriteAlvo.x;
-    const deslocamentoY = destinoY - spriteAlvo.y;
-    const distancia = Math.max(Math.abs(deslocamentoX), Math.abs(deslocamentoY));
-    const passos = Math.max(1, Math.ceil(distancia / 8));
-    const solidas = [
-      this.scene.mapaAtual?.plataformas,
-      this.scene.plataformas,
-      this.scene.chao,
-    ].filter((grupo, indice, grupos) => grupo && grupos.indexOf(grupo) === indice)
-      .flatMap((grupo) => grupo.getChildren?.() ?? [])
-      .filter((objeto) => objeto.active !== false && objeto.body?.enable)
-      .map((objeto) => new Phaser.Geom.Rectangle(
-        objeto.body.left,
-        objeto.body.top,
-        objeto.body.width,
-        objeto.body.height,
-      ));
-
-    for (let passo = 1; passo <= passos; passo += 1) {
-      const fracao = passo / passos;
-      const caixa = new Phaser.Geom.Rectangle(
-        body.left + deslocamentoX * fracao,
-        body.top + deslocamentoY * fracao,
-        body.width,
-        body.height,
-      );
-      if (solidas.some((solida) => Phaser.Geom.Intersects.RectangleToRectangle(caixa, solida))) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  encerrarNaParede() {
-    if (this.finalizado) return;
-    this.personagem.sprite.setVelocity(0, 0);
-    this.cancelar();
-    if (this.personagem.maquinaEstados.estadoAtual === this.estado) {
-      this.estado.finalizarSpecial();
-    }
-  }
-
-  liberarAlvo(pousou = false) {
-    const carregado = this.alvoCarregado;
-    if (!carregado) return;
-    this.alvoCarregado = null;
-    const { alvo } = carregado;
-    const spriteGoku = this.personagem.sprite;
-    const spriteAlvo = alvo?.sprite;
-    const body = spriteAlvo?.body;
-    if (!body) return;
-
-    if (pousou) {
-      spriteAlvo.x = spriteGoku.x + this.special.offsetAlvoX * this.direcao;
-      body.updateFromGameObject();
-      spriteAlvo.y += spriteGoku.body.bottom - body.bottom;
-      body.updateFromGameObject();
-    }
-    body.moves = carregado.moves;
-    body.setAllowGravity(carregado.gravidade);
-    body.setVelocity(pousou ? carregado.velocidadeX : 0, 0);
-    if (pousou) {
-      body.blocked.down = true;
-      body.touching.down = true;
-    }
-    if (!carregado.animacaoPausada) spriteAlvo.anims.resume();
-    if (alvo.maquinaEstados) alvo.maquinaEstados.update = carregado.atualizarEstado;
-    alvo.sincronizarHurtbox?.();
   }
 
   atualizar() {
@@ -249,10 +138,6 @@ export default class GokuAdoSpecial {
         this.special.velocidadeMergulhoX * this.direcao,
         this.special.velocidadeMergulhoY,
       );
-      if (!this.posicionarAlvoCarregado()) {
-        this.encerrarNaParede();
-        return;
-      }
       this.atualizarHitbox();
     }
     this.corpoAnterior = this.limitesCorpo();
@@ -264,7 +149,6 @@ export default class GokuAdoSpecial {
     sprite.body.setAllowGravity(this.gravidadeOriginal);
     sprite.body.blocked.down = true;
     sprite.body.touching.down = true;
-    this.liberarAlvo(true);
     this.cancelar();
     if (this.personagem.maquinaEstados.estadoAtual === this.estado) {
       this.estado.finalizarSpecial();
@@ -285,7 +169,6 @@ export default class GokuAdoSpecial {
     sprite.off("animationupdate", this.aoAtualizarAnimacao);
     sprite.off(`animationcomplete-${this.special.animacao}`, this.aoCompletarAnimacao);
     sprite.body?.setAllowGravity(this.gravidadeOriginal);
-    this.liberarAlvo();
     this.destruirHitbox();
     const lista = this.personagem.logicasEspeciaisAtivas;
     const indice = lista.indexOf(this);
@@ -308,8 +191,6 @@ GokuAdoSpecial.configuracao = {
   frameInicioMergulho: 2,
   velocidadeMergulhoX: 180,
   velocidadeMergulhoY: 760,
-  offsetAlvoX: 18,
-  offsetAlvoY: 70,
   hitbox: {
     largura: 76,
     altura: 58,
