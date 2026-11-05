@@ -745,6 +745,13 @@ const assetsFinalMap = [
 (scene, queued) => queueAsset(scene, queued, "texture", "fundo", () => { scene.load.image("fundo", "assets/cenarios/finalmap/fundo.png"); }),
 ];
 const assetsstory = [
+  (scene, queued) => queueAsset(scene, queued, "texture", "barra1", () => { scene.load.spritesheet("barra1", "assets/Menus/chaveamento/barra1.png", { frameWidth: 480, frameHeight: 1080 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "barra2", () => { scene.load.spritesheet("barra2", "assets/Menus/chaveamento/barra2.png", { frameWidth: 480, frameHeight: 1080 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "barra3", () => { scene.load.spritesheet("barra3", "assets/Menus/chaveamento/barra3.png", { frameWidth: 480, frameHeight: 1080 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Background1", () => { scene.load.image("Background1", "assets/Menus/chaveamento/Background1.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "background2", () => { scene.load.image("background2", "assets/Menus/chaveamento/background2.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "background3", () => { scene.load.image("background3", "assets/Menus/chaveamento/background3.png"); }),
+
   (scene, queued) => queueAsset(scene, queued, "audio", "Sayonara", () => { scene.load.audio("Sayonara", "assets/cenarios/MikuShow/Sayonara.wav"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "txtbox", () => { scene.load.image("txtbox", "assets/Hud/dialogo/txtbox.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Mk_N", () => { scene.load.image("Mk_N", "assets/Hud/dialogo/Miku/Mk_N.png"); }),

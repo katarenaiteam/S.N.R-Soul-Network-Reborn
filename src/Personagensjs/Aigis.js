@@ -18,7 +18,7 @@ export default class Aigis extends Personagem {
       "ai_idle",
       "0",
       {
-        velocidade: 310,
+        velocidade: 270,
         forcaPulo: -600,
         maxPulos: 2,
         maxDash: 1,
@@ -69,7 +69,7 @@ this.nomePersonagem = "Aigis";
        idle: {
         largura: 250,
         altura: 400,
-        offsetX: 130,
+        offsetX: 0,
         offsetY: -10,
         escala: 0.33,
         hurtboxes: [
@@ -82,8 +82,8 @@ this.nomePersonagem = "Aigis";
       walk: {
         largura: 250,
         altura: 400,
-        offsetX: 145,
-        offsetY: -30,
+        offsetX: 0,
+        offsetY: -8,
         escala: 0.33,
         hurtboxes: [
            { largura: 50, altura: 20, offsetX: 30, offsetY: -77 },
@@ -95,7 +95,7 @@ this.nomePersonagem = "Aigis";
       jump: {
         largura: 250,
         altura: 400,
-        offsetX: 113,
+        offsetX: 0,
         offsetY: -10,
         escala: 0.33,
         hurtboxes: [
@@ -109,18 +109,30 @@ this.nomePersonagem = "Aigis";
       crouch: {
         largura: 250,
         altura: 240,
-        offsetX: 98,
-        offsetY: 80,
+        offsetX: 0,
+        offsetY: 74,
         escala: 0.33,
         hurtboxes: [
           { largura: 50, altura: 70, offsetX: 20, offsetY: -38 },
         ],
       },
+
+        crouch2: {
+        largura: 250,
+        altura: 240,
+        offsetX: 0,
+        offsetY: 40,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 50, altura: 70, offsetX: 20, offsetY: -38 },
+        ],
+      },
+
       crouch3: {
         largura: 250,
         altura: 240,
-        offsetX: 98,
-        offsetY: 80,
+        offsetX: 0,
+        offsetY: 74,
         escala: 0.33,
         hurtboxes: [
           { largura: 50, altura: 70, offsetX: 20, offsetY: -38 },
@@ -129,10 +141,11 @@ this.nomePersonagem = "Aigis";
        
 
       dash: {
+        offsetVisualY: 5,
         largura: 250,
         altura: 400,
-        offsetX: 142,
-        offsetY: -81,
+        offsetX: 125,
+        offsetY: -60,
         escala: 0.33,
         hurtboxes: [],
       },
@@ -140,8 +153,8 @@ this.nomePersonagem = "Aigis";
       guard: {
         largura: 250,
         altura: 400,
-        offsetX: 138,
-        offsetY: -47,  //-49
+        offsetX: 0,
+        offsetY: -50,  //-49
         escala: 0.33,
         hurtboxes: [
           { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
