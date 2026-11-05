@@ -286,10 +286,23 @@ export default class GokuNeSpecial {
       return;
     }
     if (this.noAr) this.personagem.registrarUsoNeutroAereoConfirmado();
-    this.fase = "preparacaoKame";
-    this.iniciarFlutuar();
     this.tiersCarga = 0;
     this.direcao = this.personagem.sprite.flipX ? -1 : 1;
+    if (this.noAr) {
+      this.fase = "animacaoLancamentoKame";
+      this.animacaoKameAtual = this.special.animacoes.preparacaoKame;
+      this.iniciarFlutuar();
+      this.personagem.sprite.play(this.animacaoKameAtual, true);
+      this.personagem.aplicarConfiguracao("neSpecialAr");
+      this.personagem.sprite.on("animationupdate", this.aoAtualizarAnimacaoLancamento);
+      this.personagem.sprite.once(
+        `animationcomplete-${this.animacaoKameAtual}`,
+        this.aoFimLancamento,
+      );
+      return;
+    }
+    this.fase = "preparacaoKame";
+    this.iniciarFlutuar();
     this.personagem.sprite.setVelocityX(0).play(this.special.animacoes.preparacaoKame, true);
     this.personagem.aplicarConfiguracao("neSpecial");
     this.personagem.sprite.once(
@@ -359,20 +372,24 @@ export default class GokuNeSpecial {
     this.auraKame?.destroy();
     this.bolaCargaKame?.destroy();
     const sprite = this.personagem.sprite;
-    sprite.play(this.special.animacoes.lancamentoKame, true);
+    this.animacaoKameAtual = this.special.animacoes.lancamentoKame;
+    sprite.play(this.animacaoKameAtual, true);
     this.personagem.aplicarConfiguracao("kamelauch");
     sprite.on("animationupdate", this.aoAtualizarAnimacaoLancamento);
     sprite.once(
-      `animationcomplete-${this.special.animacoes.lancamentoKame}`,
+      `animationcomplete-${this.animacaoKameAtual}`,
       this.aoFimLancamento,
     );
   }
 
   aoAtualizarAnimacaoLancamento(animacao, frame) {
+    const quadroDeLancamento = this.noAr
+      ? this.special.frameLancamentoAereo
+      : (this.tiersCarga === 0 ? 4 : 6);
     if (
       this.fase === "animacaoLancamentoKame" &&
-      animacao?.key === this.special.animacoes.lancamentoKame &&
-      Number(frame?.textureFrame) >= 6
+      animacao?.key === this.animacaoKameAtual &&
+      Number(frame?.textureFrame) >= quadroDeLancamento
     ) this.aoFimLancamento();
   }
 
@@ -380,21 +397,28 @@ export default class GokuNeSpecial {
     if (this.fase !== "animacaoLancamentoKame") return;
     this.personagem.sprite.off("animationupdate", this.aoAtualizarAnimacaoLancamento);
     this.personagem.sprite.off(
-      `animationcomplete-${this.special.animacoes.lancamentoKame}`,
+      `animationcomplete-${this.animacaoKameAtual}`,
       this.aoFimLancamento,
     );
     this.criarRaioKame();
     this.fase = "raioKame";
     this.personagem.cooldownKamehamehaAte =
       this.scene.time.now + this.special.cooldownKamehameha;
+    if (this.noAr) return;
     this.personagem.sprite.play(this.special.animacoes.loopLancamentoKame, true);
     this.personagem.aplicarConfiguracao("kamelauch");
   }
 
   criarRaioKame() {
     const sprite = this.personagem.sprite;
-    this.origemKameX = sprite.x + this.direcao * 70;
-    this.origemKameY = sprite.y - 53;
+    this.inclinacaoKame = this.noAr ? this.special.inclinacaoKameAerea : 0;
+    this.rotacaoKame = Math.atan(this.inclinacaoKame) * this.direcao;
+    this.origemKameX = sprite.x + this.direcao * (
+      this.noAr ? this.special.origemKameAereaX : 70
+    );
+    this.origemKameY = sprite.y + (
+      this.noAr ? this.special.origemKameAereaY : -53
+    );
     const escala = 0.48 + this.tiersCarga * this.special.larguraKamehamehaPorCarga;
     this.escalaKame = escala;
     this.alcanceKame = this.special.alcanceBaseKamehameha +
@@ -402,28 +426,37 @@ export default class GokuNeSpecial {
     this.deslocamentoPontaFinal = 3 * escala;
     const deslocamentoBaseKame = -12 + (escala - 0.48) * 25;
     const xBaseKame = this.origemKameX + this.direcao * deslocamentoBaseKame;
-    this.baseKame = this.scene.add.sprite(xBaseKame, this.origemKameY, "kame_base")
-      .setScale(escala).setFlipX(this.direcao < 0).setDepth(sprite.depth + 1);
+    this.baseKame = this.scene.add.sprite(
+      xBaseKame,
+      this.origemKameY + deslocamentoBaseKame * this.inclinacaoKame,
+      "kame_base",
+    ).setScale(escala).setFlipX(this.direcao < 0).setRotation(this.rotacaoKame)
+      .setDepth(sprite.depth + 1);
     this.scene.camHUD?.ignore(this.baseKame);
     this.baseKame.anims.play("goku_kame_base");
     this.criarHitboxDanoKame(this.baseKame, 74 * escala, 78 * escala);
 
     this.deslocamentoPontaInicial = 90 * escala;
-    this.deslocamentoPrimeiroCaule = 86 * escala;
+    this.deslocamentoPrimeiroCaule = deslocamentoBaseKame +
+      (86.5 * escala) / Math.sqrt(1 + this.inclinacaoKame ** 2);
     this.posicaoInicialPontaX = this.origemKameX + this.direcao * this.deslocamentoPontaInicial;
     this.pointKame = this.scene.physics.add.sprite(
       this.posicaoInicialPontaX,
-      this.origemKameY,
+      this.origemKameY + this.deslocamentoPontaInicial * this.inclinacaoKame,
       "kame_point",
       0,
-    ).setScale(escala).setFlipX(this.direcao < 0).setDepth(sprite.depth + 20);
+    ).setScale(escala).setFlipX(this.direcao < 0).setRotation(this.rotacaoKame)
+      .setDepth(sprite.depth + 20);
     this.scene.camHUD?.ignore(this.pointKame);
     this.pointKame.anims.play("goku_kame_point");
     this.pointKame.body.setAllowGravity(false);
     this.pointKame.body.debugBodyColor = 0xff00ff;
     this.pointKame.body.setSize(80, 60).setOffset(25, 37);
     this.velocidadePontaKame = 2200;
-    this.pointKame.body.setVelocityX(this.direcao * this.velocidadePontaKame);
+    this.pointKame.body.setVelocity(
+      this.direcao * this.velocidadePontaKame,
+      this.velocidadePontaKame * this.inclinacaoKame,
+    );
     this.hitboxPointKame = this.criarHitbox(this.pointKame.x, this.pointKame.y, 110 * escala, 80 * escala);
     this.registrarHitboxKame(this.hitboxPointKame);
 
@@ -438,7 +471,7 @@ export default class GokuNeSpecial {
             (this.direcao > 0 && !this.pointKame.body.blocked.right) ||
             (this.direcao < 0 && !this.pointKame.body.blocked.left)
           ) return;
-          this.pointKame.body.setVelocityX(0);
+          this.pointKame.body.setVelocity(0, 0);
           this.pointParado = true;
           this.pointParadoNaParede = true;
         },
@@ -457,15 +490,16 @@ export default class GokuNeSpecial {
     if (!this.pointKame?.active) return;
     const alcancePonta = this.alcanceKame - this.deslocamentoPontaFinal;
     const pontoFinalX = this.origemKameX + this.direcao * alcancePonta;
+    const pontoFinalY = this.origemKameY + alcancePonta * this.inclinacaoKame;
     const chegouAoFim = this.direcao > 0
       ? this.pointKame.x >= pontoFinalX
       : this.pointKame.x <= pontoFinalX;
     if (!this.pointParado && chegouAoFim) {
       this.pointKame.setPosition(
         pontoFinalX,
-        this.origemKameY,
+        pontoFinalY,
       );
-      this.pointKame.body.setVelocityX(0);
+      this.pointKame.body.setVelocity(0, 0);
       this.pointParado = true;
     }
     this.hitboxPointKame?.setPosition(this.pointKame.x, this.pointKame.y);
@@ -491,17 +525,22 @@ export default class GokuNeSpecial {
   }
 
   criarCauleKame(indice) {
+    const distancia = indice === this.maxCaulesKame - 1
+        ? this.alcanceKame - this.deslocamentoCauleFinal
+        : this.deslocamentoPrimeiroCaule + indice * this.tamanhoCauleKame;
     const x = this.pointParadoNaParede
       ? this.pointKame.x
-      : this.origemKameX + this.direcao * (indice === this.maxCaulesKame - 1
-        ? this.alcanceKame - this.deslocamentoCauleFinal
-        : this.deslocamentoPrimeiroCaule + indice * this.tamanhoCauleKame);
-    const caule = this.scene.add.sprite(x, this.origemKameY, "kame_caule")
-      .setScale(this.escalaKame).setFlipX(this.direcao < 0).setDepth(this.personagem.sprite.depth + 10);
+      : this.origemKameX + this.direcao * distancia;
+    const y = this.pointParadoNaParede
+      ? this.pointKame.y
+      : this.origemKameY + distancia * this.inclinacaoKame;
+    const caule = this.scene.add.sprite(x, y, "kame_caule")
+      .setScale(this.escalaKame).setFlipX(this.direcao < 0).setRotation(this.rotacaoKame)
+      .setDepth(this.personagem.sprite.depth + 10);
     this.scene.camHUD?.ignore(caule);
     caule.anims.play("goku_kame_caule");
     this.partesKame.push(caule);
-    const hitbox = this.criarHitbox(x, this.origemKameY, 76 * this.escalaKame, 42 * this.escalaKame);
+    const hitbox = this.criarHitbox(x, y, 76 * this.escalaKame, 42 * this.escalaKame);
     this.hitboxesKame ??= [];
     this.hitboxesKame.push(hitbox);
     this.registrarHitboxKame(hitbox);

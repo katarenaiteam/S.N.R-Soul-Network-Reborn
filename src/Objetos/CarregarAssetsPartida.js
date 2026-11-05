@@ -654,7 +654,47 @@ const assetsGoku = [
   (scene, queued) => queueAsset(scene, queued, "texture", "charge_1", () => { scene.load.spritesheet("charge_1", "assets/personagens/Goku/Sprites/atacks/charge_1.png", { frameWidth: 161, frameHeight: 323 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "charge_2", () => { scene.load.spritesheet("charge_2", "assets/personagens/Goku/Sprites/atacks/charge_2.png", { frameWidth: 106, frameHeight: 352 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "charge_dust", () => { scene.load.spritesheet("charge_dust", "assets/personagens/Goku/Sprites/atacks/charge_dust.png", { frameWidth: 249, frameHeight: 111 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "neSpecial-ar", () => { scene.load.spritesheet("neSpecial-ar", "assets/personagens/Goku/Sprites/atacks/neSpecial-ar.png", { frameWidth: 98, frameHeight: 135 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "siSpecial-prepare", () => { scene.load.spritesheet("siSpecial-prepare", "assets/personagens/Goku/Sprites/atacks/siSpecial-prepare.png", { frameWidth: 102, frameHeight: 90 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "siSpecial", () => { scene.load.spritesheet("siSpecial", "assets/personagens/Goku/Sprites/atacks/siSpecial.png", { frameWidth: 166, frameHeight: 134 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "mira", () => { scene.load.spritesheet("mira", "assets/personagens/Goku/Sprites/atacks/mira.png", { frameWidth: 12, frameHeight: 12 }); }),
+  //audio
+  (scene, queued) => queueAsset(scene, queued, "audio", "goku-hurt1", () => { scene.load.audio("goku-hurt1", "assets/personagens/Goku/Audio/goku-hurt1.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "goku-hurt2", () => { scene.load.audio("goku-hurt2", "assets/personagens/Goku/Audio/goku-hurt2.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "goku-hurt3", () => { scene.load.audio("goku-hurt3", "assets/personagens/Goku/Audio/goku-hurt3.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "goku-hurt4", () => { scene.load.audio("goku-hurt4", "assets/personagens/Goku/Audio/goku-hurt4.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "goku-hurt5", () => { scene.load.audio("goku-hurt5", "assets/personagens/Goku/Audio/goku-hurt5.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "gk-atk1", () => { scene.load.audio("gk-atk1", "assets/personagens/Goku/Audio/gk-atk1.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "gk-atk2", () => { scene.load.audio("gk-atk2", "assets/personagens/Goku/Audio/gk-atk2.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "gk-atk3", () => { scene.load.audio("gk-atk3", "assets/personagens/Goku/Audio/gk-atk3.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "gk-atk4", () => { scene.load.audio("gk-atk4", "assets/personagens/Goku/Audio/gk-atk4.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "gk-atk5", () => { scene.load.audio("gk-atk5", "assets/personagens/Goku/Audio/gk-atk5.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "gk-atk6", () => { scene.load.audio("gk-atk6", "assets/personagens/Goku/Audio/gk-atk6.wav"); }),
 
+];
+
+const assetsAigis = [
+  //(scene, queued) => queueAsset(scene, queued, "texture", "", () => { scene.load.spritesheet("", "assets/personagens/Aigis/.png", { frameWidth: 800, frameHeight: 650}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_intro", () => { scene.load.spritesheet("ai_intro", "assets/personagens/Aigis/ai_intro.png", { frameWidth: 458, frameHeight: 390}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_idle", () => { scene.load.spritesheet("ai_idle", "assets/personagens/Aigis/ai_idle.png", { frameWidth: 222, frameHeight: 390}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_jump", () => { scene.load.spritesheet("ai_jump", "assets/personagens/Aigis/ai_jump.png", { frameWidth: 251, frameHeight: 393}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_walk", () => { scene.load.spritesheet("ai_walk", "assets/personagens/Aigis/ai_walk.png", { frameWidth: 226, frameHeight: 392}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_crouch1", () => { scene.load.spritesheet("ai_crouch1", "assets/personagens/Aigis/ai_crouch1.png", { frameWidth: 209, frameHeight: 311}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_crouch2", () => { scene.load.spritesheet("ai_crouch2", "assets/personagens/Aigis/ai_crouch2.png", { frameWidth: 205, frameHeight: 270}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_crouch3", () => { scene.load.spritesheet("ai_crouch3", "assets/personagens/Aigis/ai_crouch3.png", { frameWidth: 209, frameHeight: 311}); }),
+
+
+
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_dash", () => { scene.load.spritesheet("ai_dash", "assets/personagens/Aigis/ai_dash.png", { frameWidth: 361, frameHeight: 373}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_taunt", () => { scene.load.spritesheet("ai_taunt", "assets/personagens/Aigis/ai_taunt.png", { frameWidth: 218, frameHeight: 383}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_block", () => { scene.load.spritesheet("ai_block", "assets/personagens/Aigis/ai_block.png", { frameWidth: 246, frameHeight: 344}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_stun", () => { scene.load.spritesheet("ai_stun", "assets/personagens/Aigis/ai_stun.png", { frameWidth: 182, frameHeight: 299}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_dead", () => { scene.load.spritesheet("ai_dead", "assets/personagens/Aigis/ai_dead.png", { frameWidth: 477, frameHeight: 336}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_getup", () => { scene.load.spritesheet("ai_getup", "assets/personagens/Aigis/ai_getup.png", { frameWidth: 415, frameHeight: 331}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_hurt", () => { scene.load.spritesheet("ai_hurt", "assets/personagens/Aigis/ai_hurt.png", { frameWidth: 274, frameHeight: 290}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_hurtup", () => { scene.load.spritesheet("ai_hurtup", "assets/personagens/Aigis/ai_hurtup.png", { frameWidth: 178, frameHeight: 393}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_hurtside", () => { scene.load.spritesheet("ai_hurtside", "assets/personagens/Aigis/ai_hurtside.png", { frameWidth: 350, frameHeight: 321}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_hurtdown", () => { scene.load.spritesheet("ai_hurtdown", "assets/personagens/Aigis/ai_hurtdown.png", { frameWidth: 345, frameHeight: 445}); }),
 ];
 
 const assetsIce = [
@@ -757,7 +797,8 @@ const personagens = {
   Slenderman: assetsSlenderman,
   Pingu: assetsPingu,
   TH30: assetsTH30,
-  Goku: assetsGoku
+  Goku: assetsGoku,
+  Aigis: assetsAigis
 };
 
 export function carregarAssetsVersus(scene, dados) {

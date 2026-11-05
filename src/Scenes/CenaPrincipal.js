@@ -18,6 +18,7 @@ import Slenderman from "../Personagensjs/Slender.js";
 import Pingu from "../Personagensjs/Pingu.js";
 import TH30 from "../Personagensjs/TH30.js";
 import Goku from "../Personagensjs/Goku.js";
+import Aigis from "../Personagensjs/Aigis.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import SistemaPlataformasAtravessaveis from "../Objetos/SistemaPlataformasAtravessaveis.js";
 import SistemaLedge from "../Objetos/SistemaLedge.js";
@@ -437,6 +438,8 @@ this.indicadorP2 = this.criarIndicador(
         return new TH30(this, x, y, teclas, minDano, maxDano, controle);
         case "Goku":
         return new Goku(this, x, y, teclas, minDano, maxDano, controle);
+        case "Aigis":
+        return new Aigis(this, x, y, teclas, minDano, maxDano, controle);
       default:
         return new Ken(this, x, y, teclas, minDano, maxDano, controle);
     }

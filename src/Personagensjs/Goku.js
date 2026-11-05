@@ -4,6 +4,7 @@ import GokuNeSpecial from "./Specials/Goku/NeSpecial.js";
 import GokuAsiSpecial from "./Specials/Goku/AsiSpecial.js";
 import GokuAupSpecial from "./Specials/Goku/AupSpecial.js";
 import GokuAdoSpecial from "./Specials/Goku/AdoSpecial.js";
+import GokuSiSpecial from "./Specials/Goku/SiSpecial.js";
 
 
 export default class Goku extends Personagem {
@@ -268,7 +269,7 @@ export default class Goku extends Personagem {
         ],
       },
 
-      atack2: { offsetVisualX:10, largura: 85, altura: 100, offsetX: 21, offsetY: 0, escala: 1,
+      atack2: { offsetVisualX:10, largura: 85, altura: 100, offsetX: 22, offsetY: 0, escala: 1,
         hurtboxes: [
           { largura: 35, altura: 30, offsetX: 10, offsetY: -75 },
           { largura: 60, altura: 20, offsetX: 2, offsetY: -48 }, // Tronco/cabeça
@@ -302,7 +303,7 @@ export default class Goku extends Personagem {
         offsetX: 4,
         offsetY: 0,
         escala: 1,
-        hurtboxes: [{ largura: 60, altura: 80, offsetX: -20, offsetY: -40 }],
+        hurtboxes: [{ largura: 60, altura: 80, offsetX: -17, offsetY: -40 }],
       },
 
       downAtack: {
@@ -310,7 +311,7 @@ export default class Goku extends Personagem {
         offsetVisualY:3,
         largura: 85,
         altura: 100,
-        offsetX: 30,
+        offsetX: 32,
         offsetY: -12,
         escala: 1,
         hurtboxes: [
@@ -333,8 +334,8 @@ export default class Goku extends Personagem {
       upAir: {  
         largura: 85,
         altura: 100,
-        offsetX: 25,
-        offsetY: 18,
+        offsetX: 26,
+        offsetY: 15,
         escala: 1,
         hurtboxes: [{ largura: 50, altura: 90, offsetX: -5, offsetY: -70 }],
       },
@@ -342,8 +343,8 @@ export default class Goku extends Personagem {
       AupSpecial: {
         largura: 85,
         altura: 100,
-        offsetX: 0,
-        offsetY: 18,
+        offsetX: 25,
+        offsetY: 65,
         escala: 1,
         hurtboxes: [
           { largura: 48, altura: 46, offsetX: 0, offsetY: -76 },
@@ -354,7 +355,7 @@ export default class Goku extends Personagem {
       AdoSpecial: {
         largura: 85,
         altura: 100,
-        offsetX: 8,
+        offsetX: 20,
         offsetY: 20,
         escala: 1,
         hurtboxes: [
@@ -384,7 +385,44 @@ export default class Goku extends Personagem {
         ],
       },
 
+      siSpecialPrepare: {
+        largura: 85,
+        altura: 100,
+        offsetX: -1,
+        offsetY: -8,
+        escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 35, offsetX: -7, offsetY: -55 },
+          { largura: 75, altura: 35, offsetX: 0, offsetY: -20 },
+        ],
+      },
+
+      siSpecial: {
+        largura: 85,
+        altura: 100,
+        offsetX: 0,
+        offsetY: 31,
+        escala: 1,
+        hurtboxes: [
+          { largura: 35, altura: 30, offsetX: 10, offsetY: -75 },
+          { largura: 60, altura: 20, offsetX: 2, offsetY: -48 },
+          { largura: 80, altura: 35, offsetX: -2, offsetY: -18 },
+        ],
+      },
+
       neSpecial: {
+        largura: 85,
+        altura: 100,
+        offsetX: -1,
+        offsetY: 0,
+        escala: 1,
+        hurtboxes: [
+          { largura: 30, altura: 35, offsetX: -7, offsetY: -55 },
+          { largura: 75, altura: 35, offsetX: 0, offsetY: -20 },
+        ],
+      },
+
+      neSpecialAr: {
         largura: 85,
         altura: 100,
         offsetX: -1,
@@ -477,6 +515,7 @@ export default class Goku extends Personagem {
    };
 
     this.specials = {
+      lado: GokuSiSpecial.configuracao,
       agachado: {
         animacao: "gk_doSpecial_inicio",
         configuracaoAnimacao: "doSpecial",
@@ -541,11 +580,15 @@ export default class Goku extends Personagem {
         larguraKamehamehaPorCarga: 0.08,
         animacoes: {
           kiBall: ["gk_kib1", "gk_kib2", "gk_kib3"],
-          preparacaoKame: "gk_neSpecial",
+          preparacaoKame: "gk_neSpecial_ar",
           cargaKame: "gk_kamecharg",
           lancamentoKame: "gk_kamelauch",
           loopLancamentoKame: "gk_kamelauch_loop",
         },
+        frameLancamentoAereo: 20,
+        origemKameAereaX: 55,
+        origemKameAereaY: -50,
+        inclinacaoKameAerea: 0.35,
         logicaPropriedades: {
           tipoSomImpacto: "heavy",
           knockbackY: -150,
@@ -564,13 +607,13 @@ export default class Goku extends Personagem {
     this.cooldownKiBallAte = 0;
     this.cooldownKamehamehaAte = 0;
 
-  //  this.sons = {
-  //    ...this.sons,
-  //    vozAtaque: ["sp-atack", "sp-atack2", "sp-atack3"],
-  //    vozDanoNormal: ["sp-hurt", "sp-hurt2"],
-  //    vozDanoForte: ["sp-hurt", "sp-hurt2", "sp-hurt3"],
-   //   volumeVoz: 0.2,
-  //  };
+    this.sons = {
+      ...this.sons,
+      vozAtaque: ["gk-atk1", "gk-atk2", "gk-atk4", "gk-atk5", "gk-atk6"],
+      vozDanoNormal: ["goku-hurt1", "goku-hurt2", "goku-hurt3", "goku-hurt4", "goku-hurt5"],
+      vozDanoForte: ["gk-atk3"],
+      volumeVoz: 0.2,
+    };
 
 
   
@@ -944,6 +987,10 @@ export default class Goku extends Personagem {
       ["goku_charge_fim", "charge_2", 0, 7, 12, 0],
       ["goku_charge_dust", "charge_dust", 0, 8, 16, 0],
       ["gk_neSpecial", "gk_neSpecial", 0, 3, 12, 0],
+      ["gk_neSpecial_ar", "neSpecial-ar", 18, 28, 16, 0],
+      ["gk_siSpecial_prepare", "siSpecial-prepare", 0, 5, 15, 0],
+      ["gk_siSpecial", "siSpecial", 0, 7, 16, 0],
+      ["goku_mira", "mira", 0, 3, 8, -1],
       ["gk_AupSpecial", "gk_AupSpecial", 0, 8, 16, 0],
       ["gk_AdoSpecial", "gk_AdoSpecial", 0, 7, 16, 0],
       ["gk_Asi_Special", "gk_AsiSpecial", 0, 2, 12, -1],
