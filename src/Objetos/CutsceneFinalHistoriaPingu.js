@@ -230,10 +230,13 @@ export default class CutsceneFinalHistoriaPingu {
     this.scene.cameras.main.once("camerafadeoutcomplete", () => {
       this.scene.manterAssetsParaHistoria2 = true;
       this.scene.sound.stopAll();
-      this.scene.scene.start("CenaHistoria3", {
+      this.scene.scene.start("CenaTransicaoHistoria", {
+        fase: "Slenderman",
         p1: this.scene.escolhaP1,
         p2: this.scene.escolhaP2,
         numPlayers: this.scene.numPlayers,
+        vidasP1: this.scene.vidasP1,
+        vidasP2: this.scene.vidasP2,
       });
     });
     this.scene.cameras.main.fadeOut(900, 0, 0, 0);

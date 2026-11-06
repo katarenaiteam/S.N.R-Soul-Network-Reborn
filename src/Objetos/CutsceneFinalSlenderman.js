@@ -7,15 +7,15 @@ const FALAS_APARICAO = [
   { personagem: "FJ", retrato: "FJ_N", texto: "Mas como?" },
 ];
 const FALAS_CONFRONTO = [
-  { personagem: "FJ", retrato: "FJ_N", texto: "Afinal, oque voce quer?" },
-  { personagem: "FJ", retrato: "FJ_N", texto: "Todos que entraram nesse torneio." },
-  { personagem: "FJ", retrato: "FJ_N", texto: "Eles, eu. Nos so queriamos uma vida melhor." },
-  { personagem: "FJ", retrato: "FJ_N", texto: "Mas se voce esta aqui agora, entao voce acabou com eles." },
-  { personagem: "FJ", retrato: "FJ_N", texto: "Como se a vida deles nao importasse." },
-  { personagem: "FJ", retrato: "FJ_N", texto: "Como se voce fosse ..." },
-  { personagem: "FJ", retrato: "FJ_N", texto: "Como se voce fosse como..." },
-  { personagem: "FJ", retrato: "FJ_N", texto: "como eu..." },
+    { personagem: "FJ", retrato: "FJ_N", texto: "O que você veio buscar aqui?" },
+  { personagem: "FJ", retrato: "FJ_N", texto: "Todos que entraram nesse torneio tinham algo pelo que lutar." },
+  { personagem: "FJ", retrato: "FJ_N", texto: "Nós só queríamos uma chance. Uma vida que fosse nossa." },
+  { personagem: "FJ", retrato: "FJ_N", texto: "Mas agora você está aqui, e eles não vão mais ter essa chance." },
+  { personagem: "FJ", retrato: "FJ_N", texto: "Você tirou tudo deles como se nada daquilo tivesse valor." },
+  { personagem: "FJ", retrato: "FJ_N", texto: "Como se a vida deles fosse descartável..." },
+  { personagem: "FJ", retrato: "FJ_N", texto: "Como se você pudesse decidir quem merece viver..." },
   { personagem: "FJ", retrato: "FJ_N", texto: "..." },
+  { personagem: "FJ", retrato: "FJ_N", texto: "No fim, talvez eu não seja tão diferente." },
 ];
 const FALAS_FINAL = [
   { personagem: "FJ", retrato: "FJ_N", texto: "Oque eu estou fazendo afinal." },
@@ -214,6 +214,8 @@ export default class CutsceneFinalSlenderman {
             p1: this.scene.escolhaP1,
             p2: this.scene.escolhaP2,
             numPlayers: this.scene.numPlayers,
+            vidasP1: this.scene.vidasP1,
+            vidasP2: this.scene.vidasP2,
           });
         });
         this.scene.cameras.main.fadeOut(900, 0, 0, 0);

@@ -6,13 +6,13 @@ import CutsceneFinalHistoriaPingu from "../Objetos/CutsceneFinalHistoriaPingu.js
 
 const FALAS_PINGU = [
   { personagem: "Pingu", retrato: "Pg_ok", texto: "NOOT NOOT!" },
-  { personagem: "FJ", retrato: "FJ_N", texto: "Tipo... éh." },
+  { personagem: "FJ", retrato: "FJ_N", texto: "Ah, sim. É fascinante como você consegue transmitir ideias tão complexas com um vocabulário tão limitado." },
   { personagem: "Pingu", retrato: "Pg_N", texto: "Noot?" },
-  { personagem: "FJ", retrato: "FJ_N", texto: "Tipo... ahn?" },
-  { personagem: "Pingu", retrato: "Pg_mid", texto: "... noot." },
-  { personagem: "FJ", retrato: "FJ_N", texto: "Tipo, nada a haver!" },
-  { personagem: "Pingu", retrato: "Pg_bad", texto: "..." },
-  { personagem: "Pingu", retrato: "Pg_bad", texto: "Eu não sinto raiva de você. Eu só decidi que você não faz mais falta no mundo." },
+  { personagem: "FJ", retrato: "FJ_N", texto: "E mais fascinante ainda é o fato de que eu consigo compreender cada palavra. Uma verdadeira quebra das convenções narrativas." },
+  { personagem: "Pingu", retrato: "Pg_mid", texto: "NOOT NOOT!" },
+  { personagem: "FJ", retrato: "FJ_N", texto: "Exatamente! E o mais genial é que o público também sabe que isso não faz sentido. É metalinguagem em seu estado mais puro." },
+  { personagem: "Pingu", retrato: "Pg_N", texto: "Noot..." },
+  { personagem: "FJ", retrato: "FJ_N", texto: "De fato. Quem concebeu essa piada deve ser um gênio incompreendido. Talvez o maior roteirista da nossa geração." },
 ];
 
 export default class CenaHistoria2 extends CenaHistoria {
@@ -41,6 +41,7 @@ export default class CenaHistoria2 extends CenaHistoria {
   }
 
   aoVencerHistoria() {
+    this.mapaAtual.musica?.stop();
     this.cutsceneFinalHistoria = new CutsceneFinalHistoriaPingu(this);
   }
 

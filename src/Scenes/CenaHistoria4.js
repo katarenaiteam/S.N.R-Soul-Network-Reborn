@@ -4,6 +4,7 @@ import TH30_IA from "../Objetos/TH30_IA.js";
 import DialogoHistoria from "../Objetos/DialogoHistoria.js";
 import PuppetLojaMiku from "../Objetos/PuppetLojaMiku.js";
 import { RaioLoja } from "../Objetos/EfeitosAvancadosLoja.js";
+import { carregarAssetsHistoria } from "../Objetos/CarregarAssetsPartida.js";
 
 export default class CenaHistoria4 extends CenaHistoria {
   constructor() {
@@ -21,6 +22,10 @@ export default class CenaHistoria4 extends CenaHistoria {
     this.musicaHistoriaSeek = dados.musicaHistoriaSeek ?? 0;
     this.aguardandoEntradaFinal = this.entradaFinalCompleta;
     if (this.entradaFinalCompleta) this.manterAssetsParaHistoria2 = false;
+  }
+
+  preload() {
+    carregarAssetsHistoria(this);
   }
 
   criarMapaHistoria() {
@@ -57,7 +62,7 @@ export default class CenaHistoria4 extends CenaHistoria {
 
   respawnar(jogador, spawn) {
     super.respawnar(jogador, spawn);
-    if (jogador === this.boss && this.vidasBoss === 2 && !this.despertarTH30Iniciado) {
+    if (jogador === this.boss && this.vidasBoss === 1 && !this.despertarTH30Iniciado) {
       this.despertarTH30Iniciado = true;
       this.iniciarDespertarTH30();
     }
@@ -281,6 +286,10 @@ export default class CenaHistoria4 extends CenaHistoria {
 
   iniciarAberturaHistoria() {
     if (this.entradaFinalCompleta) {
+      const limites = this.mapaAtual.configCamera.limites;
+      const escalaResolucao = this.scale.width / 1920;
+      this.camJogo.setZoom(this.mapaAtual.configCamera.maxZoom * escalaResolucao)
+        .centerOn(limites.x + limites.largura / 2, limites.y + limites.altura / 2);
       this.physics.world.pause();
       this.cameras.main.fadeIn(700, 255, 255, 255);
       this.sound.play("ding");
@@ -375,6 +384,8 @@ export default class CenaHistoria4 extends CenaHistoria {
             p1: "FJ",
             p2: this.escolhaP2,
             numPlayers: this.numPlayers,
+            vidasP1: this.vidasP1,
+            vidasP2: this.vidasP2,
             entradaFinalCompleta: true,
             musicaHistoriaSeek,
           });

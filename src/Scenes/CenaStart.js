@@ -43,7 +43,6 @@ export default class CenaStart extends Phaser.Scene {
     this.opcoesMenu = [
       { id: "story", rotulo: "HISTORIA", y: this.scale.height * 0.47, },
       { id: "1v1", rotulo: "VERSUS", y: this.scale.height * 0.565 },
-      { id: "credits", rotulo: "CRÉDITOS", y: this.scale.height * 0.66 },
     ];
 
     this.emSelecaoPlayers = false;
@@ -346,9 +345,6 @@ export default class CenaStart extends Phaser.Scene {
         this.textoNumPlayers.setVisible(true);
         this.cursorSelecao.setVisible(false);
         this.bloqueado = false;
-      } else if (opcao.id === "credits") {
-        this.mqtt?.clearState();
-        this.fecharAbaEAvancar("CenaCreditos");
       } else {
         this.mqtt?.clearState();
         this.fecharAbaEAvancar("Charmenu", { modo: "1v1" });

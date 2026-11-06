@@ -229,6 +229,7 @@ export function instalarComandosDebug(game) {
         "  cenas()                 lista todas as telas",
         "  atual()                 mostra a tela atual",
         "  ir('luta')              abre uma tela",
+        "  creditos()              abre diretamente a cena de créditos",
         "  resetar()               reinicia a tela/fase atual",
         "  carregarUlt()           carrega totalmente a ult do P1",
         "  carregarUlt(2)          carrega totalmente a ult do P2",
@@ -246,6 +247,7 @@ export function instalarComandosDebug(game) {
   window.cenas = api.cenas.bind(api);
   window.atual = api.atual.bind(api);
   window.ir = api.ir.bind(api);
+  window.creditos = () => api.ir("CenaCreditos");
   window.resetar = api.resetar.bind(api);
   window.carregarUlt = api.carregarUlt.bind(api);
   window.matarBoss = api.matarBoss.bind(api);

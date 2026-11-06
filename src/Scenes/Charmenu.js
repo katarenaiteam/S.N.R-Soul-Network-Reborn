@@ -976,9 +976,9 @@ export default class Charmenu extends Phaser.Scene {
       modo: this.modoJogo
     };
 
-    const proximaCena = this.modoJogo === "historia" ? "CenaHistoria" : "CenaSelecaoMapa";
+    const proximaCena = this.modoJogo === "historia" ? "CenaTransicaoHistoria" : "CenaSelecaoMapa";
     this.cameras.main.once("camerafadeoutcomplete", () => {
-      this.scene.start(proximaCena, escolhas);
+      this.scene.start(proximaCena, this.modoJogo === "historia" ? { ...escolhas, fase: "Miku" } : escolhas);
     });
     this.cameras.main.fadeOut(350, 0, 0, 0);
   }

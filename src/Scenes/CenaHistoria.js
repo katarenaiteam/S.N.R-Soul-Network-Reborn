@@ -38,6 +38,8 @@ export default class CenaHistoria extends Phaser.Scene {
     this.escolhaP1 = dados.p1 || "Frederick";
     this.escolhaP2 = dados.p2 || (dados.numPlayers === 2 ? "Ken" : null);
     this.numPlayers = dados.numPlayers || 1;
+    this.vidasHistoriaP1 = dados.vidasP1 ?? 3;
+    this.vidasHistoriaP2 = dados.vidasP2 ?? (this.numPlayers === 2 ? 3 : 0);
     this.inimigoNome = this.obterNomeBoss();
   }
 
@@ -105,9 +107,9 @@ export default class CenaHistoria extends Phaser.Scene {
     this.pontoRespawnP1 = this.mapaAtual.spawnsRespawn.p1;
     this.pontoRespawnP2 = this.mapaAtual.spawnsRespawn.p2;
 
-    this.vidasP1 = 3;
-    this.vidasP2 = this.numPlayers === 2 ? 3 : 0;
-    this.vidasBoss = 3;
+    this.vidasP1 = this.vidasHistoriaP1;
+    this.vidasP2 = this.vidasHistoriaP2;
+    this.vidasBoss = this.scene.key === "CenaHistoria4" ? 2 : 1;
 
     // Teclas P1
     const teclasP1 = this.input.keyboard.addKeys({
