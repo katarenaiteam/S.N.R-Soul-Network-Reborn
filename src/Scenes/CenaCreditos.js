@@ -245,7 +245,9 @@ export default class CenaCreditos extends Phaser.Scene {
       const tempoRestante = Math.max(0, 62000 - (this.time.now - this.inicioCreditos) - 1400);
       this.time.delayedCall(tempoRestante, () => {
       const musica = this.registry.get("musicaCreditos");
-      if (musica?.isPlaying) musica.fadeOut(1400);
+      if (musica?.isPlaying) {
+        this.tweens.add({ targets: musica, volume: 0, duration: 1400, onComplete: () => musica.stop() });
+      }
       this.registry.remove("musicaCreditos");
       this.cameras.main.fadeOut(1400, 0, 0, 0);
       this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("CenaStart"));
