@@ -177,7 +177,6 @@ export default class Personagem {
 
 
   bloquearMovimentoParry(duracao) {
-    if (this.kaiokenAtivo) return;
     const sprite = this.sprite;
     const body = sprite?.body;
     if (!sprite?.active || !body || this.maquinaEstados.estadoAtual?.nome === "dead") return;
@@ -219,7 +218,15 @@ export default class Personagem {
 
   podeDefender(origem = null) {
     if (this.maquinaEstados.estadoAtual?.nome !== "guard" || this.vidaGuard <= 0) return false;
-    return this.maquinaEstados.estadoAtual.defesaAtiva();
+    if (!this.maquinaEstados.estadoAtual.defesaAtiva()) return false;
+    const frente = this.sprite.flipX ? -1 : 1;
+    // A direcao de chegada continua valida quando a hitbox atravessa o centro.
+    if (Number.isFinite(origem?.direcao) && origem.direcao !== 0) {
+      return Math.sign(origem.direcao) === -frente;
+    }
+    const oponente = this.scene.jogador1 === this ? this.scene.jogador2 : this.scene.jogador1;
+    const x = origem?.x ?? oponente?.sprite?.x;
+    return Number.isFinite(x) && (x - this.sprite.x) * frente > 0;
   }
 
   atualizarEfeitoGuard() {
@@ -240,29 +247,6 @@ export default class Personagem {
   // --- RECEBIMENTO DE DANO ---
   receberDano(quantidade, propriedades = {}, origem = null) {
     if (this.invulneravel) return true;
-
-    if (this.kaiokenAtivo && !propriedades.danoInternoKaioken) {
-      quantidade *= 1.3;
-    }
-
-    if (
-      this.carregandoKi &&
-      (
-        origem?.projetil ||
-        origem?.tipo === "projetil" ||
-        propriedades.projetil ||
-        !origem?.atacante ||
-        (origem.velocidadeX === undefined && origem.velocidadeY === undefined)
-      )
-    ) {
-      propriedades = {
-        ...propriedades,
-        knockbackX: 0,
-        knockbackY: 0,
-        knockbackFixo: true,
-        naoInterromperEstado: true,
-      };
-    }
 
     const atacante =
       this.scene.jogador1 === this
@@ -322,9 +306,6 @@ export default class Personagem {
 
     //. LÓGICA PADRÃO DE DANO (Quando toma golpe sem escudo):
     this.porcentagemDano += quantidade;
-    if (quantidade > 0 && !propriedades.semCargaKi) {
-      origem?.atacante?.adicionarCargaKiPorDano?.(quantidade);
-    }
     const danoDeSlenderman = atacante?.nomePersonagem === "Slanderman" || atacante?.nomePersonagem === "Slenderman";
     if (quantidade > 0 && (propriedades.corrupcaoSlender > 0 || danoDeSlenderman)) {
       this.corrupcaoSlender.adicionar(propriedades.corrupcaoSlender || 5);
@@ -350,12 +331,6 @@ export default class Personagem {
 
     // Hiper armadura recebe o dano normalmente, mas um número limitado de
     // golpes não aplica knockback nem interrompe o estado atual.
-    if (
-      this.kaiokenAtivo &&
-      this.maquinaEstados.estadoAtual?.nome === "special"
-    ) {
-      return false;
-    }
     if (this.hiperArmaduraHits > 0) {
       this.hiperArmaduraHits--;
       if (this.hiperArmaduraHits === 0) this.hiperArmaduraFonte = null;
@@ -379,7 +354,7 @@ export default class Personagem {
         ? (this.sprite.x >= origem.x ? 1 : -1)
       : (oponente && this.sprite.x > oponente.sprite.x ? 1 : -1);
 
-    const kbX = impulsoLojaAtivo ? 2000 : propriedades.knockbackX ?? 250;
+    const kbX = impulsoLojaAtivo ? 20000 : propriedades.knockbackX ?? 250;
     const kbY = propriedades.knockbackY ?? -100;
 
     //  Salva se o golpe exige recuperação manual por comandos
@@ -398,25 +373,31 @@ export default class Personagem {
     let multiplicadorY = 1;
 
     if (!knockbackFixo) {
-      // Até 180% a porcentagem cresce normalmente; acima disso, cada ponto
-      // vale menos na curva base. Depois de 320%, o knockback ganha um reforço
-      // adicional para que ataques continuem ficando mais fortes.
-      const porcentagemEscalada = Math.max(0, this.porcentagemDano);
+      // A porcentagem deixa de influenciar o lançamento depois de 300%.
+      // Até 180% ela cresce normalmente e, depois disso, cada ponto passa
+      // a valer menos, preservando a curva que o sistema já usava.
+      const tetoPorcentagem = 300;
+      const porcentagemEscalada = Phaser.Math.Clamp(
+        this.porcentagemDano,
+        0,
+        tetoPorcentagem
+      );
       const danoEscalado = porcentagemEscalada <= 180
         ? porcentagemEscalada
         : 180 + (porcentagemEscalada - 180) * 0.20;
 
-      const multiplicadorBaseX = 0.65 + danoEscalado * 0.625 / 100;
-      const multiplicadorBaseY = 0.65 + danoEscalado * 0.568 / 180;
+      const multiplicadorBaseX = 0.65 + danoEscalado / 100;
+      const multiplicadorBaseY = 0.65 + danoEscalado / 180;
 
-      // Reforça progressivamente até 300%, sem deixar a curva cair depois.
-      const progresso = Phaser.Math.Clamp(porcentagemEscalada / 300, 0, 1);
+      // Reforça progressivamente o knockback sem criar outro salto brusco.
+      // A curva perde inclinação ao se aproximar de 300% e, no teto,
+      // entrega 2,1 vezes o knockback que a regulagem anterior entregava.
+      const progresso = porcentagemEscalada / tetoPorcentagem;
       const progressoSuave = 1 - (1 - progresso) ** 2;
       const reforcoKnockback = 1 + 1.1 * progressoSuave;
-      const reforcoAcima320 = 1 + Math.max(0, porcentagemEscalada - 320) / 100;
 
-      multiplicadorX = multiplicadorBaseX * reforcoKnockback * reforcoAcima320;
-      multiplicadorY = multiplicadorBaseY * reforcoKnockback * reforcoAcima320;
+      multiplicadorX = multiplicadorBaseX * reforcoKnockback;
+      multiplicadorY = multiplicadorBaseY * reforcoKnockback;
     }
 
     // Captura o contato e o movimento anterior, sem modificar o impulso.

@@ -348,6 +348,17 @@ this.indicadorP2 = this.criarIndicador(
               : null;
           if (!jogador) return;
 
+          if (
+            ["slen-shop", "raio", "dead-shop", "froze-shop"].includes(pedido.efeito) &&
+            jogador.maquinaEstados?.estadoAtual?.nome === "ult"
+          ) {
+            mqtt.publish(`shop/response/${pedido.clientId}`, {
+              pedidoId: pedido.pedidoId,
+              mensagem: "Impossivel durante a ultimate",
+            });
+            return;
+          }
+
           if (pedido.efeito === "slen-shop") {
             jogador.corrupcaoSlender?.adicionar(100);
             this.reproduzirAudioLoja("shop-slen", idPedido);

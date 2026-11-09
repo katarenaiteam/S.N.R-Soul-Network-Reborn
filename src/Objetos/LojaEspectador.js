@@ -11,6 +11,21 @@ export default class LojaEspectador {
     this.indiceSlot = 0;
     this.rotacaoRoda = 0;
     this.ultimaCompra = -Infinity;
+    this.topicoResposta = mqtt?.clientId
+      ? `shop/response/${mqtt.clientId}`
+      : null;
+    this.aoReceberResposta = (resposta) => {
+      if (resposta?.mensagem !== "Impossivel durante a ultimate") return;
+      this.aviso.setVisible(true);
+      this.avisoTimer?.remove(false);
+      this.avisoTimer = this.scene.time.delayedCall(2500, () => {
+        this.aviso.setVisible(false);
+      });
+    };
+    if (this.topicoResposta) {
+      mqtt.on(`message:${this.topicoResposta}`, this.aoReceberResposta);
+      mqtt.subscribe(this.topicoResposta);
+    }
     this.itens = [
       { efeito: "miku-rain", textura: "shop-miku-rain", rotulo: "Miku Rain", descricao: "Essa é pra quem diz que felicidade não cai do céu." },
       { efeito: "less", textura: "less-shop", rotulo: "Curar vida", descricao: "Uma ajudinha pra aquele amigo meio podre no joguinho.", escolherJogador: true },
@@ -63,6 +78,16 @@ export default class LojaEspectador {
       color: "#9cffbb",
       align: "left",
     }).setOrigin(0, 0).setScrollFactor(0).setDepth(4003).setVisible(false);
+    this.aviso = scene.add.text(scene.scale.width / 2, 150 * this.escala, "", {
+      fontFamily: "RetroFont, monospace",
+      fontSize: `${30 * this.escala}px`,
+      color: "#ffffff",
+      backgroundColor: "#4b1010",
+      padding: { x: 18 * this.escala, y: 12 * this.escala },
+      align: "center",
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(4007)
+      .setText("Impossivel durante a ultimate")
+      .setVisible(false);
     this.fechar = scene.add.text(55 * this.escala, 55 * this.escala, "×", {
       fontFamily: "monospace",
       fontSize: `${54 * this.escala}px`,
@@ -139,6 +164,7 @@ export default class LojaEspectador {
       this.rotulo,
       this.descricao,
       this.preco,
+      this.aviso,
       this.fechar,
       this.fundoEscolha,
       this.textoEscolha,
@@ -348,6 +374,10 @@ export default class LojaEspectador {
   }
 
   destruir() {
+    if (this.topicoResposta) {
+      this.mqtt?.off(`message:${this.topicoResposta}`, this.aoReceberResposta);
+    }
+    this.avisoTimer?.remove(false);
     this.scene.input.off("pointerdown", this.aoPressionar);
     this.scene.input.off("pointermove", this.aoMover);
     this.scene.input.off("pointerup", this.aoSoltar);

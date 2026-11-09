@@ -871,7 +871,7 @@ const personagens = {
   Pingu: assetsPingu,
   TH30: assetsTH30,
   Goku: assetsGoku,
-  Aigis: assetsAigis
+  Aigis: [...assetsAigis, ...assetsFJ]
 };
 
 export function carregarAssetsVersus(scene, dados) {

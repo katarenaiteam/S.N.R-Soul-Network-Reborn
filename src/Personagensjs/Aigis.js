@@ -390,13 +390,13 @@ this.nomePersonagem = "Aigis";
    
    };
 
-     this.sons = {
-      ...this.sons,
-      vozAtaque: [ "fj-atack1", "fj-atack2", "fj-atack3", "fj-atack4" ],
-      vozDanoNormal: ["fj-hurt2", "fj-hurt3", "fj-hurt1", "fj-hurt4", ],
-      vozDanoForte: ["fj-hurt5", "fj-hurt6", ],
-      volumeVoz: 0.25,
-    };
+  //   this.sons = {
+  //    ...this.sons,
+  //    vozAtaque: [ "fj-atack1", "fj-atack2", "fj-atack3", "fj-atack4" ],
+  //    vozDanoNormal: ["fj-hurt2", "fj-hurt3", "fj-hurt1", "fj-hurt4", ],
+  //    vozDanoForte: ["fj-hurt5", "fj-hurt6", ],
+  //    volumeVoz: 0.25,
+  //  };
     
     // ============================ tabela de golpes =====================================
    this.configAnimacoes.comboRapido1 = {
