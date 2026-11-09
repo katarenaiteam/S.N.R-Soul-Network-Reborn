@@ -5,7 +5,7 @@ export default class Cidade {
         this.scene = scene;
 
         if (scene.sound) {
-            this.musica = tocarMusicaSegura(scene, 'ClockTower', { loop: true, volume: 0.05 });
+            this.musica = tocarMusicaSegura(scene, 'ClockTower', { loop: true, volume: 0.07 });
         }
 
         // 1. TAMANHO DO MUNDO (Seguindo o padrão do SkyTowers)

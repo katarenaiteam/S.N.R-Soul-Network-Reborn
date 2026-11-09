@@ -83,6 +83,7 @@ export default class GokuUlt {
 
     if (this.genkidama?.active) {
       this.genkidama.rotation += this.scene.game.loop.delta * 0.00012;
+      this.atualizarHitboxGenkidama();
     }
     if (this.efeitoGenk?.active && this.fase === "ult2") {
       const centroGenkidama = this.obterPosicaoCentroGenkidama();
@@ -321,7 +322,6 @@ export default class GokuUlt {
   explodirGenkidama(chaoY) {
     if (this.cancelada || !this.genkidama?.active) return;
     this.fase = "explosao";
-    this.expandirHitboxExplosao(chaoY);
     this.camera.flash(900, 255, 255, 255);
     this.camera.shake(350, 0.006);
     const explosao = this.scene.add.sprite(this.genkidama.x, chaoY, "genk-e", 23)
@@ -358,10 +358,14 @@ export default class GokuUlt {
   }
 
   criarHitbox(centroX, centroY) {
-    const limites = this.scene.mapaAtual?.configCamera?.limites;
-    const inicioX = limites?.x ?? this.scene.limitesArena.minX;
-    const largura = limites?.largura ?? this.scene.limitesArena.maxX - inicioX;
-    this.hitbox = this.scene.add.zone(inicioX + largura / 2, centroY, largura, 48);
+    const largura = Math.max(1, this.genkidama.displayWidth * 0.68);
+    const altura = Math.max(1, this.genkidama.displayHeight * 0.68);
+    this.hitbox = this.scene.add.zone(
+      this.genkidama.x ?? centroX,
+      this.genkidama.y ?? centroY,
+      largura,
+      altura,
+    );
     this.scene.physics.add.existing(this.hitbox);
     this.hitbox.body.setAllowGravity(false);
     this.hitbox.body.setImmovable(true);
@@ -372,15 +376,16 @@ export default class GokuUlt {
       contraAtacarDono: true,
       aoAtingirAlvo: (alvo) => this.atingirAlvo(alvo, centroX, centroY),
     });
+    this.atualizarHitboxGenkidama();
   }
 
-  expandirHitboxExplosao(chaoY) {
+  atualizarHitboxGenkidama() {
     if (!this.hitbox?.active || !this.hitbox.body) return;
-    const limites = this.scene.mapaAtual?.configCamera?.limites;
-    const largura = limites?.largura ?? this.scene.limitesArena.maxX - this.scene.limitesArena.minX;
-    const altura = 600;
+    if (!this.genkidama?.active) return;
+    const largura = Math.max(1, this.genkidama.displayWidth * 0.68);
+    const altura = Math.max(1, this.genkidama.displayHeight * 0.68);
+    this.hitbox.setPosition(this.genkidama.x, this.genkidama.y);
     this.hitbox.setSize(largura, altura);
-    this.hitbox.setPosition(this.hitbox.x, chaoY - altura / 2);
     this.hitbox.body.setSize(largura, altura);
     this.hitbox.body.updateFromGameObject();
   }

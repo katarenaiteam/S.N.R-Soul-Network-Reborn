@@ -5,7 +5,7 @@ export default class MikuMap {
         this.scene = scene;
 
         if (scene.sound) {
-            this.musica = tocarMusicaSegura(scene, 'm-doll', { loop: true, volume: 0.2 });
+            this.musica = tocarMusicaSegura(scene, 'm-doll', { loop: true, volume: 0.5 });
         }
 
         const larguraMundo = 2340;

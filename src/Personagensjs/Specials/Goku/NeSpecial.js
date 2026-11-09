@@ -330,7 +330,11 @@ export default class GokuNeSpecial {
     this.criarEfeitosCargaKame();
     this.somKameMeio = this.scene.sound.add("kame-meio", { volume: 0, loop: true });
     this.somKameMeio.play();
-    this.scene.tweens.add({ targets: this.somKameMeio, volume: 0.35, duration: 650 });
+    this.tweenVolumeKame = this.scene.tweens.add({
+      targets: this.somKameMeio,
+      volume: 0.35,
+      duration: 650,
+    });
     this.proximaCobrancaKi = this.scene.time.now + 1000;
   }
 
@@ -384,9 +388,7 @@ export default class GokuNeSpecial {
     this.fase = "animacaoLancamentoKame";
     this.auraKame?.destroy();
     this.bolaCargaKame?.destroy();
-    this.somKameMeio?.stop();
-    this.somKameMeio?.destroy();
-    this.somKameMeio = null;
+    this.encerrarSomKame();
     this.scene.sound.play("kame-fim", { volume: 0.65 });
     this.scene.sound.play("kame-fim1", { volume: 0.35 });
     const sprite = this.personagem.sprite;
@@ -630,6 +632,14 @@ export default class GokuNeSpecial {
 
   estaAtivo() { return this.personagem.maquinaEstados.estadoAtual === this.estado; }
 
+  encerrarSomKame() {
+    this.tweenVolumeKame?.stop();
+    this.tweenVolumeKame = null;
+    this.somKameMeio?.stop();
+    this.somKameMeio?.destroy();
+    this.somKameMeio = null;
+  }
+
   finalizarEstado() {
     if (this.estaAtivo()) this.estado.finalizarSpecial();
   }
@@ -651,9 +661,7 @@ export default class GokuNeSpecial {
   limpar() {
     if (this.finalizado) return;
     this.finalizado = true;
-    this.somKameMeio?.stop();
-    this.somKameMeio?.destroy();
-    this.somKameMeio = null;
+    this.encerrarSomKame();
     this.restaurarFlutuar();
     this.personagem.sprite.off(
       `animationcomplete-${this.special.animacoes.preparacaoKame}`,

@@ -240,7 +240,7 @@ export default class CenaCreditos extends Phaser.Scene {
   obrigado() {
     const { width: w, height: h } = this.scale;
     [this.personagens.miku, this.personagens.pingu, this.personagens.slender].forEach((sprite) => sprite.creditosTimer?.remove(false));
-    const texto = this.txt(w / 2, h * 0.19, "OBRIGADA POR\nJOGAR!", 64, { color: "#00ff36", stroke: "#001a08", strokeThickness: 5 }).setDepth(10).setAlpha(0);
+    const texto = this.txt(w / 2, h * 0.19, "OBRIGADO POR\nJOGAR!", 64, { color: "#00ff36", stroke: "#001a08", strokeThickness: 5 }).setDepth(10).setAlpha(0);
     this.tweens.add({ targets: texto, alpha: 1, duration: 500, onComplete: () => {
       const tempoRestante = Math.max(0, 62000 - (this.time.now - this.inicioCreditos) - 1400);
       this.time.delayedCall(tempoRestante, () => {

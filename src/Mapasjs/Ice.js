@@ -6,7 +6,7 @@ export default class Ice {
         this.escorregadio = true;
 
         if (scene.sound) {
-            this.musica = tocarMusicaSegura(scene, 'pingu-fight-music', { loop: true, volume: 0.1 });
+            this.musica = tocarMusicaSegura(scene, 'pingu-fight-music', { loop: true, volume: 0.5 });
         }
 
         // 1. TAMANHO REDUZIDO DO MUNDO (Fica menor e mais proporcional)

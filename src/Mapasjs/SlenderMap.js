@@ -79,7 +79,7 @@ export default class SlenderMap {
 
     iniciarMusica() {
         if (this.musica?.isPlaying || !this.scene.sound) return;
-        this.musica = tocarMusicaSegura(this.scene, 'backTv', { loop: true, volume: 0.2 });
+        this.musica = tocarMusicaSegura(this.scene, 'backTv', { loop: true, volume: 0.5 });
     }
 
 
