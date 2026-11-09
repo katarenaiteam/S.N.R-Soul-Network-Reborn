@@ -21,6 +21,9 @@ export default class GokuAdoSpecial {
 
   executar() {
     const sprite = this.personagem.sprite;
+    this.personagem.tocarSomSorteado(this.personagem.sons?.vozAtaque, {
+      volume: this.personagem.sons?.volumeVoz ?? 0.2,
+    });
     this.direcao = sprite.flipX ? -1 : 1;
     this.gravidadeOriginal = sprite.body.allowGravity;
     sprite.body.setAllowGravity(false);
@@ -108,11 +111,16 @@ export default class GokuAdoSpecial {
   acertar(alvo) {
     if (this.finalizado || this.alvosAtingidos.has(alvo) || alvo.invulneravel) return;
     this.alvosAtingidos.add(alvo);
-    alvo.receberDano(this.special.propriedades.dano, this.special.propriedades, {
+    const propriedades = this.personagem.aplicarBonusDanoKaioken(
+      this.special.propriedades.dano,
+      this.special.propriedades,
+    );
+    alvo.receberDano(propriedades.dano, propriedades, {
       x: this.personagem.sprite.x,
       direcao: this.direcao,
       atacante: this.personagem,
     });
+    this.personagem.tocarSomSorteado(this.personagem.sons?.heavy, { volume: 0.15 });
   }
 
   atualizar() {

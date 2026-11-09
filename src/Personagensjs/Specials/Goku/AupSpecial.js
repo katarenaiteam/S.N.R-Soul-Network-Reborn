@@ -17,6 +17,9 @@ export default class GokuAupSpecial {
 
   executar() {
     const sprite = this.personagem.sprite;
+    this.personagem.tocarSomSorteado(this.personagem.sons?.vozAtaque, {
+      volume: this.personagem.sons?.volumeVoz ?? 0.2,
+    });
     this.direcao = sprite.flipX ? -1 : 1;
     sprite.setVelocity(0, this.special.propriedades.impulsoY);
     sprite.on("animationupdate", this.aoAtualizarAnimacao);
@@ -63,11 +66,16 @@ export default class GokuAupSpecial {
   acertar(alvo) {
     if (this.finalizado || this.alvosAtingidos.has(alvo)) return;
     this.alvosAtingidos.add(alvo);
-    alvo.receberDano(this.special.propriedades.dano, this.special.propriedades, {
+    const propriedades = this.personagem.aplicarBonusDanoKaioken(
+      this.special.propriedades.dano,
+      this.special.propriedades,
+    );
+    alvo.receberDano(propriedades.dano, propriedades, {
       direcao: this.direcao,
       x: this.personagem.sprite.x,
       atacante: this.personagem,
     });
+    this.personagem.tocarSomSorteado(this.personagem.sons?.heavy, { volume: 0.15 });
   }
 
   atualizar() {

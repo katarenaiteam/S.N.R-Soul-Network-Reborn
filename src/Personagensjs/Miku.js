@@ -364,22 +364,9 @@ this.vfxAtaqueNormal = {
       vozDanoForte: ["hurt3", "hurt4", "hurt5"],
       volumeVoz: 0.32,
     };
-
-   //   this.sons = {
-   //  ...this.sons,
-   //  pulo: ['spy_pulo_1', 'spy_pulo_2'],
-   //  dash: ['spy_web_dash'],
-   //  wind: ['spy_whoosh_leve'],
-   // light: ['spy_hit_light_1'],
-   //  heavy: ['spy_hit_heavy_1']
-   // };
-
-
   
     // ============================ tabela de golpes =====================================
-    //this.golpes = {
   
-
     this.golpes = {
       neutro1: {
         animacao: "miku_atack1",
@@ -404,7 +391,7 @@ this.vfxAtaqueNormal = {
           knockbackY: 0,
           knockbackFixo: true,
           hitstunFrames: 25,
-         // tumbling: true
+          tumbling: true
         },
 
         comboProximo: "neutro2",

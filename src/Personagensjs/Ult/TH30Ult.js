@@ -19,6 +19,7 @@ export default class TH30Ult {
     this.atualizarCameraOriginal = this.scene.atualizarCamera;
     this.visibilidadeCenario = [];
     this.finalizada = false;
+    this.efeitoPoseUlt = null;
   }
 
   obterAlvo() {
@@ -66,6 +67,8 @@ export default class TH30Ult {
     sprite.body.setAllowGravity(false);
     sprite.anims.stop();
     sprite.anims.play("th_taunt", true);
+    this.personagem.tocarSomSorteado("th-taunt", { volume: 0.4, detune: 0 });
+    this.iniciarEfeitoPose();
     this.camera.pan(sprite.x, sprite.y - 55, 300, "Power2");
     this.camera.zoomTo(this.cameraOriginal.zoom * 1.4, 300);
     this.timerPose = this.scene.time.delayedCall(750, () => {
@@ -73,6 +76,28 @@ export default class TH30Ult {
       sprite.anims.pause();
       this.timerPose = this.scene.time.delayedCall(450, () => this.iniciarDive());
     });
+  }
+
+  iniciarEfeitoPose() {
+    const sprite = this.personagem.sprite;
+    this.limparEfeitoPose();
+    this.efeitoPoseUlt = this.scene.add.sprite(sprite.x + 15, sprite.y - 75, "ult_f1")
+      .setOrigin(0.5, 0.5)
+      .setScale(0.9)
+      .setDepth(sprite.depth - 1);
+    this.scene.camHUD?.ignore(this.efeitoPoseUlt);
+    this.efeitoPoseUlt.once("animationcomplete-th_ult_f1", () => {
+      if (!this.efeitoPoseUlt?.active || this.finalizada) return;
+      this.efeitoPoseUlt.setTexture("ult_f2");
+      this.efeitoPoseUlt.play("th_ult_f2");
+      this.efeitoPoseUlt.once("animationcomplete-th_ult_f2", () => this.limparEfeitoPose());
+    });
+    this.efeitoPoseUlt.play("th_ult_f1");
+  }
+
+  limparEfeitoPose() {
+    this.efeitoPoseUlt?.destroy();
+    this.efeitoPoseUlt = null;
   }
 
   ativarFundoUltimate() {
@@ -125,6 +150,7 @@ export default class TH30Ult {
     this.liberarPose();
     this.restaurarCamera();
     const sprite = this.personagem.sprite;
+    this.personagem.tocarSomSorteado("th-ult", { volume: 0.4, detune: 0 });
     sprite.anims.play("th_dive", true);
     const duracao = this.scene.anims.get("th_dive")?.duration || 450;
     this.timerDive = this.scene.time.delayedCall(duracao, () => this.transformar());
@@ -231,6 +257,7 @@ export default class TH30Ult {
     this.finalizada = true;
     this.timerPose?.remove();
     this.timerDive?.remove();
+    this.limparEfeitoPose();
     this.liberarPose();
     this.limparCenarioUltimate();
     this.restaurarCamera();

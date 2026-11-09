@@ -41,6 +41,7 @@ export default class TH30DoSpecial {
     this.limiteDireito = this.plataforma?.body.right ?? this.scene.scale.width;
     body.setAllowGravity(false);
     sprite.setVelocity(0, 0);
+    this.personagem.tocarSomSorteado("th-doSpecial", { volume: 0.4, detune: 0 });
     sprite.on("animationupdate", this.aoAtualizarAnimacao);
     sprite.once("animationcomplete-th_dive", this.aoCompletarMergulho);
   }
@@ -171,6 +172,7 @@ export default class TH30DoSpecial {
   surgir() {
     if (this.finalizado || this.fase !== "subterraneo") return;
     this.fase = "saindo";
+    this.personagem.tocarSomSorteado("th-doS2", { volume: 0.4, detune: 0 });
     this.velocidadeSubterranea = 0;
     const sprite = this.personagem.sprite;
     const body = sprite.body;

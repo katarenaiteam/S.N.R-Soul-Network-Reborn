@@ -35,6 +35,7 @@ export default class TH30NeSpecial {
     ) return;
 
     this.personagem.sprite.off("animationupdate", this.aoAtualizarPose);
+    this.personagem.tocarSomSorteado("th-neSpecial", { volume: 0.4, detune: 0 });
     this.criarEfeitoAbdomen();
     this.criarProjeteis();
   }

@@ -177,6 +177,7 @@ export default class Personagem {
 
 
   bloquearMovimentoParry(duracao) {
+    if (this.kaiokenAtivo) return;
     const sprite = this.sprite;
     const body = sprite?.body;
     if (!sprite?.active || !body || this.maquinaEstados.estadoAtual?.nome === "dead") return;
@@ -239,6 +240,10 @@ export default class Personagem {
   // --- RECEBIMENTO DE DANO ---
   receberDano(quantidade, propriedades = {}, origem = null) {
     if (this.invulneravel) return true;
+
+    if (this.kaiokenAtivo && !propriedades.danoInternoKaioken) {
+      quantidade *= 1.3;
+    }
 
     if (
       this.carregandoKi &&
@@ -345,6 +350,12 @@ export default class Personagem {
 
     // Hiper armadura recebe o dano normalmente, mas um número limitado de
     // golpes não aplica knockback nem interrompe o estado atual.
+    if (
+      this.kaiokenAtivo &&
+      this.maquinaEstados.estadoAtual?.nome === "special"
+    ) {
+      return false;
+    }
     if (this.hiperArmaduraHits > 0) {
       this.hiperArmaduraHits--;
       if (this.hiperArmaduraHits === 0) this.hiperArmaduraFonte = null;

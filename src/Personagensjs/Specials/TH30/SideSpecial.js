@@ -47,6 +47,7 @@ export default class TH30SideSpecial {
   executar() {
     const sprite = this.personagem.sprite;
     if (!sprite?.active || !sprite.body) return;
+    this.personagem.tocarSomSorteado(this.personagem.sons?.wind, { volume: 0.4 });
     this.direcao = sprite.flipX ? -1 : 1;
     this.posicaoXAnterior = sprite.x;
     this.velocidadeAvanco = 0;
@@ -112,6 +113,7 @@ export default class TH30SideSpecial {
     const ultimoHit = this.ultimoHitPorAlvo.get(alvo) ?? -1;
     if (ultimoHit >= this.indiceHitAtivo) return;
     this.ultimoHitPorAlvo.set(alvo, this.indiceHitAtivo);
+    this.personagem.tocarSomSorteado(this.personagem.sons?.heavy, { volume: 0.15 });
 
     const ehUltimoGolpe = this.indiceHitAtivo === FRAMES_DOS_GOLPES.length - 1;
     const ehGolpeAscendente = this.indiceHitAtivo === 3;

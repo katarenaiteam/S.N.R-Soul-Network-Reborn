@@ -27,6 +27,7 @@ export default class GokuDoSpecial {
     this.aoCargaCompleta = this.aoCargaCompleta.bind(this);
     this.aoPoeiraCompleta = this.aoPoeiraCompleta.bind(this);
     this.aoCargaFinalCompleta = this.aoCargaFinalCompleta.bind(this);
+    this.aoKaiokenCargaCompleta = this.aoKaiokenCargaCompleta.bind(this);
   }
 
   executar() {
@@ -53,8 +54,18 @@ export default class GokuDoSpecial {
 
   aoInicioCompleto() {
     if (this.finalizado || !this.estaAtivo()) return;
+    if (
+      this.personagem.cargaKi >= this.personagem.cargaKiMaxima &&
+      this.personagem.kaioken?.podeAtivar()
+    ) {
+      this.iniciarTransformacaoKaioken();
+      return;
+    }
     this.fase = "carregando";
     this.personagem.carregandoKi = true;
+    this.personagem.tocarSomSorteado("gk-carga", { volume: 0.65, detune: 0 });
+    this.somCargaKi = this.scene.sound.add("ki-carga", { volume: 0.3, loop: true });
+    this.somCargaKi.play();
     this.aura.play("goku_charge_inicio");
     this.aura.once("animationcomplete-goku_charge_inicio", this.aoCargaCompleta);
     this.personagem.sprite.play("gk_doSpecial_loop");
@@ -65,6 +76,61 @@ export default class GokuDoSpecial {
     if (!this.finalizado && this.fase === "carregando") this.aura.play("goku_charge_loop");
   }
 
+  iniciarTransformacaoKaioken() {
+    this.fase = "transformandoKaioken";
+    this.personagem.carregandoKi = false;
+    this.aura.setScale(2.1).setTint(0xff3028).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.9);
+    this.cargaFinal.setScale(2.2).setTint(0xff3028).setBlendMode(Phaser.BlendModes.ADD);
+    this.aura.play("goku_charge_inicio");
+    this.aura.once("animationcomplete-goku_charge_inicio", () => {
+      if (this.finalizado || this.fase !== "transformandoKaioken") return;
+      this.aura.play("goku_charge_loop");
+    });
+    this.personagem.sprite.play("gk_doSpecial_loop", true);
+    this.scene.time.delayedCall(1200, () => {
+      if (this.finalizado || this.fase !== "transformandoKaioken") return;
+      this.aura.setVisible(false);
+      this.cargaFinal.setVisible(true).play("goku_charge_fim");
+      this.cargaFinal.once("animationcomplete-goku_charge_fim", this.aoKaiokenCargaCompleta);
+    });
+  }
+
+  aoKaiokenCargaCompleta() {
+    if (this.finalizado || this.fase !== "transformandoKaioken") return;
+    this.fase = "explosaoKaioken";
+    const sprite = this.personagem.sprite;
+    const explosao = this.scene.add.sprite(sprite.x, sprite.y - 70, "genk-e", 23)
+      .setOrigin(0.5, 0.5)
+      .setScale(1.2)
+      .setDepth(sprite.depth + 2);
+    this.scene.camHUD?.ignore(explosao);
+    explosao.play("goku_genk_e_explosao");
+    this.scene.tweens.add({
+      targets: explosao,
+      scaleX: 4,
+      scaleY: 4,
+      alpha: 0,
+      duration: 650,
+      ease: "Cubic.easeOut",
+      onComplete: () => explosao.destroy(),
+    });
+    this.scene.cameras.main.flash(300, 255, 90, 90);
+    this.scene.time.delayedCall(180, () => {
+      if (this.finalizado) return;
+      this.finalizar();
+      if (this.personagem.maquinaEstados.estadoAtual === this.estado) {
+        this.personagem.maquinaEstados.mudarEstado(
+          this.personagem.sprite.body.blocked.down ? "idle" : "jump",
+        );
+      }
+      const body = this.personagem.sprite.body;
+      body.moves = true;
+      body.setAllowGravity(true);
+      body.setVelocityX(0);
+      this.personagem.kaioken?.ativar();
+    });
+  }
+
   aoPoeiraCompleta() {
     if (!this.finalizado) this.poeira.setVisible(false);
   }
@@ -72,6 +138,7 @@ export default class GokuDoSpecial {
   atualizar() {
     if (this.finalizado) return;
     if (!this.estaAtivo()) return this.cancelar();
+    this.personagem.sprite.setVelocityX(0);
     this.atualizarEfeitos();
     this.atualizarHitbox();
     if (this.fase !== "carregando") return;
@@ -120,7 +187,8 @@ export default class GokuDoSpecial {
   acertar(alvo) {
     if (this.finalizado || this.alvosAtingidos.has(alvo)) return;
     this.alvosAtingidos.add(alvo);
-    alvo.receberDano(11, PROPRIEDADES_DANO, {
+    const propriedades = this.personagem.aplicarBonusDanoKaioken(11, PROPRIEDADES_DANO);
+    alvo.receberDano(propriedades.dano, propriedades, {
       atacante: this.personagem,
       x: this.personagem.sprite.x,
       direcao: this.direcao,
@@ -148,7 +216,8 @@ export default class GokuDoSpecial {
         if (this.alvosAtingidos.has(alvo)) return;
         this.alvosAtingidos.add(alvo);
         const direcao = alvo.sprite.x < this.personagem.sprite.x ? -1 : 1;
-        alvo.receberDano(11, PROPRIEDADES_FINALIZACAO, {
+        const propriedades = this.personagem.aplicarBonusDanoKaioken(11, PROPRIEDADES_FINALIZACAO);
+        alvo.receberDano(propriedades.dano, propriedades, {
           atacante: this.personagem,
           x: this.personagem.sprite.x,
           direcao,
@@ -182,9 +251,13 @@ export default class GokuDoSpecial {
 
   limpar() {
     this.personagem.carregandoKi = false;
+    this.somCargaKi?.stop();
+    this.somCargaKi?.destroy();
+    this.somCargaKi = null;
     const sprite = this.personagem.sprite;
     sprite.off("animationcomplete-gk_doSpecial_inicio", this.aoInicioCompleto);
     this.cargaFinal?.off("animationcomplete-goku_charge_fim", this.aoCargaFinalCompleta);
+    this.cargaFinal?.off("animationcomplete-goku_charge_fim", this.aoKaiokenCargaCompleta);
     this.registroHitbox?.remover();
     this.hitbox?.destroy();
     this.aura?.destroy();

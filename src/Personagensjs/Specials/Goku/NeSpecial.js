@@ -105,7 +105,7 @@ export default class GokuNeSpecial {
     if (
       segurando &&
       tempoSegurado >= this.special.esperaKamehameha &&
-      this.personagem.cargaKi >= this.special.custoKamehameha &&
+      (this.personagem.kaiokenAtivo || this.personagem.cargaKi >= this.special.custoKamehameha) &&
       this.scene.time.now >= this.personagem.cooldownKamehamehaAte
     ) {
       this.iniciarKamehameha();
@@ -114,6 +114,7 @@ export default class GokuNeSpecial {
     if (
       segurando &&
       tempoSegurado >= this.special.esperaKamehameha &&
+      !this.personagem.kaiokenAtivo &&
       this.personagem.cargaKi < this.special.custoKamehameha
     ) {
       this.finalizarEstado();
@@ -187,6 +188,9 @@ export default class GokuNeSpecial {
   }
 
   criarProjetilKiBall() {
+    const somKiBall = this.personagem.proximoSomKiBall === 1 ? "kib2" : "kib1";
+    this.personagem.tocarSomSorteado(somKiBall, { volume: 0.4, detune: 0 });
+    this.personagem.proximoSomKiBall = somKiBall === "kib1" ? 1 : 0;
     const spriteGoku = this.personagem.sprite;
     this.direcao = spriteGoku.flipX ? -1 : 1;
     const projetil = this.scene.physics.add.sprite(
@@ -268,7 +272,11 @@ export default class GokuNeSpecial {
     this.alvosAtingidosKib.add(alvo);
     const xImpacto = this.explosaoKiBall?.x ?? this.projetilKib?.x ?? this.personagem.sprite.x;
     const direcao = alvo.sprite.x < xImpacto ? -1 : 1;
-    alvo.receberDano(this.special.danoKiBall, PROPRIEDADES_KIB, {
+    const propriedades = this.personagem.aplicarBonusDanoKaioken(
+      this.special.danoKiBall,
+      PROPRIEDADES_KIB,
+    );
+    alvo.receberDano(propriedades.dano, propriedades, {
       atacante: this.personagem,
       x: xImpacto,
       direcao,
@@ -285,6 +293,8 @@ export default class GokuNeSpecial {
       this.finalizarEstado();
       return;
     }
+    this.personagem.tocarSomSorteado("gk-carga", { volume: 0.4, detune: 0 });
+    this.personagem.tocarSomSorteado("kame-inicio", { volume: 0.35, detune: 0 });
     if (this.noAr) this.personagem.registrarUsoNeutroAereoConfirmado();
     this.tiersCarga = 0;
     this.direcao = this.personagem.sprite.flipX ? -1 : 1;
@@ -318,6 +328,9 @@ export default class GokuNeSpecial {
     sprite.play(this.special.animacoes.cargaKame, true);
     this.personagem.aplicarConfiguracao("kamecharg");
     this.criarEfeitosCargaKame();
+    this.somKameMeio = this.scene.sound.add("kame-meio", { volume: 0, loop: true });
+    this.somKameMeio.play();
+    this.scene.tweens.add({ targets: this.somKameMeio, volume: 0.35, duration: 650 });
     this.proximaCobrancaKi = this.scene.time.now + 1000;
   }
 
@@ -371,6 +384,11 @@ export default class GokuNeSpecial {
     this.fase = "animacaoLancamentoKame";
     this.auraKame?.destroy();
     this.bolaCargaKame?.destroy();
+    this.somKameMeio?.stop();
+    this.somKameMeio?.destroy();
+    this.somKameMeio = null;
+    this.scene.sound.play("kame-fim", { volume: 0.65 });
+    this.scene.sound.play("kame-fim1", { volume: 0.35 });
     const sprite = this.personagem.sprite;
     this.animacaoKameAtual = this.special.animacoes.lancamentoKame;
     sprite.play(this.animacaoKameAtual, true);
@@ -574,13 +592,15 @@ export default class GokuNeSpecial {
   acertarRaioKame(alvo) {
     if (this.alvosAtingidosKame.has(alvo)) return;
     this.alvosAtingidosKame.add(alvo);
-    const propriedades = {
+    const propriedades = this.personagem.aplicarBonusDanoKaioken(
+      this.special.danoBaseKamehameha + this.tiersCarga * 6,
+      {
       ...this.special.logicaPropriedades,
       semCargaKi: true,
-      dano: this.special.danoBaseKamehameha + this.tiersCarga * 6,
       knockbackX: this.special.knockbackBaseKamehameha +
         this.tiersCarga * this.special.knockbackPorCargaKamehameha,
-    };
+      },
+    );
     alvo.receberDano(propriedades.dano, propriedades, {
       atacante: this.personagem,
       x: this.origemKameX,
@@ -631,6 +651,9 @@ export default class GokuNeSpecial {
   limpar() {
     if (this.finalizado) return;
     this.finalizado = true;
+    this.somKameMeio?.stop();
+    this.somKameMeio?.destroy();
+    this.somKameMeio = null;
     this.restaurarFlutuar();
     this.personagem.sprite.off(
       `animationcomplete-${this.special.animacoes.preparacaoKame}`,

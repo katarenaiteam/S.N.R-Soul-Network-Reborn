@@ -408,13 +408,13 @@ this.nomePersonagem = "TH30";
       },
     };
 
-  //  this.sons = {
-  //    ...this.sons,
-  //    vozAtaque: ["ken-punch1", "ken-punch1", "ken-punch2", "ken-punch3", "ken-punch4"],
-  //    vozDanoNormal: ["ken-damaged1", "ken-damaged2", "ken-damaged3"],
-  //     vozDanoForte: ["ken-damaged1", "ken-damaged2", "ken-damaged3"],
-  //     volumeVoz: 0.4,
-  //   };
+    this.sons = {
+      ...this.sons,
+      vozAtaque: ["th-atk1", "th-atk2", "th-atk3", "th-atk4", "th-atk5", "th-atk6",],
+      vozDanoNormal: ["th-hurt1", "th-hurt2", "th-hurt3", "th-hurt4",],
+       vozDanoForte: ["th-hurt5", "th-hurt6"],
+       volumeVoz: 0.4,
+     };
 
     // ============================ tabela de golpes =====================================
     this.golpes = {
@@ -848,6 +848,24 @@ this.nomePersonagem = "TH30";
   }
 
   static criarAnimacoes(scene) {
+
+   if (!scene.anims.exists("th_ult_f1")) {
+    scene.anims.create({
+      key: "th_ult_f1",
+      frames: scene.anims.generateFrameNumbers("ult_f1"),
+      frameRate: 24,
+      repeat: 0,
+    });
+  }
+
+  if (!scene.anims.exists("th_ult_f2")) {
+    scene.anims.create({
+      key: "th_ult_f2",
+      frames: scene.anims.generateFrameNumbers("ult_f2"),
+      frameRate: 24,
+      repeat: 0,
+    });
+  }
 
    // efeitos anim
   if (!scene.anims.exists("punch_effect")) {

@@ -77,6 +77,8 @@ export default class GokuSiSpecial {
     this.mira?.destroy();
     this.mira = null;
     sprite.setPosition(destinoX, sprite.y);
+    this.personagem.tocarSomSorteado("teleport", { volume: 0.3, detune: 0 });
+    this.personagem.tocarSomSorteado(this.personagem.sons?.vozAtaque, { volume: 0.4 });
     sprite.body.updateFromGameObject();
     sprite.body.prev.copy(sprite.body.position);
     sprite.body.prevFrame.copy(sprite.body.position);
@@ -136,15 +138,18 @@ export default class GokuSiSpecial {
       0,
       1,
     );
-    const propriedades = {
+    const propriedades = this.personagem.aplicarBonusDanoKaioken(
+      this.special.danoInicial + progresso * this.special.aumentoDanoDistancia,
+      {
       ...this.special.propriedades,
-      dano: this.special.danoInicial + progresso * this.special.aumentoDanoDistancia,
-    };
+      },
+    );
     alvo.receberDano(propriedades.dano, propriedades, {
       direcao: this.direcao,
       x: this.personagem.sprite.x,
       atacante: this.personagem,
     });
+    this.personagem.tocarSomSorteado(this.personagem.sons?.heavy, { volume: 0.15 });
   }
 
   aoCompletarAnimacao() {

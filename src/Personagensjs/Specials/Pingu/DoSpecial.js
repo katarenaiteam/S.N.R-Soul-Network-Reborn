@@ -14,6 +14,7 @@ export default class PinguDoSpecial {
     this.ultimoUpdate = this.scene.time.now;
     this.ultimoApertoSpecial = this.scene.time.now;
     this.alvosAtingidos = new Set();
+    this.primeiroPuloUsado = false;
     this.hitbox = null;
     this.registroHitbox = null;
     this.aoCompletarPreparacao = this.aoCompletarPreparacao.bind(this);
@@ -54,9 +55,14 @@ export default class PinguDoSpecial {
       this.personagem.inputJustDown("cima") &&
       this.personagem.pulos < this.personagem.maxPulos
     ) {
-      this.cancelar();
-      this.personagem.pular();
-      return;
+      if (this.primeiroPuloUsado) {
+        this.cancelar();
+        this.personagem.pular();
+      } else {
+        this.primeiroPuloUsado = true;
+        this.personagem.pular({ mudarEstado: false });
+      }
+      if (this.fase === "finalizado") return;
     }
 
     const sprite = this.personagem.sprite;
@@ -94,7 +100,27 @@ export default class PinguDoSpecial {
         sprite.setVelocityY(0);
       }
       this.atualizarAvanco(deltaSegundos);
+      this.impulsionarParaDentroDaPlataforma();
       this.atualizarHitbox();
+    }
+  }
+
+  impulsionarParaDentroDaPlataforma() {
+    const sprite = this.personagem.sprite;
+    const corpo = sprite.body;
+    const plataformas = this.scene.mapaAtual?.plataformas?.getChildren?.() ?? [];
+    const margem = this.special.margemBorda;
+    for (const plataforma of plataformas) {
+      const apoio = plataforma.body;
+      if (!plataforma.active || !apoio?.enable) continue;
+      if (corpo.bottom < apoio.top - 8 || corpo.bottom > apoio.top + margem) continue;
+      if (corpo.right > apoio.left && corpo.left < apoio.right) {
+        if (corpo.left - apoio.left < margem) {
+          corpo.setVelocityX(Math.max(corpo.velocity.x, this.special.impulsoBorda));
+        } else if (apoio.right - corpo.right < margem) {
+          corpo.setVelocityX(Math.min(corpo.velocity.x, -this.special.impulsoBorda));
+        }
+      }
     }
   }
 
@@ -305,6 +331,8 @@ PinguDoSpecial.configuracao = {
   velocidadeAvancoMaxima: 1000,
   desaceleracaoAvanco: 250,
   velocidadeMinimaAvanco: 0,
+  margemBorda: 48,
+  impulsoBorda: 260,
   velocidadeAnimAvanco: 5,
   impulsoYInicial: 90,
   impulsoYMaximo: 60,

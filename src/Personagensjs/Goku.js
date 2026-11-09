@@ -5,6 +5,8 @@ import GokuAsiSpecial from "./Specials/Goku/AsiSpecial.js";
 import GokuAupSpecial from "./Specials/Goku/AupSpecial.js";
 import GokuAdoSpecial from "./Specials/Goku/AdoSpecial.js";
 import GokuSiSpecial from "./Specials/Goku/SiSpecial.js";
+import GokuUlt from "./Ult/GokuUlt.js";
+import GokuKaioken from "./Specials/Goku/Kaioken.js";
 
 
 export default class Goku extends Personagem {
@@ -520,6 +522,7 @@ export default class Goku extends Personagem {
         animacao: "gk_doSpecial_inicio",
         configuracaoAnimacao: "doSpecial",
         logica: GokuDoSpecial,
+        propriedades: { travarMovimentoAir: true },
         cooldown: 500,
         taxaCargaPorMs: 0.026,
       },
@@ -601,6 +604,9 @@ export default class Goku extends Personagem {
     };
     this.cargaKi = 0;
     this.cargaKiMaxima = 100;
+    this.kaioken = new GokuKaioken(this);
+    this.kaiokenAtivo = false;
+    this.kaiokenDisponivelEm = 0;
     this.tempoCargaKi = 0;
     this.sequenciaKiBall = 0;
     this.ultimaKiBallAte = 0;
@@ -941,16 +947,34 @@ export default class Goku extends Personagem {
 
 
     //-------------------------- ult ------------------------------------
-  
+    this.ult = GokuUlt.configuracao;
   
   }
 
   //animaçoes====================================================
   adicionarCargaKiPorDano(dano) {
+    if (this.kaiokenAtivo) return;
     this.cargaKi = Math.min(this.cargaKiMaxima, this.cargaKi + Math.max(0, dano) * 0.7);
   }
 
+  aplicarBonusDanoKaioken(dano, propriedades = {}) {
+    return {
+      ...propriedades,
+      dano: Math.max(0, dano) * (this.kaiokenAtivo ? 1.5 : 1),
+    };
+  }
+
+  update() {
+    super.update();
+    this.kaioken?.atualizar(this.scene.game.loop.delta);
+  }
+
   podeUsarSpecial(tipoSpecial) {
+    if (
+      tipoSpecial === "lado" &&
+      this.maquinaEstados.estadoAtual?.nome === "crouch"
+    ) return false;
+    if (tipoSpecial === "agachado" && this.kaiokenAtivo) return false;
     const neutro = tipoSpecial === "neutro" || tipoSpecial === "air_neutro";
     if (!neutro) return super.podeUsarSpecial(tipoSpecial);
     const agora = this.scene.time.now;
@@ -958,7 +982,7 @@ export default class Goku extends Personagem {
       this.sequenciaKiBall = 0;
     }
     return super.podeUsarSpecial(tipoSpecial) &&
-      this.cargaKi >= this.specials.neutro.custoKiBall;
+      (this.kaiokenAtivo || this.cargaKi >= this.specials.neutro.custoKiBall);
   }
 
   registrarUsoSpecialAereo(tipoSpecial) {
@@ -971,6 +995,7 @@ export default class Goku extends Personagem {
   }
 
   consumirCargaKi(percentual) {
+    if (this.kaiokenAtivo) return true;
     const quantidade = Math.max(0, Number(percentual) || 0);
     if (this.cargaKi < quantidade) return false;
     this.cargaKi -= quantidade;
@@ -1013,6 +1038,45 @@ export default class Goku extends Personagem {
       if (scene.anims.exists(key)) return;
       scene.anims.create({ key, frames: scene.anims.generateFrameNumbers(textura, { start, end }), frameRate, repeat });
     });
+
+    const animacoesUlt = [
+      ["goku_ult0", "Goku_ult0", 0, 8, 16, 0],
+      ["goku_ult1", "Goku_ult1", 0, 8, 14, 0],
+      ["goku_ult2", "Goku_ult2", 0, 7, 16, 0],
+      ["goku_ult3", "Goku_ult3", 0, 26, 18, 0],
+      ["goku_genk", "genk", 0, 1, 25, -1],
+    ];
+    animacoesUlt.forEach(([key, textura, start, end, frameRate, repeat]) => {
+      if (scene.anims.exists(key)) return;
+      scene.anims.create({
+        key,
+        frames: scene.anims.generateFrameNumbers(textura, { start, end }),
+        frameRate,
+        repeat,
+      });
+    });
+    if (!scene.anims.exists("goku_genk_e_reverso")) {
+      scene.anims.create({
+        key: "goku_genk_e_reverso",
+        frames: Array.from({ length: 24 }, (_, indice) => ({
+          key: "genk-e",
+          frame: 23 - indice,
+        })),
+        frameRate: 9,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("goku_genk_e_explosao")) {
+      scene.anims.create({
+        key: "goku_genk_e_explosao",
+        frames: Array.from({ length: 24 }, (_, indice) => ({
+          key: "genk-e",
+          frame: 23 - indice,
+        })),
+        frameRate: 24,
+        repeat: 0,
+      });
+    }
 
    // efeitos anim
   if (!scene.anims.exists("punch_effect")) {

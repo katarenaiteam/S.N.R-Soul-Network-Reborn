@@ -67,6 +67,8 @@ export default class GokuAsiSpecial {
       onComplete: () => {
         if (this.fase !== "inicio") return;
         this.fase = "montado";
+        this.somNuvem = this.scene.sound.add("nuvem", { volume: 0.4, loop: true });
+        this.somNuvem.play();
         this.inicioMontaria = this.inicio;
         sprite.body.setAllowGravity(false);
         sprite.setVelocityY(this.special.velocidadeQueda);
@@ -176,11 +178,16 @@ export default class GokuAsiSpecial {
     const propriedades = this.fase === "montado"
       ? PROPRIEDADES_MONTADO
       : PROPRIEDADES_NUVEM;
-    alvo.receberDano(propriedades.dano, propriedades, {
+    const propriedadesKaioken = this.personagem.aplicarBonusDanoKaioken(
+      propriedades.dano,
+      propriedades,
+    );
+    alvo.receberDano(propriedadesKaioken.dano, propriedadesKaioken, {
       x: this.personagem.sprite.x,
       direcao: this.direcao,
       atacante: this.personagem,
     });
+    this.personagem.tocarSomSorteado(this.personagem.sons?.heavy, { volume: 0.15 });
     if (this.fase === "montado") {
       this.encerrarMontaria();
     } else if (this.fase === "nuvemSolta") {
@@ -191,6 +198,9 @@ export default class GokuAsiSpecial {
   desmontar() {
     const sprite = this.personagem.sprite;
     this.fase = "nuvemSolta";
+    this.somNuvem?.stop();
+    this.somNuvem?.destroy();
+    this.somNuvem = null;
     this.personagem.bloquearSpecialAteSoltar = true;
     this.nuvem.setPosition(
       this.nuvem.x - this.direcao * this.special.recuoLancamentoNuvem,
@@ -254,6 +264,9 @@ export default class GokuAsiSpecial {
   limpar() {
     if (this.finalizado) return;
     this.finalizado = true;
+    this.somNuvem?.stop();
+    this.somNuvem?.destroy();
+    this.somNuvem = null;
     if (this.special.cooldown > 0) {
       this.personagem.iniciarCooldownSpecial(this.estado.tipoSpecialAtual);
     }

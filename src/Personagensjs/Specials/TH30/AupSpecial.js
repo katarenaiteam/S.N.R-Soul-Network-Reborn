@@ -45,6 +45,7 @@ export default class TH30AupSpecial {
   executar() {
     const sprite = this.personagem.sprite;
     if (!sprite?.active || !sprite.body) return;
+    this.personagem.tocarSomSorteado("th-Aup I ado", { volume: 0.4, detune: 0 });
     sprite.setVelocity(0, 0);
     sprite.on("animationupdate", this.aoAtualizarAnimacao);
     sprite.once("animationcomplete-th_AdoSpecial", this.aoCompletarAnimacao);
@@ -114,6 +115,7 @@ export default class TH30AupSpecial {
       x: this.personagem.sprite.x,
       atacante: this.personagem,
     });
+    this.personagem.tocarSomSorteado(this.personagem.sons?.heavy, { volume: 0.15 });
     if (ultimoGolpe) this.alvosCarregados.delete(alvo);
     else this.alvosCarregados.add(alvo);
 
@@ -122,6 +124,7 @@ export default class TH30AupSpecial {
 
   criarProjeteis(alvo) {
     const sprite = this.personagem.sprite;
+    this.personagem.tocarSomSorteado("th-neSpecial", { volume: 0.4, detune: 0 });
     for (const deslocamentoX of [-55, 55]) {
       const projetil = this.scene.physics.add.sprite(
         sprite.x + deslocamentoX,
