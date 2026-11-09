@@ -719,7 +719,6 @@ const assetsGoku = [
    (scene, queued) => queueAsset(scene, queued, "audio", "genk-impact", () => { scene.load.audio("genk-impact", "assets/personagens/Goku/Audio/genk-impact.wav"); }),
 
 
-  
 
 ];
 
