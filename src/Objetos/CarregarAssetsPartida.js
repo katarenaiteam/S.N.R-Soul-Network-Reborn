@@ -876,11 +876,19 @@ const personagens = {
 export function carregarAssetsVersus(scene, dados) {
   const queued = new Set();
   carregarGrupo(scene, queued, assetscommon);
+  if (dados.mapa === "ForgottenOne" || dados.ClasseMapa?.name === "ForgottenOne") {
+    const base = "assets/personagens/The forgoten one/Sprites/usavel/";
+    queueAsset(scene, queued, "texture", "forgotten-face", () => scene.load.image("forgotten-face", `${base}face-1.png`));
+    queueAsset(scene, queued, "texture", "forgotten-face-eye", () => scene.load.image("forgotten-face-eye", `${base}face-eye.png`));
+    queueAsset(scene, queued, "texture", "forgotten-hand-6", () => scene.load.image("forgotten-hand-6", `${base}hand-6.png`));
+    queueAsset(scene, queued, "texture", "forgotten-hand-7", () => scene.load.image("forgotten-hand-7", `${base}hand-7.png`));
+    queueAsset(scene, queued, "texture", "forgotten-hand-punch", () => scene.load.image("forgotten-hand-punch", `${base}hand-punch.png`));
+  }
   for (const nome of [dados.p1, dados.p2]) {
     if (!nome) continue;
     carregarGrupo(scene, queued, personagens[nome] || assetsKen);
   }
-  const mapas = { Cidade: assetsCidade, MapaTeste: assetsMapaTeste, MikuMap: assetsMikuMap, SkyTowers: assetsSkyTowers, Ice:assetsIce, SlenderMap:assetsSlenderMap, FinalMap:assetsFinalMap };
+  const mapas = { Cidade: assetsCidade, MapaTeste: assetsMapaTeste, MikuMap: assetsMikuMap, SkyTowers: assetsSkyTowers, Ice:assetsIce, SlenderMap:assetsSlenderMap, FinalMap:assetsFinalMap, ForgottenOne: [] };
   const mapa = typeof dados.mapa === "string" ? dados.mapa : dados.ClasseMapa?.name;
   if (mapa === "Ice" && scene.textures.exists("ice-back")) {
     const texturaIce = scene.textures.get("ice-back");

@@ -86,7 +86,7 @@ export function instalarComandosDebug(game) {
       }
 
       let dadosReset = dados;
-      if (dadosReset === undefined && scene.scene.key === "cenaPrincipal") {
+      if (dadosReset === undefined && ["cenaPrincipal", "CenaForgottenOne"].includes(scene.scene.key)) {
         dadosReset = {
           p1: scene.escolhaP1,
           p2: scene.escolhaP2,
@@ -175,6 +175,20 @@ export function instalarComandosDebug(game) {
       return api.ir("CenaHistoria3", { p1: escolhido, numPlayers: 1 });
     },
 
+    lutaForgottenOne(personagem = "FJ") {
+      const nomes = {
+        fj: "FJ", frederick: "Frederick", spiderman: "SpiderMan",
+        miku: "Miku", ken: "Ken", slenderman: "Slenderman", pingu: "Pingu", th30: "TH30",
+        goku: "Goku", aigis: "Aigis",
+      };
+      const escolhido = nomes[normalizar(personagem)];
+      if (!escolhido) {
+        console.error("Personagem invalido. Escolha FJ, SpiderMan, Miku, Ken, Slenderman, Pingu, TH30, Goku ou Aigis.");
+        return false;
+      }
+      return api.ir("CenaForgottenOne", { p1: escolhido });
+    },
+
     cenaFinal(personagem = "FJ") {
       const nomes = {
         fj: "FJ", frederick: "Frederick", spiderman: "SpiderMan",
@@ -236,6 +250,7 @@ export function instalarComandosDebug(game) {
         "  matarBoss()             remove a ultima vida do boss da historia ativa",
         '  lutaPingu("FJ")         inicia a historia do Pingu usando o personagem escolhido (inclui TH30)',
         '  lutaSlenderman("FJ")   inicia a historia do Slenderman usando o personagem escolhido (inclui TH30)',
+        '  lutaForgottenOne("FJ") abre a luta de teste contra The Forgotten One',
         '  cenaFinal("FJ")        abre o dialogo final; recusar inicia a luta contra TH30',
         "  SNR.diagnosticarSpecials() registra a leitura de G/K",
         "Aliases: preload, start, personagens, mapas, luta, historia, escolhafinal, gameover, creditos",
@@ -253,6 +268,7 @@ export function instalarComandosDebug(game) {
   window.matarBoss = api.matarBoss.bind(api);
   window.lutaPingu = api.lutaPingu.bind(api);
   window.lutaSlenderman = api.lutaSlenderman.bind(api);
+  window.lutaForgottenOne = api.lutaForgottenOne.bind(api);
   window.cenaFinal = api.cenaFinal.bind(api);
 
   console.log("Comandos de teste carregados. Digite SNR.ajuda() no console.");
