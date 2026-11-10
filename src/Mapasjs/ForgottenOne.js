@@ -65,6 +65,8 @@ export default class ForgottenOne {
       .setScale(220 / 401).setRotation(0).setDepth(-1);
     this.mao7 = scene.add.image(x + 380, y + 170, "forgotten-hand-7")
       .setScale(220 / 401).setRotation(0).setDepth(-1);
+    this.maosPalmadasJuntas = scene.add.image(x, y, "forgotten-hand-palm2")
+      .setScale(0.38).setDepth(-1).setVisible(false);
     this.estadoEsmagamento = {
       fase: "espera",
       tempo: Phaser.Math.Between(5000, 8000),
@@ -83,7 +85,9 @@ export default class ForgottenOne {
     };
     this.offsetCabecaX = 0;
     this.offsetCabecaY = 0;
-    this.ataquesDisponiveis = ["esmagamento"];
+    this.ataquesDisponiveis = ["esmagamento", "varridaPendulo", "prensadaPalm", "grab", "arma"];
+    this.projeteisArma = new Set();
+    this.grabCooldownAte = 0;
     this.ultimoAtaque = null;
     this.repeticoesUltimoAtaque = 0;
     this.maosHurtbox = [this.mao6, this.mao7].map((mao) => {
@@ -110,9 +114,10 @@ export default class ForgottenOne {
       superficie.body.checkCollision.right = false;
       return { mao, superficie };
     });
+    this.temposPertoDasMaos = new Map([[this.mao6, 0], [this.mao7, 0]]);
     scene.physics.add.collider(scene.jogador1.sprite, this.superficiesMaosGrupo);
     this.elapsed = 1700;
-    this.objetosVisuais.push(this.cabeca, this.olhoEsquerdo, this.olhoDireito, this.mao6, this.mao7);
+    this.objetosVisuais.push(this.cabeca, this.olhoEsquerdo, this.olhoDireito, this.mao6, this.mao7, this.maosPalmadasJuntas);
 
     boss.receberDano = (quantidade) => {
       boss.vidaBoss = Math.max(0, boss.vidaBoss - Math.max(0, Number(quantidade) || 0));
@@ -124,6 +129,8 @@ export default class ForgottenOne {
     scene.events.on(Phaser.Scenes.Events.PRE_UPDATE, this.atualizarNoPreUpdate);
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       scene.events.off(Phaser.Scenes.Events.PRE_UPDATE, this.atualizarNoPreUpdate);
+      this.liberarJogadorGrab();
+      for (const registro of [...this.projeteisArma]) this.destruirProjetilArma(registro);
     });
     boss.sincronizarHurtbox?.();
   }
@@ -216,25 +223,65 @@ export default class ForgottenOne {
     const cena = this.scene;
     const jogador = cena.jogador1?.sprite;
     const topoPlataforma = this.plataforma.body.top;
+
+    if (ataque.tipo === "grab" || ataque.tipo === "grabProximidade") {
+      ataque.tempo -= delta;
+      this.atualizarGrab(delta, ataque, jogador, boss);
+      return;
+    }
+
     ataque.tempo -= delta;
 
     if (ataque.fase === "espera") {
+      if (this.atualizarProximidadeGrab(delta, jogador, ataque)) return;
       if (ataque.tempo <= 0) {
         const selecionado = this.selecionarAtaque();
-        if (selecionado !== "esmagamento") {
+        if (selecionado === "esmagamento") {
+          ataque.tipo = selecionado;
+          ataque.total = Phaser.Math.Between(4, 6);
+          ataque.golpes = 0;
+          ataque.ultimoAlvoX = null;
+          this.iniciarGolpeEsmagamento(ataque, jogador, topoPlataforma);
+        } else if (selecionado === "varridaPendulo") {
+          ataque.tipo = selecionado;
+          ataque.total = 2;
+          ataque.golpes = 0;
+          ataque.lado = 1;
+          this.iniciarGolpeVarredura(ataque, jogador, topoPlataforma);
+        } else if (selecionado === "prensadaPalm") {
+          ataque.tipo = selecionado;
+          this.iniciarPrensadaPalm(ataque, jogador);
+        } else if (selecionado === "grab") {
+          ataque.tipo = selecionado;
+          this.iniciarGrabAgendado(ataque, jogador);
+        } else if (selecionado === "arma") {
+          ataque.tipo = selecionado;
+          this.iniciarAtaqueArma(ataque);
+        } else {
           ataque.tempo = Phaser.Math.Between(5000, 8000);
-          return;
         }
-        ataque.total = Phaser.Math.Between(4, 6);
-        ataque.golpes = 0;
-        ataque.ultimoAlvoX = null;
-        this.iniciarGolpeEsmagamento(ataque, jogador, topoPlataforma);
       }
       return;
     }
 
+    if (ataque.tipo === "varridaPendulo") {
+      this.atualizarVarredura(delta, ataque, jogador, boss, topoPlataforma);
+      return;
+    }
+    if (ataque.tipo === "prensadaPalm") {
+      this.atualizarPrensadaPalm(delta, ataque, jogador, boss);
+      return;
+    }
+    if (ataque.tipo === "arma") {
+      this.atualizarAtaqueArma(delta, ataque, jogador, boss);
+      return;
+    }
+
     const mao = ataque.maoAtacante;
-    if (!mao) return;
+    if (!mao) {
+      this.finalizarEsmagamento(ataque);
+      return;
+    }
 
     if (ataque.fase === "subida") {
       const progresso = 1 - Math.max(0, ataque.tempo) / 300;
@@ -329,7 +376,7 @@ export default class ForgottenOne {
     ataque.fase = "subida";
     ataque.tempo = 300;
     ataque.lado *= -1;
-    const minimoEntreGolpes = 240;
+    const minimoEntreGolpes = 100;
     const limiteEsquerdo = limites.left + 120;
     const limiteDireito = limites.right - 120;
     let alvoX = Phaser.Math.Clamp(jogador?.x ?? this.plataforma.x, limiteEsquerdo, limiteDireito);
@@ -354,12 +401,676 @@ export default class ForgottenOne {
       ]);
       ataque.plataformasAtacadas = new Set(this.superficiesMaos.map(({ superficie }) => superficie));
       this.mao6.setTexture("forgotten-hand-punch").setRotation(-Math.PI / 2);
-      this.mao7.setTexture("forgotten-hand-punch").setRotation(-Math.PI / 2).setFlipX(true);
+      this.mao7.setTexture("forgotten-hand-punch").setRotation(-Math.PI / 2).setFlipX(false);
       ataque.plataformasAtacadas.forEach((superficie) => { superficie.body.checkCollision.up = false; });
     }
     ataque.maosMovidas.add(ataque.maoAtacante);
     ataque.xInicial = ataque.maoAtacante.x;
     ataque.yInicial = ataque.maoAtacante.y;
+  }
+
+  iniciarGolpeVarredura(ataque, jogador, topoPlataforma) {
+    ataque.lado *= -1;
+    ataque.maoAtacante = ataque.lado < 0 ? this.mao6 : this.mao7;
+    const mao = ataque.maoAtacante;
+    const superficie = this.superficiesMaos.find((item) => item.mao === mao)?.superficie;
+    ataque.texturasOriginais = new Map([[mao, mao.texture.key]]);
+    ataque.plataformasAtacadas = new Set(superficie ? [superficie] : []);
+    ataque.maosMovidas = new Set([mao]);
+    mao.setTexture("forgotten-hand-punch").setRotation(-Math.PI / 2).setFlipX(false);
+    if (superficie) superficie.body.checkCollision.up = false;
+
+    const esquerda = this.limitesArena.minX;
+    const direita = this.limitesArena.maxX;
+    ataque.direcaoVarredura = ataque.lado < 0 ? 1 : -1;
+    ataque.inicioVarreduraX = ataque.direcaoVarredura > 0 ? esquerda : direita;
+    ataque.fimVarreduraX = ataque.direcaoVarredura > 0 ? direita : esquerda;
+    ataque.alturaBaseVarredura = topoPlataforma - 200;
+    ataque.xInicial = mao.x;
+    ataque.yInicial = mao.y;
+    ataque.tempo = 300;
+    ataque.fase = "varridaAproximacao";
+    ataque.acertoResolvido = false;
+  }
+
+  atualizarProximidadeGrab(delta, jogador, ataque) {
+    if (this.elapsed < this.grabCooldownAte) {
+      this.temposPertoDasMaos.forEach((_tempo, mao) => this.temposPertoDasMaos.set(mao, 0));
+      this.maoMonitoradaGrab = null;
+      return false;
+    }
+    const corpo = jogador?.body;
+    if (!corpo) return false;
+    let maoProxima = null;
+    let distanciaMinima = Infinity;
+    for (const { mao, superficie } of this.superficiesMaos) {
+      const emCima = (corpo.blocked.down || corpo.touching.down || corpo.wasTouching.down) &&
+        corpo.right > superficie.body.left - 35 && corpo.left < superficie.body.right + 35 &&
+        Math.abs(corpo.bottom - superficie.body.top) <= 55;
+      const dx = Math.abs(jogador.x - mao.x);
+      const dy = Math.abs(jogador.y - mao.y);
+      const perto = dx <= 190 && dy <= 240;
+      const distancia = dx * dx + dy * dy;
+      if ((emCima || perto) && distancia < distanciaMinima) {
+        maoProxima = mao;
+        distanciaMinima = distancia;
+      }
+    }
+
+    if (!maoProxima) {
+      this.temposPertoDasMaos.forEach((_tempo, mao) => this.temposPertoDasMaos.set(mao, 0));
+      this.maoMonitoradaGrab = null;
+      return false;
+    }
+    if (this.maoMonitoradaGrab && this.maoMonitoradaGrab !== maoProxima) {
+      this.temposPertoDasMaos.set(this.maoMonitoradaGrab, 0);
+    }
+    this.temposPertoDasMaos.forEach((_tempo, mao) => {
+      if (mao !== maoProxima) this.temposPertoDasMaos.set(mao, 0);
+    });
+    this.maoMonitoradaGrab = maoProxima;
+    const tempo = (this.temposPertoDasMaos.get(maoProxima) ?? 0) + delta;
+    this.temposPertoDasMaos.set(maoProxima, tempo);
+    if (tempo < 4000) return false;
+
+    this.temposPertoDasMaos.set(maoProxima, 0);
+    this.maoMonitoradaGrab = null;
+    ataque.cooldownPendente = ataque.tempo;
+    this.iniciarGrabProximidade(ataque, jogador, maoProxima);
+    return true;
+  }
+
+  prepararMaoGrab(ataque, mao, texturaGrab = true) {
+    const superficie = this.superficiesMaos.find((item) => item.mao === mao)?.superficie;
+    ataque.maoAtacante = mao;
+    ataque.maosMovidas = new Set([mao]);
+    ataque.plataformasAtacadas = new Set();
+    ataque.texturasOriginais = new Map([[mao, mao.texture.key]]);
+    ataque.escalasOriginais = new Map([[mao, { x: mao.scaleX, y: mao.scaleY }]]);
+    ataque.superficieGrab = superficie;
+    ataque.xInicial = mao.x;
+    ataque.yInicial = mao.y;
+    if (texturaGrab) {
+      mao.setTexture("forgotten-hand-catch").setRotation(0).setFlipX(false);
+      if (superficie) {
+        ataque.plataformasAtacadas.add(superficie);
+        superficie.body.checkCollision.up = false;
+      }
+    }
+  }
+
+  iniciarGrabAgendado(ataque, jogador) {
+    this.grabCooldownAte = this.elapsed + 30000;
+    const mao = Phaser.Utils.Array.GetRandom([this.mao6, this.mao7]);
+    this.prepararMaoGrab(ataque, mao, true);
+    ataque.tipo = "grab";
+    ataque.fase = "grabRastreia";
+    ataque.tempo = 4000;
+    ataque.alvoX = jogador?.x ?? mao.x;
+    ataque.alvoY = jogador?.y ?? mao.y;
+  }
+
+  iniciarGrabProximidade(ataque, jogador, mao) {
+    this.grabCooldownAte = this.elapsed + 30000;
+    this.prepararMaoGrab(ataque, mao, false);
+    ataque.tipo = "grabProximidade";
+    ataque.fase = "grabAviso";
+    ataque.tempo = 1000;
+    ataque.alvoX = jogador?.x ?? mao.x;
+    ataque.alvoY = jogador?.y ?? mao.y;
+    ataque.cooldownPendente ??= ataque.tempo;
+  }
+
+  atualizarGrab(delta, ataque, jogador, boss) {
+    const mao = ataque.maoAtacante;
+    if (!mao) {
+      this.finalizarGrab(ataque);
+      return;
+    }
+    if (ataque.fase === "grabAviso") {
+      mao.setPosition(
+        ataque.xInicial + Math.sin(this.elapsed * 0.055) * 12,
+        ataque.yInicial + Math.sin(this.elapsed * 0.09) * 6,
+      );
+      ataque.alvoX = mao.x;
+      if (ataque.tempo <= 0) {
+        mao.setTexture("forgotten-hand-catch");
+        if (ataque.superficieGrab) {
+          ataque.plataformasAtacadas.add(ataque.superficieGrab);
+          ataque.superficieGrab.body.checkCollision.up = false;
+        }
+        ataque.fase = "grabLunge";
+        ataque.tempo = 400;
+      }
+      return;
+    }
+
+    if (ataque.fase === "grabRastreia" || ataque.fase === "grabLunge") {
+      if (!jogador?.active || !jogador.body) {
+        this.iniciarRetornoGrab(ataque);
+        return;
+      }
+      const alvoX = Phaser.Math.Clamp(jogador.x, this.limitesArena.minX + 80, this.limitesArena.maxX - 80);
+      const alvoY = jogador.y - 25;
+      const fator = Math.min(1, delta * (ataque.fase === "grabLunge" ? 0.006 : 0.0015));
+      mao.setPosition(Phaser.Math.Linear(mao.x, alvoX, fator), Phaser.Math.Linear(mao.y, alvoY, fator));
+      ataque.alvoX = jogador.x;
+      ataque.alvoY = jogador.y;
+      const centro = jogador.body.center;
+      const perto = Math.abs(mao.x - centro.x) <= jogador.body.width / 2 + 70 &&
+        Math.abs(mao.y - centro.y) <= jogador.body.height / 2 + 90;
+      if (perto) {
+        this.capturarJogadorGrab(ataque, jogador, boss);
+        return;
+      }
+      if (ataque.tempo <= 0) this.iniciarRetornoGrab(ataque);
+      return;
+    }
+
+    if (ataque.fase === "grabPresa") {
+      const sprite = this.capturaGrab?.sprite;
+      if (sprite?.active) {
+        sprite.setPosition(mao.x, mao.y);
+        sprite.body?.updateFromGameObject();
+      }
+      if (ataque.tempo <= 0) {
+        this.liberarJogadorGrab();
+        this.iniciarRetornoGrab(ataque);
+      }
+      return;
+    }
+
+    if (ataque.fase === "grabRetorno") {
+      const progresso = 1 - Math.max(0, ataque.tempo) / 500;
+      const xBase = this.xBaseAtual + (mao === this.mao6 ? -380 : 380);
+      const yBase = this.yBaseAtual + 170 + (mao === this.mao6 ? this.gestoAtual : -this.gestoAtual);
+      mao.setPosition(
+        Phaser.Math.Linear(ataque.xInicial, xBase, progresso),
+        Phaser.Math.Linear(ataque.yInicial, yBase, progresso),
+      );
+      if (ataque.tempo <= 0) this.finalizarGrab(ataque);
+    }
+  }
+
+  capturarJogadorGrab(ataque, spriteJogador, boss) {
+    const personagem = this.scene.jogador1;
+    const sprite = personagem?.sprite;
+    const body = sprite?.body;
+    if (!personagem || !sprite || !body) return;
+    const metodosInput = ["inputDown", "inputJustDown", "inputJustUp"];
+    this.capturaGrab = {
+      personagem,
+      sprite,
+      body,
+      visivel: sprite.visible,
+      moves: body.moves,
+      allowGravity: body.allowGravity,
+      metodos: new Map(metodosInput.map((nome) => [nome, {
+        proprio: Object.prototype.hasOwnProperty.call(personagem, nome),
+        original: personagem[nome],
+      }])),
+    };
+    metodosInput.forEach((nome) => { personagem[nome] = () => false; });
+    body.moves = false;
+    body.setAllowGravity(false);
+    body.setVelocity(0, 0);
+    sprite.setVisible(false);
+    personagem.receberDano(30, {
+      tipoSomImpacto: "heavy",
+      knockbackX: 0,
+      knockbackY: 0,
+    }, {
+      atacante: boss,
+      direcao: sprite.x >= this.cabeca.x ? 1 : -1,
+      x: ataque.maoAtacante.x,
+      y: ataque.maoAtacante.y,
+    });
+    personagem.maquinaEstados.mudarEstado("atordoado");
+    ataque.maoAtacante.setTexture("forgotten-hand-punch").setRotation(-Math.PI / 2);
+    ataque.fase = "grabPresa";
+    ataque.tempo = 750;
+  }
+
+  iniciarRetornoGrab(ataque) {
+    const mao = ataque.maoAtacante;
+    if (!mao) return this.finalizarGrab(ataque);
+    const textura = ataque.texturasOriginais?.get(mao);
+    const escala = ataque.escalasOriginais?.get(mao);
+    if (textura) mao.setTexture(textura);
+    if (escala) mao.setScale(escala.x, escala.y);
+    mao.setRotation(0).setFlipX(false);
+    ataque.xInicial = mao.x;
+    ataque.yInicial = mao.y;
+    ataque.fase = "grabRetorno";
+    ataque.tempo = 500;
+  }
+
+  finalizarGrab(ataque) {
+    this.liberarJogadorGrab();
+    ataque.texturasOriginais?.forEach((textura, mao) => {
+      const escala = ataque.escalasOriginais?.get(mao);
+      mao.setTexture(textura).setRotation(0).setFlipX(false);
+      if (escala) mao.setScale(escala.x, escala.y);
+    });
+    ataque.plataformasAtacadas?.forEach((superficie) => { superficie.body.checkCollision.up = true; });
+    const foiProximidade = ataque.tipo === "grabProximidade";
+    ataque.fase = "espera";
+    ataque.tipo = null;
+    ataque.tempo = foiProximidade
+      ? (ataque.cooldownPendente ?? 0)
+      : Phaser.Math.Between(5000, 8000);
+    ataque.cooldownPendente = null;
+    ataque.maoAtacante = null;
+    ataque.superficieGrab = null;
+    ataque.texturasOriginais = null;
+    ataque.escalasOriginais = null;
+    ataque.plataformasAtacadas = null;
+    ataque.maosMovidas = null;
+  }
+
+  liberarJogadorGrab() {
+    const captura = this.capturaGrab;
+    if (!captura) return;
+    const { personagem, sprite, body } = captura;
+    for (const [nome, metodo] of captura.metodos) {
+      if (metodo.proprio) personagem[nome] = metodo.original;
+      else delete personagem[nome];
+    }
+    if (body) {
+      body.moves = captura.moves;
+      body.setAllowGravity(captura.allowGravity);
+      if (body.moves && captura.allowGravity) {
+        body.setVelocityY(Math.max(80, body.velocity.y));
+        body.setGravityY(200);
+      }
+    }
+    if (sprite?.active) sprite.setVisible(captura.visivel);
+    this.capturaGrab = null;
+  }
+
+  iniciarPrensadaPalm(ataque, jogador) {
+    const limites = this.plataforma.body;
+    const sprite = jogador;
+    ataque.alvoX = Phaser.Math.Clamp(sprite?.x ?? this.plataforma.x, limites.left + 50, limites.right - 50);
+    ataque.alvoY = Phaser.Math.Clamp(sprite?.y ?? limites.top - 90, this.limitesArena.minY + 100, this.limitesArena.maxY - 100);
+    ataque.maosMovidas = new Set([this.mao6, this.mao7]);
+    ataque.plataformasAtacadas = new Set(this.superficiesMaos.map(({ superficie }) => superficie));
+    ataque.texturasOriginais = new Map([
+      [this.mao6, this.mao6.texture.key],
+      [this.mao7, this.mao7.texture.key],
+    ]);
+    ataque.escalasOriginais = new Map([
+      [this.mao6, { x: this.mao6.scaleX, y: this.mao6.scaleY }],
+      [this.mao7, { x: this.mao7.scaleX, y: this.mao7.scaleY }],
+    ]);
+    this.mao6.setTexture("forgotten-hand-palm").setScale(0.38).setRotation(0).setFlipX(false).setVisible(true);
+    this.mao7.setTexture("forgotten-hand-palm").setScale(0.38).setRotation(0).setFlipX(true).setVisible(true);
+    ataque.plataformasAtacadas.forEach((superficie) => { superficie.body.checkCollision.up = false; });
+    ataque.inicioPalmX = new Map([[this.mao6, this.mao6.x], [this.mao7, this.mao7.x]]);
+    ataque.inicioPalmY = new Map([[this.mao6, this.mao6.y], [this.mao7, this.mao7.y]]);
+    ataque.tempo = 750;
+    ataque.fase = "palmPosiciona";
+    ataque.acertoResolvido = false;
+    this.maosPalmadasJuntas.setPosition(ataque.alvoX, ataque.alvoY).setVisible(false);
+  }
+
+  iniciarAtaqueArma(ataque) {
+    const maos = [this.mao6, this.mao7];
+    ataque.maosMovidas = new Set(maos);
+    ataque.plataformasAtacadas = new Set(this.superficiesMaos.map(({ superficie }) => superficie));
+    ataque.texturasOriginais = new Map(maos.map((mao) => [mao, mao.texture.key]));
+    ataque.escalasOriginais = new Map(maos.map((mao) => [mao, { x: mao.scaleX, y: mao.scaleY }]));
+    ataque.posicoesArmaInicio = new Map(maos.map((mao) => [mao, { x: mao.x, y: mao.y }]));
+    ataque.plataformasAtacadas.forEach((superficie) => { superficie.body.checkCollision.up = false; });
+    for (const mao of maos) {
+      mao.setTexture("forgotten-hand-gun").setDisplaySize(220, 159.5).setRotation(0).setFlipX(false).setVisible(true);
+    }
+    ataque.fase = "armaPosiciona";
+    ataque.tempo = 750;
+    ataque.disparosArma = 0;
+    ataque.acumuladorDisparo = 0;
+  }
+
+  atualizarAtaqueArma(delta, ataque, jogador, boss) {
+    const progresso = (duracao) => 1 - Math.max(0, ataque.tempo) / duracao;
+    if (ataque.fase === "armaPosiciona") {
+      const t = Phaser.Math.Clamp(progresso(750), 0, 1);
+      const suave = t * t * (3 - 2 * t);
+      for (const [indice, mao] of [this.mao6, this.mao7].entries()) {
+        const origem = ataque.posicoesArmaInicio.get(mao);
+        const lado = indice === 0 ? -1 : 1;
+        mao.setPosition(
+          Phaser.Math.Linear(origem.x, this.xBaseAtual + lado * 590, suave),
+          Phaser.Math.Linear(origem.y, this.yBaseAtual + 170, suave),
+        );
+      }
+      if (ataque.tempo <= 0) {
+        ataque.fase = "armaDisparo";
+        ataque.tempo = 4550;
+        ataque.acumuladorDisparo = 350;
+      }
+      return;
+    }
+
+    if (ataque.fase === "armaDisparo") {
+      for (const mao of [this.mao6, this.mao7]) {
+        if (jogador?.active) {
+          const angulo = Phaser.Math.Angle.Between(mao.x, mao.y, jogador.x, jogador.y);
+          mao.rotation = Phaser.Math.Angle.RotateTo(mao.rotation, angulo, Math.min(Math.PI, delta * 0.006));
+        }
+      }
+      ataque.acumuladorDisparo += delta;
+      while (ataque.acumuladorDisparo >= 350 && ataque.disparosArma < 13) {
+        ataque.acumuladorDisparo -= 350;
+        const mao = ataque.disparosArma % 2 === 0 ? this.mao6 : this.mao7;
+        const numero = ataque.disparosArma % 2 === 0 ? 6 : 7;
+        this.dispararNumeroArma(mao, numero, jogador, boss);
+        ataque.disparosArma++;
+      }
+      if (ataque.disparosArma >= 13) {
+        ataque.fase = "armaRetorno";
+        ataque.tempo = 550;
+        ataque.posicoesRetorno = new Map([
+          [this.mao6, { x: this.mao6.x, y: this.mao6.y }],
+          [this.mao7, { x: this.mao7.x, y: this.mao7.y }],
+        ]);
+      }
+      return;
+    }
+
+    if (ataque.fase === "armaRetorno") {
+      const t = Phaser.Math.Clamp(progresso(550), 0, 1);
+      const suave = t * t * (3 - 2 * t);
+      for (const mao of [this.mao6, this.mao7]) {
+        const inicio = ataque.posicoesRetorno.get(mao);
+        const lado = mao === this.mao6 ? -1 : 1;
+        const base = { x: this.xBaseAtual + lado * 380, y: this.yBaseAtual + 170 + (lado < 0 ? this.gestoAtual : -this.gestoAtual) };
+        mao.setPosition(Phaser.Math.Linear(inicio.x, base.x, suave), Phaser.Math.Linear(inicio.y, base.y, suave));
+        mao.rotation = Phaser.Math.Angle.RotateTo(mao.rotation, 0, Math.min(Math.PI, delta * 0.006));
+      }
+      if (ataque.tempo <= 0) this.finalizarEsmagamento(ataque);
+    }
+  }
+
+  dispararNumeroArma(mao, numero, jogador, boss) {
+    if (!jogador?.active) return;
+    const cena = this.scene;
+    const angulo = Phaser.Math.Angle.Between(mao.x, mao.y, jogador.x, jogador.y);
+    const projetil = cena.physics.add.image(mao.x + Math.cos(angulo) * 90, mao.y + Math.sin(angulo) * 90, `${numero}.png`);
+    projetil.setDisplaySize(38, 46).setDepth(3);
+    cena.camHUD?.ignore(projetil);
+    projetil.body.setAllowGravity(false);
+    projetil.body.setSize(30, 36, true);
+    projetil.body.setVelocity(Math.cos(angulo) * 620, Math.sin(angulo) * 620);
+    const registro = { projetil, colisor: null, timer: null };
+    this.projeteisArma.add(registro);
+    registro.colisor = cena.physics.add.overlap(projetil, jogador.grupoHurtbox, () => {
+      if (!this.projeteisArma.has(registro)) return;
+      cena.jogador1?.receberDano(numero, {
+        knockbackX: 180,
+        knockbackY: -55,
+      }, {
+        atacante: boss,
+        direcao: Math.cos(angulo) >= 0 ? 1 : -1,
+        x: projetil.x,
+        y: projetil.y,
+      });
+      this.destruirProjetilArma(registro);
+    });
+    registro.timer = cena.time.delayedCall(3500, () => this.destruirProjetilArma(registro));
+  }
+
+  destruirProjetilArma(registro) {
+    if (!this.projeteisArma?.has(registro)) return;
+    this.projeteisArma.delete(registro);
+    if (registro.colisor) this.scene.physics.world.removeCollider(registro.colisor);
+    registro.timer?.remove(false);
+    registro.projetil.destroy();
+  }
+
+  atualizarPrensadaPalm(delta, ataque, jogador, boss) {
+    if (ataque.fase === "palmPosiciona") {
+      const progresso = 1 - Math.max(0, ataque.tempo) / 750;
+      const suavizado = progresso * progresso * (3 - 2 * progresso);
+      const limites = this.plataforma.body;
+      const alvoJogadorX = Phaser.Math.Clamp(jogador?.x ?? ataque.alvoX, limites.left + 50, limites.right - 50);
+      const alvoJogadorY = Phaser.Math.Clamp(
+        jogador?.y ?? ataque.alvoY,
+        this.limitesArena.minY + 100,
+        this.limitesArena.maxY - 100,
+      );
+      const acompanhamento = Math.min(1, delta * 0.012);
+      ataque.alvoX = Phaser.Math.Linear(ataque.alvoX, alvoJogadorX, acompanhamento);
+      ataque.alvoY = Phaser.Math.Linear(ataque.alvoY, alvoJogadorY, acompanhamento);
+      const posicoesAlvo = new Map([
+        [this.mao6, ataque.alvoX - 220],
+        [this.mao7, ataque.alvoX + 220],
+      ]);
+      for (const mao of [this.mao6, this.mao7]) {
+        const xInicio = ataque.inicioPalmX.get(mao);
+        const yInicio = ataque.inicioPalmY.get(mao);
+        mao.setPosition(
+          Phaser.Math.Linear(xInicio, posicoesAlvo.get(mao), suavizado),
+          Phaser.Math.Linear(yInicio, ataque.alvoY, suavizado),
+        );
+      }
+      if (ataque.tempo <= 0) {
+        this.mao6.setPosition(ataque.alvoX - 220, ataque.alvoY);
+        this.mao7.setPosition(ataque.alvoX + 220, ataque.alvoY);
+        ataque.fase = "palmAviso";
+        ataque.tempo = 450;
+      }
+      return;
+    }
+
+    if (ataque.fase === "palmAviso") {
+      this.mao6.setPosition(ataque.alvoX - 220, ataque.alvoY);
+      this.mao7.setPosition(ataque.alvoX + 220, ataque.alvoY);
+      if (ataque.tempo <= 0) {
+        ataque.fase = "palmFecha";
+        ataque.tempo = 550;
+      }
+      return;
+    }
+
+    if (ataque.fase === "palmFecha") {
+      const progresso = 1 - Math.max(0, ataque.tempo) / 550;
+      const suavizado = progresso * progresso * (3 - 2 * progresso);
+      this.mao6.setPosition(Phaser.Math.Linear(ataque.alvoX - 220, ataque.alvoX - 45, suavizado), ataque.alvoY);
+      this.mao7.setPosition(Phaser.Math.Linear(ataque.alvoX + 220, ataque.alvoX + 45, suavizado), ataque.alvoY);
+      this.acertarPrensadaPalm(ataque, jogador, boss);
+      if (ataque.tempo <= 0) {
+        this.mao6.setPosition(ataque.alvoX - 45, ataque.alvoY).setVisible(false);
+        this.mao7.setPosition(ataque.alvoX + 45, ataque.alvoY).setVisible(false);
+        this.maosPalmadasJuntas.setPosition(ataque.alvoX, ataque.alvoY).setVisible(true);
+        this.scene.camJogo.shake(220, 0.012);
+        this.acertarPrensadaPalm(ataque, jogador, boss);
+        ataque.fase = "palmContato";
+        ataque.tempo = 650;
+      }
+      return;
+    }
+
+    if (ataque.fase === "palmContato") {
+      this.maosPalmadasJuntas.setPosition(ataque.alvoX, ataque.alvoY);
+      if (ataque.tempo <= 0) {
+        this.maosPalmadasJuntas.setVisible(false);
+        this.mao6.setVisible(true);
+        this.mao7.setVisible(true);
+        ataque.texturasOriginais?.forEach((textura, mao) => {
+          const escala = ataque.escalasOriginais.get(mao);
+          mao.setTexture(textura).setScale(escala.x, escala.y).setRotation(0).setFlipX(false);
+        });
+        ataque.posicoesRetorno = new Map([
+          [this.mao6, { x: this.mao6.x, y: this.mao6.y }],
+          [this.mao7, { x: this.mao7.x, y: this.mao7.y }],
+        ]);
+        ataque.tempo = 440;
+        ataque.fase = "palmRetorno";
+      }
+      return;
+    }
+
+    if (ataque.fase === "palmRetorno") {
+      const progresso = 1 - Math.max(0, ataque.tempo) / 440;
+      const alvosBase = new Map([
+        [this.mao6, { x: this.xBaseAtual - 380, y: this.yBaseAtual + 170 + this.gestoAtual }],
+        [this.mao7, { x: this.xBaseAtual + 380, y: this.yBaseAtual + 170 - this.gestoAtual }],
+      ]);
+      for (const mao of [this.mao6, this.mao7]) {
+        const inicio = ataque.posicoesRetorno.get(mao);
+        const destino = alvosBase.get(mao);
+        mao.setPosition(
+          Phaser.Math.Linear(inicio.x, destino.x, progresso),
+          Phaser.Math.Linear(inicio.y, destino.y, progresso),
+        );
+      }
+      if (ataque.tempo <= 0) {
+        ataque.plataformasAtacadas?.forEach((superficie) => { superficie.body.checkCollision.up = true; });
+        ataque.fase = "espera";
+        ataque.tipo = null;
+        ataque.tempo = Phaser.Math.Between(5000, 8000);
+        ataque.plataformasAtacadas = null;
+        ataque.texturasOriginais = null;
+        ataque.escalasOriginais = null;
+        ataque.maosMovidas = null;
+        ataque.posicoesRetorno = null;
+      }
+    }
+  }
+
+  acertarPrensadaPalm(ataque, jogador, boss) {
+    if (ataque.acertoResolvido || !jogador?.active || !jogador.body) return;
+    const corpo = jogador.body;
+    const acertou = ataque.fase === "palmFecha"
+      ? [this.mao6, this.mao7].some((mao) =>
+        corpo.right >= mao.x - mao.displayWidth * 0.38 && corpo.left <= mao.x + mao.displayWidth * 0.38 &&
+        corpo.bottom >= mao.y - mao.displayHeight * 0.38 && corpo.top <= mao.y + mao.displayHeight * 0.38)
+      : corpo.right >= ataque.alvoX - 130 && corpo.left <= ataque.alvoX + 130 &&
+        corpo.bottom >= ataque.alvoY - 130 && corpo.top <= ataque.alvoY + 130;
+    if (!acertou) return;
+    ataque.acertoResolvido = true;
+    const direcao = jogador.x >= ataque.alvoX ? 1 : -1;
+    this.scene.jogador1?.receberDano(40, {
+      tipoSomImpacto: "heavy",
+      knockbackX: 650,
+      knockbackY: -850,
+    }, {
+      atacante: boss,
+      direcao,
+      x: ataque.alvoX,
+      y: ataque.alvoY,
+    });
+  }
+
+  atualizarVarredura(delta, ataque, jogador, boss, topoPlataforma) {
+    if (ataque.fase === "varridaIntervalo") {
+      if (ataque.tempo <= 0) this.iniciarGolpeVarredura(ataque, jogador, topoPlataforma);
+      return;
+    }
+
+    const mao = ataque.maoAtacante;
+    if (!mao) {
+      this.restaurarMaoVarredura(ataque);
+      ataque.fase = "espera";
+      ataque.tipo = null;
+      ataque.tempo = Phaser.Math.Between(5000, 8000);
+      return;
+    }
+
+    if (ataque.fase === "varridaAproximacao") {
+      const progresso = 1 - Math.max(0, ataque.tempo) / 300;
+      mao.setPosition(
+        Phaser.Math.Linear(ataque.xInicial, ataque.inicioVarreduraX, progresso),
+        Phaser.Math.Linear(ataque.yInicial, ataque.alturaBaseVarredura, progresso),
+      );
+      if (ataque.tempo <= 0) {
+        mao.setPosition(ataque.inicioVarreduraX, ataque.alturaBaseVarredura);
+        ataque.fase = "varrida";
+        ataque.tempo = 650;
+        ataque.xAnteriorVarredura = mao.x;
+        ataque.yAnteriorVarredura = mao.y;
+      }
+      return;
+    }
+
+    if (ataque.fase === "varrida") {
+      const progresso = 1 - Math.max(0, ataque.tempo) / 650;
+      const x = Phaser.Math.Linear(ataque.inicioVarreduraX, ataque.fimVarreduraX, progresso);
+      const y = ataque.alturaBaseVarredura + Math.sin(progresso * Math.PI) * 150;
+      const xAnterior = ataque.xAnteriorVarredura;
+      const yAnterior = ataque.yAnteriorVarredura;
+      mao.setPosition(x, y);
+      ataque.alvoX = x;
+      this.acertarVarredura(ataque, jogador, boss, xAnterior, yAnterior, x, y);
+      ataque.xAnteriorVarredura = x;
+      ataque.yAnteriorVarredura = y;
+      if (ataque.tempo <= 0) {
+        mao.setPosition(ataque.fimVarreduraX, ataque.alturaBaseVarredura);
+        ataque.xInicial = mao.x;
+        ataque.yInicial = mao.y;
+        ataque.fase = "varridaRetorno";
+        ataque.tempo = 500;
+      }
+      return;
+    }
+
+    if (ataque.fase === "varridaRetorno") {
+      const progresso = 1 - Math.max(0, ataque.tempo) / 500;
+      const xBase = this.xBaseAtual + ataque.lado * 380;
+      const yBase = this.yBaseAtual + 170 + (ataque.lado < 0 ? this.gestoAtual : -this.gestoAtual);
+      mao.setPosition(
+        Phaser.Math.Linear(ataque.xInicial, xBase, progresso),
+        Phaser.Math.Linear(ataque.yInicial, yBase, progresso),
+      );
+      if (ataque.tempo <= 0) {
+        this.restaurarMaoVarredura(ataque);
+        ataque.golpes++;
+        if (ataque.golpes < ataque.total) {
+          ataque.fase = "varridaIntervalo";
+          ataque.tempo = 180;
+        } else {
+          ataque.fase = "espera";
+          ataque.tipo = null;
+          ataque.tempo = Phaser.Math.Between(5000, 8000);
+          ataque.maoAtacante = null;
+        }
+      }
+      return;
+    }
+
+  }
+
+  acertarVarredura(ataque, jogador, boss, xAnterior, yAnterior, xAtual, yAtual) {
+    if (ataque.acertoResolvido || !jogador?.active || !jogador.body) return;
+    const corpo = jogador.body;
+    const esquerda = Math.min(xAnterior, xAtual) - 150;
+    const direita = Math.max(xAnterior, xAtual) + 150;
+    const topo = Math.min(yAnterior, yAtual) - 160;
+    const baixo = Math.max(yAnterior, yAtual) + 160;
+    const acertou = corpo.right >= esquerda && corpo.left <= direita &&
+      corpo.bottom >= topo && corpo.top <= baixo;
+    if (!acertou) return;
+    ataque.acertoResolvido = true;
+    this.scene.jogador1?.receberDano(30, {
+      tipoSomImpacto: "heavy",
+      knockbackX: 1050,
+      knockbackY: -120,
+    }, {
+      atacante: boss,
+      direcao: ataque.direcaoVarredura,
+      x: xAtual,
+      y: yAtual,
+    });
+  }
+
+  restaurarMaoVarredura(ataque) {
+    ataque.texturasOriginais?.forEach((textura, mao) => mao.setTexture(textura).setRotation(0).setFlipX(false));
+    ataque.plataformasAtacadas?.forEach((superficie) => { superficie.body.checkCollision.up = true; });
+    ataque.maoAtacante = null;
+    ataque.texturasOriginais = null;
+    ataque.plataformasAtacadas = null;
+    ataque.maosMovidas = null;
   }
 
   acertarEsmagamento(ataque, boss, topoPlataforma) {
@@ -378,7 +1089,6 @@ export default class ForgottenOne {
       tipoSomImpacto: "heavy",
       knockbackX: 1100,
       knockbackY: -750,
-      knockbackFixo: true,
     }, {
       atacante: boss,
       direcao,
@@ -389,18 +1099,27 @@ export default class ForgottenOne {
 
   finalizarEsmagamento(ataque) {
     ataque.fase = "espera";
+    ataque.tipo = null;
     ataque.tempo = Phaser.Math.Between(5000, 8000);
-    ataque.texturasOriginais?.forEach((textura, mao) => mao.setTexture(textura).setRotation(0).setFlipX(false));
+    ataque.texturasOriginais?.forEach((textura, mao) => {
+      mao.setTexture(textura).setRotation(0).setFlipX(false);
+      const escala = ataque.escalasOriginais?.get(mao);
+      if (escala) mao.setScale(escala.x, escala.y);
+    });
     ataque.plataformasAtacadas?.forEach((superficie) => { superficie.body.checkCollision.up = true; });
     ataque.maoAtacante = null;
     ataque.plataformasAtacadas = null;
     ataque.texturasOriginais = null;
+    ataque.escalasOriginais = null;
     ataque.maosMovidas = null;
     ataque.posicoesRetorno = null;
   }
 
   selecionarAtaque() {
     let candidatos = this.ataquesDisponiveis;
+    if (this.elapsed < this.grabCooldownAte) {
+      candidatos = candidatos.filter((chave) => chave !== "grab");
+    }
     if (this.repeticoesUltimoAtaque >= 2) {
       candidatos = candidatos.filter((chave) => chave !== this.ultimoAtaque);
     }

@@ -883,6 +883,10 @@ export function carregarAssetsVersus(scene, dados) {
     queueAsset(scene, queued, "texture", "forgotten-hand-6", () => scene.load.image("forgotten-hand-6", `${base}hand-6.png`));
     queueAsset(scene, queued, "texture", "forgotten-hand-7", () => scene.load.image("forgotten-hand-7", `${base}hand-7.png`));
     queueAsset(scene, queued, "texture", "forgotten-hand-punch", () => scene.load.image("forgotten-hand-punch", `${base}hand-punch.png`));
+    queueAsset(scene, queued, "texture", "forgotten-hand-palm", () => scene.load.image("forgotten-hand-palm", `${base}hand-palm.png`));
+    queueAsset(scene, queued, "texture", "forgotten-hand-palm2", () => scene.load.image("forgotten-hand-palm2", `${base}hand-palm2.png`));
+    queueAsset(scene, queued, "texture", "forgotten-hand-catch", () => scene.load.image("forgotten-hand-catch", `${base}hand-catch.png`));
+    queueAsset(scene, queued, "texture", "forgotten-hand-gun", () => scene.load.image("forgotten-hand-gun", `${base}hand-gun.png`));
   }
   for (const nome of [dados.p1, dados.p2]) {
     if (!nome) continue;
