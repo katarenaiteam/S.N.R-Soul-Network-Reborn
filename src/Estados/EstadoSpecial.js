@@ -34,6 +34,10 @@ export default class EstadoSpecial extends EstadoBase {
     }
 
     this.tempoInicio = this.personagem.scene.time.now;
+    this.escalaAnimacaoOriginal = this.personagem.sprite.anims.timeScale ?? 1;
+    if (this.personagem.kaiokenAtivo) {
+      this.personagem.sprite.anims.timeScale = this.escalaAnimacaoOriginal * 2;
+    }
     this.personagem.configAnimacaoOverride =
       this.specialAtual.configuracaoAnimacao ?? null;
     this.timerFinalizacaoChao = null;
@@ -259,6 +263,10 @@ export default class EstadoSpecial extends EstadoBase {
   }
 
   exit() {
+    if (this.escalaAnimacaoOriginal !== undefined) {
+      this.personagem.sprite.anims.timeScale = this.escalaAnimacaoOriginal;
+      this.escalaAnimacaoOriginal = undefined;
+    }
     this.personagem.configAnimacaoOverride = null;
     const animAtual = this.personagem.sprite.anims.currentAnim?.key;
     if (animAtual) {

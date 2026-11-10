@@ -125,7 +125,7 @@ this.nomePersonagem = "TH30";
         largura: 70,
         altura: 120,
         offsetX: 30,
-        offsetY: 2.5,
+        offsetY: 2.6,
         escala: 1,
         hurtboxes: [
            ],
@@ -209,7 +209,7 @@ this.nomePersonagem = "TH30";
         largura: 80,
         altura: 33,
         offsetX: 35,
-        offsetY: 50,
+        offsetY: 52,
         escala: 1,
         hurtboxes: [
           { largura: 100, altura: 34, offsetX: -10, offsetY: -18 },
@@ -332,7 +332,7 @@ this.nomePersonagem = "TH30";
         largura: 65,
         altura: 120,
         offsetX: 35,
-        offsetY: 58,
+        offsetY: 55,
         escala: 1,
         hurtboxes: [{ largura: 60, altura: 80, offsetX: -5, offsetY: -90 }],
       },
@@ -668,7 +668,7 @@ this.nomePersonagem = "TH30";
         ],
 
          movimento: {
-    inicio: 80,
+    inicio: 80,   //80
     fim: 500,
     x: {
       de: 700,
@@ -818,6 +818,7 @@ this.nomePersonagem = "TH30";
     this.specials.air_neutro = {
       ...this.specials.neutro,
       animacao: "th_neSpecial_air",
+      configuracaoAnimacao: "neSpecial",
       chaveCooldown: "neutro",
       duracao: 400,
       quantidadeProjeteis: 3,

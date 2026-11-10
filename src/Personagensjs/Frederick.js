@@ -241,7 +241,7 @@ this.nomePersonagem = "FJ";
         largura: 250,
         altura: 400,
         offsetX: 90,
-        offsetY: 80,
+        offsetY: 84,
         escala: 0.33,
         hurtboxes: [
           { largura: 55, altura: 70, offsetX: 20, offsetY: -80 },
@@ -278,7 +278,7 @@ this.nomePersonagem = "FJ";
         largura: 250,
         altura: 250,
         offsetX: 113,
-        offsetY: 0,
+        offsetY: -17,
         escala: 0.33,
         hurtboxes: [
           { largura: 100, altura: 34, offsetX: -10, offsetY: -18 },
@@ -292,7 +292,7 @@ this.nomePersonagem = "FJ";
         largura: 250,
         altura: 400,
         offsetX: 113,
-        offsetY: -70,
+        offsetY: -78,
         escala: 0.3,
         hurtboxes: [],
       },
@@ -413,8 +413,8 @@ this.nomePersonagem = "FJ";
       upAir: {  
         largura: 250,
         altura: 400,
-        offsetX: 113,
-        offsetY: 134,
+        offsetX: 120,
+        offsetY: 100,
         escala: 0.33,
         hurtboxes: [
            { largura: 40, altura: 43, offsetX: 26, offsetY: -105 },
@@ -546,7 +546,7 @@ this.nomePersonagem = "FJ";
         largura: 250,
         altura: 300,
         offsetX: 60,
-        offsetY: 74,
+        offsetY: 55,
         escala: 0.33,
         hurtboxes: [
           { largura: 65, altura: 75, offsetX: 0, offsetY: -68 },

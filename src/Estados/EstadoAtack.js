@@ -603,7 +603,11 @@ export default class EstadoAtack extends EstadoBase {
     this.alvosAtingidosHitbox.add(alvo);
     const golpe = this.dadosHitboxAtual;
 
-    const valorDano = golpe.propriedades?.dano ?? 0;
+    const valorDanoBase = golpe.propriedades?.dano ?? 0;
+    const propriedadesDano = this.personagem.aplicarBonusDanoKaioken
+      ? this.personagem.aplicarBonusDanoKaioken(valorDanoBase, golpe.propriedades)
+      : golpe.propriedades;
+    const valorDano = propriedadesDano?.dano ?? valorDanoBase;
     const origem = {
       atacante: this.personagem,
       direcao: this.personagem.sprite.flipX ? -1 : 1,
@@ -614,7 +618,7 @@ export default class EstadoAtack extends EstadoBase {
     };
 
     this.personagem.estadoInvencible?.aoAcertarAtaque();
-    alvo.receberDano(valorDano, golpe.propriedades, origem);
+    alvo.receberDano(valorDano, propriedadesDano, origem);
 
     const tipoImpacto = golpe.tipoSomImpacto || "light";
     const somImpacto = golpe.somImpacto || this.personagem.sons?.[tipoImpacto];

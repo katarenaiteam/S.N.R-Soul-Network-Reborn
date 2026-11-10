@@ -50,6 +50,11 @@ export default class GokuUlt {
     this.atualizarCameraOriginal = this.scene.atualizarCamera;
     this.physicsPausadaAntes = this.scene.physics.world.isPaused;
     this.configAnimacaoOverrideOriginal = this.personagem.configAnimacaoOverride;
+    this.gravidadeOriginal = {
+      permitida: sprite.body.allowGravity,
+      x: sprite.body.gravity.x,
+      y: sprite.body.gravity.y,
+    };
     this.scene.atualizarCamera = () => {};
     this.camera.stopFollow();
     this.congelarAtores();
@@ -68,6 +73,7 @@ export default class GokuUlt {
 
   atualizar() {
     if (this.cancelada || this.finalizada) return;
+    this.personagem.sprite.body?.setAllowGravity(false);
     this.ajustarFundoUltimate();
 
     if (this.fase === "carregando") {
@@ -614,8 +620,9 @@ export default class GokuUlt {
     const body = this.personagem.sprite?.body;
     if (body) {
       body.moves = true;
-      body.setAllowGravity(true);
-      body.setVelocity(0, 100);
+      body.setAllowGravity(this.gravidadeOriginal?.permitida ?? true);
+      body.setGravity(this.gravidadeOriginal?.x ?? 0, this.gravidadeOriginal?.y ?? 0);
+      body.setVelocity(0, 0);
       body.updateFromGameObject();
       body.prev.copy(body.position);
       body.prevFrame.copy(body.position);

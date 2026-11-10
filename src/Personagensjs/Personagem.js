@@ -306,6 +306,9 @@ export default class Personagem {
 
     //. LÓGICA PADRÃO DE DANO (Quando toma golpe sem escudo):
     this.porcentagemDano += quantidade;
+    if (quantidade > 0 && !propriedades.semCargaKi) {
+      atacanteDoEfeito?.adicionarCargaKiPorDano?.(quantidade);
+    }
     const danoDeSlenderman = atacante?.nomePersonagem === "Slanderman" || atacante?.nomePersonagem === "Slenderman";
     if (quantidade > 0 && (propriedades.corrupcaoSlender > 0 || danoDeSlenderman)) {
       this.corrupcaoSlender.adicionar(propriedades.corrupcaoSlender || 5);

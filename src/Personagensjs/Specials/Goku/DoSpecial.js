@@ -273,5 +273,5 @@ GokuDoSpecial.configuracao = {
   animacao: "gk_doSpecial_inicio",
   logica: GokuDoSpecial,
   cooldown: 500,
-  taxaCargaPorMs: 0.026,
+  taxaCargaPorMs: 0.0312,
 };

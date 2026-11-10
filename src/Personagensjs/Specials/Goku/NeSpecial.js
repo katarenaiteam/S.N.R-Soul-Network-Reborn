@@ -104,7 +104,7 @@ export default class GokuNeSpecial {
     const tempoSegurado = this.scene.time.now - this.inicioPressao;
     if (
       segurando &&
-      tempoSegurado >= this.special.esperaKamehameha &&
+      tempoSegurado >= this.obterEsperaKamehameha() &&
       (this.personagem.kaiokenAtivo || this.personagem.cargaKi >= this.special.custoKamehameha) &&
       this.scene.time.now >= this.personagem.cooldownKamehamehaAte
     ) {
@@ -113,7 +113,7 @@ export default class GokuNeSpecial {
     }
     if (
       segurando &&
-      tempoSegurado >= this.special.esperaKamehameha &&
+      tempoSegurado >= this.obterEsperaKamehameha() &&
       !this.personagem.kaiokenAtivo &&
       this.personagem.cargaKi < this.special.custoKamehameha
     ) {
@@ -181,7 +181,8 @@ export default class GokuNeSpecial {
     if (!this.kibFoiLancada) this.criarProjetilKiBall();
     if (this.numeroKiBall === 3) {
       this.personagem.sequenciaKiBall = 0;
-      this.personagem.cooldownKiBallAte = this.scene.time.now + this.special.cooldownKiBall;
+      this.personagem.cooldownKiBallAte = this.scene.time.now +
+        this.special.cooldownKiBall / (this.personagem.kaiokenAtivo ? 2 : 1);
     }
     if (this.fase === "animacaoKiBall") this.fase = "projetilKib";
     this.finalizarEstado();
@@ -335,7 +336,13 @@ export default class GokuNeSpecial {
       volume: 0.35,
       duration: 650,
     });
-    this.proximaCobrancaKi = this.scene.time.now + 1000;
+    this.intervaloCargaKame = 1000 / (this.personagem.kaiokenAtivo ? 2 : 1);
+    this.proximaCobrancaKi = this.scene.time.now + this.intervaloCargaKame;
+  }
+
+  obterEsperaKamehameha() {
+    return this.special.esperaKamehameha /
+      (this.personagem.kaiokenAtivo ? 2 : 1);
   }
 
   criarEfeitosCargaKame() {
@@ -359,7 +366,7 @@ export default class GokuNeSpecial {
     if (segurando && agora >= this.proximaCobrancaKi) {
       if (this.personagem.consumirCargaKi(5)) {
         this.tiersCarga += 1;
-        this.proximaCobrancaKi += 1000;
+        this.proximaCobrancaKi += this.intervaloCargaKame;
       } else {
         this.proximaCobrancaKi = agora + 1000;
       }
@@ -423,7 +430,8 @@ export default class GokuNeSpecial {
     this.criarRaioKame();
     this.fase = "raioKame";
     this.personagem.cooldownKamehamehaAte =
-      this.scene.time.now + this.special.cooldownKamehameha;
+      this.scene.time.now + this.special.cooldownKamehameha /
+        (this.personagem.kaiokenAtivo ? 2 : 1);
     if (this.noAr) return;
     this.personagem.sprite.play(this.special.animacoes.loopLancamentoKame, true);
     this.personagem.aplicarConfiguracao("kamelauch");
