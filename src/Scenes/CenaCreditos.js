@@ -29,6 +29,12 @@ const ASSETS = {
   Slan_taunt: ["sheet", "assets/personagens/Slenderman/Sprites/Slan_taunt.png", 103, 122],
 };
 
+const FOTOS_DESENVOLVEDORES = {
+  campos: "assets/Menus/creditos/campospfp.png",
+  theo: "assets/Menus/creditos/theopfp.webp",
+  marcos: "assets/Menus/creditos/marcospfp.webp",
+};
+
 export default class CenaCreditos extends Phaser.Scene {
   constructor() { super({ key: "CenaCreditos" }); }
 
@@ -41,6 +47,83 @@ export default class CenaCreditos extends Phaser.Scene {
         else this.load.spritesheet(key, path, { frameWidth: fw, frameHeight: fh });
       }
     });
+  }
+
+  iniciarVideosCreditos(indices, proximo, spritesParaOcultar = []) {
+    const anteriores = [this.pfp, this.nome, this.funcao, ...spritesParaOcultar]
+      .filter((elemento) => elemento?.visible);
+    const iniciar = () => {
+      anteriores.forEach((elemento) => elemento.setVisible(false));
+      this.tocarSequenciaVideos(indices, proximo);
+    };
+    if (anteriores.length === 0) iniciar();
+    else this.tweens.add({ targets: anteriores, alpha: 0, duration: 300, onComplete: iniciar });
+  }
+
+  tocarSequenciaVideos(indices, proximo) {
+    let posicao = 0;
+    const proximoVideo = () => {
+      if (posicao >= indices.length) { proximo(); return; }
+      const video = document.createElement("video");
+      this.videoCreditos = video;
+      const numeroCredito = indices[posicao++];
+      video.src = `assets/Menus/creditos/credito${numeroCredito}.mp4`;
+      video.playsInline = true;
+      video.preload = "auto";
+      video.muted = true;
+      const quadroVideo = document.createElement("div");
+      this.videoCreditosContainer = quadroVideo;
+      quadroVideo.style.cssText = "position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:12px;width:min(46vw,620px);z-index:10000;opacity:0;transition:opacity 650ms ease;pointer-events:none";
+      video.style.cssText = "display:block;width:100%;height:min(34vh,300px);object-fit:contain;background:#000";
+      const legenda = document.createElement("div");
+      legenda.textContent = "Fases do desenvolvimento";
+      legenda.style.cssText = "color:#00ff36;background:rgba(0,0,0,.9);padding:8px 18px;font-family:'RetroFont',monospace;font-size:clamp(16px,2vw,25px);letter-spacing:.04em;text-align:center";
+      quadroVideo.append(video, legenda);
+      document.body.appendChild(quadroVideo);
+      video.addEventListener("loadeddata", () => { quadroVideo.style.opacity = "1"; }, { once: true });
+      video.playbackRate = 1;
+      video.addEventListener("loadedmetadata", () => {
+        if (!Number.isFinite(video.duration)) return;
+        const duracao = Math.max(1, video.duration - 2);
+        video.creditosTimeout = setTimeout(finalizar, duracao * 1000);
+      }, { once: true });
+      let finalizando = false;
+      const finalizar = () => {
+        if (finalizando) return;
+        finalizando = true;
+        clearTimeout(video.creditosTimeout);
+        quadroVideo.style.opacity = "0";
+        video.creditosFadeTimeout = setTimeout(() => {
+          video.pause();
+          quadroVideo.remove();
+          if (this.videoCreditos === video) this.videoCreditos = null;
+          if (this.videoCreditosContainer === quadroVideo) this.videoCreditosContainer = null;
+          this.time.delayedCall(100, proximoVideo);
+        }, 650);
+      };
+      video.addEventListener("ended", finalizar, { once: true });
+      video.addEventListener("error", finalizar, { once: true });
+      video.play().catch(finalizar);
+    };
+    proximoVideo();
+  }
+
+  limparVideoCreditos() {
+    this.limparCartaoDesenvolvedor();
+    if (!this.videoCreditos) return;
+    clearTimeout(this.videoCreditos.creditosTimeout);
+    clearTimeout(this.videoCreditos.creditosFadeTimeout);
+    this.videoCreditos.pause();
+    this.videoCreditos.remove();
+    this.videoCreditosContainer?.remove();
+    this.videoCreditosContainer = null;
+    this.videoCreditos = null;
+  }
+
+  limparCartaoDesenvolvedor() {
+    clearTimeout(this.cartaoDevTimer);
+    this.cartaoDev?.remove();
+    this.cartaoDev = null;
   }
 
   create() {
@@ -75,7 +158,8 @@ export default class CenaCreditos extends Phaser.Scene {
     this.cameras.main.fadeIn(900, 0, 0, 0);
     this.tweens.add({ targets: this.fundo, alpha: 1, duration: 900 });
     this.tweens.add({ targets: this.conteudo, alpha: 1, duration: 900,
-      onComplete: () => this.time.delayedCall(3500, () => this.mostrarEquipe()) });
+      onComplete: () => this.time.delayedCall(4000, () => this.mostrarEquipe()) });
+    this.events.once("shutdown", this.limparVideoCreditos, this);
   }
 
   tocarMusica() {
@@ -83,8 +167,12 @@ export default class CenaCreditos extends Phaser.Scene {
     if (!musica || !musica.isPlaying) {
       musica = this.sound.add("katarenai8bit", { loop: false, volume: 0.8 });
       this.registry.set("musicaCreditos", musica);
-      musica.play();
     }
+    musica.once("complete", () => {
+      this.registry.remove("musicaCreditos");
+      this.scene.start("CenaStart");
+    });
+    if (!musica.isPlaying) musica.play();
   }
 
   quadro(sprite, textura, primeiro, ultimo, fps, loop = false, aoTerminar = null) {
@@ -135,35 +223,61 @@ export default class CenaCreditos extends Phaser.Scene {
       this.escrita.setVisible(true).setAlpha(0);
       this.logoTeam.setVisible(true).setAlpha(0);
       this.tweens.add({ targets: [this.escrita, this.logoTeam], alpha: 1, duration: 700 });
-      this.time.delayedCall(3600, () => this.tweens.add({ targets: [this.escrita, this.logoTeam], alpha: 0, duration: 700,
-        onComplete: () => { this.escrita.setVisible(false); this.logoTeam.setVisible(false); this.apresentarMiku(); } }));
+      this.time.delayedCall(5000, () => this.tweens.add({ targets: [this.escrita, this.logoTeam], alpha: 0, duration: 500,
+        onComplete: () => { this.escrita.setVisible(false); this.logoTeam.setVisible(false); this.iniciarVideosCreditos([1, 2], () => this.apresentarMiku()); } }));
     }});
   }
 
   apresentarMiku() {
     const { width: w, height: h } = this.scale;
-    this.pfp.setVisible(true); this.nome.setVisible(true); this.funcao.setVisible(true);
     const miku = this.personagem("miku", "Miku_jump", w * 0.18, -h * 0.35, h * 0.39, h * 0.43);
     this.quadro(miku, "Miku_jump", 0, 1, 12, true);
     this.tweens.add({ targets: miku, y: h * 0.69, duration: 650, ease: "Cubic.easeIn", onComplete: () => {
       miku.creditosTimer?.remove(false);
       this.quadro(miku, "Miku_idle", 0, 13, 12, true);
-      this.time.delayedCall(1200, () => this.mikuFeita());
+      this.time.delayedCall(450, () => this.mikuFeita());
     }});
   }
 
   mikuFeita() {
-    this.quadro(this.personagens.miku, "Miku_taunt1", 0, 28, 8, true);
-    this.apresentar("campos", "Campos", "programação", () => this.entradaPingu());
+    this.quadro(this.personagens.miku, "Miku_taunt1", 0, 28, 8, false,
+      () => this.quadro(this.personagens.miku, "Miku_idle", 0, 13, 12, true));
+    this.apresentar("campos", "Campos", "programação", () => this.entradaPingu(), 5000);
   }
 
-  apresentar(foto, nome, funcao, proximo) {
-    this.pfp.setTexture(foto);
-    this.ajustarPfp(this.scale.height * 0.34, this.scale.height * 0.34);
-    this.nome.setText(nome); this.funcao.setText(funcao);
-    this.pfp.setAlpha(0); this.nome.setAlpha(0); this.funcao.setAlpha(0);
-    this.tweens.add({ targets: [this.pfp, this.nome, this.funcao], alpha: 1, duration: 800,
-      onComplete: () => this.time.delayedCall(8500, proximo) });
+  apresentar(foto, nome, funcao, proximo, tempoTela = 5000) {
+    this.limparCartaoDesenvolvedor();
+    this.pfp.setVisible(false); this.nome.setVisible(false); this.funcao.setVisible(false);
+    const cartao = document.createElement("div");
+    this.cartaoDev = cartao;
+    cartao.style.cssText = "position:fixed;left:50%;top:31%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;gap:28px;width:min(72vw,900px);z-index:10020;opacity:0;transition:opacity 600ms ease;pointer-events:none";
+    const imagem = document.createElement("img");
+    imagem.src = FOTOS_DESENVOLVEDORES[foto];
+    imagem.alt = nome;
+    imagem.style.cssText = "display:block;flex:0 0 auto;width:clamp(150px,20vw,240px);height:clamp(150px,20vw,240px);object-fit:contain";
+    const textos = document.createElement("div");
+    textos.style.cssText = "display:flex;flex-direction:column;gap:10px;color:#00ff36;font-family:'RetroFont',monospace;text-shadow:2px 2px #001a08";
+    const nomeDev = document.createElement("div");
+    nomeDev.textContent = nome;
+    nomeDev.style.cssText = "font-size:clamp(38px,5vw,68px);line-height:1.1";
+    const funcaoDev = document.createElement("div");
+    funcaoDev.textContent = funcao;
+    funcaoDev.style.cssText = "font-size:clamp(22px,2.7vw,36px);line-height:1.2";
+    textos.append(nomeDev, funcaoDev);
+    cartao.append(imagem, textos);
+    document.body.appendChild(cartao);
+    requestAnimationFrame(() => {
+      if (this.cartaoDev !== cartao) return;
+      cartao.style.opacity = "1";
+      this.cartaoDevTimer = setTimeout(() => {
+        cartao.style.opacity = "0";
+        this.cartaoDevTimer = setTimeout(() => {
+          cartao.remove();
+          if (this.cartaoDev === cartao) this.cartaoDev = null;
+          proximo();
+        }, 600);
+      }, tempoTela);
+    });
   }
 
   entradaPingu() {
@@ -182,23 +296,30 @@ export default class CenaCreditos extends Phaser.Scene {
     }, onComplete: () => {
       this.quadro(pingu, "Pingu_taunt2", 0, 24, 12, false,
         () => this.quadro(pingu, "Pingu_idle", 0, 5, 12, true));
-      this.apresentar("theo", "Theo", "direção de arte", () => this.entradaSlender());
+      this.apresentar("theo", "Theo", "direção de arte", () => {
+        pingu.creditosTimer?.remove(false);
+        this.entradaSlender();
+      }, 5000);
     }});
   }
 
   entradaSlender() {
     const { width: w, height: h } = this.scale;
     const pingu = this.personagens.pingu;
+    pingu.setPosition(w * 0.78, h * 0.79).setVisible(true).setAlpha(0);
+    this.tweens.add({ targets: pingu, alpha: 1, duration: 300 });
     const slender = this.personagem("slender", "Slan_sideAtack", w + h * 0.22, h * 0.72, h * 0.4, h * 0.4, true);
     this.quadro(slender, "Slan_sideAtack", 0, 5, 18, false);
     this.tweens.add({ targets: slender, x: w * 0.52, duration: 720, onComplete: () => {
       this.quadro(slender, "Slan_taunt", 0, 25, 12, false,
         () => this.quadro(slender, "Slan_idle", 0, 38, 12, true));
-      this.apresentar("marcos", "Marcos", "direção e áudio", () => this.finalJuntos());
+      this.apresentar("marcos", "Marcos", "direção e áudio", () => {
+        slender.creditosTimer?.remove(false);
+        this.iniciarVideosCreditos([3, 5], () => this.finalJuntos(), [slender]);
+      }, 5000);
     }});
     // O encontro alinha os sprites no contato antes de projetar o Pingu para fora.
     this.time.delayedCall(420, () => {
-      pingu.setPosition(w * 0.78, h * 0.79);
       this.quadro(pingu, "Pingu_hurt", 0, 1, 16, false);
       this.tweens.add({ targets: pingu, x: w + h * 0.4, y: h * 0.79, duration: 480, ease: "Cubic.easeOut" });
     });
@@ -208,6 +329,7 @@ export default class CenaCreditos extends Phaser.Scene {
     const { width: w, height: h } = this.scale;
     this.pfp.setVisible(false); this.nome.setVisible(false); this.funcao.setVisible(false);
     const miku = this.personagens.miku, pingu = this.personagens.pingu, slender = this.personagens.slender;
+    [miku, pingu, slender].forEach((sprite) => sprite.setVisible(true).setAlpha(1));
     miku.setPosition(w * 0.4, h + h * 0.25); miku.alturaCreditos = h * 0.35;
     pingu.setPosition(-h * 0.25, h * 0.79); pingu.alturaCreditos = h * 0.27;
     slender.setPosition(w + h * 0.22, h * 0.72); slender.alturaCreditos = h * 0.4;
@@ -228,7 +350,7 @@ export default class CenaCreditos extends Phaser.Scene {
       this.quadro(slender, "Slan_jump", 0, 7, 16, true);
       this.tweens.add({ targets: [miku, pingu, slender], y: `-=${h * 0.12}`, duration: 250 });
       this.tweens.add({ targets: this.cameras.main, zoom: 1.18, duration: 650 });
-      this.time.delayedCall(700, () => {
+      this.time.delayedCall(500, () => {
         this.quadro(miku, "Miku_airplosion", 0, 5, 14, false);
         this.quadro(pingu, "Pingu_taunt2", 0, 24, 12, true);
         this.quadro(slender, "Slan_taunt", 0, 25, 12, true);
@@ -239,19 +361,7 @@ export default class CenaCreditos extends Phaser.Scene {
 
   obrigado() {
     const { width: w, height: h } = this.scale;
-    [this.personagens.miku, this.personagens.pingu, this.personagens.slender].forEach((sprite) => sprite.creditosTimer?.remove(false));
     const texto = this.txt(w / 2, h * 0.19, "OBRIGADO POR\nJOGAR!", 64, { color: "#00ff36", stroke: "#001a08", strokeThickness: 5 }).setDepth(10).setAlpha(0);
-    this.tweens.add({ targets: texto, alpha: 1, duration: 500, onComplete: () => {
-      const tempoRestante = Math.max(0, 62000 - (this.time.now - this.inicioCreditos) - 1400);
-      this.time.delayedCall(tempoRestante, () => {
-      const musica = this.registry.get("musicaCreditos");
-      if (musica?.isPlaying) {
-        this.tweens.add({ targets: musica, volume: 0, duration: 1400, onComplete: () => musica.stop() });
-      }
-      this.registry.remove("musicaCreditos");
-      this.cameras.main.fadeOut(1400, 0, 0, 0);
-      this.cameras.main.once("camerafadeoutcomplete", () => this.scene.start("CenaStart"));
-      });
-    } });
+    this.tweens.add({ targets: texto, alpha: 1, duration: 500 });
   }
 }

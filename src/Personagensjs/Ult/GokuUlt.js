@@ -559,7 +559,9 @@ export default class GokuUlt {
   }
 
   retomarFisica() {
-    if (!this.physicsPausadaAntes && this.scene.physics.world.isPaused) this.scene.physics.resume();
+    if (this.physicsPausadaAntes || !this.scene.physics.world.isPaused) return;
+    this.restaurarCorpoGoku();
+    this.scene.physics.resume();
   }
 
   tocarAnimacao(chave, callback) {

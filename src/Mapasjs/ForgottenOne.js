@@ -1,3 +1,5 @@
+import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
+
 export default class ForgottenOne {
   constructor(scene) {
     this.scene = scene;
@@ -29,7 +31,7 @@ export default class ForgottenOne {
     const scene = this.scene;
     this.boss = boss;
     boss.nomePersonagem = "The Forgotten One";
-    boss.vidaBoss = 1000;
+    boss.vidaBoss = 500;
     boss.porcentagemDano = 0;
     boss.textoDano?.setVisible(false);
     boss.sprite.setVisible(false);
@@ -67,6 +69,7 @@ export default class ForgottenOne {
       .setScale(220 / 401).setRotation(0).setDepth(-1);
     this.maosPalmadasJuntas = scene.add.image(x, y, "forgotten-hand-palm2")
       .setScale(0.38).setDepth(-1).setVisible(false);
+    this.graficoHitboxesAtaque = scene.add.graphics().setDepth(10);
     this.estadoEsmagamento = {
       fase: "espera",
       tempo: Phaser.Math.Between(5000, 8000),
@@ -117,10 +120,12 @@ export default class ForgottenOne {
     this.temposPertoDasMaos = new Map([[this.mao6, 0], [this.mao7, 0]]);
     scene.physics.add.collider(scene.jogador1.sprite, this.superficiesMaosGrupo);
     this.elapsed = 1700;
-    this.objetosVisuais.push(this.cabeca, this.olhoEsquerdo, this.olhoDireito, this.mao6, this.mao7, this.maosPalmadasJuntas);
+    this.objetosVisuais.push(this.cabeca, this.olhoEsquerdo, this.olhoDireito, this.mao6, this.mao7, this.maosPalmadasJuntas, this.graficoHitboxesAtaque);
 
     boss.receberDano = (quantidade) => {
+      if (this.bossDerrotado) return true;
       boss.vidaBoss = Math.max(0, boss.vidaBoss - Math.max(0, Number(quantidade) || 0));
+      if (boss.vidaBoss === 0) this.derrotarBoss(boss);
       return true;
     };
     boss.atualizarCargaUlt = () => {};
@@ -141,6 +146,110 @@ export default class ForgottenOne {
 
   atualizar() {}
 
+  desenharHitboxAtaque(pontos) {
+    const grafico = this.graficoHitboxesAtaque;
+    if (!grafico || !pontos?.length) return;
+    grafico.lineStyle(3, 0xff3030, 0.95);
+    grafico.beginPath();
+    grafico.moveTo(pontos[0].x, pontos[0].y);
+    for (const ponto of pontos.slice(1)) grafico.lineTo(ponto.x, ponto.y);
+    grafico.closePath();
+    grafico.strokePath();
+  }
+
+  obterHitboxSprite(sprite) {
+    const limitesAlfa = {
+      "forgotten-hand-punch": [500, 350, 22, 12, 477, 339],
+      "forgotten-hand-palm": [256, 832, 2, 2, 255, 831],
+      "forgotten-hand-palm2": [310, 780, 0, 6, 309, 779],
+      "forgotten-hand-catch": [650, 450, 76, 28, 593, 395],
+      "forgotten-hand-gun": [800, 580, 22, 16, 777, 563],
+      "6.png": [241, 286, 10, 2, 235, 283],
+      "7.png": [241, 286, 28, 6, 241, 277],
+    };
+    const [fonteLargura, fonteAltura, esquerda, topo, direita, baixo] =
+      limitesAlfa[sprite.texture.key] ?? [sprite.frame.cutWidth, sprite.frame.cutHeight, 0, 0, sprite.frame.cutWidth, sprite.frame.cutHeight];
+    const escalaX = sprite.displayWidth / fonteLargura;
+    const escalaY = sprite.displayHeight / fonteAltura;
+    const localX = (((esquerda + direita) / 2) - fonteLargura * sprite.originX) * escalaX * (sprite.flipX ? -1 : 1);
+    const localY = (((topo + baixo) / 2) - fonteAltura * sprite.originY) * escalaY * (sprite.flipY ? -1 : 1);
+    const cos = Math.cos(sprite.rotation);
+    const sin = Math.sin(sprite.rotation);
+    const centroX = sprite.x + localX * cos - localY * sin;
+    const centroY = sprite.y + localX * sin + localY * cos;
+    const metadeLargura = (direita - esquerda) * escalaX / 2;
+    const metadeAltura = (baixo - topo) * escalaY / 2;
+    const pontos = [
+      [-metadeLargura, -metadeAltura], [metadeLargura, -metadeAltura],
+      [metadeLargura, metadeAltura], [-metadeLargura, metadeAltura],
+    ].map(([x, y]) => ({ x: centroX + x * cos - y * sin, y: centroY + x * sin + y * cos }));
+    return { pontos };
+  }
+
+  hitboxPoligonalSobrepoeCorpo(hitbox, corpo) {
+    if (!hitbox?.pontos || !corpo?.enable) return false;
+    const pontosCorpo = [
+      { x: corpo.left, y: corpo.top }, { x: corpo.right, y: corpo.top },
+      { x: corpo.right, y: corpo.bottom }, { x: corpo.left, y: corpo.bottom },
+    ];
+    const eixos = [{ x: 1, y: 0 }, { x: 0, y: 1 }];
+    for (let i = 0; i < hitbox.pontos.length; i++) {
+      const atual = hitbox.pontos[i];
+      const proximo = hitbox.pontos[(i + 1) % hitbox.pontos.length];
+      eixos.push({ x: -(proximo.y - atual.y), y: proximo.x - atual.x });
+    }
+    return eixos.every((eixo) => {
+      const projetar = (pontos) => pontos.map((ponto) => ponto.x * eixo.x + ponto.y * eixo.y);
+      const a = projetar(hitbox.pontos);
+      const b = projetar(pontosCorpo);
+      return Math.max(...a) >= Math.min(...b) && Math.max(...b) >= Math.min(...a);
+    });
+  }
+
+  verificarColisoesProjeteisArma(personagem) {
+    const corpoPersonagem = personagem?.sprite?.body;
+    if (!corpoPersonagem) return;
+    const hurtboxes = personagem.grupoHurtbox?.getChildren() ?? [];
+    for (const registro of [...this.projeteisArma]) {
+      if (!registro.projetil.active || !registro.projetil.body) continue;
+      const hitbox = this.obterHitboxSprite(registro.projetil);
+      this.desenharHitboxAtaque(hitbox.pontos);
+      if (this.hitboxPoligonalSobrepoeCorpo(hitbox, corpoPersonagem) ||
+        hurtboxes.some((hurtbox) => this.hitboxPoligonalSobrepoeCorpo(hitbox, hurtbox.body))) {
+        this.acertarProjetilArma(registro);
+      }
+    }
+  }
+
+  derrotarBoss(boss) {
+    if (this.bossDerrotado) return;
+    this.bossDerrotado = true;
+    this.estadoEsmagamento.fase = "derrotado";
+    this.estadoEsmagamento.tipo = null;
+    this.liberarJogadorGrab();
+    for (const { zona } of this.zonasHurtbox) {
+      zona.body.enable = false;
+    }
+    for (const { superficie } of this.superficiesMaos) {
+      superficie.body.enable = false;
+    }
+    for (const visual of [this.cabeca, this.olhoEsquerdo, this.olhoDireito, this.mao6, this.mao7, this.maosPalmadasJuntas]) {
+      visual.setVisible(false);
+    }
+    for (const registro of [...this.projeteisArma]) this.destruirProjetilArma(registro);
+
+    const vencedor = this.scene.jogador1;
+    const resultado = {
+      vencedor: { id: this.scene.escolhaP1, nome: vencedor?.nomePersonagem ?? "Jogador 1" },
+      perdedor: { id: this.scene.escolhaP2, nome: boss.nomePersonagem },
+    };
+    this.scene.partidaFinalizada = true;
+    this.scene.sound.stopAll();
+    publicarEstadoVersus(this.scene, "game-over", resultado);
+    this.scene.preservarAssetsGameOver = true;
+    this.scene.scene.start("CenaGameOver", resultado);
+  }
+
   atualizarHurtboxes() {
     if (!this.cabeca?.active) return;
     this.zonasHurtbox?.forEach(({ zona, deslocamentoY = 0, mao = null }) => {
@@ -152,6 +261,8 @@ export default class ForgottenOne {
   }
 
   atualizarOponente(delta, boss) {
+    if (this.bossDerrotado) return;
+    this.graficoHitboxesAtaque.clear();
     this.elapsed += delta;
     const fase = this.elapsed * 0.00028;
     const flutuacao = Math.sin(this.elapsed * 0.003) * 18;
@@ -191,6 +302,7 @@ export default class ForgottenOne {
       this.mao7.setPosition(x + 380, y + 170 - gesto);
     }
     this.atualizarEsmagamento(delta, this.boss);
+    this.verificarColisoesProjeteisArma(this.scene.jogador1);
     this.superficiesMaos.forEach(({ mao, superficie }) => {
       const xAnterior = superficie.x;
       const topoAnterior = superficie.body.top;
@@ -312,10 +424,10 @@ export default class ForgottenOne {
         ataque.alvoX,
         Phaser.Math.Linear(topoPlataforma - 600, topoPlataforma - 100, progresso),
       );
+      this.acertarEsmagamento(ataque, boss, topoPlataforma);
       if (ataque.tempo <= 0) {
         mao.setY(topoPlataforma - 100);
         cena.camJogo.shake(180, 0.008);
-        this.acertarEsmagamento(ataque, boss, topoPlataforma);
         ataque.fase = "impacto";
         ataque.tempo = 120;
       }
@@ -505,7 +617,7 @@ export default class ForgottenOne {
     this.prepararMaoGrab(ataque, mao, true);
     ataque.tipo = "grab";
     ataque.fase = "grabRastreia";
-    ataque.tempo = 4000;
+    ataque.tempo = 2000;
     ataque.alvoX = jogador?.x ?? mao.x;
     ataque.alvoY = jogador?.y ?? mao.y;
   }
@@ -556,10 +668,9 @@ export default class ForgottenOne {
       mao.setPosition(Phaser.Math.Linear(mao.x, alvoX, fator), Phaser.Math.Linear(mao.y, alvoY, fator));
       ataque.alvoX = jogador.x;
       ataque.alvoY = jogador.y;
-      const centro = jogador.body.center;
-      const perto = Math.abs(mao.x - centro.x) <= jogador.body.width / 2 + 70 &&
-        Math.abs(mao.y - centro.y) <= jogador.body.height / 2 + 90;
-      if (perto) {
+      const hitbox = this.obterHitboxSprite(mao);
+      this.desenharHitboxAtaque(hitbox.pontos);
+      if (this.hitboxPoligonalSobrepoeCorpo(hitbox, jogador.body)) {
         this.capturarJogadorGrab(ataque, jogador, boss);
         return;
       }
@@ -723,7 +834,10 @@ export default class ForgottenOne {
     ataque.posicoesArmaInicio = new Map(maos.map((mao) => [mao, { x: mao.x, y: mao.y }]));
     ataque.plataformasAtacadas.forEach((superficie) => { superficie.body.checkCollision.up = false; });
     for (const mao of maos) {
-      mao.setTexture("forgotten-hand-gun").setDisplaySize(220, 159.5).setRotation(0).setFlipX(false).setVisible(true);
+      const direita = mao === this.mao7;
+      mao.setTexture("forgotten-hand-gun")
+        .setDisplaySize(direita ? 264 : 220, direita ? 191.4 : 159.5)
+        .setRotation(0).setFlipX(direita).setVisible(true);
     }
     ataque.fase = "armaPosiciona";
     ataque.tempo = 750;
@@ -746,8 +860,8 @@ export default class ForgottenOne {
       }
       if (ataque.tempo <= 0) {
         ataque.fase = "armaDisparo";
-        ataque.tempo = 4550;
-        ataque.acumuladorDisparo = 350;
+        ataque.tempo = 8450;
+        ataque.acumuladorDisparo = 650;
       }
       return;
     }
@@ -756,12 +870,13 @@ export default class ForgottenOne {
       for (const mao of [this.mao6, this.mao7]) {
         if (jogador?.active) {
           const angulo = Phaser.Math.Angle.Between(mao.x, mao.y, jogador.x, jogador.y);
-          mao.rotation = Phaser.Math.Angle.RotateTo(mao.rotation, angulo, Math.min(Math.PI, delta * 0.006));
+          const anguloArma = mao === this.mao7 ? Phaser.Math.Angle.Wrap(angulo - Math.PI) : angulo;
+          mao.rotation = Phaser.Math.Angle.RotateTo(mao.rotation, anguloArma, Math.min(Math.PI, delta * 0.006));
         }
       }
       ataque.acumuladorDisparo += delta;
-      while (ataque.acumuladorDisparo >= 350 && ataque.disparosArma < 13) {
-        ataque.acumuladorDisparo -= 350;
+      while (ataque.acumuladorDisparo >= 650 && ataque.disparosArma < 13) {
+        ataque.acumuladorDisparo -= 650;
         const mao = ataque.disparosArma % 2 === 0 ? this.mao6 : this.mao7;
         const numero = ataque.disparosArma % 2 === 0 ? 6 : 7;
         this.dispararNumeroArma(mao, numero, jogador, boss);
@@ -800,30 +915,30 @@ export default class ForgottenOne {
     projetil.setDisplaySize(38, 46).setDepth(3);
     cena.camHUD?.ignore(projetil);
     projetil.body.setAllowGravity(false);
-    projetil.body.setSize(30, 36, true);
+    projetil.body.setSize(36, 45, true);
     projetil.body.setVelocity(Math.cos(angulo) * 620, Math.sin(angulo) * 620);
-    const registro = { projetil, colisor: null, timer: null };
+    const registro = { projetil, timer: null, numero, boss, angulo };
     this.projeteisArma.add(registro);
-    registro.colisor = cena.physics.add.overlap(projetil, jogador.grupoHurtbox, () => {
-      if (!this.projeteisArma.has(registro)) return;
-      cena.jogador1?.receberDano(numero, {
-        knockbackX: 180,
-        knockbackY: -55,
-      }, {
-        atacante: boss,
-        direcao: Math.cos(angulo) >= 0 ? 1 : -1,
-        x: projetil.x,
-        y: projetil.y,
-      });
-      this.destruirProjetilArma(registro);
-    });
     registro.timer = cena.time.delayedCall(3500, () => this.destruirProjetilArma(registro));
+  }
+
+  acertarProjetilArma(registro) {
+    if (!this.projeteisArma.has(registro)) return;
+    this.scene.jogador1?.receberDano(registro.numero, {
+      knockbackX: 180,
+      knockbackY: -55,
+    }, {
+      atacante: registro.boss,
+      direcao: Math.cos(registro.angulo) >= 0 ? 1 : -1,
+      x: registro.projetil.x,
+      y: registro.projetil.y,
+    });
+    this.destruirProjetilArma(registro);
   }
 
   destruirProjetilArma(registro) {
     if (!this.projeteisArma?.has(registro)) return;
     this.projeteisArma.delete(registro);
-    if (registro.colisor) this.scene.physics.world.removeCollider(registro.colisor);
     registro.timer?.remove(false);
     registro.projetil.destroy();
   }
@@ -942,12 +1057,11 @@ export default class ForgottenOne {
   acertarPrensadaPalm(ataque, jogador, boss) {
     if (ataque.acertoResolvido || !jogador?.active || !jogador.body) return;
     const corpo = jogador.body;
-    const acertou = ataque.fase === "palmFecha"
-      ? [this.mao6, this.mao7].some((mao) =>
-        corpo.right >= mao.x - mao.displayWidth * 0.38 && corpo.left <= mao.x + mao.displayWidth * 0.38 &&
-        corpo.bottom >= mao.y - mao.displayHeight * 0.38 && corpo.top <= mao.y + mao.displayHeight * 0.38)
-      : corpo.right >= ataque.alvoX - 130 && corpo.left <= ataque.alvoX + 130 &&
-        corpo.bottom >= ataque.alvoY - 130 && corpo.top <= ataque.alvoY + 130;
+    const acertou = [this.mao6, this.mao7].some((mao) => {
+      const hitbox = this.obterHitboxSprite(mao);
+      this.desenharHitboxAtaque(hitbox.pontos);
+      return this.hitboxPoligonalSobrepoeCorpo(hitbox, corpo);
+    });
     if (!acertou) return;
     ataque.acertoResolvido = true;
     const direcao = jogador.x >= ataque.alvoX ? 1 : -1;
@@ -988,8 +1102,6 @@ export default class ForgottenOne {
         mao.setPosition(ataque.inicioVarreduraX, ataque.alturaBaseVarredura);
         ataque.fase = "varrida";
         ataque.tempo = 650;
-        ataque.xAnteriorVarredura = mao.x;
-        ataque.yAnteriorVarredura = mao.y;
       }
       return;
     }
@@ -998,13 +1110,9 @@ export default class ForgottenOne {
       const progresso = 1 - Math.max(0, ataque.tempo) / 650;
       const x = Phaser.Math.Linear(ataque.inicioVarreduraX, ataque.fimVarreduraX, progresso);
       const y = ataque.alturaBaseVarredura + Math.sin(progresso * Math.PI) * 150;
-      const xAnterior = ataque.xAnteriorVarredura;
-      const yAnterior = ataque.yAnteriorVarredura;
       mao.setPosition(x, y);
       ataque.alvoX = x;
-      this.acertarVarredura(ataque, jogador, boss, xAnterior, yAnterior, x, y);
-      ataque.xAnteriorVarredura = x;
-      ataque.yAnteriorVarredura = y;
+      this.acertarVarredura(ataque, jogador, boss, x, y);
       if (ataque.tempo <= 0) {
         mao.setPosition(ataque.fimVarreduraX, ataque.alturaBaseVarredura);
         ataque.xInicial = mao.x;
@@ -1041,16 +1149,12 @@ export default class ForgottenOne {
 
   }
 
-  acertarVarredura(ataque, jogador, boss, xAnterior, yAnterior, xAtual, yAtual) {
-    if (ataque.acertoResolvido || !jogador?.active || !jogador.body) return;
+  acertarVarredura(ataque, jogador, boss, xAtual, yAtual) {
+    if (!jogador?.active || !jogador.body) return;
     const corpo = jogador.body;
-    const esquerda = Math.min(xAnterior, xAtual) - 150;
-    const direita = Math.max(xAnterior, xAtual) + 150;
-    const topo = Math.min(yAnterior, yAtual) - 160;
-    const baixo = Math.max(yAnterior, yAtual) + 160;
-    const acertou = corpo.right >= esquerda && corpo.left <= direita &&
-      corpo.bottom >= topo && corpo.top <= baixo;
-    if (!acertou) return;
+    const hitbox = this.obterHitboxSprite(ataque.maoAtacante);
+    this.desenharHitboxAtaque(hitbox.pontos);
+    if (ataque.acertoResolvido || !this.hitboxPoligonalSobrepoeCorpo(hitbox, corpo)) return;
     ataque.acertoResolvido = true;
     this.scene.jogador1?.receberDano(30, {
       tipoSomImpacto: "heavy",
@@ -1076,14 +1180,12 @@ export default class ForgottenOne {
   acertarEsmagamento(ataque, boss, topoPlataforma) {
     const personagem = this.scene.jogador1;
     const jogador = personagem?.sprite;
-    if (ataque.acertoResolvido || !jogador?.active || !jogador.body) return;
+    const mao = ataque.maoAtacante;
+    if (!mao || !jogador?.active || !jogador.body) return;
+    const hitbox = this.obterHitboxSprite(mao);
+    this.desenharHitboxAtaque(hitbox.pontos);
+    if (ataque.acertoResolvido || !this.hitboxPoligonalSobrepoeCorpo(hitbox, jogador.body)) return;
     ataque.acertoResolvido = true;
-    const corpo = jogador.body;
-    const larguraGolpe = 150;
-    const dentroDaArea = corpo.right >= ataque.alvoX - larguraGolpe &&
-      corpo.left <= ataque.alvoX + larguraGolpe &&
-      corpo.bottom >= topoPlataforma - 110 && corpo.top <= topoPlataforma + 30;
-    if (!dentroDaArea) return;
     const direcao = jogador.x >= this.cabeca.x ? 1 : -1;
     personagem.receberDano(50, {
       tipoSomImpacto: "heavy",

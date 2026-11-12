@@ -110,7 +110,7 @@ this.nomePersonagem = "Ken";
         largura: 80,
         altra: 60,
         offsetX: 5,
-        offsetY: 0,
+        offsetY: -1,
         escuala: 1,
         hurtboxes: [
           { largura: 65, altura: 100, offsetX: 0, offsetY: -55 },

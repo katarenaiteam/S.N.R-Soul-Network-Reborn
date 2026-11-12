@@ -48,6 +48,11 @@ export default class FJUlt {
     this.zoomOriginal = cam.zoom;
     this.scrollOriginal = { x: cam.scrollX, y: cam.scrollY };
     this.physicsPausadaAntes = this.scene.physics.world.isPaused;
+    this.gravidadeOriginal = {
+      permitida: sprite.body.allowGravity,
+      x: sprite.body.gravity.x,
+      y: sprite.body.gravity.y,
+    };
     this.funcaoCameraOriginal = this.scene.atualizarCamera;
     this.scene.atualizarCamera = () => {};
     this.desativarHurtboxes();
@@ -215,7 +220,7 @@ export default class FJUlt {
     sprite.y += baseCorpoY - body.bottom;
     body.updateFromGameObject();
     body.setAllowGravity(true);
-    body.setGravityY(GRAVIDADE_SUBIDA_ULT);
+    body.setGravityY(GRAVIDADE_SUBIDA_ULT - this.scene.physics.world.gravity.y);
     body.setVelocityY(-VELOCIDADE_SUBIDA_ULT);
     sprite.play("fj_jump", true);
     const limitesArena = this.scene.mapaAtual?.configCamera?.limites;
@@ -319,7 +324,7 @@ export default class FJUlt {
     if (this.subindoUlt) {
       const sprite = this.personagem.sprite;
       const body = sprite.body;
-      body.setGravityY(GRAVIDADE_SUBIDA_ULT);
+      body.setGravityY(GRAVIDADE_SUBIDA_ULT - this.scene.physics.world.gravity.y);
       const dx = this.alvoVoo.x - sprite.x;
       body.setVelocityX(Math.abs(dx) < 12 ? 0 : Math.sign(dx) * VELOCIDADE_CENTRO_ULT);
       if (sprite.y <= this.alvoVoo.y && Math.abs(dx) < 12) {
@@ -606,9 +611,11 @@ export default class FJUlt {
     }
     if (!this.physicsPausadaAntes) this.scene.physics.resume();
     if (sprite?.body) {
-      this.confirmarContatoChao();
-      sprite.body.setAllowGravity(true);
-      sprite.body.setGravityY(0);
+      sprite.body.setAllowGravity(this.gravidadeOriginal?.permitida ?? true);
+      sprite.body.setGravity(
+        this.gravidadeOriginal?.x ?? 0,
+        this.gravidadeOriginal?.y ?? this.scene.physics.world.gravity.y,
+      );
     }
   }
 }

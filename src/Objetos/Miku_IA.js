@@ -19,7 +19,7 @@ export default class Miku_IA {
   definirAlvo() {
     const { scene, bot } = this.ctrl;
     return [scene.jogador1, scene.jogador2]
-      .filter(p => p?.sprite?.active && !p.eliminado && !p.emMorteVS && p.vidas !== 0)
+      .filter(p => p && p !== bot.donoClone && p.sprite?.active && !p.eliminado && !p.emMorteVS && p.vidas !== 0)
       .sort((a, b) => Math.hypot(a.sprite.x - bot.sprite.x, a.sprite.y - bot.sprite.y) -
         Math.hypot(b.sprite.x - bot.sprite.x, b.sprite.y - bot.sprite.y))[0];
   }

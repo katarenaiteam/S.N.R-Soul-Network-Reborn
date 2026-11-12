@@ -1,12 +1,22 @@
 import { obterAlvosCombate } from "../../Objetos/SistemaCombateEspecial.js";
 import { gerarQuadrosUltimateBackground } from "../../Objetos/QuadrosUltimateBackground.js";
+import BotController from "../../Objetos/BotController.js";
+import TH30_IA from "../../Objetos/TH30_IA.js";
+import GokuKaioken from "../Specials/Goku/Kaioken.js";
 
 const CAMPOS_COPIADOS = [
   "nomePersonagem", "prefixoAnim", "configAnimacoes", "golpes", "specials",
   "ult", "velocidade", "forcaPulo", "maxPulos", "maxDash", "sons",
-  "acertosSpecialStun",
+  "acertosSpecialStun", "cargaKi", "cargaKiMaxima", "kaioken",
+  "kaiokenAtivo", "kaiokenDisponivelEm", "tempoCargaKi", "sequenciaKiBall",
+  "ultimaKiBallAte", "cooldownKiBallAte", "cooldownKamehamehaAte", "carregandoKi",
 ];
-const METODOS_COPIADOS = ["aplicarDanoSpecialStun", "obterIndicadorHabilidade"];
+const METODOS_COPIADOS = [
+  "aplicarDanoSpecialStun", "obterIndicadorHabilidade", "update",
+  "adicionarCargaKiPorDano", "aplicarBonusDanoKaioken", "iniciarCooldownSpecial",
+  "podeUsarSpecial", "registrarUsoSpecialAereo", "registrarUsoNeutroAereoConfirmado",
+  "consumirCargaKi",
+];
 
 export default class TH30Ult {
   constructor(personagem, _config, estadoFSM) {
@@ -160,6 +170,12 @@ export default class TH30Ult {
     if (this.finalizada) return;
     this.alvo = this.obterAlvo();
     if (!this.alvo) return this.cancelarSemAlvo();
+    if (this.alvo.nomePersonagem === "TH30") {
+      this.limparCenarioUltimate();
+      this.criarCloneTH30();
+      this.finalizarUlt();
+      return;
+    }
     const personagem = this.personagem;
     this.limparCenarioUltimate();
     this.camposOriginais = Object.fromEntries(CAMPOS_COPIADOS.map((campo) => [campo, personagem[campo]]));
@@ -176,9 +192,16 @@ export default class TH30Ult {
       : { x: this.alvo.sprite.scaleX, y: this.alvo.sprite.scaleY };
     for (const campo of CAMPOS_COPIADOS) personagem[campo] = this.alvo[campo];
     for (const metodo of METODOS_COPIADOS) {
+      if (this.alvo.nomePersonagem !== "Goku" &&
+          !["aplicarDanoSpecialStun", "obterIndicadorHabilidade"].includes(metodo)) continue;
       if (typeof this.alvo[metodo] === "function") {
         personagem[metodo] = this.alvo[metodo].bind(personagem);
       }
+    }
+    if (this.alvo.nomePersonagem === "Goku") {
+      personagem.kaioken = new GokuKaioken(personagem);
+      personagem.kaiokenAtivo = false;
+      this.adicionarBarraKiHud();
     }
     personagem.sprite.setScale(escalaAlvo.x, escalaAlvo.y);
     personagem.sprite.setTint(0x399cff);
@@ -215,6 +238,76 @@ export default class TH30Ult {
     });
   }
 
+  adicionarBarraKiHud() {
+    const cena = this.scene;
+    const jogador = this.personagem;
+    const entrada = cena.participantes?.find(({ jogador: participante }) => participante === jogador);
+    const hud = entrada?.hud ?? (jogador === cena.jogador1 ? cena.hudP1_Nome :
+      jogador === cena.jogador2 ? cena.hudP2_Nome : null);
+    if (!hud || hud.barraKi || !cena.textures.exists("Gk_portrait-bar")) return;
+    const barra = cena.add.image(0, 0, "Gk_portrait-bar", 0)
+      .setOrigin(hud.retrato?.originX ?? 0, hud.retrato?.originY ?? 0)
+      .setDisplaySize(hud.retrato?.displayWidth ?? 440, hud.retrato?.displayHeight ?? 357.5);
+    hud.add(barra);
+    hud.barraKi = barra;
+    hud.frameKiAtual = -1;
+    this.barraKiHudTemporaria = { hud, barra };
+  }
+
+  criarCloneTH30() {
+    const cena = this.scene;
+    const personagem = this.personagem;
+    if (this.alvo?.nomePersonagem === "TH30" && cena.scene?.key === "CenaHistoria4") {
+      const texto = cena.add.text(cena.scale.width / 2, cena.scale.height * 0.18,
+        "Você não pode copiar o poder de um verdadeiro Deus", {
+          fontFamily: "RetroFont, monospace", fontSize: `${32 * cena.scale.width / 1920}px`,
+          color: "#ffffff", stroke: "#000000", strokeThickness: 6, align: "center",
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(3000);
+      cena.time.delayedCall(2500, () => texto.destroy());
+    }
+    const controle = new BotController(cena);
+    const clone = cena.criarPersonagem("TH30", personagem.sprite.x + (personagem.sprite.flipX ? -75 : 75),
+      personagem.sprite.y, controle.teclas, 0, 0, controle);
+    clone.controle = null;
+    clone.donoClone = personagem;
+    clone.vidas = 1;
+    clone.eliminado = false;
+    clone.cloneTH30 = true;
+    clone.podeUsarUlt = () => false;
+    const cerebro = new TH30_IA(controle);
+    controle.setCerebro(cerebro);
+    controle.bot = clone;
+    cena.sistemaPlataformasAtravessaveis?.registrar(clone, false);
+    cena.physics.add.collider(clone.sprite, cena.mapaAtual.plataformas);
+    const entrada = { jogador: clone, escolha: "TH30", vidas: null, cloneTH30: true,
+      spawn: { x: clone.sprite.x, y: clone.sprite.y }, rotulo: "CLONE", controle, cerebro };
+    (cena.alvosAtaqueExtras ??= []).push(clone);
+    cena.camHUD?.ignore([clone.sprite, clone.grupoHurtbox, clone.textoDano].filter(Boolean));
+    entrada.atualizar = (time, delta) => {
+      if (!clone.sprite.active || clone.eliminado) return;
+      controle.update(time, delta);
+      clone.atualizarCargaUlt(delta);
+      clone.update();
+      clone.maquinaEstados.estados.atack?.verificarAcertoManual?.();
+      const arena = cena.limitesArena;
+      if (arena && (clone.sprite.x < arena.minX || clone.sprite.x > arena.maxX ||
+          clone.sprite.y < arena.minY || clone.sprite.y > arena.maxY)) this.removerCloneTH30(entrada);
+    };
+    cena.events.on("update", entrada.atualizar);
+    entrada.timerDesaparecer = cena.time.delayedCall(20000, () => this.removerCloneTH30(entrada));
+    clone.aoMorrerCloneTH30 = () => this.removerCloneTH30(entrada);
+  }
+
+  removerCloneTH30(entrada) {
+    if (!entrada) return;
+    entrada.timerDesaparecer?.remove();
+    this.scene.events.off("update", entrada.atualizar);
+    this.scene.sistemaPlataformasAtravessaveis?.desregistrar(entrada.jogador);
+    entrada.jogador.eliminado = true;
+    entrada.jogador.sprite.destroy();
+    this.scene.alvosAtaqueExtras = (this.scene.alvosAtaqueExtras ?? []).filter((alvo) => alvo !== entrada.jogador);
+  }
+
   atualizar() {
     this.ajustarFundoUltimate();
     if (!this.camposOriginais) return;
@@ -226,9 +319,14 @@ export default class TH30Ult {
     this.tweenEmergencia?.stop();
     this.timerForma?.remove();
     const personagem = this.personagem;
-    const body = personagem.sprite.body;
-    const baseCorpoAntes = body?.bottom;
     const cargaRestante = personagem.ultCarga > 0;
+    personagem.kaioken?.encerrar?.();
+    this.barraKiHudTemporaria?.barra?.destroy();
+    if (this.barraKiHudTemporaria?.hud) {
+      this.barraKiHudTemporaria.hud.barraKi = null;
+      this.barraKiHudTemporaria.hud.frameKiAtual = -1;
+    }
+    this.barraKiHudTemporaria = null;
     for (const campo of CAMPOS_COPIADOS) personagem[campo] = this.camposOriginais[campo];
     for (const [metodo, descriptor] of this.metodosOriginais ?? []) {
       if (descriptor) Object.defineProperty(personagem, metodo, descriptor);
@@ -244,10 +342,6 @@ export default class TH30Ult {
     personagem.tocarAnimacao(
       personagem.maquinaEstados.estadoAtual?.nome === "dead" ? "dead" : "idle"
     );
-    if (body && Number.isFinite(baseCorpoAntes)) {
-      personagem.sprite.y += baseCorpoAntes - body.bottom;
-      body.updateFromGameObject();
-    }
     this.camposOriginais = null;
     this.finalizarUlt();
   }

@@ -346,11 +346,12 @@ this.indicadorCPU = this.criarIndicador(
     if (this.boss?.sprite.active && !this.boss.eliminado) this.botIA.update(time, delta);
     for (const entrada of this.participantes) {
       const jogador = entrada.jogador;
+      if (entrada.cloneTH30 && jogador.sprite.active && !jogador.eliminado) entrada.controle.update(time, delta);
       if (!jogador.eliminado && jogador.sprite.active) {
         jogador.atualizarCargaUlt(delta);
         jogador.update();
       }
-      if (!(jogador === this.boss && this.esconderBarraUltBoss)) atualizarBarraUlt.call(this, jogador, entrada.hud);
+      if (!entrada.cloneTH30 && !(jogador === this.boss && this.esconderBarraUltBoss)) atualizarBarraUlt.call(this, jogador, entrada.hud);
     }
  
       this.sistemaPlataformasAtravessaveis.atualizar();
@@ -387,6 +388,10 @@ this.indicadorCPU = this.criarIndicador(
   processarQueda(jogador, spawn) {
     if (this.partidaEncerrada || jogador.eliminado || jogador.processandoQueda) return;
     const entrada = this.participantes.find(item => item.jogador === jogador);
+    if (entrada?.cloneTH30) {
+      jogador.aoMorrerCloneTH30?.();
+      return;
+    }
     if (!entrada || this[entrada.vidas] <= 0) return;
     jogador.transformacaoTH30?.restaurarForma();
     jogador.processandoQueda = true;

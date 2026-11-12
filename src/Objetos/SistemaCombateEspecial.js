@@ -37,6 +37,7 @@ export function obterAlvosCombate(personagem) {
   return [...new Set([...jogadores, ...extras])].filter((alvo) =>
     alvo &&
     alvo !== personagem &&
+    alvo !== personagem.donoClone &&
     alvo.dono !== personagem &&
     !alvo.eliminado &&
     alvo.sprite?.active &&

@@ -286,6 +286,10 @@ export default class CenaHistoria4 extends CenaHistoria {
 
   iniciarAberturaHistoria() {
     if (this.entradaFinalCompleta) {
+      // O personagem FJ e criado antes das configuracoes da subclasse existirem
+      // no estado idle. Aplique a escala antes de mostrar a transformacao.
+      this.jogador1.aplicarConfiguracao("idle");
+      this.jogador1.sprite.body.updateFromGameObject();
       const limites = this.mapaAtual.configCamera.limites;
       const escalaResolucao = this.scale.width / 1920;
       this.camJogo.setZoom(this.mapaAtual.configCamera.maxZoom * escalaResolucao)
@@ -293,15 +297,21 @@ export default class CenaHistoria4 extends CenaHistoria {
       this.physics.world.pause();
       this.cameras.main.fadeIn(700, 255, 255, 255);
       this.sound.play("ding");
-      const escala = Math.min(this.scale.width / 1920, this.scale.height / 1080);
-      const retratoFJ = this.add.image(18 * escala, this.scale.height - 15 * escala, "FJ_true")
-        .setOrigin(0, 1)
-        .setDisplaySize(550 * escala, 550 * escala)
-        .setScrollFactor(0)
-        .setDepth(2500);
-      this.camJogo.ignore(retratoFJ);
+      this.dialogoHistoria = new DialogoHistoria(this, () => {}, {
+        falas: [{
+          personagem: "FJ",
+          retrato: "FJ_true",
+          texto: "Sou EU",
+          zoom: 1,
+        }],
+        digitarTexto: false,
+        prepararPersonagens: false,
+        restaurarEstado: false,
+      });
+      this.dialogoHistoria.bloquearAvanco = true;
       this.time.delayedCall(3000, () => {
-        retratoFJ.destroy();
+        this.dialogoHistoria?.destruir();
+        this.dialogoHistoria = null;
         this.aguardandoEntradaFinal = false;
         this.iniciarIntroPartida();
       });

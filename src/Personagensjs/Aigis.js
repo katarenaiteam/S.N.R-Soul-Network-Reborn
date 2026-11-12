@@ -399,27 +399,10 @@ this.nomePersonagem = "Aigis";
   //  };
     
     // ============================ tabela de golpes =====================================
-   this.configAnimacoes.comboRapido1 = {
-     ...this.configAnimacoes.atack2,
-     offsetY: 25, // Compensa a altura de 448px da nova spritesheet no corpo fisico.
-     offsetVisualX: 0,
-     offsetVisualY: 0,
-   };
-   this.configAnimacoes.comboRapido2 = {
-     ...this.configAnimacoes.atack2,
-     offsetY: 25,
-     offsetVisualX: 0,
-     offsetVisualY: 0,
-   };
-   this.configAnimacoes.comboRapido3 = {
-     ...this.configAnimacoes.atack2,
-     offsetY: 25,
-     offsetVisualX: 0,
-     offsetVisualY: 0,
-   };
+
    this.golpes = {
       neutro1: {
-        animacao: "fj_atack1",
+        animacao: "ai_atack1",
         frameHitbox: 2,
         offsetX: 60,
         offsetY: -100,
@@ -450,7 +433,7 @@ this.nomePersonagem = "Aigis";
       },
 
       neutro2: {
-        animacao: "fj_atack2",
+        animacao: "ai_atack2",
 
         frameHitbox: 5,
 
@@ -492,24 +475,24 @@ this.nomePersonagem = "Aigis";
           tumbling: false,
         },
         vfxAcerto: [{ escolherUm: ["punch1", "punch2", "punch3"] }],
-        multiHit: {
-          tipo: "comboRapido",
-          maxHits: 15, // Conta hitboxes criadas, mesmo sem acertar.
-          intervaloInput: 250, // Tempo maximo entre novos apertos, em ms.
-          duracaoCiclo: 250,
-          hits: [
-            { inicio: 12.5, duracao: 27.5, offsetY: -82,
-              animacao: "fj_comboRapido1", antecipacao: 25 },
-            { inicio: 112, duracao: 27.5, offsetY: -65,
-              animacao: "fj_comboRapido2", antecipacao: 62 },
-            { inicio: 200, duracao: 27.5, offsetY: -75,
-              animacao: "fj_comboRapido3", antecipacao: 25},
-          ],
-        },
+      //  multiHit: {
+      //    tipo: "comboRapido",
+       //   maxHits: 15, // Conta hitboxes criadas, mesmo sem acertar.
+     //     intervaloInput: 250, // Tempo maximo entre novos apertos, em ms.
+     //     duracaoCiclo: 250,
+      //    hits: [
+      //      { inicio: 12.5, duracao: 27.5, offsetY: -82,
+       //       animacao: "fj_comboRapido1", antecipacao: 25 },
+       //     { inicio: 112, duracao: 27.5, offsetY: -65,
+    //          animacao: "fj_comboRapido2", antecipacao: 62 },
+      //      { inicio: 200, duracao: 27.5, offsetY: -75,
+      //        animacao: "fj_comboRapido3", antecipacao: 25},
+      //    ],
+      //  },
       },
 
       neutro4: {
-        animacao: "fj_atack3",
+        animacao: "ai_atack3",
 
         frameHitbox: 3,
 
@@ -539,20 +522,20 @@ this.nomePersonagem = "Aigis";
       },
 
       side: {
-        animacao: "fj_sideAtack",
-        multiHit: {
-          tipo: "automatico",
-          hits: [
-            { inicio: 140, duracao: 70, offsetY: -65,
-              propriedades: { dano: 3, knockbackX: 280, knockbackY: 0,
-                knockbackFixo: true, tumbling: false, hitstunFrames: 18 } },
-            { inicio: 240, duracao: 70, offsetX: 40,
-              propriedades: { dano: 3, knockbackX: 200, knockbackY: -10,
-                knockbackFixo: true, tumbling: false, hitstunFrames: 18 } },
-            { inicio: 340, duracao: 70, offsetX: 45,
-              propriedades: { dano: 6 } }, // Herda o arremesso forte do golpe.
-          ],
-        },
+        animacao: "ai_sideAtack",
+    //    multiHit: {
+    //      tipo: "automatico",
+      //    hits: [
+      //      { inicio: 140, duracao: 70, offsetY: -65,
+      //        propriedades: { dano: 3, knockbackX: 280, knockbackY: 0,
+      //          knockbackFixo: true, tumbling: false, hitstunFrames: 18 } },
+      //      { inicio: 240, duracao: 70, offsetX: 40,
+       //       propriedades: { dano: 3, knockbackX: 200, knockbackY: -10,
+      //          knockbackFixo: true, tumbling: false, hitstunFrames: 18 } },
+      //      { inicio: 340, duracao: 70, offsetX: 45,
+      //        propriedades: { dano: 6 } }, // Herda o arremesso forte do golpe.
+      //    ],
+      //  },
         offsetX: 40,
         offsetY: -70,
         largura: 78,
@@ -587,7 +570,7 @@ this.nomePersonagem = "Aigis";
         },
       },
      agachado: {
-        animacao: "fj_downAtack",
+        animacao: "ai_downAtack",
         frameHitbox: 3,
         offsetX: 56,
         offsetY: -20,
@@ -613,7 +596,7 @@ this.nomePersonagem = "Aigis";
       },
 
         air_neutro: {
-        animacao: "fj_neutralAir",
+        animacao: "ai_neutralAir",
         frameHitbox: 3,
         offsetX: 58,
         offsetY: -97,
@@ -640,7 +623,7 @@ this.nomePersonagem = "Aigis";
       },
 
       air_cima: {
-        animacao: "fj_upAir",
+        animacao: "ai_upAir",
         frameHitbox: 3,
         offsetX: 38,
         offsetY: -130,
@@ -666,7 +649,7 @@ this.nomePersonagem = "Aigis";
       },
 
       air_side: {
-        animacao: "fj_sideAir",
+        animacao: "ai_sideAir",
         frameHitbox: 2,
         offsetX: 40,
         offsetY: -57,
@@ -706,7 +689,7 @@ this.nomePersonagem = "Aigis";
 
 
       air_agachado: {
-        animacao: "fj_downAir",
+        animacao: "ai_downAir",
         frameHitbox: 3,
         offsetX: 60,
         offsetY: -70,
@@ -943,8 +926,8 @@ scene.anims.create({
    });
 
     scene.anims.create({
-      key: "fj_atack1",
-      frames: scene.anims.generateFrameNumbers("FJ_neu1", {
+      key: "ai_atack1",
+      frames: scene.anims.generateFrameNumbers("ai_combo", {
         start: 0,
         end: 4,
       }),
@@ -952,54 +935,54 @@ scene.anims.create({
       repeat: 0,
     });
     scene.anims.create({
-      key: "fj_atack2",
-      frames: scene.anims.generateFrameNumbers("FJ_neu2", {
-        start: 0,
-        end: 14,
+      key: "ai_atack2",
+      frames: scene.anims.generateFrameNumbers("ai_combo", {
+        start: 5,
+        end: 12,
       }),
       frameRate: 26,
       repeat: 0,
     });
     scene.anims.create({
-      key: "fj_atack3",
-      frames: scene.anims.generateFrameNumbers("FJ_neu3", {
-        start: 0,
-        end: 13,
+      key: "ai_atack3",
+      frames: scene.anims.generateFrameNumbers("ai_combo", {
+        start: 13,
+        end: 20,
       }),
       frameRate: 18,
       repeat: 0,
     });
    
     scene.anims.create({
-      key: "fj_sideAtack",
-      frames: scene.anims.generateFrameNumbers("FJ_SideAtack", {
+      key: "ai_sideAtack",
+      frames: scene.anims.generateFrameNumbers("ai_sideAtack", {
         start: 0,
-        end: 8,
+        end: 18,
       }),
-      frameRate: 16,
+      frameRate: 18,
       repeat: 0,
     });
     scene.anims.create({
-      key: "fj_downAtack",
-      frames: scene.anims.generateFrameNumbers("FJ_downAtack", {
+      key: "ai_downAtack",
+      frames: scene.anims.generateFrameNumbers("ai_downAtack", {
         start: 0,
         end: 8,
       }),
-      frameRate: 24,
+      frameRate: 22,
       repeat: 0,
     });
     scene.anims.create({
-      key: "fj_neutralAir",
-      frames: scene.anims.generateFrameNumbers("FJ_AirNeutro", {
+      key: "ai_neutralAir",
+      frames: scene.anims.generateFrameNumbers("ai_neutralAir", {
         start: 0,
-        end: 7,
+        end: 9,
       }),
       frameRate: 14,
       repeat: 0,
     });
      scene.anims.create({
-      key: "fj_upAir",
-      frames: scene.anims.generateFrameNumbers("FJ_airup", {
+      key: "ai_upAir",
+      frames: scene.anims.generateFrameNumbers("ai_upAir", {
         start: 0,
         end: 9,
       }),
@@ -1007,8 +990,8 @@ scene.anims.create({
       repeat: 0,
     });
      scene.anims.create({
-      key: "fj_sideAir",
-      frames: scene.anims.generateFrameNumbers("FJ_airside", {
+      key: "ai_sideAir",
+      frames: scene.anims.generateFrameNumbers("ai_sideAir", {
         start: 0,
         end: 9,
       }),
@@ -1016,12 +999,12 @@ scene.anims.create({
       repeat: 0,
     });
      scene.anims.create({
-      key: "fj_downAir",
-      frames: scene.anims.generateFrameNumbers("FJ_airDown", {
+      key: "ai_downAir",
+      frames: scene.anims.generateFrameNumbers("ai_downAir", {
         start: 0,
-        end: 14,
+        end: 8,
       }),
-      frameRate: 16,
+      frameRate: 12,
       repeat: 0,
     });
     
