@@ -1,4 +1,6 @@
 const ALIASES_CENAS = {
+  ficha: "CenaInserirFicha",
+  inserirficha: "CenaInserirFicha",
   preload: "CenaPreload",
   start: "CenaStart",
   menu: "CenaStart",

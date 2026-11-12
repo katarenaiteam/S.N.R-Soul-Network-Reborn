@@ -576,6 +576,7 @@ this.indicadorP2 = this.criarIndicador(
     const vencedor = p1Venceu ? this.jogador1 : this.jogador2;
     const perdedor = p1Venceu ? this.jogador2 : this.jogador1;
     const resultado = {
+      modo: "versus",
       vencedor: {
         id: p1Venceu ? this.escolhaP1 : this.escolhaP2,
         nome: vencedor.nomePersonagem,

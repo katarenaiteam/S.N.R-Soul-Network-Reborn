@@ -170,7 +170,7 @@ export default class CenaCreditos extends Phaser.Scene {
     }
     musica.once("complete", () => {
       this.registry.remove("musicaCreditos");
-      this.scene.start("CenaStart");
+      this.scene.start("CenaAvaliacao");
     });
     if (!musica.isPlaying) musica.play();
   }

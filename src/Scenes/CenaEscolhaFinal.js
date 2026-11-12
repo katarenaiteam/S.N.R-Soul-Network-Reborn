@@ -421,7 +421,7 @@ export default class CenaEscolhaFinal extends Phaser.Scene {
 
   aoTerminarVideoFinal = () => {
     this.limparVideoFinal();
-    this.scene.start("CenaPreload");
+    this.scene.start("CenaAvaliacao");
   };
 
   limparVideoFinal() {

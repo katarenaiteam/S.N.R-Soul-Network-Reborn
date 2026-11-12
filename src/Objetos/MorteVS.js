@@ -336,6 +336,7 @@ export default class MorteVS {
       const vencedor = p1Perdeu ? this.scene.jogador2 : this.scene.jogador1;
       const perdedor = p1Perdeu ? this.scene.jogador1 : this.scene.jogador2;
       const resultado = {
+        modo: "versus",
         vencedor: {
           id: p1Perdeu ? this.scene.escolhaP2 : this.scene.escolhaP1,
           nome: vencedor.nomePersonagem,

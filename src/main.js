@@ -1,6 +1,7 @@
 //import * as Phaser from "phaser";
 import CenaPrincipal from "./Scenes/CenaPrincipal.js";
 import CenaPreload from "./Scenes/CenaPreLoad.js";
+import CenaInserirFicha from "./Scenes/CenaInserirFicha.js";
 import Charmenu from "./Scenes/Charmenu.js";
 import CenaStart from "./Scenes/CenaStart.js";
 import CenaGameOver from "./Scenes/GameOver.js";
@@ -12,6 +13,7 @@ import CenaHistoria4 from "./Scenes/CenaHistoria4.js";
 import CenaTransicaoHistoria from "./Scenes/CenaTransicaoHistoria.js";
 import CenaEscolhaFinal from "./Scenes/CenaEscolhaFinal.js";
 import CenaCreditos from "./Scenes/CenaCreditos.js";
+import CenaAvaliacao from "./Scenes/CenaAvaliacao.js";
 import IntroMovie from "./Scenes/IntroMovie.js";
 import CenaPreloadVersus from "./Scenes/CenaPreloadVersus.js";
 import CenaEspectador from "./Scenes/CenaEspectador.js";
@@ -54,7 +56,7 @@ const config = {
 
   mqtt: configMQTT,
 
-  scene: [CenaPreload, CenaStart, IntroMovie, Charmenu, CenaSelecaoMapa, CenaPreloadVersus, CenaPrincipal, CenaForgottenOne, CenaHistoria, CenaHistoria2, CenaHistoria3, CenaHistoria4, CenaTransicaoHistoria, CenaEscolhaFinal, CenaGameOver, CenaCreditos, CenaEspectador],
+  scene: [CenaInserirFicha, CenaPreload, CenaStart, IntroMovie, Charmenu, CenaSelecaoMapa, CenaPreloadVersus, CenaPrincipal, CenaForgottenOne, CenaHistoria, CenaHistoria2, CenaHistoria3, CenaHistoria4, CenaTransicaoHistoria, CenaEscolhaFinal, CenaGameOver, CenaCreditos, CenaAvaliacao, CenaEspectador],
 };
 
 const game = new Phaser.Game(config);
