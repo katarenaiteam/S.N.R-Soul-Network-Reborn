@@ -778,6 +778,10 @@ const assetsAigis = [
   (scene, queued) => queueAsset(scene, queued, "texture", "ai_cut", () => { scene.load.spritesheet("ai_cut", "assets/personagens/Aigis/atacks/persona/ai_cut.png", { frameWidth: 775, frameHeight: 289 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "overcharge", () => { scene.load.spritesheet("overcharge", "assets/personagens/Aigis/atacks/persona/overcharge.png", { frameWidth: 716, frameHeight: 477 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Per_cut", () => { scene.load.spritesheet("Per_cut", "assets/personagens/Aigis/atacks/persona/Per_cut.png", { frameWidth: 701, frameHeight: 329 }); }),
+
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_eyes", () => { scene.load.spritesheet("ai_eyes", "assets/personagens/Aigis/atacks/ult/ai_eyes.png", { frameWidth: 1897, frameHeight: 279 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "fundo_eyes", () => { scene.load.image("fundo_eyes", "assets/personagens/Aigis/atacks/ult/fundo_eyes.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "exclamaçao", () => { scene.load.image("exclamaçao", "assets/personagens/Aigis/atacks/ult/exclamaçao.png"); }),
   
 ];
 

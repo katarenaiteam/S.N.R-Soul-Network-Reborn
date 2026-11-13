@@ -388,8 +388,9 @@ export default class GokuUlt {
   atualizarHitboxGenkidama() {
     if (!this.hitbox?.active || !this.hitbox.body) return;
     if (!this.genkidama?.active) return;
-    const largura = Math.max(1, this.genkidama.displayWidth * 0.68);
-    const altura = Math.max(1, this.genkidama.displayHeight * 0.68);
+    const escalaHitbox = this.fase === "explosao" ? 0.8 : 1;
+    const largura = Math.max(1, this.genkidama.displayWidth * 0.68 * escalaHitbox);
+    const altura = Math.max(1, this.genkidama.displayHeight * 0.68 * escalaHitbox);
     this.hitbox.setPosition(this.genkidama.x, this.genkidama.y);
     this.hitbox.setSize(largura, altura);
     this.hitbox.body.setSize(largura, altura);

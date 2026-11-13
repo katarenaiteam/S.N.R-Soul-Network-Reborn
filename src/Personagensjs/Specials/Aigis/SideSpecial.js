@@ -169,9 +169,9 @@ AigisSideSpecial.configuracao = {
   impulsoDescida: 700,
   gravidadeSalto: 1500,
   hitbox: {
-    largura: 75,
-    altura: 85,
-    offsetX: 65,
+    largura: 65,
+    altura: 55,
+    offsetX: 35,
     offsetY: -85,
   },
   propriedades: {

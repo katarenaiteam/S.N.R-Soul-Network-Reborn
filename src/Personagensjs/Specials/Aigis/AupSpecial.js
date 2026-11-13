@@ -1,5 +1,32 @@
 import { registrarAtaqueEspecial } from "../../../Objetos/SistemaCombateEspecial.js";
 
+export function obterTexturaAuraAigis(scene) {
+  const chave = "aigis_up_special_aura";
+  if (scene.textures.exists(chave)) return chave;
+  const textura = scene.textures.createCanvas(chave, 144, 208);
+  const contexto = textura.getContext();
+  const desenharBrilho = (x, y, raioX, raioY, alpha) => {
+    contexto.save();
+    contexto.translate(x, y);
+    contexto.scale(raioX / 64, raioY / 64);
+    const gradiente = contexto.createRadialGradient(0, 0, 2, 0, 0, 64);
+    gradiente.addColorStop(0, `rgba(63, 166, 255, ${alpha})`);
+    gradiente.addColorStop(0.48, `rgba(24, 116, 255, ${alpha * 0.42})`);
+    gradiente.addColorStop(1, "rgba(8, 74, 255, 0)");
+    contexto.fillStyle = gradiente;
+    contexto.beginPath();
+    contexto.arc(0, 0, 64, 0, Math.PI * 2);
+    contexto.fill();
+    contexto.restore();
+  };
+  desenharBrilho(72, 104, 52, 96, 0.42);
+  desenharBrilho(45, 64, 35, 49, 0.28);
+  desenharBrilho(99, 143, 33, 52, 0.24);
+  desenharBrilho(103, 78, 26, 39, 0.2);
+  textura.refresh();
+  return chave;
+}
+
 export default class AigisAupSpecial {
   constructor(personagem, special, estado) {
     this.personagem = personagem;
@@ -14,9 +41,13 @@ export default class AigisAupSpecial {
     this.tweenAura = null;
     this.overcharge = null;
     this.choques = [];
+    this.timerPersonaFinal = null;
+    this.alvosAtingidosPersona = new Set();
+    this.personaConcluida = false;
     this.finalizado = false;
     this.aoAtualizarAnimacao = this.aoAtualizarAnimacao.bind(this);
     this.aoCompletarAnimacao = this.aoCompletarAnimacao.bind(this);
+    this.aoAtualizarPersona = this.aoAtualizarPersona.bind(this);
   }
 
   executar() {
@@ -24,7 +55,112 @@ export default class AigisAupSpecial {
     this.direcao = sprite.flipX ? -1 : 1;
     sprite.on("animationupdate", this.aoAtualizarAnimacao);
     sprite.once(`animationcomplete-${this.special.animacao}`, this.aoCompletarAnimacao);
+    if (this.special.persona) this.criarPersona();
     this.aoAtualizarAnimacao(sprite.anims.currentAnim, sprite.anims.currentFrame);
+  }
+
+  criarPersona() {
+    const sprite = this.personagem.sprite;
+    const config = this.special.persona;
+    this.persona = this.scene.add.sprite(
+      sprite.x + (sprite.flipX ? -1 : 1) * config.offsetX,
+      sprite.y + config.offsetY,
+      "p_AupSpecial",
+      0,
+    )
+      .setOrigin(0.5, 1)
+      .setScale(config.escala)
+      .setFlipX(sprite.flipX)
+      .setDepth(sprite.depth + 1);
+    this.scene.camHUD?.ignore(this.persona);
+    this.persona.on("animationupdate", this.aoAtualizarPersona);
+    this.persona.once("animationcomplete-ai_p_AupSpecial", () => {
+      if (!this.persona?.active) return;
+      this.personaConcluida = true;
+      this.persona.anims.stop();
+      this.persona.setTexture("p_AupSpecial", 14);
+      this.destruirHitboxPersona();
+      this.timerPersonaFinal = this.scene.time.delayedCall(config.duracaoPoseFinal, () => {
+        this.timerPersonaFinal = null;
+        this.persona?.destroy();
+        this.persona = null;
+      });
+    });
+    this.persona.play("ai_p_AupSpecial");
+    this.atualizarPersona(this.persona.anims.currentFrame);
+  }
+
+  aoAtualizarPersona(animacao, frame) {
+    if (this.finalizado || animacao?.key !== "ai_p_AupSpecial") return;
+    this.atualizarPersona(frame);
+  }
+
+  atualizarPersona(frame) {
+    if (!frame || !this.persona?.active) return;
+    const config = this.special.persona;
+    const aigis = this.personagem.sprite;
+    const direcao = aigis.flipX ? -1 : 1;
+    const quadro = Number(frame.textureFrame);
+    const progressoSubida = Phaser.Math.Clamp(quadro / config.quadroFimSubida, 0, 1);
+    this.persona
+      .setPosition(
+        aigis.x + direcao * config.offsetX,
+        aigis.y + config.offsetY - config.deslocamentoY * progressoSubida,
+      )
+      .setFlipX(aigis.flipX)
+      .setDepth(aigis.depth + 1);
+
+    if (quadro >= config.quadroInicioAtaque && quadro <= config.quadroFimAtaque) {
+      if (!this.hitboxPersona) this.criarHitboxPersona();
+      this.atualizarHitboxPersona();
+    } else {
+      this.destruirHitboxPersona();
+    }
+  }
+
+  criarHitboxPersona() {
+    const config = this.special.persona.hitbox;
+    this.hitboxPersona = this.scene.add.zone(0, 0, config.largura, config.altura);
+    this.scene.physics.add.existing(this.hitboxPersona);
+    this.hitboxPersona.body.setAllowGravity(false);
+    this.hitboxPersona.body.setImmovable(true);
+    this.hitboxPersona.body.debugBodyColor = 0xff0000;
+    this.scene.camHUD?.ignore(this.hitboxPersona);
+    this.ataquePersona = registrarAtaqueEspecial(this, this.hitboxPersona, {
+      categoria: "corpo",
+      contraAtacarDono: true,
+      aoAtingirAlvo: (alvo) => this.atingirAlvoPersona(alvo),
+    });
+  }
+
+  atualizarHitboxPersona() {
+    if (!this.hitboxPersona?.active || !this.persona?.active) return;
+    const config = this.special.persona.hitbox;
+    const direcao = this.personagem.sprite.flipX ? -1 : 1;
+    this.hitboxPersona.setPosition(
+      this.persona.x + direcao * config.offsetX,
+      this.persona.y + config.offsetY,
+    );
+    this.hitboxPersona.body.updateFromGameObject();
+  }
+
+  atingirAlvoPersona(alvo) {
+    if (this.finalizado || this.alvosAtingidosPersona.has(alvo)) return;
+    this.alvosAtingidosPersona.add(alvo);
+    const sprite = this.personagem.sprite;
+    alvo.receberDano(this.special.persona.propriedadesAtaque.dano,
+      this.special.persona.propriedadesAtaque, {
+        x: this.persona?.x ?? sprite.x,
+        direcao: sprite.flipX ? -1 : 1,
+        atacante: this.personagem,
+      });
+  }
+
+  destruirHitboxPersona() {
+    this.ataquePersona?.remover();
+    this.ataquePersona = null;
+    this.hitboxPersona?.destroy();
+    this.hitboxPersona = null;
   }
 
   aoAtualizarAnimacao(animacao, frame) {
@@ -78,30 +214,7 @@ export default class AigisAupSpecial {
   }
 
   obterTexturaAura() {
-    const chave = "aigis_up_special_aura";
-    if (this.scene.textures.exists(chave)) return chave;
-    const textura = this.scene.textures.createCanvas(chave, 144, 208);
-    const contexto = textura.getContext();
-    const desenharBrilho = (x, y, raioX, raioY, alpha) => {
-      contexto.save();
-      contexto.translate(x, y);
-      contexto.scale(raioX / 64, raioY / 64);
-      const gradiente = contexto.createRadialGradient(0, 0, 2, 0, 0, 64);
-      gradiente.addColorStop(0, `rgba(63, 166, 255, ${alpha})`);
-      gradiente.addColorStop(0.48, `rgba(24, 116, 255, ${alpha * 0.42})`);
-      gradiente.addColorStop(1, "rgba(8, 74, 255, 0)");
-      contexto.fillStyle = gradiente;
-      contexto.beginPath();
-      contexto.arc(0, 0, 64, 0, Math.PI * 2);
-      contexto.fill();
-      contexto.restore();
-    };
-    desenharBrilho(72, 104, 52, 96, 0.42);
-    desenharBrilho(45, 64, 35, 49, 0.28);
-    desenharBrilho(99, 143, 33, 52, 0.24);
-    desenharBrilho(103, 78, 26, 39, 0.2);
-    textura.refresh();
-    return chave;
+    return obterTexturaAuraAigis(this.scene);
   }
 
   criarOvercharge() {
@@ -182,6 +295,9 @@ export default class AigisAupSpecial {
       this.atualizarAura();
       this.atualizarOvercharge();
       this.atualizarChoques(progresso);
+    }
+    if (!this.personaConcluida && this.persona?.active && animacao.currentAnim?.key === this.special.animacao) {
+      this.atualizarPersona(this.persona.anims.currentFrame);
     }
   }
 
@@ -267,6 +383,12 @@ export default class AigisAupSpecial {
     const sprite = this.personagem.sprite;
     sprite.off("animationupdate", this.aoAtualizarAnimacao);
     sprite.off(`animationcomplete-${this.special.animacao}`, this.aoCompletarAnimacao);
+    this.persona?.off("animationupdate", this.aoAtualizarPersona);
+    this.timerPersonaFinal?.remove(false);
+    this.timerPersonaFinal = null;
+    this.destruirHitboxPersona();
+    this.persona?.destroy();
+    this.persona = null;
     this.encerrarFlutuacao();
     this.restaurarGravidade();
     this.overcharge?.destroy();
@@ -316,5 +438,28 @@ AigisAupSpecial.configuracao = {
     knockbackY: -80,
     knockbackFixo: true,
     tumbling: false,
+  },
+};
+
+AigisAupSpecial.configuracaoPersona = {
+  ...AigisAupSpecial.configuracao,
+  persona: {
+    offsetX: 85,
+    offsetY: -5,
+    escala: 0.33,
+    deslocamentoY: 28,
+    quadroFimSubida: 7,
+    quadroInicioAtaque: 10,
+    quadroFimAtaque: 14,
+    duracaoPoseFinal: 600,
+    hitbox: {
+      largura: 70,
+      altura: 82,
+      offsetX: 12,
+      offsetY: -190,
+    },
+    propriedadesAtaque: {
+      ...AigisAupSpecial.configuracao.propriedadesAtaque,
+    },
   },
 };

@@ -6,6 +6,11 @@ import AigisAdoSpecial from "./Specials/Aigis/AdoSpecial.js";
 import AigisAupSpecial from "./Specials/Aigis/AupSpecial.js";
 import AigisDoSpecial from "./Specials/Aigis/DoSpecial.js";
 import AigisSideSpecial from "./Specials/Aigis/SideSpecial.js";
+import AigisUlt from "./Ult/AigisUlt.js";
+import { obterTexturaAuraAigis } from "./Specials/Aigis/AupSpecial.js";
+import AigisPersonaNeSpecial from "./Specials/Aigis/NePersonaSpecial.js";
+import AigisPersonaDoSpecial from "./Specials/Aigis/DoPersonaSpecial.js";
+import AigisPersonaSideSpecial from "./Specials/Aigis/SidePersonaSpecial.js";
 
 
 export default class Aigis extends Personagem {
@@ -168,6 +173,19 @@ this.scene.events.once("shutdown", () => {
 
 
 this.nomePersonagem = "Aigis";
+    this.ult = AigisUlt.configuracao;
+    this.modoUltAigisAtivo = false;
+    this.aigisUltAtivando = false;
+    this.guardMaximoNormal = this.guardMaximo;
+    this.ultimaGuardaModoUlt = false;
+    this.personaGuardaUlt = null;
+    this.auraModoUlt = null;
+    this.tweenAuraModoUlt = null;
+    this.scene.events.once("shutdown", () => {
+      this.auraModoUlt?.destroy();
+      this.personaGuardaUlt?.destroy();
+      this.tweenAuraModoUlt?.stop();
+    });
     this.tauntPausaFinal = 0; // Encerra o taunt sem segurar o último frame.
     //============================= hitboxes ========================================
    
@@ -255,6 +273,84 @@ this.nomePersonagem = "Aigis";
         offsetY: -28,
         escala: 0.33,
         hurtboxes: [],
+      },
+
+      NeSpecialUlt: {
+        largura: 220,
+        altura: 400,
+        offsetX: 55,
+        offsetY: 15,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+        ],
+      },
+
+      NeSpecialUltAir: {
+        largura: 220,
+        altura: 400,
+        offsetX: 10,
+        offsetY: 19,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+        ],
+      },
+
+      DoSpecialUlt: {
+        largura: 220,
+        altura: 400,
+        offsetX: 20,
+        offsetY: -85,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+        ],
+      },
+
+      invoc3_special: {
+        largura: 220,
+        altura: 400,
+        offsetX: 0,
+        offsetY: 6,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+        ],
+      },
+
+      ult_siSpecial: {
+        largura: 220,
+        altura: 400,
+        offsetX: 0,
+        offsetY: -100,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+        ],
+      },
+
+      DoSpecialUltAir: {
+        largura: 220,
+        altura: 400,
+        offsetX: 0,
+        offsetY: -8,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+        ],
       },
 
       guard: {
@@ -494,8 +590,8 @@ this.nomePersonagem = "Aigis";
       neSpecial: {
         largura: 220,
         altura: 400,
-        offsetX: 0,
-        offsetY: -9,
+        offsetX: 50,
+        offsetY: 3,
         escala: 0.33,
         hurtboxes: [
           { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
@@ -507,8 +603,8 @@ this.nomePersonagem = "Aigis";
       AneSpecial: {
         largura: 220,
         altura: 400,
-        offsetX: 0,
-        offsetY: -9,
+        offsetX: 35,
+        offsetY: 0,
         escala: 0.33,
         hurtboxes: [
           { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
@@ -520,8 +616,8 @@ this.nomePersonagem = "Aigis";
       AsiSpecial: {
         largura: 220,
         altura: 400,
-        offsetX: 0,
-        offsetY: -9,
+        offsetX: 90,
+        offsetY: 100,
         escala: 0.33,
         hurtboxes: [
           { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
@@ -533,8 +629,8 @@ this.nomePersonagem = "Aigis";
       AdoSpecial: {
         largura: 220,
         altura: 400,
-        offsetX: 0,
-        offsetY: -9,
+        offsetX: 70,
+        offsetY: 50,
         escala: 0.33,
         hurtboxes: [
           { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
@@ -941,6 +1037,8 @@ this.nomePersonagem = "Aigis";
 
    }
 
+    this.golpesNormaisAigis = this.golpes;
+
     // specials ==========================
     this.specials = {
       neutro: AigisNeSpecial.configuracao,
@@ -951,8 +1049,189 @@ this.nomePersonagem = "Aigis";
       agachado: AigisDoSpecial.configuracao,
       lado: AigisSideSpecial.configuracao,
     };
+    this.specialsNormaisAigis = this.specials;
 
    
+  }
+
+  update() {
+    super.update();
+    this.atualizarAtaqueBaixoUlt();
+    this.atualizarAuraModoUlt();
+    this.atualizarPersonaGuarda();
+  }
+
+  atualizarAtaqueBaixoUlt() {
+    const estadoAtack = this.maquinaEstados.estadoAtual;
+    const ataqueBaixoUltAtivo =
+      this.modoUltAigisAtivo &&
+      estadoAtack?.nome === "atack" &&
+      estadoAtack.tipoAtaqueAtual === "agachado" &&
+      estadoAtack.golpeAtual === this.golpes.agachado;
+
+    if (!ataqueBaixoUltAtivo) {
+      this.logicaAtaqueBaixoUlt?.cancelar();
+      this.logicaAtaqueBaixoUlt = null;
+      return;
+    }
+
+    if (this.logicaAtaqueBaixoUlt) return;
+    this.logicaAtaqueBaixoUlt = new AigisPersonaDoSpecial(
+      this,
+      AigisPersonaDoSpecial.configuracaoAtaqueNormal,
+      estadoAtack,
+    );
+    this.logicasEspeciaisAtivas.push(this.logicaAtaqueBaixoUlt);
+    this.logicaAtaqueBaixoUlt.executar();
+  }
+
+  ativarSpecialsUltAigis() {
+    if (this.specialsUltAigis) return;
+    this.golpesUltAigis = {
+      ...this.golpesNormaisAigis,
+      agachado: AigisPersonaDoSpecial.configuracaoAtaqueNormal,
+    };
+    this.golpes = this.golpesUltAigis;
+    this.specialsUltAigis = {
+      ...this.specialsNormaisAigis,
+      neutro: AigisPersonaNeSpecial.configuracaoChao,
+      air_neutro: AigisPersonaNeSpecial.configuracaoAr,
+      air_cima: AigisAupSpecial.configuracaoPersona,
+      lado: AigisPersonaSideSpecial.configuracaoChao,
+      air_lado: AigisPersonaSideSpecial.configuracaoAr,
+      agachado: AigisPersonaDoSpecial.configuracaoChao,
+      air_agachado: AigisPersonaDoSpecial.configuracaoAr,
+    };
+    this.specials = this.specialsUltAigis;
+  }
+
+  restaurarSpecialsNormaisAigis() {
+    this.logicaAtaqueBaixoUlt?.cancelar();
+    this.logicaAtaqueBaixoUlt = null;
+    if (!this.specialsUltAigis) return;
+    this.golpes = this.golpesNormaisAigis;
+    this.golpesUltAigis = null;
+    this.specials = this.specialsNormaisAigis;
+    this.specialsUltAigis = null;
+  }
+
+  consumirUlt() {
+    this.aigisUltAtivando = true;
+    this.ultMultiplicadorCarga = 1;
+    this.ultBoostAte = 0;
+  }
+
+  atualizarCargaUlt(delta) {
+    if (this.modoUltAigisAtivo || this.aigisUltAtivando) {
+      const decaimento = this.ultCargaMax / this.ultTempoCarga * delta;
+      this.ultCarga = Math.max(0, this.ultCarga - decaimento);
+      if (this.ultCarga === 0 && this.modoUltAigisAtivo) {
+        this.encerrarModoUltAigis();
+      }
+      return;
+    }
+    super.atualizarCargaUlt(delta);
+  }
+
+  aplicarBoostUltPorDano(dano) {
+    if (this.modoUltAigisAtivo || this.aigisUltAtivando) return;
+    super.aplicarBoostUltPorDano(dano);
+  }
+
+  ganharCargaUltPorMorte() {
+    if (this.modoUltAigisAtivo || this.aigisUltAtivando) {
+      this.encerrarModoUltAigis({ morte: true });
+      this.maquinaEstados.estadoAtual?.logicaUlt?.cancelar?.();
+      return;
+    }
+    super.ganharCargaUltPorMorte();
+  }
+
+  encerrarModoUltAigis({ morte = false } = {}) {
+    this.modoUltAigisAtivo = false;
+    this.aigisUltAtivando = false;
+    this.restaurarSpecialsNormaisAigis();
+    this.tweenAuraModoUlt?.stop();
+    this.tweenAuraModoUlt = null;
+    this.auraModoUlt?.destroy();
+    this.auraModoUlt = null;
+    this.guardMaximo = this.guardMaximoNormal;
+    this.vidaGuard = Math.min(this.vidaGuard, this.guardMaximo);
+    if (morte) {
+      this.personaGuardaUlt?.destroy();
+      this.personaGuardaUlt = null;
+      this.ultimaGuardaModoUlt = false;
+    } else if (this.personaGuardaUlt?.active) {
+      this.recolherPersonaGuarda();
+      this.ultimaGuardaModoUlt = false;
+    }
+  }
+
+  criarAuraModoUlt() {
+    if (this.auraModoUlt?.active) return;
+    this.auraModoUlt = this.scene.add.image(this.sprite.x, this.sprite.y - 70, obterTexturaAuraAigis(this.scene))
+      .setScale(1.05)
+      .setAlpha(0.68)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setDepth(this.sprite.depth - 1);
+    this.scene.camHUD?.ignore(this.auraModoUlt);
+    this.tweenAuraModoUlt = this.scene.tweens.add({
+      targets: this.auraModoUlt,
+      alpha: { from: 0.5, to: 0.76 },
+      scale: { from: 0.99, to: 1.11 },
+      duration: 170,
+      yoyo: true,
+      repeat: -1,
+    });
+  }
+
+  atualizarAuraModoUlt() {
+    if (!this.modoUltAigisAtivo || !this.auraModoUlt?.active) return;
+    this.auraModoUlt
+      .setPosition(this.sprite.x, this.sprite.y - 70)
+      .setDepth(this.sprite.depth - 1);
+  }
+
+  atualizarPersonaGuarda() {
+    const estaGuardando = this.modoUltAigisAtivo &&
+      this.maquinaEstados.estadoAtual?.nome === "guard";
+    if (estaGuardando && !this.ultimaGuardaModoUlt) this.invocarPersonaGuarda();
+    if (!estaGuardando && this.ultimaGuardaModoUlt) this.recolherPersonaGuarda();
+    this.ultimaGuardaModoUlt = estaGuardando;
+
+    if (estaGuardando && this.personaGuardaUlt?.active) {
+      const direcao = this.sprite.flipX ? -1 : 1;
+      this.personaGuardaUlt.setPosition(this.sprite.x + direcao * 78, this.sprite.y - 40)
+        .setFlipX(this.sprite.flipX)
+        .setDepth(this.sprite.depth - 1);
+    }
+  }
+
+  invocarPersonaGuarda() {
+    if (!this.personaGuardaUlt?.active) {
+      this.personaGuardaUlt = this.scene.add.sprite(this.sprite.x, this.sprite.y - 40, "p_guard", 0)
+        .setOrigin(0.5, 1)
+        .setScale(0.33)
+        .setDepth(this.sprite.depth - 1);
+      this.scene.camHUD?.ignore(this.personaGuardaUlt);
+    }
+    this.personaGuardaUlt.anims.stop();
+    this.personaGuardaUlt.play("ai_p_guard_invocar", true);
+    this.personaGuardaUlt.once("animationcomplete-ai_p_guard_invocar", () => {
+      if (!this.personaGuardaUlt?.active || this.maquinaEstados.estadoAtual?.nome !== "guard") return;
+      this.personaGuardaUlt.setFrame(10);
+      this.personaGuardaUlt.anims.pause();
+    });
+  }
+
+  recolherPersonaGuarda() {
+    if (!this.personaGuardaUlt?.active) return;
+    this.personaGuardaUlt.anims.stop();
+    this.personaGuardaUlt.play("ai_p_guard_recolher", true);
+    this.personaGuardaUlt.once("animationcomplete-ai_p_guard_recolher", () => {
+      this.personaGuardaUlt?.destroy();
+      this.personaGuardaUlt = null;
+    });
   }
 
   //animaçoes====================================================
@@ -964,6 +1243,126 @@ this.nomePersonagem = "Aigis";
         key: "ai_AupSpecial",
         frames: scene.anims.generateFrameNumbers("ai_AupSpecial", { start: 0, end: 17 }),
         frameRate: 16,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_ult_intro_pose")) {
+      scene.anims.create({
+        key: "ai_ult_intro_pose",
+        frames: scene.anims.generateFrameNumbers("ai_AupSpecial", { start: 0, end: 11 }),
+        frameRate: 16,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("ai_ult_intro_fim")) {
+      scene.anims.create({
+        key: "ai_ult_intro_fim",
+        frames: scene.anims.generateFrameNumbers("ai_AupSpecial", { start: 12, end: 17 }),
+        frameRate: 16,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_eyes_ult")) {
+      scene.anims.create({
+        key: "ai_eyes_ult",
+        frames: scene.anims.generateFrameNumbers("ai_eyes", { start: 0, end: 21 }),
+        frameRate: 12,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_invoc1_special")) {
+      scene.anims.create({
+        key: "ai_invoc1_special",
+        frames: scene.anims.generateFrameNumbers("ai_invoc1", { start: 0, end: 4 }),
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("ai_invoc2_special")) {
+      scene.anims.create({
+        key: "ai_invoc2_special",
+        frames: scene.anims.generateFrameNumbers("ai_invoc2", { start: 0, end: 4 }),
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("ai_invoc3_special")) {
+      scene.anims.create({
+        key: "ai_invoc3_special",
+        frames: scene.anims.generateFrameNumbers("ai_invoc3", { start: 0, end: 5 }),
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("ai_p_neSpecial")) {
+      scene.anims.create({
+        key: "ai_p_neSpecial",
+        frames: scene.anims.generateFrameNumbers("p_neSpecial", { start: 8, end: 20 }),
+        frameRate: 30,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("ai_p_doSpecial")) {
+      scene.anims.create({
+        key: "ai_p_doSpecial",
+        frames: scene.anims.generateFrameNumbers("p_doSpecial", { start: 0, end: 11 }),
+        frameRate: 30,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_p_siSpecial")) {
+      scene.anims.create({
+        key: "ai_p_siSpecial",
+        frames: scene.anims.generateFrameNumbers("p_siSpecial", { start: 0, end: 44 }),
+        frameRate: 30,
+        repeat: -1,
+      });
+    }
+
+    if (!scene.anims.exists("ai_p_siSpecial_air")) {
+      scene.anims.create({
+        key: "ai_p_siSpecial_air",
+        frames: scene.anims.generateFrameNumbers("p_siSpecial", { start: 20, end: 44 }),
+        frameRate: 30,
+        repeat: -1,
+      });
+    }
+
+    if (!scene.anims.exists("ai_ult_siSpecial")) {
+      scene.anims.create({
+        key: "ai_ult_siSpecial",
+        frames: scene.anims.generateFrameNumbers("ult_siSpecial", { start: 0, end: 8 }),
+        frameRate: 18,
+        repeat: -1,
+      });
+    }
+
+    if (!scene.anims.exists("ai_p_AupSpecial")) {
+      scene.anims.create({
+        key: "ai_p_AupSpecial",
+        frames: scene.anims.generateFrameNumbers("p_AupSpecial", { start: 0, end: 14 }),
+        frameRate: 25,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_p_guard_invocar")) {
+      scene.anims.create({
+        key: "ai_p_guard_invocar",
+        frames: scene.anims.generateFrameNumbers("p_guard", { start: 0, end: 10 }),
+        frameRate: 36,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("ai_p_guard_recolher")) {
+      scene.anims.create({
+        key: "ai_p_guard_recolher",
+        frames: scene.anims.generateFrameNumbers("p_guard", { start: 23, end: 26 }),
+        frameRate: 24,
         repeat: 0,
       });
     }
@@ -989,7 +1388,10 @@ this.nomePersonagem = "Aigis";
     if (!scene.anims.exists("ai_AdoSpecial")) {
       scene.anims.create({
         key: "ai_AdoSpecial",
-        frames: scene.anims.generateFrameNumbers("ai_AdoSpecial", { start: 1, end: 14 }),
+        frames: scene.anims.generateFrameNumbers("ai_AdoSpecial", { start: 1, end: 14 })
+          .map((frame) => frame.frame >= 5 && frame.frame <= 9
+            ? { ...frame, duration: 65 }
+            : frame),
         frameRate: 18,
         repeat: 0,
       });
