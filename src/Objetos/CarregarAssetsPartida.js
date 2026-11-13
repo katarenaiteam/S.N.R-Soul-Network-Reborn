@@ -91,9 +91,6 @@ const assetscommon = [
 
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_portrait", () => { scene.load.image("FJ_portrait", "assets/Hud/Portrait/FJ_portrait.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_portrait2", () => { scene.load.image("FJ_portrait2", "assets/Hud/Portrait/FJ_portrait2.png"); }),
-  
-
-
 
   (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_portrait", () => { scene.load.image("Pingu_portrait", "assets/Hud/Portrait/Pingu_portrait.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Pingu_portrait2", () => { scene.load.image("Pingu_portrait2", "assets/Hud/Portrait/Pingu_portrait2.png"); }),
@@ -109,6 +106,8 @@ const assetscommon = [
 
   (scene, queued) => queueAsset(scene, queued, "texture", "Gk_portrait", () => { scene.load.image("Gk_portrait", "assets/Hud/Portrait/Gk_portrait.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Gk_portrait2", () => { scene.load.image("Gk_portrait2", "assets/Hud/Portrait/Gk_portrait2.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Aigis_portrait", () => { scene.load.image("Aigis_portrait", "assets/Hud/Portrait/Aigis_portrait.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Aigis_portrait2", () => { scene.load.image("Aigis_portrait2", "assets/Hud/Portrait/Aigis_portrait2.png"); }),
 
   (scene, queued) => queueAsset(scene, queued, "texture", "0.png", () => { scene.load.image("0.png", "assets/Hud/DamagePercentage/0-19_/0.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "1.png", () => { scene.load.image("1.png", "assets/Hud/DamagePercentage/0-19_/1.png"); }),
@@ -729,10 +728,8 @@ const assetsAigis = [
   (scene, queued) => queueAsset(scene, queued, "texture", "ai_jump", () => { scene.load.spritesheet("ai_jump", "assets/personagens/Aigis/ai_jump.png", { frameWidth: 251, frameHeight: 393}); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "ai_walk", () => { scene.load.spritesheet("ai_walk", "assets/personagens/Aigis/ai_walk.png", { frameWidth: 226, frameHeight: 392}); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "ai_crouch1", () => { scene.load.spritesheet("ai_crouch1", "assets/personagens/Aigis/ai_crouch1.png", { frameWidth: 209, frameHeight: 311}); }),
-  (scene, queued) => queueAsset(scene, queued, "texture", "ai_crouch2", () => { scene.load.spritesheet("ai_crouch2", "assets/personagens/Aigis/ai_crouch2.png", { frameWidth: 205, frameHeight: 270}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_crouch2", () => { scene.load.spritesheet("ai_crouch2", "assets/personagens/Aigis/ai_crouch2.png", { frameWidth: 209, frameHeight: 311}); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "ai_crouch3", () => { scene.load.spritesheet("ai_crouch3", "assets/personagens/Aigis/ai_crouch3.png", { frameWidth: 209, frameHeight: 311}); }),
-
-
   (scene, queued) => queueAsset(scene, queued, "texture", "ai_dash", () => { scene.load.spritesheet("ai_dash", "assets/personagens/Aigis/ai_dash.png", { frameWidth: 361, frameHeight: 373}); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "ai_taunt", () => { scene.load.spritesheet("ai_taunt", "assets/personagens/Aigis/ai_taunt.png", { frameWidth: 218, frameHeight: 383}); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "ai_block", () => { scene.load.spritesheet("ai_block", "assets/personagens/Aigis/ai_block.png", { frameWidth: 246, frameHeight: 344}); }),
@@ -753,18 +750,35 @@ const assetsAigis = [
   (scene, queued) => queueAsset(scene, queued, "texture", "ai_upAir", () => { scene.load.spritesheet("ai_upAir", "assets/personagens/Aigis/ai_upAir.png", { frameWidth: 330, frameHeight: 420 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "ai_downAir", () => { scene.load.spritesheet("ai_downAir", "assets/personagens/Aigis/ai_downAir.png", { frameWidth: 258, frameHeight: 407 }); }),
 
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_neSpecial", () => { scene.load.spritesheet("ai_neSpecial", "assets/personagens/Aigis/atacks/ai_neSpecial.png", { frameWidth: 322, frameHeight: 402 }); }),  
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_doSpecial", () => { scene.load.spritesheet("ai_doSpecial", "assets/personagens/Aigis/atacks/ai_doSpecial.png", { frameWidth: 405, frameHeight: 269 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_doE1", () => { scene.load.spritesheet("ai_doE1", "assets/personagens/Aigis/atacks/ai_doE1.png", { frameWidth: 195, frameHeight: 104 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_doE2", () => { scene.load.spritesheet("ai_doE2", "assets/personagens/Aigis/atacks/ai_doE2.png", { frameWidth: 491, frameHeight: 119}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_sideSpecial", () => { scene.load.spritesheet("ai_sideSpecial", "assets/personagens/Aigis/atacks/ai_sideSpecial.png", { frameWidth: 362, frameHeight: 409 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_AneSpecial", () => { scene.load.spritesheet("ai_AneSpecial", "assets/personagens/Aigis/atacks/ai_AneSpecial.png", { frameWidth: 304, frameHeight: 418 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_mina", () => { scene.load.spritesheet("ai_mina", "assets/personagens/Aigis/atacks/ai_mina.png", { frameWidth: 55, frameHeight: 55 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_AupSpecial", () => { scene.load.spritesheet("ai_AupSpecial", "assets/personagens/Aigis/atacks/ai_AupSpecial.png", { frameWidth: 246, frameHeight: 402 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_upEfect", () => { scene.load.spritesheet("ai_upEfect", "assets/personagens/Aigis/atacks/ai_upEfect.png", { frameWidth: 50, frameHeight: 60 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_AdoSpecial", () => { scene.load.spritesheet("ai_AdoSpecial", "assets/personagens/Aigis/atacks/ai_AdoSpecial.png", { frameWidth: 400, frameHeight: 454 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "granade", () => { scene.load.spritesheet("granade", "assets/personagens/Aigis/atacks/granade.png", { frameWidth: 38, frameHeight: 47 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_siExp", () => { scene.load.spritesheet("ai_siExp", "assets/personagens/Aigis/atacks/ai_siExp.png", { frameWidth: 142, frameHeight: 160 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_AsiSpecial", () => { scene.load.spritesheet("ai_AsiSpecial", "assets/personagens/Aigis/atacks/ai_AsiSpecial.png", { frameWidth: 395, frameHeight: 507 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_bulet1", () => { scene.load.spritesheet("ai_bulet1", "assets/personagens/Aigis/ai_bulet1.png", { frameWidth: 216, frameHeight: 262 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_missel", () => { scene.load.spritesheet("ai_missel", "assets/personagens/Aigis/atacks/ai_missel.png", { frameWidth: 60, frameHeight: 20 }); }),
 
-  (scene, queued) => queueAsset(scene, queued, "texture", "ai_neSpecial", () => { scene.load.spritesheet("ai_neSpecial", "assets/personagens/Aigis/ai_neSpecial.png", { frameWidth: 322, frameHeight: 402 }); }),  
-  (scene, queued) => queueAsset(scene, queued, "texture", "ai_doSpecial", () => { scene.load.spritesheet("ai_doSpecial", "assets/personagens/Aigis/ai_doSpecial.png", { frameWidth: 405, frameHeight: 269 }); }),
-  (scene, queued) => queueAsset(scene, queued, "texture", "ai_sideSpecial", () => { scene.load.spritesheet("ai_sideSpecial", "assets/personagens/Aigis/ai_sideSpecial.png", { frameWidth: 362, frameHeight: 409 }); }),
-  (scene, queued) => queueAsset(scene, queued, "texture", "ai_AupSpecial", () => { scene.load.spritesheet("ai_AupSpecial", "assets/personagens/Aigis/ai_AupSpecial.png", { frameWidth: 246, frameHeight: 402 }); }),
-  (scene, queued) => queueAsset(scene, queued, "texture", "granade", () => { scene.load.spritesheet("granade", "assets/personagens/Aigis/granade.png", { frameWidth: 38, frameHeight: 47 }); }),
-  (scene, queued) => queueAsset(scene, queued, "texture", "ai_AsiSpecial", () => { scene.load.spritesheet("ai_AsiSpecial", "assets/personagens/Aigis/ai_AsiSpecial.png", { frameWidth: 395, frameHeight: 507 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_invoc1", () => { scene.load.spritesheet("ai_invoc1", "assets/personagens/Aigis/atacks/persona/ai_invoc1.png", { frameWidth: 331, frameHeight: 415 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_invoc2", () => { scene.load.spritesheet("ai_invoc2", "assets/personagens/Aigis/atacks/persona/ai_invoc2.png", { frameWidth: 259, frameHeight: 425}); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_invoc3", () => { scene.load.spritesheet("ai_invoc3", "assets/personagens/Aigis/atacks/persona/ai_invoc3.png", { frameWidth: 267, frameHeight: 316 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "p_AupSpecial", () => { scene.load.spritesheet("p_AupSpecial", "assets/personagens/Aigis/atacks/persona/p_AupSpecial.png", { frameWidth: 501, frameHeight: 835 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "p_doSpecial", () => { scene.load.spritesheet("p_doSpecial", "assets/personagens/Aigis/atacks/persona/p_doSpecial.png", { frameWidth: 743, frameHeight: 499 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "p_guard", () => { scene.load.spritesheet("p_guard", "assets/personagens/Aigis/atacks/persona/p_guard.png", { frameWidth: 558, frameHeight: 604 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "p_neSpecial", () => { scene.load.spritesheet("p_neSpecial", "assets/personagens/Aigis/atacks/persona/p_neSpecial.png", { frameWidth: 809, frameHeight: 556 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "p_siSpecial", () => { scene.load.spritesheet("p_siSpecial", "assets/personagens/Aigis/atacks/persona/p_siSpecial.png", { frameWidth: 591, frameHeight: 467 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ult_siSpecial", () => { scene.load.spritesheet("ult_siSpecial", "assets/personagens/Aigis/atacks/persona/ult_siSpecial.png", { frameWidth: 392, frameHeight: 326 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "ai_cut", () => { scene.load.spritesheet("ai_cut", "assets/personagens/Aigis/atacks/persona/ai_cut.png", { frameWidth: 775, frameHeight: 289 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "overcharge", () => { scene.load.spritesheet("overcharge", "assets/personagens/Aigis/atacks/persona/overcharge.png", { frameWidth: 716, frameHeight: 477 }); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "Per_cut", () => { scene.load.spritesheet("Per_cut", "assets/personagens/Aigis/atacks/persona/Per_cut.png", { frameWidth: 701, frameHeight: 329 }); }),
   
-
-
-
-
 ];
 
 const assetsIce = [
@@ -910,7 +924,7 @@ export function carregarAssetsVersus(scene, dados) {
 export function carregarAssetsHistoria(scene) {
   const queued = new Set();
   carregarGrupo(scene, queued, assetscommon);
-  for (const pack of [assetsFJ, assetsSpiderMan, assetsMiku, assetsKen, assetsSlenderman, assetsPingu, assetsTH30, assetsGoku]) {
+  for (const pack of [assetsFJ, assetsSpiderMan, assetsMiku, assetsKen, assetsSlenderman, assetsPingu, assetsTH30, assetsGoku, assetsAigis]) {
     carregarGrupo(scene, queued, pack);
   }
   carregarGrupo(scene, queued, assetsMikuMap);

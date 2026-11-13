@@ -40,7 +40,7 @@ export default class PuppetLojaMiku {
     scene.alvosAtaqueExtras.push(this);
 
     this.atualizarNoPostUpdate = () => this.atualizar();
-    this.limparAoEncerrar = () => this.destruir();
+    this.limparAoEncerrar = () => this.destruir(true);
     scene.events.on("postupdate", this.atualizarNoPostUpdate);
     scene.events.once("shutdown", this.limparAoEncerrar);
   }
@@ -144,16 +144,18 @@ export default class PuppetLojaMiku {
     this.alvosAtingidos.clear();
   }
 
-  destruir() {
+  destruir(encerrandoCena = false) {
     if (!this.ativo) return;
     this.ativo = false;
     this.scene.events.off("postupdate", this.atualizarNoPostUpdate);
     this.scene.events.off("shutdown", this.limparAoEncerrar);
     this.limparAtaque();
-    this.colliderMapa?.destroy();
+    if (!encerrandoCena) this.colliderMapa?.destroy();
     this.colliderMapa = null;
-    if (this.hurtbox?.body) this.hurtbox.body.enable = false;
-    this.grupoHurtbox?.clear(true, true);
+    if (!encerrandoCena) {
+      if (this.hurtbox?.body) this.hurtbox.body.enable = false;
+      this.grupoHurtbox?.clear(true, true);
+    }
     this.grupoHurtbox = null;
     this.hurtbox = null;
     this.scene.alvosAtaqueExtras = (this.scene.alvosAtaqueExtras ?? []).filter(

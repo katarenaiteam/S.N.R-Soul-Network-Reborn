@@ -1,4 +1,11 @@
 import Personagem from "./Personagem.js";
+import AigisNeSpecial from "./Specials/Aigis/NeSpecial.js";
+import AigisAneSpecial from "./Specials/Aigis/AneSpecial.js";
+import AigisAsiSpecial from "./Specials/Aigis/AsiSpecial.js";
+import AigisAdoSpecial from "./Specials/Aigis/AdoSpecial.js";
+import AigisAupSpecial from "./Specials/Aigis/AupSpecial.js";
+import AigisDoSpecial from "./Specials/Aigis/DoSpecial.js";
+import AigisSideSpecial from "./Specials/Aigis/SideSpecial.js";
 
 
 export default class Aigis extends Personagem {
@@ -22,7 +29,7 @@ export default class Aigis extends Personagem {
         forcaPulo: -600,
         maxPulos: 2,
         maxDash: 1,
-        maxComboIndex: 4,
+        maxComboIndex: 3,
       },
 
       teclas,
@@ -54,9 +61,109 @@ export default class Aigis extends Personagem {
     escala: 1,
   },
 
+  explosaoAtaque2: {
+    textura: "ai_siExp",
+    animacao: "ai_siExp_ataque",
+    escala: 0.24,
+    blendMode: Phaser.BlendModes.ADD,
+    alpha: 0.85,
+  },
+
+  explosaoAtaque3: {
+    textura: "ai_bulet1",
+    animacao: "ai_bulet1_ataque",
+    escala: 0.8,
+    blendMode: Phaser.BlendModes.ADD,
+    alpha: 1,
+  },
+
   fumacaPulo: { escala: 0.25, offsetX: 30, offsetY: -10 },
 
 };
+
+this.framesEfeitosCombo = {
+  ai_atack2: new Set(),
+  ai_sideAtack: new Set(),
+  ai_downAtack: new Set(),
+};
+this.efeitoAtaque3Criado = false;
+this.tocarEfeitoCombo = (nome, x, y, opcoes = {}) => {
+  const efeito = this.vfx.tocar(nome, { offsetX: x, offsetY: y });
+  if (!efeito) return null;
+  const eExplosaoPequena = nome === "explosaoAtaque2";
+  const duracaoEfeito = eExplosaoPequena ? 1000 / 18 * 4 : 1000 / 36 * 17;
+  this.scene.tweens.add({
+    targets: efeito,
+    alpha: 0,
+    delay: 300,
+    duration: eExplosaoPequena ? 180 : 160,
+    ease: "Quad.easeOut",
+  });
+  if (opcoes.compensarMovimento) {
+    const velocidadeX = this.sprite.body?.velocity.x ?? 0;
+    const duracaoCompensacao = opcoes.duracaoCompensacaoMovimento ?? duracaoEfeito;
+    const deltaX = velocidadeX * (duracaoCompensacao / 1000) *
+      (opcoes.fatorCompensacaoMovimento ?? 1);
+    this.scene.tweens.add({
+      targets: efeito,
+      x: efeito.x + deltaX,
+      duration: duracaoCompensacao,
+      ease: "Linear",
+    });
+  }
+  return efeito;
+};
+this.etapasEfeitosCombo = {
+  ai_atack2: [
+    { textura: 7, sequencia: 2, x: 50, y: -100 },
+    { textura: 9, sequencia: 4, x: 43, y: -126 },
+    { textura: 11, sequencia: 6, x: 28, y: -146 },
+  ],
+  ai_sideAtack: [
+    { textura: 7, sequencia: 7, x: 65, y: -100 },
+    { textura: 9, sequencia: 9, x: 55, y: -126 },
+    { textura: 11, sequencia: 11, x: 43, y: -146 },
+  ],
+  ai_downAtack: [
+    { textura: 7, sequencia: 2, x: 50, y: -80 },
+    { textura: 9, sequencia: 4, x: 43, y: -106 },
+    { textura: 11, sequencia: 6, x: 23, y: -123 },
+  ],
+};
+this.aoAtualizarEfeitosCombo = (anim, frame) => {
+  const frameTextura = Number(frame.textureFrame);
+  const frameSequencia = frame.index;
+  const etapas = this.etapasEfeitosCombo[anim.key];
+  if (etapas) {
+    const indice = etapas.findIndex(etapa =>
+      frameTextura === etapa.textura || frameSequencia === etapa.sequencia
+    );
+    const framesDisparados = this.framesEfeitosCombo[anim.key];
+    if (indice < 0 || framesDisparados.has(indice)) return;
+    framesDisparados.add(indice);
+    const ponto = etapas[indice];
+    this.tocarEfeitoCombo("explosaoAtaque2", ponto.x, ponto.y, {
+      compensarMovimento: anim.key === "ai_sideAtack",
+      duracaoCompensacaoMovimento: 300,
+      fatorCompensacaoMovimento: 0.35,
+    });
+  } else if (anim.key === "ai_atack3" && !this.efeitoAtaque3Criado &&
+    (frameTextura === 16 || frameSequencia === 3)) {
+    this.efeitoAtaque3Criado = true;
+    // O centro fica adiante da mão para alinhar o início brilhante do sprite.
+    this.tocarEfeitoCombo("explosaoAtaque3", 110, -100);
+  }
+};
+this.aoIniciarComboAtaque = (anim) => {
+  this.framesEfeitosCombo[anim.key]?.clear();
+  if (anim.key === "ai_atack3") this.efeitoAtaque3Criado = false;
+};
+this.sprite.on("animationstart", this.aoIniciarComboAtaque);
+this.sprite.on("animationupdate", this.aoAtualizarEfeitosCombo);
+this.scene.events.once("shutdown", () => {
+  this.sprite?.off("animationstart", this.aoIniciarComboAtaque);
+  this.sprite?.off("animationupdate", this.aoAtualizarEfeitosCombo);
+});
 
 
 
@@ -67,106 +174,106 @@ this.nomePersonagem = "Aigis";
     this.configAnimacoes = {
       
        idle: {
-        largura: 250,
+        largura: 220,
         altura: 400,
         offsetX: 0,
-        offsetY: -10,
+        offsetY: -9,
         escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
-          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
-          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
+          { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
         ],
       },
 
       walk: {
-        largura: 250,
+        largura: 220,
         altura: 400,
         offsetX: 0,
-        offsetY: -8,
+        offsetY: -7,
         escala: 0.33,
         hurtboxes: [
-           { largura: 50, altura: 20, offsetX: 30, offsetY: -77 },
-          { largura: 40, altura: 18, offsetX: 17, offsetY: -57 },
-          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
+           { largura: 30, altura: 40, offsetX: 0, offsetY: -107 },
+          { largura: 35, altura: 48, offsetX: 0, offsetY: -67 },
+          { largura: 30, altura: 40, offsetX: 0, offsetY: -25 },
         ],
       },
 
       jump: {
-        largura: 250,
+        largura: 220,
         altura: 400,
-        offsetX: 0,
-        offsetY: -10,
+        offsetX: 8,
+        offsetY: -6,
         escala: 0.33,
         hurtboxes: [
-           { largura: 40, altura: 43, offsetX: 26, offsetY: -105 },
-          { largura: 46, altura: 25, offsetX: 32, offsetY: -72 },
-          { largura: 18, altura: 40, offsetX: 20, offsetY: -30 },
+           { largura: 30, altura: 43, offsetX: 0, offsetY: -105 },
+          { largura: 26, altura: 25, offsetX: 2, offsetY: -72 },
+          { largura: 18, altura: 40, offsetX: 0, offsetY: -30 },
         ],
       },
 
       
       crouch: {
-        largura: 250,
+        largura: 220,
         altura: 240,
-        offsetX: 0,
-        offsetY: 74,
+        offsetX: -5,
+        offsetY: 72,
         escala: 0.33,
         hurtboxes: [
-          { largura: 50, altura: 70, offsetX: 20, offsetY: -38 },
+          { largura: 50, altura: 70, offsetX: 0, offsetY: -38 },
         ],
       },
 
         crouch2: {
-        largura: 250,
+        largura: 220,
         altura: 240,
-        offsetX: 0,
-        offsetY: 40,
+        offsetX: -5,
+        offsetY: 72,
         escala: 0.33,
         hurtboxes: [
-          { largura: 50, altura: 70, offsetX: 20, offsetY: -38 },
+          { largura: 50, altura: 70, offsetX: 0, offsetY: -38 },
         ],
       },
 
       crouch3: {
-        largura: 250,
+        largura: 220,
         altura: 240,
-        offsetX: 0,
-        offsetY: 74,
+        offsetX: -5,
+        offsetY: 72,
         escala: 0.33,
         hurtboxes: [
-          { largura: 50, altura: 70, offsetX: 20, offsetY: -38 },
+          { largura: 50, altura: 70, offsetX: 0, offsetY: -38 },
         ],
       },
        
 
       dash: {
         offsetVisualY: 5,
-        largura: 250,
+        largura: 220,
         altura: 400,
-        offsetX: 125,
-        offsetY: -60,
+        offsetX: 130,
+        offsetY: -28,
         escala: 0.33,
         hurtboxes: [],
       },
 
       guard: {
-        largura: 250,
+        largura: 220,
         altura: 400,
-        offsetX: 0,
-        offsetY: -50,  //-49
+        offsetX: 11,
+        offsetY: -55,  //-49
         escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
-          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
-          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 }
+          { largura: 35, altura: 40, offsetX: 0, offsetY: -95 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 }
         ],
       },
       stun: {
-        largura: 250,
+        largura: 220,
         altura: 240,
         offsetX: 95,
-        offsetY: 80,
+        offsetY: 50,
         escala: 0.33,
         hurtboxes: [
           { largura: 45, altura: 70, offsetX: 23, offsetY: -38 },
@@ -174,11 +281,11 @@ this.nomePersonagem = "Aigis";
       },
 
       taunt: {
-        offsetVisualX: 19,
-        largura: 250,
+        
+        largura: 220,
         altura: 400,
-        offsetX: 150,
-        offsetY: -10,
+        offsetX: 30,
+        offsetY: -15,
         escala: 0.33,
         hurtboxes: [
           { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
@@ -188,10 +295,10 @@ this.nomePersonagem = "Aigis";
       },
 
         dano: {
-  largura: 250,
+  largura: 220,
   altura: 400,
-  offsetX: 154,
-  offsetY: -80,
+  offsetX: 0,
+  offsetY: -109,
   escala: 0.33,
   hurtboxes: [
     { largura: 50, altura: 65, offsetX: -10, offsetY: -60 }, // Tronco inclinado
@@ -202,10 +309,10 @@ this.nomePersonagem = "Aigis";
 
      
       danoUp: {
-        largura: 250,
+        largura: 220,
         altura: 400,
-        offsetX: 90,
-        offsetY: 80,
+        offsetX: 0,
+        offsetY: 40,
         escala: 0.33,
         hurtboxes: [
           { largura: 55, altura: 70, offsetX: 20, offsetY: -80 },
@@ -214,10 +321,10 @@ this.nomePersonagem = "Aigis";
       },
 
       danoSide: {
-        largura: 250,
+        largura: 220,
         altura: 400,
         offsetX: 113,
-        offsetY: 80,
+        offsetY: 20,
         escala: 0.33,
         hurtboxes: [
           { largura: 65, altura: 55, offsetX: -15, offsetY: -90 }, // Tronco inclinado
@@ -226,10 +333,10 @@ this.nomePersonagem = "Aigis";
       },
      
       danoDown: {
-        largura: 250,
+        largura: 220,
         altura: 400,
         offsetX: 100,
-        offsetY: 60,
+        offsetY: 40,
         escala: 0.33,
         hurtboxes: [
           { largura: 60, altura: 65, offsetX: -10, offsetY: -60 }, 
@@ -239,10 +346,10 @@ this.nomePersonagem = "Aigis";
 
     
       dead: {
-        largura: 250,
+        largura: 220,
         altura: 250,
-        offsetX: 113,
-        offsetY: 0,
+        offsetX: 120,
+        offsetY: 86,
         escala: 0.33,
         hurtboxes: [
           { largura: 100, altura: 34, offsetX: -10, offsetY: -18 },
@@ -253,21 +360,21 @@ this.nomePersonagem = "Aigis";
 
       
       getup: {
-        largura: 250,
+        largura: 220,
         altura: 400,
-        offsetX: 113,
+        offsetX: 90,
         offsetY: -70,
         escala: 0.3,
         hurtboxes: [],
       },
 
       atack1: {
-        offsetVisualX: 19, // Pixels na tela: positivo para frente.
+       
         offsetVisualY: 0, // Positivo para baixo; negativo para cima.
-        largura: 250,
+        largura: 220,
         altura: 400,
-        offsetX: 175,
-        offsetY: -40,
+        offsetX: 73,
+        offsetY: 47,
         escala: 0.33,
         hurtboxes: [
           { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
@@ -277,27 +384,27 @@ this.nomePersonagem = "Aigis";
       },
 
       atack2: {
-        offsetVisualX: -65,
-        offsetVisualY: 0,
-        largura: 250,
+        
+        offsetVisualY: 0, // Positivo para baixo; negativo para cima.
+        largura: 220,
         altura: 400,
-        offsetX: 382,
-        offsetY: -60,
+        offsetX: 73,
+        offsetY: 47,
         escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 20, offsetX: 20, offsetY: -90 },   
-          { largura: 40, altura: 25, offsetX: 20, offsetY: -60 },
-          { largura: 85, altura: 40, offsetX: 15, offsetY: -25 },
+          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
         ],
       },
 
       atack3: {
-        offsetVisualX: 21,
-        offsetVisualY: 0,
-         largura: 250,
+       
+        offsetVisualY: 0, // Positivo para baixo; negativo para cima.
+        largura: 220,
         altura: 400,
-        offsetX: 178,
-        offsetY: 22,
+        offsetX: 73,
+        offsetY: 47,
         escala: 0.33,
         hurtboxes: [
           { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
@@ -308,24 +415,24 @@ this.nomePersonagem = "Aigis";
 
       neutralAir: {
         offsetVisualX: 16,
-         largura: 250,
+         largura: 220,
         altura: 400,
-        offsetX: 190,
-        offsetY: 120,
+        offsetX: 45,
+        offsetY: -26,
         escala: 0.33,
         hurtboxes: [
-          { largura: 40, altura: 43, offsetX: 26, offsetY: -105 },
-          { largura: 46, altura: 25, offsetX: 32, offsetY: -72 },
-          { largura: 18, altura: 40, offsetX: 20, offsetY: -30 },
+          { largura: 35, altura: 35, offsetX: 26, offsetY: -90 },
+          { largura: 26, altura: 25, offsetX: 0, offsetY: -72 },
+          { largura: 18, altura: 40, offsetX: 0, offsetY: -30 },
         ],
       },
 
       sideAtack: {
         offsetVisualX: 3,
-         largura: 250,
+         largura: 220,
         altura: 400,
-        offsetX: 155,
-        offsetY: -34,
+        offsetX: 65,
+        offsetY: 46,
         escala: 0.33,
         hurtboxes: [
           { largura: 45, altura: 45, offsetX: 15, offsetY: -100 },
@@ -335,22 +442,20 @@ this.nomePersonagem = "Aigis";
       },
 
       downAtack: {
-        offsetVisualX: 33,
-        offsetVisualY: 32,
-           largura: 250,
+           largura: 220,
         altura: 240,
-        offsetX: 198,
-        offsetY: 425,
+        offsetX: 20,
+        offsetY: 105,
         escala: 0.33,
         hurtboxes: [
           { largura: 50, altura: 70, offsetX: 20, offsetY: -38 }],
       },
 
       sideAir: {
-        largura: 250,
+        largura: 220,
         altura: 400,
-        offsetX: 145,
-        offsetY: -30,
+        offsetX: 100,
+        offsetY: -20,
         escala: 0.33,
         hurtboxes: [
            { largura: 40, altura: 43, offsetX: 26, offsetY: -105 },
@@ -360,10 +465,10 @@ this.nomePersonagem = "Aigis";
       },
 
       upAir: {  
-        largura: 250,
+        largura: 220,
         altura: 400,
-        offsetX: 113,
-        offsetY: 134,
+        offsetX: 55,
+        offsetY: 40,
         escala: 0.33,
         hurtboxes: [
            { largura: 40, altura: 43, offsetX: 26, offsetY: -105 },
@@ -373,11 +478,11 @@ this.nomePersonagem = "Aigis";
       },
 
       downAir: {
-        offsetVisualX: 18,
-         largura: 250,
+  
+         largura: 220,
         altura: 400,
-        offsetX: 193,
-        offsetY: 140,
+        offsetX: 40,
+        offsetY: 0,
         escala: 0.33,
         hurtboxes: [
           { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
@@ -386,9 +491,104 @@ this.nomePersonagem = "Aigis";
         ],
       },
 
+      neSpecial: {
+        largura: 220,
+        altura: 400,
+        offsetX: 0,
+        offsetY: -9,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+        ],
+      },
+
+      AneSpecial: {
+        largura: 220,
+        altura: 400,
+        offsetX: 0,
+        offsetY: -9,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+        ],
+      },
+
+      AsiSpecial: {
+        largura: 220,
+        altura: 400,
+        offsetX: 0,
+        offsetY: -9,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+        ],
+      },
+
+      AdoSpecial: {
+        largura: 220,
+        altura: 400,
+        offsetX: 0,
+        offsetY: -9,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+        ],
+      },
+
+      AupSpecial: {
+        largura: 220,
+        altura: 400,
+        offsetX: 0,
+        offsetY: -9,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+        ],
+      },
+
+      doSpecial: {
+        largura: 220,
+        altura: 280,
+        offsetX: 0,
+        offsetY: -15,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 45, altura: 55, offsetX: 0, offsetY: -92 },
+          { largura: 50, altura: 42, offsetX: 0, offsetY: -48 },
+          { largura: 60, altura: 36, offsetX: 0, offsetY: -12 },
+        ],
+      },
+
+      sideSpecial: {
+        largura: 220,
+        altura: 400,
+        offsetX: 0,
+        offsetY: 10,
+        escala: 0.33,
+        hurtboxes: [
+          { largura: 34, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 38, altura: 28, offsetX: 0, offsetY: -62 },
+          { largura: 55, altura: 42, offsetX: 0, offsetY: -25 },
+        ],
+      },
+
   
    
    };
+
+    this.configAnimacoes.intro = {
+      ...this.configAnimacoes.idle,
+    };
 
   //   this.sons = {
   //    ...this.sons,
@@ -457,24 +657,7 @@ this.nomePersonagem = "Aigis";
         comboJanelaFim: 460,
       },
 
-      neutro3: {
-        animacao: "fj_comboRapido1",
-        offsetX: 45,
-        offsetY: -75,
-        largura: 80,
-        altura: 40,
-        cancelavel: true,
-        comboProximo: "neutro4",
-        propriedades: {
-          dano: 1,
-          knockbackX: 1,
-          knockbackY: 0,
-          knockbackFixo: true,
-          hitstunFrames: 22,
-          ignorarHitstunDecay: true,
-          tumbling: false,
-        },
-        vfxAcerto: [{ escolherUm: ["punch1", "punch2", "punch3"] }],
+      
       //  multiHit: {
       //    tipo: "comboRapido",
        //   maxHits: 15, // Conta hitboxes criadas, mesmo sem acertar.
@@ -489,9 +672,9 @@ this.nomePersonagem = "Aigis";
       //        animacao: "fj_comboRapido3", antecipacao: 25},
       //    ],
       //  },
-      },
+      
 
-      neutro4: {
+      neutro3: {
         animacao: "ai_atack3",
 
         frameHitbox: 3,
@@ -536,6 +719,7 @@ this.nomePersonagem = "Aigis";
       //        propriedades: { dano: 6 } }, // Herda o arremesso forte do golpe.
       //    ],
       //  },
+       frameHitbox: 3,
         offsetX: 40,
         offsetY: -70,
         largura: 78,
@@ -563,19 +747,34 @@ this.nomePersonagem = "Aigis";
         propriedades: {
           tipoSomImpacto: "heavy",
           dano: 12,
-          knockbackX: 100,
-          knockbackY: -110,
+          knockbackX: 600,
+          knockbackY: -400,
           tumbling: false,
           knockbackFixo: true,
         },
       },
      agachado: {
         animacao: "ai_downAtack",
+
+         multiHit: {
+          tipo: "automatico",
+          hits: [
+            { inicio: 100, duracao: 60, offsetX:60, offsetY:-50,
+              propriedades: { dano: 2, knockbackX: -40, knockbackY: -20,
+                knockbackFixo: true, tumbling: false } },
+            { inicio: 220, duracao: 60, offsetX:50, offsetY:-75,
+              propriedades: { dano: 2, knockbackX: 80, knockbackY: -140,
+                knockbackFixo: true, tumbling: false } },
+            { inicio: 340, duracao: 60, offsetX:30, offsetY:-100,
+              propriedades: { dano: 5 } }, // Mantém o knockback forte do golpe.
+          ],
+        },
+
         frameHitbox: 3,
-        offsetX: 56,
-        offsetY: -20,
-        largura: 70,
-        altura: 45,
+      //  offsetX: 56,
+      //  offsetY: -60,
+        largura: 40,
+        altura: 40,
         cooldown: 700,
         duracao: 350,
         cancelavel: true,
@@ -650,6 +849,19 @@ this.nomePersonagem = "Aigis";
 
       air_side: {
         animacao: "ai_sideAir",
+        multiHit: {
+          tipo: "automatico",
+          hits: [
+            { inicio: 100, duracao: 60,
+              propriedades: { dano: 2, knockbackX: 140, knockbackY: 0,
+                knockbackFixo: true, tumbling: false } },
+            { inicio: 220, duracao: 60,
+              propriedades: { dano: 2, knockbackX: 280, knockbackY: -100,
+                knockbackFixo: true, tumbling: false } },
+            { inicio: 340, duracao: 60,
+              propriedades: { dano: 5 } }, // Mantém o knockback forte do golpe.
+          ],
+        },
         frameHitbox: 2,
         offsetX: 40,
         offsetY: -57,
@@ -730,8 +942,15 @@ this.nomePersonagem = "Aigis";
    }
 
     // specials ==========================
-
-
+    this.specials = {
+      neutro: AigisNeSpecial.configuracao,
+      air_neutro: AigisAneSpecial.configuracao,
+      air_lado: AigisAsiSpecial.configuracao,
+      air_agachado: AigisAdoSpecial.configuracao,
+      air_cima: AigisAupSpecial.configuracao,
+      agachado: AigisDoSpecial.configuracao,
+      lado: AigisSideSpecial.configuracao,
+    };
 
    
   }
@@ -740,11 +959,164 @@ this.nomePersonagem = "Aigis";
   
 
   static criarAnimacoes(scene) {
+    if (!scene.anims.exists("ai_AupSpecial")) {
+      scene.anims.create({
+        key: "ai_AupSpecial",
+        frames: scene.anims.generateFrameNumbers("ai_AupSpecial", { start: 0, end: 17 }),
+        frameRate: 16,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_upEfect_choque")) {
+      scene.anims.create({
+        key: "ai_upEfect_choque",
+        frames: scene.anims.generateFrameNumbers("ai_upEfect", { start: 0, end: 9 }),
+        frameRate: 24,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_overcharge")) {
+      scene.anims.create({
+        key: "ai_overcharge",
+        frames: scene.anims.generateFrameNumbers("overcharge", { start: 0, end: 14 }),
+        frameRate: 20,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_AdoSpecial")) {
+      scene.anims.create({
+        key: "ai_AdoSpecial",
+        frames: scene.anims.generateFrameNumbers("ai_AdoSpecial", { start: 1, end: 14 }),
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_AsiSpecial")) {
+      scene.anims.create({
+        key: "ai_AsiSpecial",
+        frames: scene.anims.generateFrameNumbers("ai_AsiSpecial", { start: 0, end: 14 }),
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_missel_loop")) {
+      scene.anims.create({
+        key: "ai_missel_loop",
+        frames: scene.anims.generateFrameNumbers("ai_missel", { start: 0, end: 9 }),
+        frameRate: 18,
+        repeat: -1,
+      });
+    }
+
+    if (!scene.anims.exists("ai_AneSpecial")) {
+      scene.anims.create({
+        key: "ai_AneSpecial",
+        frames: scene.anims.generateFrameNumbers("ai_AneSpecial", { start: 0, end: 6 }),
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_mina_queda")) {
+      scene.anims.create({
+        key: "ai_mina_queda",
+        frames: scene.anims.generateFrameNumbers("ai_mina", { start: 0, end: 2 }),
+        frameRate: 10,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_mina_ativa")) {
+      scene.anims.create({
+        key: "ai_mina_ativa",
+        frames: scene.anims.generateFrameNumbers("ai_mina", { start: 3, end: 4 }),
+        frameRate: 6,
+        repeat: -1,
+      });
+    }
+
+    if (!scene.anims.exists("ai_sideSpecial")) {
+      scene.anims.create({
+        key: "ai_sideSpecial",
+        frames: scene.anims.generateFrameNumbers("ai_sideSpecial", { start: 0, end: 15 }),
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_doSpecial")) {
+      scene.anims.create({
+        key: "ai_doSpecial",
+        frames: scene.anims.generateFrameNumbers("ai_doSpecial", { start: 0, end: 8 }),
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_doE1_deslize")) {
+      scene.anims.create({
+        key: "ai_doE1_deslize",
+        frames: scene.anims.generateFrameNumbers("ai_doE1", { start: 0, end: 3 }),
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_neSpecial")) {
+      scene.anims.create({
+        key: "ai_neSpecial",
+        frames: scene.anims.generateFrameNumbers("ai_neSpecial", { start: 0, end: 10 }),
+        frameRate: 16,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_granade_voo")) {
+      scene.anims.create({
+        key: "ai_granade_voo",
+        frames: scene.anims.generateFrameNumbers("granade", { start: 0, end: 5 }),
+        frameRate: 12,
+        repeat: -1,
+      });
+    }
+
     if (!scene.anims.exists("ai_intro")) {
       scene.anims.create({
         key: "ai_intro",
         frames: scene.anims.generateFrameNumbers("ai_intro", { start: 0, end: 41 }),
-        frameRate: 14,
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_siExp_ataque")) {
+      scene.anims.create({
+        key: "ai_siExp_ataque",
+        frames: scene.anims.generateFrameNumbers("ai_siExp", { start: 11, end: 14 }),
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_granada_explosao")) {
+      scene.anims.create({
+        key: "ai_granada_explosao",
+        frames: scene.anims.generateFrameNumbers("ai_siExp", { start: 0, end: 24 }),
+        frameRate: 36,
+        repeat: 0,
+      });
+    }
+
+    if (!scene.anims.exists("ai_bulet1_ataque")) {
+      scene.anims.create({
+        key: "ai_bulet1_ataque",
+        frames: scene.anims.generateFrameNumbers("ai_bulet1", { start: 3 }),
+        frameRate: 36,
         repeat: 0,
       });
     }
@@ -940,7 +1312,7 @@ scene.anims.create({
         start: 5,
         end: 12,
       }),
-      frameRate: 26,
+      frameRate: 22,
       repeat: 0,
     });
     scene.anims.create({
@@ -959,7 +1331,7 @@ scene.anims.create({
         start: 0,
         end: 18,
       }),
-      frameRate: 18,
+      frameRate: 22,
       repeat: 0,
     });
     scene.anims.create({
@@ -975,9 +1347,9 @@ scene.anims.create({
       key: "ai_neutralAir",
       frames: scene.anims.generateFrameNumbers("ai_neutralAir", {
         start: 0,
-        end: 9,
+        end: 5,
       }),
-      frameRate: 14,
+      frameRate: 22,
       repeat: 0,
     });
      scene.anims.create({
@@ -986,7 +1358,7 @@ scene.anims.create({
         start: 0,
         end: 9,
       }),
-      frameRate: 18,
+      frameRate: 20,
       repeat: 0,
     });
      scene.anims.create({
@@ -1004,7 +1376,7 @@ scene.anims.create({
         start: 0,
         end: 8,
       }),
-      frameRate: 12,
+      frameRate: 18,
       repeat: 0,
     });
     

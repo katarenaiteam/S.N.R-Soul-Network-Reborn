@@ -1,6 +1,7 @@
 const ANIMACOES = {
   SpiderMan: "intro", Ken: "intro", Miku: "intro", Slenderman: "intro",
   FJ: "intro", Frederick: "intro", Pingu: "intro", TH30: "intro", Goku: "intro",
+  Aigis: "intro",
 };
 
 const FIM_POSE_P1 = 0.27;

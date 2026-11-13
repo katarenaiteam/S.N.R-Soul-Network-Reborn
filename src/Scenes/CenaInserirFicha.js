@@ -15,11 +15,11 @@ export default class CenaInserirFicha extends Phaser.Scene {
   }
 
   criarTela() {
-    const escala = this.scale.width / 1920;
-    const margemX = 240 * escala;
-    const margemY = 120 * escala;
+    const escala = this.scale.width / 1366;
+    const margemX = 40 * escala;
+    const margemY = 48 * escala;
     const larguraBarra = this.scale.width - margemX * 2;
-    const footerY = 940 * escala;
+    const footerY = this.scale.height - 55 * escala;
     const textoStyle = {
       fontFamily: "RetroFont, monospace",
       fontSize: `${28 * escala}px`,
@@ -51,8 +51,8 @@ export default class CenaInserirFicha extends Phaser.Scene {
     if (!this.anims.exists("insira-ficha-loop")) {
       this.anims.create({
         key: "insira-ficha-loop",
-        frames: this.anims.generateFrameNumbers("insira-ficha", { start: 0, end: 15 }),
-        frameRate: 12,
+        frames: this.anims.generateFrameNumbers("insira-ficha", { start: 0, end: 13 }),
+        frameRate: 6,
         repeat: -1,
       });
     }
@@ -76,7 +76,6 @@ export default class CenaInserirFicha extends Phaser.Scene {
       repeat: -1,
       ease: "Sine.easeInOut",
     });
-
     this.textoFicha = this.add.text(
       centroX,
       centroY + 220 * escala,

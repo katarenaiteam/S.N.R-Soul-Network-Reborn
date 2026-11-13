@@ -13,11 +13,12 @@ function obterIdEfeito(prefixo) {
 }
 
 export class RaioLoja {
-  constructor(scene, x, y) {
+  constructor(scene, x, y, opcoes = {}) {
     this.scene = scene;
     this.x = x;
     this.y = y;
-    this.dono = obterDonoAmbiental(scene);
+    this.dono = opcoes.dono ?? obterDonoAmbiental(scene);
+    this.alvo = opcoes.alvo ?? null;
     this.alvosAtingidos = new Set();
     this.encerrado = false;
     this.sprite = scene.physics.add.sprite(x, 0, "Loja_raio", 0)
@@ -39,7 +40,16 @@ export class RaioLoja {
     const limites = scene.limitesArena;
     const topo = limites.minY ?? limites.topo;
     this.sprite.y = topo - 330;
-    this.sprite.play("loja-raio");
+    this.sprite.play({ key: "loja-raio", repeat: 0 });
+    if (opcoes.animacaoCompletaTH30) {
+      this.atualizarAlvo = () => {
+        if (this.encerrado || !this.sprite?.active || !this.alvo?.sprite?.active) return;
+        this.x = this.alvo.sprite.x;
+        this.y = this.alvo.sprite.y;
+        this.sprite.setX(this.x);
+      };
+      scene.events.on("postupdate", this.atualizarAlvo);
+    }
     this.tween = scene.tweens.add({
       targets: this.sprite,
       y: y - 120,
@@ -52,7 +62,9 @@ export class RaioLoja {
   }
 
   impactar() {
-    if (this.encerrado) return;
+    if (this.encerrado || !this.sprite?.active) return;
+    if (this.alvo?.sprite?.active) this.x = this.alvo.sprite.x;
+    this.sprite.setX(this.x);
     this.scene.reproduzirAudioLoja("shop-raio", obterIdEfeito("raio"));
     this.hitbox = this.scene.add.zone(this.x, this.y - 110, 220, 260);
     this.scene.physics.add.existing(this.hitbox);
@@ -95,6 +107,7 @@ export class RaioLoja {
   destruir() {
     if (this.encerrado) return;
     this.encerrado = true;
+    if (this.atualizarAlvo) this.scene.events.off("postupdate", this.atualizarAlvo);
     this.scene.events.off("shutdown", this.aoEncerrar);
     this.tween?.stop();
     this.timer?.remove(false);

@@ -16,11 +16,11 @@ export default class CenaPreload extends Phaser.Scene {
     this.footerProgress = null;
     this.cameras.main.setBackgroundColor("#000000");
 
-    const escalaResolucao = this.scale.width / 1920;
-    const margemX = 240 * escalaResolucao;
-    const margemY = 120 * escalaResolucao;
+    const escalaResolucao = this.scale.width / 1366;
+    const margemX = 40 * escalaResolucao;
+    const margemY = 48 * escalaResolucao;
     const larguraBarra = this.scale.width - margemX * 2;
-    const footerY = 940 * escalaResolucao;
+    const footerY = this.scale.height - 55 * escalaResolucao;
 
     const textStyle = { fontFamily: "RetroFont, monospace", fontSize: `${28 * escalaResolucao}px`, fill: "#00ff00" };
     const footerTextStyle = { fontFamily: "RetroFont, monospace", fontSize: `${22 * escalaResolucao}px`, fill: "#000000", fontStyle: "bold" };
@@ -155,9 +155,9 @@ export default class CenaPreload extends Phaser.Scene {
   }
 
   iniciarSequenciaLogo() {
-    const escalaResolucao = this.scale.width / 1920;
-    const margemX = 240 * escalaResolucao;
-    const margemY = 120 * escalaResolucao;
+    const escalaResolucao = this.scale.width / 1366;
+    const margemX = 40 * escalaResolucao;
+    const margemY = 48 * escalaResolucao;
 
     if (this.logText) this.logText.setText('');
 

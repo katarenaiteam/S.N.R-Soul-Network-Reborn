@@ -11,6 +11,7 @@ export function criarHudPartida(jogador, personagem, x, y, ladoDireito) {
       Pingu: "Pingu",
       TH30: "Th",
       Goku: "Gk",
+      Aigis: "Aigis",
     };
     const hud = this.add.container(x, y).setScrollFactor(0).setDepth(1000);
     const prefixoRetrato = retratoPorPersonagem[personagem];

@@ -12,6 +12,7 @@ import Slenderman from "../Personagensjs/Slender.js";
 import Miku from "../Personagensjs/Miku.js";
 import TH30 from "../Personagensjs/TH30.js";
 import Goku from "../Personagensjs/Goku.js";
+import Aigis from "../Personagensjs/Aigis.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 import BotController from "../Objetos/BotController.js";
 import Miku_IA from "../Objetos/Miku_IA.js";
@@ -319,6 +320,8 @@ this.indicadorCPU = this.criarIndicador(
               return new TH30(this, x, y, teclas, minDano, maxDano, controle);
               case "Goku":
               return new Goku(this, x, y, teclas, minDano, maxDano, controle);
+              case "Aigis":
+              return new Aigis(this, x, y, teclas, minDano, maxDano, controle);
             default:
               return new Ken(this, x, y, teclas, minDano, maxDano, controle);
     }

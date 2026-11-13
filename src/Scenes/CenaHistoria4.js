@@ -56,6 +56,7 @@ export default class CenaHistoria4 extends CenaHistoria {
     if (this.aguardandoEntradaFinal) return;
     super.update(time, delta);
     if (this.partidaEncerrada) return;
+    this.atualizarPoseDespertarTH30();
     this.atualizarHabilidadesTH30();
     this.atualizarLavaTH30();
   }
@@ -75,15 +76,22 @@ export default class CenaHistoria4 extends CenaHistoria {
     this.iniciarEfeitoTVFundo();
     this.sound.play("tv-static");
     this.cameras.main.shake(650, 0.018);
-    this.time.delayedCall(250, () => this.trocarFundoTH30());
     this.time.delayedCall(650, () => {
       this.cameras.main.flash(220, 255, 255, 255);
       this.habilidadesTH30Ativas = true;
-      this.proximaHabilidadeTH30 = this.time.now + 3500;
+      this.proximaHabilidadeTH30 = this.time.now + 6000;
       this.cooldownsHabilidadesTH30 = new Map();
       this.ultimaHabilidadeTH30 = null;
-      this.time.delayedCall(30000, () => this.iniciarTransicaoFundoTH30());
+      this.aguardandoPoseDespertarTH30 = true;
     });
+  }
+
+  atualizarPoseDespertarTH30() {
+    if (!this.aguardandoPoseDespertarTH30 || this.poseAuraTH30Ativa) return;
+    if (this.tocarPoseAuraTH30(() => {
+      this.trocarFundoTH30();
+      this.proximaTransicaoFundoTH30 = this.time.now + 30000;
+    })) this.aguardandoPoseDespertarTH30 = false;
   }
 
   tocarPoseAuraTH30(aoConcluir, restaurarBoss = true) {
@@ -95,7 +103,7 @@ export default class CenaHistoria4 extends CenaHistoria {
       boss.emMorteVS ||
       boss.eliminado ||
       !["idle", "walk", "jump"].includes(estadoBoss)
-    ) return;
+    ) return false;
     this.poseAuraTH30Ativa = true;
     this.botIA.soltarTudo();
     this.limparAcao(boss);
@@ -134,6 +142,7 @@ export default class CenaHistoria4 extends CenaHistoria {
       if (restaurarBoss) this.restaurarPoseAuraTH30();
       aoConcluir?.();
     });
+    return true;
   }
 
   restaurarPoseAuraTH30() {
@@ -208,11 +217,7 @@ export default class CenaHistoria4 extends CenaHistoria {
 
   iniciarTransicaoFundoTH30() {
     if (!this.habilidadesTH30Ativas || this.partidaEncerrada) return;
-    this.iniciarEfeitoTVFundo();
-    this.sound.play("tv-static");
-    this.cameras.main.shake(450, 0.012);
-    this.time.delayedCall(180, () => this.trocarFundoTH30());
-    this.time.delayedCall(30000, () => this.iniciarTransicaoFundoTH30());
+    this.proximaTransicaoFundoTH30 = this.time.now;
   }
 
   atualizarHabilidadesTH30() {
@@ -224,7 +229,19 @@ export default class CenaHistoria4 extends CenaHistoria {
     const prontas = disponiveis.filter((nome) => nome !== this.ultimaHabilidadeTH30 && this.time.now >= (this.cooldownsHabilidadesTH30.get(nome) ?? 0));
     if (!prontas.length) return;
     const habilidade = Phaser.Utils.Array.GetRandom(prontas);
-    this.tocarPoseAuraTH30(() => this.usarHabilidadeTH30(habilidade));
+    const transicaoFundo = this.time.now >= this.proximaTransicaoFundoTH30;
+    if (this.tocarPoseAuraTH30(() => {
+      if (transicaoFundo) {
+        this.iniciarEfeitoTVFundo();
+        this.sound.play("tv-static");
+        this.cameras.main.shake(450, 0.012);
+        this.time.delayedCall(180, () => this.trocarFundoTH30());
+      }
+      this.usarHabilidadeTH30(habilidade);
+    })) {
+      this.proximaHabilidadeTH30 = this.time.now + 6000;
+      if (transicaoFundo) this.proximaTransicaoFundoTH30 = this.time.now + 30000;
+    }
   }
 
   usarHabilidadeTH30(habilidade) {
@@ -248,23 +265,16 @@ export default class CenaHistoria4 extends CenaHistoria {
     }
     this.cooldownsHabilidadesTH30.set(habilidade, this.time.now + (habilidade === "cura" ? 60000 : 30000));
     this.ultimaHabilidadeTH30 = habilidade;
-    this.proximaHabilidadeTH30 = this.time.now + 4500;
+    this.proximaHabilidadeTH30 = this.time.now + 6000;
   }
 
   lancarRaiosTH30() {
     const boss = this.boss?.sprite;
     if (!boss?.active) return;
-    const x = boss.x;
-    const y = boss.y;
-    const lancarDupla = distancia => {
-      const opcoes = { animacaoCompletaTH30: true, dono: this.boss };
-      new RaioLoja(this, x - distancia, y, opcoes);
-      new RaioLoja(this, x + distancia, y, opcoes);
-    };
-    lancarDupla(120);
-    this.time.delayedCall(500, () => {
-      if (!this.partidaEncerrada && this.boss?.sprite?.active) lancarDupla(220);
-    });
+    const alvos = [this.jogador1, this.jogador2].filter((jogador) => jogador?.sprite?.active && jogador.vidas > 0);
+    for (const alvo of alvos) {
+      new RaioLoja(this, alvo.sprite.x, alvo.sprite.y, { dono: this.boss, alvo, animacaoCompletaTH30: true });
+    }
   }
 
   atualizarLavaTH30() {
