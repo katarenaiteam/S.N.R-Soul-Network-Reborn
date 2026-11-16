@@ -462,7 +462,7 @@ AigisAupSpecial.configuracaoPersona = {
     quadroFimSubida: 7,
     quadroInicioAtaque: 10,
     quadroFimAtaque: 14,
-    duracaoPoseFinal: 1100,
+    duracaoPoseFinal: 2000,
     hitbox: {
       largura: 70,
       altura: 152,

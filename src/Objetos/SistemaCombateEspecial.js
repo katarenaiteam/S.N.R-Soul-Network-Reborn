@@ -29,7 +29,11 @@ function obterHurtboxesValidas(alvo) {
 
 export function obterAlvosCombate(personagem) {
   const scene = personagem.scene;
-  const jogadores = scene.scene.key.startsWith("CenaHistoria")
+  const jogadores = scene.scene.key === "CenaForgottenOne" && scene.bossControlador
+    ? (personagem === scene.bossControlador
+      ? [scene.jogador1, scene.jogador2]
+      : [scene.bossControlador])
+    : scene.scene.key.startsWith("CenaHistoria")
     ? (personagem === scene.boss ? [scene.jogador1, scene.jogador2] : [scene.boss])
     : [scene.jogador1, scene.jogador2, scene.jogador3, scene.jogador4];
   const extras = scene.alvosAtaqueExtras ?? [];

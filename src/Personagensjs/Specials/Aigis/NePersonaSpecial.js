@@ -210,7 +210,7 @@ const criarConfiguracao = (aereo) => ({
   velocidadeMaximaPose: 85,
   hitbox: {
     largura: 190,
-    altura: 58,
+    altura: 78,
     offsetX: 60,
     offsetY: -100,
   },

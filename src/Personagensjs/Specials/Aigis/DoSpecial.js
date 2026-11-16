@@ -207,10 +207,5 @@ AigisDoSpecial.configuracao = {
 
 AigisDoSpecial.configuracaoAtaqueUlt = {
   ...AigisDoSpecial.configuracao,
-  cooldown: 700,
-  duracao: 500,
-  frameHitbox: -1,
-  cancelavel: false,
-  propriedades: {},
   finalizarComoAtaque: true,
 };

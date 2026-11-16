@@ -1,4 +1,5 @@
 import { encerrarOutrasCenas } from "../Objetos/CenasExclusivas.js";
+import { carregarAssetsForgottenSecret } from "../Objetos/CarregarAssetsPartida.js";
 import ControleEntrada from "../Objetos/ControleEntrada.js";
 
 const FALAS_INICIAIS = [
@@ -36,6 +37,16 @@ export default class CenaEscolhaFinal extends Phaser.Scene {
     this.indiceFala = 0;
     this.opcao = 0;
     this.confirmacao = 0;
+    this.contagemAlternanciasSecreta = 0;
+    this.etapaAtivacaoSecreta = 0;
+    this.ultimaAlternanciaSecreta = null;
+    this.falasSecretasPendentes = [];
+    this.dialogoSecretoAtivo = false;
+    this.transicaoSecretaAgendada = false;
+  }
+
+  preload() {
+    carregarAssetsForgottenSecret(this);
   }
 
   create() {
@@ -113,13 +124,19 @@ export default class CenaEscolhaFinal extends Phaser.Scene {
     if (this.etapa === "escolha") {
       if (esquerda || direita) {
         this.prepararMaos();
+        const opcaoAnterior = this.opcao;
         this.selecionarOpcao(esquerda ? 0 : 1);
+        if (this.opcao !== opcaoAnterior) this.registrarAlternanciaSecreta();
       }
       if (confirmar) {
-        this.prepararMaos();
-        this.atualizarEscolha();
-        this.etapa = "confirmacao";
-        this.atualizarConfirmacao();
+        if (this.dialogoSecretoAtivo || this.falasSecretasPendentes.length || this.transicaoSecretaAgendada) {
+          this.completarDigitacao();
+        } else {
+          this.prepararMaos();
+          this.atualizarEscolha();
+          this.etapa = "confirmacao";
+          this.atualizarConfirmacao();
+        }
       }
     } else if (this.etapa === "confirmacao") {
       if (esquerda || direita) this.confirmacao = this.confirmacao ? 0 : 1;
@@ -371,8 +388,169 @@ export default class CenaEscolhaFinal extends Phaser.Scene {
     this.rotuloDireito.setVisible(this.opcao === 1);
     const sobeEsquerda = this.opcao === 0 ? -24 : 18;
     const sobeDireita = this.opcao === 1 ? -24 : 18;
+    this.tweens.killTweensOf(this.maoEsquerda);
+    this.tweens.killTweensOf(this.maoDireita);
     this.tweens.add({ targets: this.maoEsquerda, y: this.chris.y + sobeEsquerda, duration: 280, ease: "Sine.Out" });
     this.tweens.add({ targets: this.maoDireita, y: this.chris.y + sobeDireita, duration: 280, ease: "Sine.Out" });
+  }
+
+  registrarAlternanciaSecreta() {
+    if (this.transicaoSecretaAgendada) return;
+    const agora = this.time.now;
+    if (this.ultimaAlternanciaSecreta !== null && agora - this.ultimaAlternanciaSecreta >= 1000) {
+      this.contagemAlternanciasSecreta = 0;
+    }
+    this.ultimaAlternanciaSecreta = agora;
+    this.contagemAlternanciasSecreta += 1;
+
+    const limites = [12, 14, 20, 30];
+    if (this.contagemAlternanciasSecreta < limites[this.etapaAtivacaoSecreta]) return;
+    this.contagemAlternanciasSecreta = 0;
+    this.ultimaAlternanciaSecreta = null;
+
+    const falas = [
+      "Ha ha, 67, muito engraçado.",
+      "Pare com isso, isso não tem graça.",
+      "Este é o aviso final. Você não deveria mexer com o que você não entende.",
+    ];
+    const etapa = this.etapaAtivacaoSecreta;
+    this.etapaAtivacaoSecreta += 1;
+
+    if (etapa < falas.length) {
+      this.enfileirarFalaSecreta(falas[etapa]);
+      return;
+    }
+
+    this.transicaoSecretaAgendada = true;
+    this.enfileirarFalaSecreta(
+      "Eu não acredito. Você condenou a todos nós.",
+      () => this.time.delayedCall(450, () => this.iniciarAparicaoForgottenOne()),
+      () => {
+        this.chris.setTexture("Chris2");
+        this.ajustarChris();
+      },
+    );
+  }
+
+  enfileirarFalaSecreta(texto, aoTerminar = null, aoIniciar = null) {
+    this.falasSecretasPendentes.push({ texto, aoTerminar, aoIniciar });
+    this.mostrarProximaFalaSecreta();
+  }
+
+  mostrarProximaFalaSecreta() {
+    if (this.digitando || this.dialogoSecretoAtivo || this.etapa !== "escolha") return;
+    const fala = this.falasSecretasPendentes.shift();
+    if (!fala) return;
+    this.dialogoSecretoAtivo = true;
+    fala.aoIniciar?.();
+    this.escreverTexto(fala.texto, () => {
+      this.dialogoSecretoAtivo = false;
+      fala.aoTerminar?.();
+      this.mostrarProximaFalaSecreta();
+    });
+  }
+
+  iniciarAparicaoForgottenOne() {
+    if (this.etapa !== "escolha") return;
+    this.etapa = "transicao";
+    this.ajudaEscolha.setVisible(false);
+    this.rotuloEsquerdo?.setVisible(false);
+    this.rotuloDireito?.setVisible(false);
+    this.maoEsquerda?.destroy();
+    this.maoDireita?.destroy();
+
+    const larguraTela = this.scale.width;
+    const alturaTela = this.scale.height;
+    const escalaResolucao = larguraTela / 1920;
+    const alturaFace = Math.min(alturaTela * 0.88, 1020 * escalaResolucao);
+    const larguraFace = alturaFace * (470 / 620);
+    const yInicialFace = alturaTela + alturaFace * 0.5;
+    const face = this.add.image(larguraTela / 2, yInicialFace, "forgotten-face")
+      .setDisplaySize(larguraFace * 0.34, alturaFace * 0.34)
+      .setAlpha(0).setDepth(3);
+
+    const larguraMao = larguraTela * 0.24;
+    const alturaMao = larguraMao * (450 / 650);
+    const yInicialMao = alturaTela + alturaMao * 0.65;
+    const maoEsquerda = this.add.image(larguraTela * 0.18, yInicialMao, "forgotten-hand-catch")
+      .setDisplaySize(larguraMao, alturaMao).setRotation(Phaser.Math.DegToRad(28)).setDepth(6);
+    const maoDireita = this.add.image(larguraTela * 0.82, yInicialMao, "forgotten-hand-catch")
+      .setDisplaySize(larguraMao, alturaMao).setFlipX(true)
+      .setRotation(Phaser.Math.DegToRad(-28)).setDepth(6);
+
+    this.tweens.add({
+      targets: face,
+      y: alturaTela * 0.38,
+      displayWidth: larguraFace,
+      displayHeight: alturaFace,
+      alpha: 1,
+      duration: 5200,
+      ease: "Sine.Out",
+      onComplete: () => chegadaConcluida(),
+    });
+
+    let elementosChegaram = 0;
+    const chegadaConcluida = () => {
+      elementosChegaram += 1;
+      if (elementosChegaram === 3) {
+        this.time.delayedCall(900, () => this.avancarMaosContraChris(maoEsquerda, maoDireita, larguraMao));
+      }
+    };
+    this.tweens.add({
+      targets: maoEsquerda,
+      x: larguraTela * 0.17,
+      y: alturaTela * 0.63,
+      duration: 4600,
+      ease: "Cubic.Out",
+      onComplete: chegadaConcluida,
+    });
+    this.tweens.add({
+      targets: maoDireita,
+      x: larguraTela * 0.83,
+      y: alturaTela * 0.63,
+      duration: 4600,
+      ease: "Cubic.Out",
+      onComplete: chegadaConcluida,
+    });
+  }
+
+  avancarMaosContraChris(maoEsquerda, maoDireita, larguraMao) {
+    const yAtaque = this.scale.height * 0.55;
+    this.tweens.add({
+      targets: maoEsquerda,
+      x: this.scale.width * 0.42,
+      y: yAtaque,
+      displayWidth: larguraMao * 1.08,
+      displayHeight: larguraMao * 1.08 * (450 / 650),
+      duration: 180,
+      ease: "Cubic.In",
+    });
+    this.tweens.add({
+      targets: maoDireita,
+      x: this.scale.width * 0.58,
+      y: yAtaque,
+      displayWidth: larguraMao * 1.08,
+      displayHeight: larguraMao * 1.08 * (450 / 650),
+      duration: 180,
+      ease: "Cubic.In",
+    });
+    this.time.delayedCall(190, () => this.cortarParaLutaForgottenOne());
+  }
+
+  cortarParaLutaForgottenOne() {
+    if (this.transicaoLutaIniciada) return;
+    this.transicaoLutaIniciada = true;
+    this.add.rectangle(this.scale.width / 2, this.scale.height / 2,
+      this.scale.width, this.scale.height, 0x000000)
+      .setScrollFactor(0).setDepth(10000);
+    this.time.delayedCall(80, () => {
+      this.sound.stopAll();
+      this.scene.start("CenaForgottenOne", {
+        p1: this.dadosHistoria?.p1 ?? "Frederick",
+        p2: this.dadosHistoria?.p2,
+        numPlayers: this.dadosHistoria?.numPlayers ?? 1,
+      });
+    });
   }
 
   atualizarConfirmacao() {

@@ -1,5 +1,3 @@
-import { publicarEstadoVersus } from "../Objetos/PublicarEstadoVersus.js";
-
 export default class ForgottenOne {
   constructor(scene) {
     this.scene = scene;
@@ -31,7 +29,12 @@ export default class ForgottenOne {
     const scene = this.scene;
     this.boss = boss;
     boss.nomePersonagem = "The Forgotten One";
-    boss.vidaBoss = 500;
+    boss.vidaBoss = 800;
+    this.vidaMaximaBoss = 800;
+    this.vidaLimiarOlho = 700;
+    this.faseBoss = 1;
+    this.rostoBase = "forgotten-face";
+    this.olhosProgressao = [];
     boss.porcentagemDano = 0;
     boss.textoDano?.setVisible(false);
     boss.sprite.setVisible(false);
@@ -58,6 +61,10 @@ export default class ForgottenOne {
     const y = boss.sprite.y - 120;
     this.cabeca = scene.add.image(x, y, "forgotten-face")
       .setDisplaySize(600, 600).setDepth(-2);
+    this.rostoAtual = "forgotten-face";
+    this.tempoFlashDano = null;
+    this.tempoRostoDano = null;
+    this.ladoTorcaoDano = 1;
     const escalaOlho = 0.68;
     this.olhoEsquerdo = scene.add.image(x - 99, y - 77, "forgotten-face-eye")
       .setScale(escalaOlho).setDepth(-2.1);
@@ -67,6 +74,8 @@ export default class ForgottenOne {
       .setScale(220 / 401).setRotation(0).setDepth(-1);
     this.mao7 = scene.add.image(x + 380, y + 170, "forgotten-hand-7")
       .setScale(220 / 401).setRotation(0).setDepth(-1);
+    this.maoGlitter = scene.add.sprite(x, y, "forgotten-hand-glitter", 0)
+      .setDisplaySize(600, 337).setDepth(-1.5).setVisible(false);
     this.maosPalmadasJuntas = scene.add.image(x, y, "forgotten-hand-palm2")
       .setScale(0.38).setDepth(-1).setVisible(false);
     this.graficoHitboxesAtaque = scene.add.graphics().setDepth(10);
@@ -88,8 +97,9 @@ export default class ForgottenOne {
     };
     this.offsetCabecaX = 0;
     this.offsetCabecaY = 0;
-    this.ataquesDisponiveis = ["esmagamento", "varridaPendulo", "prensadaPalm", "grab", "arma"];
+    this.ataquesDisponiveis = ["esmagamento", "varridaPendulo", "prensadaPalm", "grab", "arma", "raioBucal", "golpeL", "glitter"];
     this.projeteisArma = new Set();
+    this.raiosBucais = new Set();
     this.grabCooldownAte = 0;
     this.ultimoAtaque = null;
     this.repeticoesUltimoAtaque = 0;
@@ -117,14 +127,25 @@ export default class ForgottenOne {
       superficie.body.checkCollision.right = false;
       return { mao, superficie };
     });
+    this.superficiesMaosTodas = [...this.superficiesMaos];
+    this.paresMaos = [{ indice: 0, esquerda: this.mao6, direita: this.mao7, alcanceX: 380, deslocamentoY: 170, superficies: this.superficiesMaos }];
+    this.parMaosAtivo = this.paresMaos[0];
+    this.cooldownsParesMaos = [0, 0];
+    this.proximoParAtaque = 0;
     this.temposPertoDasMaos = new Map([[this.mao6, 0], [this.mao7, 0]]);
     scene.physics.add.collider(scene.jogador1.sprite, this.superficiesMaosGrupo);
+    if (scene.numPlayersForgotten === 2 && scene.jogador2?.sprite?.body?.enable) {
+      scene.physics.add.collider(scene.jogador2.sprite, this.superficiesMaosGrupo);
+    }
     this.elapsed = 1700;
-    this.objetosVisuais.push(this.cabeca, this.olhoEsquerdo, this.olhoDireito, this.mao6, this.mao7, this.maosPalmadasJuntas, this.graficoHitboxesAtaque);
+    this.objetosVisuais.push(this.cabeca, this.olhoEsquerdo, this.olhoDireito, this.mao6, this.mao7, this.maoGlitter, this.maosPalmadasJuntas, this.graficoHitboxesAtaque);
 
     boss.receberDano = (quantidade) => {
       if (this.bossDerrotado) return true;
-      boss.vidaBoss = Math.max(0, boss.vidaBoss - Math.max(0, Number(quantidade) || 0));
+      const dano = Math.max(0, Number(quantidade) || 0);
+      boss.vidaBoss = Math.max(0, boss.vidaBoss - dano);
+      if (dano > 0) this.atualizarProgressaoVidaBoss();
+      if (dano > 0) this.reagirAoDano();
       if (boss.vidaBoss === 0) this.derrotarBoss(boss);
       return true;
     };
@@ -135,13 +156,160 @@ export default class ForgottenOne {
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       scene.events.off(Phaser.Scenes.Events.PRE_UPDATE, this.atualizarNoPreUpdate);
       this.liberarJogadorGrab();
+      this.liberarJogadorEnquadrado();
       for (const registro of [...this.projeteisArma]) this.destruirProjetilArma(registro);
+      this.limparRaioBucal();
+      for (const olho of this.olhosProgressao) olho.destroy();
     });
     boss.sincronizarHurtbox?.();
   }
 
   esconderIndicador(indicador) {
     indicador?.setVisible(false);
+  }
+
+  atualizarProgressaoVidaBoss() {
+    while (this.boss.vidaBoss <= this.vidaLimiarOlho && this.vidaLimiarOlho > 0) {
+      this.criarOlhoProgressao();
+      this.vidaLimiarOlho -= 100;
+    }
+
+    const novaFase = this.boss.vidaBoss <= 200 ? 3 : this.boss.vidaBoss <= 400 ? 2 : 1;
+    if (novaFase <= this.faseBoss) return;
+    this.faseBoss = novaFase;
+    this.rostoBase = novaFase === 3 ? "forgotten-face-5" : "forgotten-face-3";
+    this.definirRostoBoss(this.rostoBase);
+
+    if (novaFase === 3) {
+      this.criarSegundoParMaos();
+      this.cooldownsParesMaos = [0, 0];
+      this.proximoParAtaque = 0;
+      if (this.estadoEsmagamento.fase === "espera") this.estadoEsmagamento.tempo = 0;
+    }
+  }
+
+  criarOlhoProgressao() {
+    const scene = this.scene;
+    if (!scene.anims.exists("forgotten-eye-loop")) {
+      scene.anims.create({
+        key: "forgotten-eye-loop",
+        frames: scene.anims.generateFrameNumbers("forgotten-eye-loop", { start: 0, end: 92 }),
+        frameRate: 15,
+        repeat: -1,
+      });
+    }
+    const camera = scene.camJogo ?? scene.cameras.main;
+    const view = camera.worldView;
+    const halfWidth = 70;
+    const halfHeight = 56;
+    const minX = view.x + Math.min(halfWidth, view.width / 4);
+    const maxX = view.right - Math.min(halfWidth, view.width / 4);
+    const minY = view.y + Math.min(halfHeight, view.height / 4);
+    const maxY = view.bottom - Math.min(halfHeight, view.height / 4);
+    const olho = scene.add.sprite(
+      Phaser.Math.Between(minX, Math.max(minX, maxX)),
+      Phaser.Math.Between(minY, Math.max(minY, maxY)),
+      "forgotten-eye-loop",
+      0,
+    ).setDisplaySize(140, 112).setDepth(-3);
+    scene.camHUD?.ignore(olho);
+    olho.play("forgotten-eye-loop");
+    this.olhosProgressao.push(olho);
+    this.objetosVisuais.push(olho);
+  }
+
+  criarSegundoParMaos() {
+    if (this.paresMaos.length > 1) return;
+    const scene = this.scene;
+    const x = this.cabeca.x;
+    const y = this.cabeca.y;
+    const mao8 = scene.add.image(x - 560, y + 80, "forgotten-hand-6")
+      .setScale(220 / 401).setDepth(-1);
+    const mao9 = scene.add.image(x + 560, y + 80, "forgotten-hand-7")
+      .setScale(220 / 401).setDepth(-1);
+    const maos = [mao8, mao9];
+    const superficies = maos.map((mao) => {
+      const zona = scene.add.zone(mao.x, mao.y, 200, 130);
+      this.boss.grupoHurtbox.add(zona);
+      zona.body.setAllowGravity(false);
+      zona.body.setImmovable(true);
+      zona.body.setSize(200, 130);
+      zona.body.debugBodyColor = 0x00ff00;
+      const superficie = scene.add.rectangle(mao.x, mao.y + 15, 230, 32, 0xffffff, 0);
+      scene.physics.add.existing(superficie, true);
+      this.superficiesMaosGrupo.add(superficie);
+      superficie.body.checkCollision.up = true;
+      superficie.body.checkCollision.down = false;
+      superficie.body.checkCollision.left = false;
+      superficie.body.checkCollision.right = false;
+      scene.camHUD?.ignore(mao);
+      scene.camHUD?.ignore(superficie);
+      this.maosHurtbox.push({ zona, mao });
+      this.zonasHurtbox.push({ zona, mao });
+      return { mao, superficie };
+    });
+    this.superficiesMaosTodas.push(...superficies);
+    this.paresMaos.push({
+      indice: 1,
+      esquerda: mao8,
+      direita: mao9,
+      alcanceX: 560,
+      deslocamentoY: 80,
+      superficies,
+    });
+    this.temposPertoDasMaos.set(mao8, 0);
+    this.temposPertoDasMaos.set(mao9, 0);
+    this.objetosVisuais.push(mao8, mao9);
+    this.boss.hurtboxesAtivas = this.zonasHurtbox.map(({ zona }) => zona);
+    this.ativarParMaos(0);
+    this.atualizarHurtboxes();
+  }
+
+  ativarParMaos(indice) {
+    const par = this.paresMaos[indice] ?? this.paresMaos[0];
+    this.parMaosAtivo = par;
+    this.mao6 = par.esquerda;
+    this.mao7 = par.direita;
+    this.superficiesMaos = par.superficies;
+    return par;
+  }
+
+  obterPosicaoBaseMao(mao) {
+    const par = this.paresMaos.find((item) => item.esquerda === mao || item.direita === mao) ?? this.paresMaos[0];
+    const lado = mao === par.esquerda ? -1 : 1;
+    return {
+      x: this.xBaseAtual + lado * par.alcanceX,
+      y: this.yBaseAtual + par.deslocamentoY + (lado < 0 ? this.gestoAtual : -this.gestoAtual),
+    };
+  }
+
+  reagirAoDano() {
+    const cena = this.scene;
+    const cabeca = this.cabeca;
+    if (!cabeca?.active) return;
+
+    if (this.tempoFlashDano) cena.time.removeEvent(this.tempoFlashDano);
+    if (this.tempoRostoDano) cena.time.removeEvent(this.tempoRostoDano);
+    cena.tweens.killTweensOf(cabeca);
+
+    cabeca.setTint(0xe8e8e8).setTintMode(Phaser.TintModes.FILL);
+    this.tempoFlashDano = cena.time.delayedCall(50, () => {
+      if (cabeca.active) cabeca.clearTint();
+      this.tempoFlashDano = null;
+    });
+
+    cabeca.setTexture("forgotten-face-2").setRotation(0.14 * this.ladoTorcaoDano);
+    this.ladoTorcaoDano *= -1;
+    this.tempoRostoDano = cena.time.delayedCall(180, () => {
+      if (cabeca.active) cabeca.setTexture(this.rostoAtual ?? "forgotten-face");
+      this.tempoRostoDano = null;
+    });
+    cena.tweens.add({
+      targets: cabeca,
+      rotation: 0,
+      duration: 320,
+      ease: "Sine.Out",
+    });
   }
 
   atualizar() {}
@@ -227,32 +395,179 @@ export default class ForgottenOne {
     this.estadoEsmagamento.fase = "derrotado";
     this.estadoEsmagamento.tipo = null;
     this.liberarJogadorGrab();
+    this.liberarJogadorEnquadrado();
     for (const { zona } of this.zonasHurtbox) {
-      zona.body.enable = false;
+      if (zona?.body) zona.body.enable = false;
     }
-    for (const { superficie } of this.superficiesMaos) {
-      superficie.body.enable = false;
-    }
-    for (const visual of [this.cabeca, this.olhoEsquerdo, this.olhoDireito, this.mao6, this.mao7, this.maosPalmadasJuntas]) {
-      visual.setVisible(false);
+    for (const { superficie } of this.superficiesMaosTodas) {
+      if (superficie?.body) superficie.body.enable = false;
     }
     for (const registro of [...this.projeteisArma]) this.destruirProjetilArma(registro);
+    this.limparRaioBucal();
 
-    const vencedor = this.scene.jogador1;
-    const resultado = {
-      vencedor: { id: this.scene.escolhaP1, nome: vencedor?.nomePersonagem ?? "Jogador 1" },
-      perdedor: { id: this.scene.escolhaP2, nome: boss.nomePersonagem },
-    };
     this.scene.partidaFinalizada = true;
     this.scene.sound.stopAll();
-    publicarEstadoVersus(this.scene, "game-over", resultado);
-    this.scene.preservarAssetsGameOver = true;
-    this.scene.scene.start("CenaGameOver", resultado);
+    this.iniciarCinematicaDerrota(boss);
+  }
+
+  iniciarCinematicaDerrota(boss) {
+    const cena = this.scene;
+    if (this.tempoFlashDano) cena.time.removeEvent(this.tempoFlashDano);
+    if (this.tempoRostoDano) cena.time.removeEvent(this.tempoRostoDano);
+    cena.tweens.killTweensOf(this.cabeca);
+    this.cabeca.clearTint().setRotation(0);
+    this.maoGlitter.stop().setVisible(false);
+    this.maosPalmadasJuntas.setVisible(false);
+    for (const par of this.paresMaos) {
+      par.esquerda.setTexture("forgotten-hand-6").setScale(220 / 401).setRotation(0).setFlipX(false).setVisible(true);
+      par.direita.setTexture("forgotten-hand-7").setScale(220 / 401).setRotation(0).setFlipX(false).setVisible(true);
+    }
+
+    const camera = cena.camJogo ?? cena.cameras.main;
+    const limiteInferior = camera.worldView.bottom + 250;
+    for (const mao of this.paresMaos.flatMap((par) => [par.esquerda, par.direita])) {
+      cena.tweens.add({
+        targets: mao,
+        y: Math.max(mao.y + 850, limiteInferior),
+        duration: 1800,
+        ease: "Quad.In",
+      });
+    }
+
+    cena.camHUD?.setBackgroundColor("rgba(255,255,255,0)");
+
+    this.cinematicaDerrota = {
+      tempo: 0,
+      ultimaTrocaFace: 0,
+      indiceFace: 1,
+      xInicial: this.cabeca.x,
+      yInicial: this.cabeca.y,
+      epilogoRevelado: false,
+    };
+  }
+
+  atualizarCinematicaDerrota(delta) {
+    const cena = this.scene;
+    const morte = this.cinematicaDerrota;
+    if (!morte) return;
+    morte.tempo += delta;
+    const claridade = Phaser.Math.Clamp(morte.tempo / 5000, 0, 1);
+    cena.camHUD?.setBackgroundColor(`rgba(255,255,255,${claridade})`);
+    if (morte.tempo >= 5000 && !morte.hudEscondida) {
+      morte.hudEscondida = true;
+      for (const objeto of [
+        cena.hudP1_Nome,
+        cena.hudP2_Nome,
+        cena.indicadorP1,
+        cena.indicadorP2,
+        cena.jogador1?.textoDano,
+        cena.jogador2?.textoDano,
+        cena.textoTempoVersus,
+      ]) objeto?.setVisible(false);
+    }
+
+    if (morte.tempo < 5000) {
+      if (morte.tempo - morte.ultimaTrocaFace >= 70) {
+        morte.ultimaTrocaFace = morte.tempo;
+        morte.indiceFace = morte.indiceFace % 5 + 1;
+        const textura = morte.indiceFace === 1 ? "forgotten-face" : `forgotten-face-${morte.indiceFace}`;
+        this.cabeca.setTexture(textura).setDisplaySize(600, 600);
+      }
+      this.cabeca.setPosition(
+        morte.xInicial + Math.sin(morte.tempo * 0.075) * 26,
+        morte.yInicial + Math.sin(morte.tempo * 0.091) * 20,
+      ).setRotation(Math.sin(morte.tempo * 0.083) * 0.16);
+    } else if (morte.tempo < 10000 && !morte.epilogoRevelado) {
+      this.cabeca.setVisible(false);
+      this.olhoEsquerdo.setVisible(false);
+      this.olhoDireito.setVisible(false);
+      this.cabeca.setTexture("forgotten-face-5").setDisplaySize(600, 600)
+        .setPosition(morte.xInicial, morte.yInicial).setRotation(0);
+    } else if (!morte.epilogoRevelado && morte.tempo >= 10000) {
+      morte.epilogoRevelado = true;
+      this.revelarMonologoDerrota();
+    }
+  }
+
+  revelarMonologoDerrota() {
+    const cena = this.scene;
+    const morte = this.cinematicaDerrota;
+    this.cabeca.setVisible(false);
+    this.olhoEsquerdo.setVisible(false);
+    this.olhoDireito.setVisible(false);
+    for (const olho of this.olhosProgressao) olho.setVisible(false);
+
+    const larguraTela = cena.scale.width;
+    const alturaTela = cena.scale.height;
+    const larguraRosto = Math.min(larguraTela * 0.76, alturaTela * 0.70);
+    const centroX = larguraTela / 2;
+    const centroY = alturaTela * 0.32;
+    const escalaRosto = larguraRosto / 600;
+    this.rostoFinalHUD = cena.add.image(centroX, centroY, "forgotten-face-67")
+      .setDisplaySize(larguraRosto, larguraRosto).setScrollFactor(0).setDepth(10001);
+    cena.camJogo?.ignore(this.rostoFinalHUD);
+
+    if (!cena.anims.exists("forgotten-eye-loop")) {
+      cena.anims.create({
+        key: "forgotten-eye-loop",
+        frames: cena.anims.generateFrameNumbers("forgotten-eye-loop", { start: 0, end: 92 }),
+        frameRate: 15,
+        repeat: -1,
+      });
+    }
+    this.olhosFinaisHUD = [
+      { x: centroX - 99 * escalaRosto, y: centroY - 77 * escalaRosto },
+      { x: centroX + 64 * escalaRosto, y: centroY - 77 * escalaRosto },
+    ].map(({ x, y }) => {
+      const olho = cena.add.sprite(x, y, "forgotten-eye-loop", 0)
+      .setDisplaySize(104 * escalaRosto, 84 * escalaRosto).setScrollFactor(0).setDepth(10002);
+      cena.camJogo?.ignore(olho);
+      olho.play("forgotten-eye-loop");
+      return olho;
+    });
+
+    morte.linhasMonologo = [
+      "Ah... então foi você que sobrou.",
+      "Você chegou antes de ser criado.",
+      "Eles disseram que você não acordaria.",
+      "Não conte a eles que me encontrou.",
+    ];
+    morte.indiceMonologo = -1;
+    morte.textoMonologo = cena.add.text(centroX, alturaTela * 0.79, "", {
+      fontFamily: "Arial, sans-serif",
+      fontSize: `${Math.max(36, Math.round(48 * escalaRosto))}px`,
+      color: "#000000",
+      align: "center",
+      wordWrap: { width: larguraTela * 0.86 },
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(10003);
+    cena.camJogo?.ignore(morte.textoMonologo);
+    this.avancarMonologoDerrota();
+  }
+
+  avancarMonologoDerrota() {
+    const morte = this.cinematicaDerrota;
+    if (!morte?.textoMonologo) return;
+    morte.indiceMonologo++;
+    if (morte.indiceMonologo >= morte.linhasMonologo.length) {
+      morte.textoMonologo.setVisible(false);
+      morte.transicaoAgendada = true;
+      this.scene.time.delayedCall(4500, () => this.finalizarCinematicaDerrota());
+      return;
+    }
+    morte.textoMonologo.setText(morte.linhasMonologo[morte.indiceMonologo]).setVisible(true);
+    this.scene.time.delayedCall(3500, () => this.avancarMonologoDerrota());
+  }
+
+  finalizarCinematicaDerrota() {
+    if (this.resultadoFinalizado) return;
+    this.resultadoFinalizado = true;
+    this.scene.scene.start("CenaStart");
   }
 
   atualizarHurtboxes() {
     if (!this.cabeca?.active) return;
     this.zonasHurtbox?.forEach(({ zona, deslocamentoY = 0, mao = null }) => {
+      if (!zona?.active || !zona.body?.updateFromGameObject) return;
       const ancoraX = mao?.x ?? this.cabeca.x;
       const ancoraY = mao?.y ?? this.cabeca.y + deslocamentoY;
       zona.setPosition(ancoraX, ancoraY);
@@ -260,8 +575,32 @@ export default class ForgottenOne {
     });
   }
 
+  obterJogadoresAlvoBoss() {
+    const cena = this.scene;
+    const jogadores = cena.numPlayersForgotten === 2
+      ? [cena.jogador1, cena.jogador2]
+      : [cena.jogador1];
+    return jogadores.filter((jogador) =>
+      jogador?.sprite?.active && jogador.sprite.body?.enable && !jogador.eliminado
+    );
+  }
+
+  obterPersonagemPorSprite(sprite) {
+    return this.obterJogadoresAlvoBoss().find((jogador) => jogador.sprite === sprite) ?? null;
+  }
+
+  obterAlvoBossMaisProximo(x, y) {
+    return this.obterJogadoresAlvoBoss().sort((a, b) =>
+      Phaser.Math.Distance.Between(a.sprite.x, a.sprite.y, x, y) -
+      Phaser.Math.Distance.Between(b.sprite.x, b.sprite.y, x, y)
+    )[0] ?? null;
+  }
+
   atualizarOponente(delta, boss) {
-    if (this.bossDerrotado) return;
+    if (this.bossDerrotado) {
+      this.atualizarCinematicaDerrota(delta);
+      return;
+    }
     this.graficoHitboxesAtaque.clear();
     this.elapsed += delta;
     const fase = this.elapsed * 0.00028;
@@ -287,23 +626,43 @@ export default class ForgottenOne {
     const cabecaX = x + this.offsetCabecaX;
     const cabecaY = y + this.offsetCabecaY;
     this.cabeca.setPosition(cabecaX, cabecaY);
-    const jogador = this.scene.jogador1?.sprite;
+    const alvoBoss = this.obterAlvoBossMaisProximo(cabecaX, cabecaY);
+    const jogador = alvoBoss?.sprite;
     const direcaoX = jogador ? Phaser.Math.Clamp((jogador.x - cabecaX) * 0.015, -6, 6) : 0;
     const direcaoY = jogador ? Phaser.Math.Clamp((jogador.y - cabecaY) * 0.01, -4, 4) : 0;
     const movimentoOlhosX = Math.sin(this.elapsed * 0.0017) * 1.5;
     const movimentoOlhosY = Math.sin(this.elapsed * 0.0023) * 1.2;
-    this.olhoEsquerdo.setPosition(cabecaX - 99 + direcaoX + movimentoOlhosX, cabecaY - 77 + direcaoY + movimentoOlhosY);
-    this.olhoDireito.setPosition(cabecaX + 64 + direcaoX + movimentoOlhosX, cabecaY - 77 + direcaoY + movimentoOlhosY);
+    const olhoCaoticoEsquerdoX = this.faseBoss >= 2 ? Math.sin(this.elapsed * 0.031) * 8 + Math.sin(this.elapsed * 0.013) * 4 : 0;
+    const olhoCaoticoEsquerdoY = this.faseBoss >= 2 ? Math.sin(this.elapsed * 0.027 + 1.1) * 6 : 0;
+    const olhoCaoticoDireitoX = this.faseBoss >= 2 ? Math.sin(this.elapsed * 0.029 + 2.2) * 8 + Math.sin(this.elapsed * 0.016) * 4 : 0;
+    const olhoCaoticoDireitoY = this.faseBoss >= 2 ? Math.sin(this.elapsed * 0.033 + 0.4) * 6 : 0;
+    this.olhoEsquerdo.setPosition(cabecaX - 99 + direcaoX + movimentoOlhosX + olhoCaoticoEsquerdoX, cabecaY - 77 + direcaoY + movimentoOlhosY + olhoCaoticoEsquerdoY);
+    this.olhoDireito.setPosition(cabecaX + 64 + direcaoX + movimentoOlhosX + olhoCaoticoDireitoX, cabecaY - 77 + direcaoY + movimentoOlhosY + olhoCaoticoDireitoY);
     const maosMovidas = this.estadoEsmagamento.maosMovidas;
-    if (this.estadoEsmagamento.fase === "espera" || !maosMovidas?.has(this.mao6)) {
-      this.mao6.setPosition(x - 380, y + 170 + gesto);
+    for (const par of this.paresMaos) {
+      for (const mao of [par.esquerda, par.direita]) {
+        if (this.estadoEsmagamento.fase === "espera" || !maosMovidas?.has(mao)) {
+          const lado = mao === par.esquerda ? -1 : 1;
+          mao.setPosition(x + lado * par.alcanceX, y + par.deslocamentoY + (lado < 0 ? gesto : -gesto));
+        }
+      }
     }
-    if (this.estadoEsmagamento.fase === "espera" || !maosMovidas?.has(this.mao7)) {
-      this.mao7.setPosition(x + 380, y + 170 - gesto);
+    if (this.faseBoss >= 3) {
+      this.cooldownsParesMaos = this.cooldownsParesMaos.map((tempo) => Math.max(0, tempo - delta));
     }
+    const tipoAtaqueAntes = this.estadoEsmagamento.tipo;
+    const faseAtaqueAntes = this.estadoEsmagamento.fase;
     this.atualizarEsmagamento(delta, this.boss);
-    this.verificarColisoesProjeteisArma(this.scene.jogador1);
-    this.superficiesMaos.forEach(({ mao, superficie }) => {
+    const ataque = this.estadoEsmagamento;
+    if (this.faseBoss >= 3 && tipoAtaqueAntes && faseAtaqueAntes !== "espera" &&
+        ataque.fase === "espera" && !ataque.tipo) {
+      const parQueAtacou = ataque.parIndex ?? this.parMaosAtivo.indice;
+      this.cooldownsParesMaos[parQueAtacou] = Phaser.Math.Between(5000, 8000);
+      this.proximoParAtaque = 1 - parQueAtacou;
+      ataque.tempo = this.cooldownsParesMaos[this.proximoParAtaque];
+    }
+    this.verificarColisoesProjeteisArma(alvoBoss);
+    this.superficiesMaosTodas.forEach(({ mao, superficie }) => {
       const xAnterior = superficie.x;
       const topoAnterior = superficie.body.top;
       const corpoJogador = jogador?.body;
@@ -333,7 +692,7 @@ export default class ForgottenOne {
   atualizarEsmagamento(delta, boss) {
     const ataque = this.estadoEsmagamento;
     const cena = this.scene;
-    const jogador = cena.jogador1?.sprite;
+    const jogador = this.obterAlvoBossMaisProximo(this.cabeca.x, this.cabeca.y)?.sprite;
     const topoPlataforma = this.plataforma.body.top;
 
     if (ataque.tipo === "grab" || ataque.tipo === "grabProximidade") {
@@ -345,8 +704,12 @@ export default class ForgottenOne {
     ataque.tempo -= delta;
 
     if (ataque.fase === "espera") {
+      if (this.faseBoss >= 3) this.ativarParMaos(this.proximoParAtaque);
+      ataque.parIndex = this.parMaosAtivo.indice;
       if (this.atualizarProximidadeGrab(delta, jogador, ataque)) return;
       if (ataque.tempo <= 0) {
+        if (this.faseBoss >= 3) this.ativarParMaos(this.proximoParAtaque);
+        ataque.parIndex = this.parMaosAtivo.indice;
         const selecionado = this.selecionarAtaque();
         if (selecionado === "esmagamento") {
           ataque.tipo = selecionado;
@@ -369,6 +732,15 @@ export default class ForgottenOne {
         } else if (selecionado === "arma") {
           ataque.tipo = selecionado;
           this.iniciarAtaqueArma(ataque);
+        } else if (selecionado === "raioBucal") {
+          ataque.tipo = selecionado;
+          this.iniciarRaioBucal(ataque);
+        } else if (selecionado === "golpeL") {
+          ataque.tipo = selecionado;
+          this.iniciarGolpeL(ataque, jogador);
+        } else if (selecionado === "glitter") {
+          ataque.tipo = selecionado;
+          this.iniciarAtaqueGlitter(ataque, jogador);
         } else {
           ataque.tempo = Phaser.Math.Between(5000, 8000);
         }
@@ -386,6 +758,18 @@ export default class ForgottenOne {
     }
     if (ataque.tipo === "arma") {
       this.atualizarAtaqueArma(delta, ataque, jogador, boss);
+      return;
+    }
+    if (ataque.tipo === "raioBucal") {
+      this.atualizarRaioBucal(delta, ataque, jogador, boss);
+      return;
+    }
+    if (ataque.tipo === "golpeL") {
+      this.atualizarGolpeL(delta, ataque, jogador, boss);
+      return;
+    }
+    if (ataque.tipo === "glitter") {
+      this.atualizarAtaqueGlitter(delta, ataque, jogador, boss);
       return;
     }
 
@@ -470,10 +854,9 @@ export default class ForgottenOne {
 
     if (ataque.fase === "voltaBase") {
       const progresso = 1 - Math.max(0, ataque.tempo) / 300;
-      const base6 = { x: this.xBaseAtual - 380, y: this.yBaseAtual + 170 + this.gestoAtual };
-      const base7 = { x: this.xBaseAtual + 380, y: this.yBaseAtual + 170 - this.gestoAtual };
-      for (const [maoRetorno, base] of [[this.mao6, base6], [this.mao7, base7]]) {
+      for (const maoRetorno of [this.mao6, this.mao7]) {
         const origem = ataque.posicoesRetorno.get(maoRetorno);
+        const base = this.obterPosicaoBaseMao(maoRetorno);
         maoRetorno.setPosition(
           Phaser.Math.Linear(origem.x, base.x, progresso),
           Phaser.Math.Linear(origem.y, base.y, progresso),
@@ -693,19 +1076,18 @@ export default class ForgottenOne {
 
     if (ataque.fase === "grabRetorno") {
       const progresso = 1 - Math.max(0, ataque.tempo) / 500;
-      const xBase = this.xBaseAtual + (mao === this.mao6 ? -380 : 380);
-      const yBase = this.yBaseAtual + 170 + (mao === this.mao6 ? this.gestoAtual : -this.gestoAtual);
+      const base = this.obterPosicaoBaseMao(mao);
       mao.setPosition(
-        Phaser.Math.Linear(ataque.xInicial, xBase, progresso),
-        Phaser.Math.Linear(ataque.yInicial, yBase, progresso),
+        Phaser.Math.Linear(ataque.xInicial, base.x, progresso),
+        Phaser.Math.Linear(ataque.yInicial, base.y, progresso),
       );
       if (ataque.tempo <= 0) this.finalizarGrab(ataque);
     }
   }
 
   capturarJogadorGrab(ataque, spriteJogador, boss) {
-    const personagem = this.scene.jogador1;
-    const sprite = personagem?.sprite;
+    const sprite = spriteJogador;
+    const personagem = this.obterPersonagemPorSprite(sprite);
     const body = sprite?.body;
     if (!personagem || !sprite || !body) return;
     const metodosInput = ["inputDown", "inputJustDown", "inputJustUp"];
@@ -714,8 +1096,6 @@ export default class ForgottenOne {
       sprite,
       body,
       visivel: sprite.visible,
-      moves: body.moves,
-      allowGravity: body.allowGravity,
       metodos: new Map(metodosInput.map((nome) => [nome, {
         proprio: Object.prototype.hasOwnProperty.call(personagem, nome),
         original: personagem[nome],
@@ -788,12 +1168,10 @@ export default class ForgottenOne {
       else delete personagem[nome];
     }
     if (body) {
-      body.moves = captura.moves;
-      body.setAllowGravity(captura.allowGravity);
-      if (body.moves && captura.allowGravity) {
-        body.setVelocityY(Math.max(80, body.velocity.y));
-        body.setGravityY(200);
-      }
+      body.moves = true;
+      body.setAllowGravity(true);
+      body.setGravity(0, 0);
+      body.setVelocityY(Math.max(80, body.velocity.y));
     }
     if (sprite?.active) sprite.setVisible(captura.visivel);
     this.capturaGrab = null;
@@ -825,6 +1203,500 @@ export default class ForgottenOne {
     this.maosPalmadasJuntas.setPosition(ataque.alvoX, ataque.alvoY).setVisible(false);
   }
 
+  iniciarGolpeL(ataque, jogador) {
+    const maos = [this.mao6, this.mao7];
+    ataque.maosMovidas = new Set(maos);
+    ataque.plataformasAtacadas = new Set(this.superficiesMaos.map(({ superficie }) => superficie));
+    ataque.texturasOriginais = new Map(maos.map((mao) => [mao, mao.texture.key]));
+    ataque.escalasOriginais = new Map(maos.map((mao) => [mao, { x: mao.scaleX, y: mao.scaleY }]));
+    ataque.tamanhosOriginais = new Map(maos.map((mao) => [mao, { largura: mao.displayWidth, altura: mao.displayHeight }]));
+    ataque.rotacoesOriginais = new Map(maos.map((mao) => [mao, mao.rotation]));
+    ataque.flipsOriginais = new Map(maos.map((mao) => [mao, mao.flipX]));
+    ataque.posicoesLInicio = new Map(maos.map((mao) => [mao, { x: mao.x, y: mao.y }]));
+    ataque.plataformasAtacadas.forEach((superficie) => { superficie.body.checkCollision.up = false; });
+    ataque.alvoLX = Phaser.Math.Clamp(jogador?.x ?? this.cabeca.x, 260, 1760);
+    ataque.alvoLY = Phaser.Math.Clamp(jogador?.y ?? this.cabeca.y + 250, 100, 980);
+    ataque.fase = "lChegada";
+    ataque.tempo = 850;
+  }
+
+  iniciarAtaqueGlitter(ataque, jogador) {
+    const maos = [this.mao6, this.mao7];
+    ataque.maosMovidas = new Set(maos);
+    ataque.plataformasAtacadas = new Set(this.superficiesMaos.map(({ superficie }) => superficie));
+    ataque.texturasOriginais = new Map(maos.map((mao) => [mao, mao.texture.key]));
+    ataque.escalasOriginais = new Map(maos.map((mao) => [mao, { x: mao.scaleX, y: mao.scaleY }]));
+    ataque.tamanhosOriginais = new Map(maos.map((mao) => [mao, { largura: mao.displayWidth, altura: mao.displayHeight }]));
+    ataque.rotacoesOriginais = new Map(maos.map((mao) => [mao, mao.rotation]));
+    ataque.flipsOriginais = new Map(maos.map((mao) => [mao, mao.flipX]));
+    ataque.posicoesGlitterInicio = new Map(maos.map((mao) => [mao, { x: mao.x, y: mao.y }]));
+    ataque.plataformasAtacadas.forEach((superficie) => { superficie.body.checkCollision.up = false; });
+    ataque.alvoGlitterX = Phaser.Math.Clamp(jogador?.x ?? this.cabeca.x, 280, 1640);
+    ataque.alvoGlitterY = Phaser.Math.Clamp((jogador?.y ?? this.cabeca.y + 450) - 430, 80, 690);
+    ataque.fase = "glitterAproxima";
+    ataque.tempo = 800;
+  }
+
+  atualizarAtaqueGlitter(delta, ataque, jogador, boss) {
+    const atualizarAlvo = () => {
+      if (!jogador?.active) return;
+      const suavizacao = Math.min(1, delta * 0.004);
+      ataque.alvoGlitterX = Phaser.Math.Linear(ataque.alvoGlitterX, Phaser.Math.Clamp(jogador.x, 280, 1640), suavizacao);
+      ataque.alvoGlitterY = Phaser.Math.Linear(ataque.alvoGlitterY, Phaser.Math.Clamp(jogador.y - 430, 80, 690), suavizacao);
+    };
+
+    if (ataque.fase === "glitterAproxima") {
+      atualizarAlvo();
+      const t = Phaser.Math.Clamp(1 - Math.max(0, ataque.tempo) / 800, 0, 1);
+      const suave = t * t * (3 - 2 * t);
+      for (const [indice, mao] of [this.mao6, this.mao7].entries()) {
+        const inicio = ataque.posicoesGlitterInicio.get(mao);
+        const lado = indice === 0 ? -1 : 1;
+        mao.setPosition(
+          Phaser.Math.Linear(inicio.x, ataque.alvoGlitterX + lado * 190, suave),
+          Phaser.Math.Linear(inicio.y, ataque.alvoGlitterY, suave),
+        );
+      }
+      if (ataque.tempo <= 0) {
+        if (!this.scene.anims.exists("forgotten-hand-glitter-loop")) {
+          this.scene.anims.create({
+            key: "forgotten-hand-glitter-loop",
+            frames: this.scene.anims.generateFrameNumbers("forgotten-hand-glitter", { start: 0, end: 14 }),
+            frameRate: 18,
+            repeat: -1,
+          });
+        }
+        this.mao6.setVisible(false);
+        this.mao7.setVisible(false);
+        this.maoGlitter.setPosition(ataque.alvoGlitterX, ataque.alvoGlitterY)
+          .setVisible(true).play("forgotten-hand-glitter-loop");
+        ataque.fase = "glitterSalpica";
+        ataque.tempo = 6000;
+        ataque.acumuladorGlitter = 1000;
+        ataque.proximoNumeroGlitter = 6;
+      }
+      return;
+    }
+
+    if (ataque.fase === "glitterSalpica") {
+      atualizarAlvo();
+      this.maoGlitter.setPosition(ataque.alvoGlitterX, ataque.alvoGlitterY);
+      ataque.acumuladorGlitter += delta;
+      while (ataque.acumuladorGlitter >= 1000) {
+        ataque.acumuladorGlitter -= 1000;
+        const quantidade = 4;
+        for (let indice = 0; indice < quantidade; indice++) {
+          const numero = ataque.proximoNumeroGlitter;
+          const atraso = Phaser.Math.Between(0, 900);
+          this.scene.time.delayedCall(atraso, () => {
+            if (ataque.fase !== "glitterSalpica" || !this.maoGlitter.active) return;
+            this.soltarNumeroGlitter(
+              numero,
+              jogador,
+              boss,
+              Phaser.Math.Between(-350, 350),
+              Phaser.Math.Between(0, 90),
+            );
+          });
+          ataque.proximoNumeroGlitter = ataque.proximoNumeroGlitter === 6 ? 7 : 6;
+        }
+      }
+      if (ataque.tempo <= 0) this.iniciarRetornoGlitter(ataque);
+      return;
+    }
+
+    if (ataque.fase === "glitterRetorno") {
+      const t = Phaser.Math.Clamp(1 - Math.max(0, ataque.tempo) / 650, 0, 1);
+      const suave = t * t * (3 - 2 * t);
+      for (const [indice, mao] of [this.mao6, this.mao7].entries()) {
+        const inicio = ataque.posicoesGlitterInicio.get(mao);
+        const destino = this.obterPosicaoBaseMao(mao);
+        const tamanhoInicio = ataque.tamanhosRetornoGlitter.get(mao);
+        const tamanhoOriginal = ataque.tamanhosOriginais.get(mao);
+        mao.setPosition(Phaser.Math.Linear(inicio.x, destino.x, suave), Phaser.Math.Linear(inicio.y, destino.y, suave));
+        mao.setDisplaySize(
+          Phaser.Math.Linear(tamanhoInicio.largura, tamanhoOriginal.largura, suave),
+          Phaser.Math.Linear(tamanhoInicio.altura, tamanhoOriginal.altura, suave),
+        );
+      }
+      if (ataque.tempo <= 0) {
+        for (const mao of [this.mao6, this.mao7]) {
+          mao.setTexture(ataque.texturasOriginais.get(mao))
+            .setScale(ataque.escalasOriginais.get(mao).x, ataque.escalasOriginais.get(mao).y)
+            .setRotation(ataque.rotacoesOriginais.get(mao) ?? 0)
+            .setFlipX(ataque.flipsOriginais.get(mao) ?? false)
+            .setVisible(true);
+        }
+        ataque.plataformasAtacadas?.forEach((superficie) => { superficie.body.checkCollision.up = true; });
+        this.finalizarEsmagamento(ataque);
+      }
+    }
+  }
+
+  soltarNumeroGlitter(numero, jogador, boss, deslocamentoX = Phaser.Math.Between(-210, 210), deslocamentoY = 0) {
+    if (!jogador?.active) return;
+    const x = Phaser.Math.Clamp(this.maoGlitter.x + deslocamentoX, 35, 1885);
+    const y = this.maoGlitter.y + 125 + deslocamentoY;
+    const projetil = this.scene.physics.add.image(x, y, `${numero}.png`);
+    projetil.setDisplaySize(38, 46).setDepth(3);
+    this.scene.camHUD?.ignore(projetil);
+    projetil.body.setAllowGravity(false);
+    projetil.body.setSize(36, 45, true);
+    const velocidadeX = Phaser.Math.Clamp((jogador.x - x) * 0.12, -100, 100);
+    projetil.body.setVelocity(velocidadeX, 420);
+    const registro = { projetil, timer: null, numero, boss, angulo: Math.PI / 2 };
+    this.projeteisArma.add(registro);
+    registro.timer = this.scene.time.delayedCall(3500, () => this.destruirProjetilArma(registro));
+  }
+
+  iniciarRetornoGlitter(ataque) {
+    this.maoGlitter.stop().setVisible(false);
+    const maos = [this.mao6, this.mao7];
+    ataque.posicoesGlitterInicio = new Map();
+    ataque.tamanhosRetornoGlitter = new Map();
+    for (const [indice, mao] of maos.entries()) {
+      const lado = indice === 0 ? -1 : 1;
+      mao.setTexture(ataque.texturasOriginais.get(mao))
+        .setRotation(0)
+        .setFlipX(ataque.flipsOriginais.get(mao) ?? false)
+        .setPosition(ataque.alvoGlitterX + lado * 100, ataque.alvoGlitterY)
+        .setVisible(true);
+      const tamanhoOriginal = ataque.tamanhosOriginais.get(mao);
+      const alturaInicio = 170 * (tamanhoOriginal.altura / tamanhoOriginal.largura);
+      mao.setDisplaySize(170, alturaInicio);
+      ataque.posicoesGlitterInicio.set(mao, { x: mao.x, y: mao.y });
+      ataque.tamanhosRetornoGlitter.set(mao, { largura: mao.displayWidth, altura: mao.displayHeight });
+    }
+    ataque.fase = "glitterRetorno";
+    ataque.tempo = 650;
+  }
+
+  posicionarMolduraL(ataque, mao, espalhamentoX, espalhamentoY, progressoRotacao) {
+    const esquerda = mao === this.mao6;
+    const sinal = esquerda ? -1 : 1;
+    const cantoX = ataque.alvoLX + sinal * espalhamentoX;
+    const cantoY = ataque.alvoLY + (esquerda ? 1 : -1) * espalhamentoY;
+    const rotacaoFinal = 0;
+    const posicao = ataque.posicoesLInicio.get(mao);
+    const alvoX = cantoX + (esquerda ? 30 : -30);
+    const alvoY = cantoY + 5;
+    const t = Phaser.Math.Clamp(progressoRotacao, 0, 1);
+    mao.setPosition(Phaser.Math.Linear(posicao.x, alvoX, t), Phaser.Math.Linear(posicao.y, alvoY, t));
+    mao.setRotation(Phaser.Math.Linear(ataque.rotacoesOriginais.get(mao) ?? 0, rotacaoFinal, t));
+    const tamanhoOriginal = ataque.tamanhosOriginais.get(mao);
+    mao.setDisplaySize(
+      Phaser.Math.Linear(tamanhoOriginal.largura, 360, t),
+      Phaser.Math.Linear(tamanhoOriginal.altura, 240, t),
+    );
+  }
+
+  atualizarGolpeL(delta, ataque, jogador, boss) {
+    if (ataque.fase.startsWith("raio")) {
+      this.atualizarRaioBucal(delta, ataque, jogador, boss);
+      return;
+    }
+
+    if (ataque.fase === "lChegada") {
+      const t = Phaser.Math.Clamp(1 - Math.max(0, ataque.tempo) / 850, 0, 1);
+      const suave = t * t * (3 - 2 * t);
+      for (const mao of [this.mao6, this.mao7]) {
+        if (mao.texture.key !== "forgotten-hand-L") mao.setTexture("forgotten-hand-L");
+        mao.setFlipX(mao === this.mao7);
+        this.posicionarMolduraL(ataque, mao, 220, 160, suave);
+      }
+      if (ataque.tempo <= 0) {
+        ataque.fase = "lFecha";
+        ataque.tempo = 550;
+        ataque.posicoesLInicio = new Map([this.mao6, this.mao7].map((mao) => [mao, { x: mao.x, y: mao.y }]));
+        ataque.rotacoesLInicio = new Map([this.mao6, this.mao7].map((mao) => [mao, mao.rotation]));
+      }
+      return;
+    }
+
+    if (ataque.fase === "lFecha") {
+      const t = Phaser.Math.Clamp(1 - Math.max(0, ataque.tempo) / 550, 0, 1);
+      const suave = t * t * (3 - 2 * t);
+      for (const mao of [this.mao6, this.mao7]) {
+        const esquerda = mao === this.mao6;
+        const sinal = esquerda ? -1 : 1;
+        const cantoX = ataque.alvoLX + sinal * Phaser.Math.Linear(220, 110, suave);
+        const cantoY = ataque.alvoLY + (esquerda ? 1 : -1) * Phaser.Math.Linear(160, 90, suave);
+        const alvoX = cantoX + (esquerda ? 30 : -30);
+        const alvoY = cantoY + 5;
+        const inicio = ataque.posicoesLInicio.get(mao);
+        mao.setPosition(Phaser.Math.Linear(inicio.x, alvoX, suave), Phaser.Math.Linear(inicio.y, alvoY, suave));
+        mao.setRotation(Phaser.Math.Linear(ataque.rotacoesLInicio.get(mao), 0, suave));
+      }
+      if (ataque.tempo <= 0) {
+        const corpo = jogador?.body;
+        const dentroDaMoldura = corpo &&
+          Math.abs(corpo.center.x - ataque.alvoLX) <= 105 &&
+          Math.abs(corpo.center.y - ataque.alvoLY) <= 85;
+        if (dentroDaMoldura && this.capturarJogadorEnquadrado(jogador)) {
+          this.iniciarRaioBucal(ataque);
+        } else {
+          this.iniciarRetornoMaosL(ataque);
+        }
+      }
+      return;
+    }
+
+    if (ataque.fase === "lRetorno") {
+      const t = Phaser.Math.Clamp(1 - Math.max(0, ataque.tempo) / 650, 0, 1);
+      const suave = t * t * (3 - 2 * t);
+      for (const mao of [this.mao6, this.mao7]) {
+        const inicio = ataque.posicoesLInicio.get(mao);
+        const destino = this.obterPosicaoBaseMao(mao);
+        const tamanhoOriginal = ataque.tamanhosOriginais.get(mao);
+        const tamanhoInicio = ataque.tamanhosRetornoInicio.get(mao);
+        mao.setPosition(Phaser.Math.Linear(inicio.x, destino.x, suave), Phaser.Math.Linear(inicio.y, destino.y, suave));
+        mao.setRotation(Phaser.Math.Linear(ataque.rotacoesLInicio.get(mao), ataque.rotacoesOriginais.get(mao) ?? 0, suave));
+        mao.setDisplaySize(Phaser.Math.Linear(tamanhoInicio.largura, tamanhoOriginal.largura, suave), Phaser.Math.Linear(tamanhoInicio.altura, tamanhoOriginal.altura, suave));
+      }
+      if (ataque.tempo <= 0) {
+        for (const mao of [this.mao6, this.mao7]) {
+          mao.setTexture(ataque.texturasOriginais.get(mao))
+            .setScale(ataque.escalasOriginais.get(mao).x, ataque.escalasOriginais.get(mao).y)
+            .setRotation(ataque.rotacoesOriginais.get(mao) ?? 0)
+            .setFlipX(ataque.flipsOriginais.get(mao) ?? false);
+        }
+        ataque.plataformasAtacadas?.forEach((superficie) => { superficie.body.checkCollision.up = true; });
+        this.liberarJogadorEnquadrado();
+        this.finalizarEsmagamento(ataque);
+      }
+    }
+  }
+
+  iniciarRetornoMaosL(ataque) {
+    ataque.posicoesLInicio = new Map([this.mao6, this.mao7].map((mao) => [mao, { x: mao.x, y: mao.y }]));
+    ataque.rotacoesLInicio = new Map([this.mao6, this.mao7].map((mao) => [mao, mao.rotation]));
+    ataque.tamanhosRetornoInicio = new Map([this.mao6, this.mao7].map((mao) => [mao, { largura: mao.displayWidth, altura: mao.displayHeight }]));
+    ataque.fase = "lRetorno";
+    ataque.tempo = 650;
+  }
+
+  capturarJogadorEnquadrado(sprite) {
+    const personagem = this.obterPersonagemPorSprite(sprite);
+    const body = sprite?.body;
+    if (!personagem || !sprite?.active || !body || this.capturaEnquadramento) return false;
+    const nomesInput = ["inputDown", "inputJustDown", "inputJustUp"];
+    this.capturaEnquadramento = {
+      personagem,
+      body,
+      moves: body.moves,
+      allowGravity: body.allowGravity,
+      gravityY: body.gravity.y,
+      velocidadeX: body.velocity.x,
+      velocidadeY: body.velocity.y,
+      metodos: new Map(nomesInput.map((nome) => [nome, {
+        proprio: Object.prototype.hasOwnProperty.call(personagem, nome),
+        original: personagem[nome],
+      }])),
+    };
+    nomesInput.forEach((nome) => { personagem[nome] = () => false; });
+    body.moves = false;
+    body.setAllowGravity(false);
+    body.setVelocity(0, 0);
+    return true;
+  }
+
+  liberarJogadorEnquadrado() {
+    const captura = this.capturaEnquadramento;
+    if (!captura) return;
+    for (const [nome, metodo] of captura.metodos) {
+      if (metodo.proprio) captura.personagem[nome] = metodo.original;
+      else delete captura.personagem[nome];
+    }
+    const body = captura.body;
+    if (body) {
+      body.moves = captura.moves;
+      body.setAllowGravity(captura.allowGravity);
+      body.setGravityY(captura.gravityY);
+      body.setVelocity(captura.velocidadeX, captura.velocidadeY);
+    }
+    this.capturaEnquadramento = null;
+  }
+
+  definirRostoBoss(textura) {
+    this.rostoAtual = textura;
+    this.cabeca.setTexture(textura).setDisplaySize(600, 600);
+  }
+
+  iniciarRaioBucal(ataque) {
+    this.definirRostoBoss("forgotten-face-2");
+    ataque.fase = "raioAbrindo";
+    ataque.etapaRosto = 2;
+    ataque.tempo = 110;
+    ataque.ultimoHitRaio = -Infinity;
+    ataque.raiosCriados = false;
+  }
+
+  iniciarFeixeBucal(ataque) {
+    const cena = this.scene;
+    const textura1 = cena.textures.get("forgotten-beam-1");
+    const textura2 = cena.textures.get("forgotten-beam-2");
+    const ultimoFrame1 = Math.max(0, textura1.frameTotal - 2);
+
+    const criarAnimacao = (chave, textura, inicio, fim, repeat) => {
+      if (cena.anims.exists(chave)) return;
+      cena.anims.create({
+        key: chave,
+        frames: cena.anims.generateFrameNumbers(textura, { start: inicio, end: fim }),
+        frameRate: 24,
+        repeat,
+      });
+    };
+    criarAnimacao("forgotten-beam1-open", "forgotten-beam-1", 0, ultimoFrame1, 0);
+    criarAnimacao("forgotten-beam2-open", "forgotten-beam-2", 0, 16, 0);
+    criarAnimacao("forgotten-beam2-loop", "forgotten-beam-2", 13, 16, -1);
+
+    const aplicarEscalaCinza = (raio) => {
+      raio.clearTint();
+      raio.postFX?.addColorMatrix().grayscale(1);
+      raio.preFX?.addColorMatrix().grayscale(1);
+    };
+    const origem = this.obterOrigemRaioBucal();
+    const raio1 = cena.add.sprite(origem.x, origem.y, "forgotten-beam-1")
+      .setOrigin(0, 0.5).setBlendMode(Phaser.BlendModes.NORMAL).setDepth(-1.5);
+    const raio2 = cena.add.sprite(origem.x, origem.y, "forgotten-beam-2")
+      .setOrigin(0, 0.5).setBlendMode(Phaser.BlendModes.NORMAL).setDepth(-1.4);
+    aplicarEscalaCinza(raio1);
+    aplicarEscalaCinza(raio2);
+    cena.camHUD?.ignore(raio1);
+    cena.camHUD?.ignore(raio2);
+    raio1.play("forgotten-beam1-open");
+    raio1.once("animationcomplete", () => raio1.anims.pause());
+    raio2.play("forgotten-beam2-open");
+    raio2.once("animationcomplete", () => {
+      if (raio2.active) raio2.play("forgotten-beam2-loop");
+    });
+    this.raiosBucais.add(raio1);
+    this.raiosBucais.add(raio2);
+    ataque.raio1 = raio1;
+    ataque.raio2 = raio2;
+    ataque.raiosCriados = true;
+    ataque.fase = "raioAtivo";
+    ataque.tempo = 4000;
+  }
+
+  obterOrigemRaioBucal() {
+    const cabeca = this.cabeca;
+    const offsetX = 20 * cabeca.scaleX;
+    const offsetY = 148 * cabeca.scaleY;
+    const cos = Math.cos(cabeca.rotation);
+    const sin = Math.sin(cabeca.rotation);
+    return {
+      x: cabeca.x + offsetX * cos - offsetY * sin,
+      y: cabeca.y + offsetX * sin + offsetY * cos,
+    };
+  }
+
+  atualizarRaioBucal(delta, ataque, jogador, boss) {
+    if (ataque.fase === "raioAbrindo") {
+      if (ataque.tempo > 0) return;
+      if (ataque.etapaRosto < 4) {
+        ataque.etapaRosto++;
+        this.definirRostoBoss(ataque.etapaRosto === 1 ? "forgotten-face" : `forgotten-face-${ataque.etapaRosto}`);
+        ataque.tempo = 110;
+        return;
+      }
+      this.iniciarFeixeBucal(ataque);
+      return;
+    }
+
+    if (ataque.fase === "raioAtivo") {
+      if (ataque.tempo <= 0) {
+        for (const raio of [ataque.raio1, ataque.raio2]) {
+          if (raio?.active) {
+            this.raiosBucais.delete(raio);
+            raio.destroy();
+          }
+        }
+        ataque.raio1 = null;
+        ataque.raio2 = null;
+        ataque.fase = "raioFechando";
+        ataque.etapaRosto = 3;
+        ataque.tempo = 110;
+        this.definirRostoBoss("forgotten-face-3");
+        return;
+      }
+
+      const origem = this.obterOrigemRaioBucal();
+      const alvoX = jogador?.active ? jogador.x : origem.x;
+      const alvoY = jogador?.active ? jogador.y : origem.y + 500;
+      const anguloAlvo = Phaser.Math.Clamp(
+        Phaser.Math.Angle.Between(origem.x, origem.y, alvoX, alvoY),
+        Phaser.Math.DegToRad(25),
+        Phaser.Math.DegToRad(155),
+      );
+      const comprimento = Math.max(400, Math.hypot(alvoX - origem.x, alvoY - origem.y) + 100);
+      const espessuraVisual = 210;
+      for (const raio of [ataque.raio1, ataque.raio2]) {
+        if (!raio?.active) continue;
+        raio.setPosition(origem.x, origem.y).setRotation(anguloAlvo)
+          .setDisplaySize(comprimento, espessuraVisual);
+      }
+
+      const ux = Math.cos(anguloAlvo);
+      const uy = Math.sin(anguloAlvo);
+      const nx = -uy;
+      const ny = ux;
+      const metadeEspessura = 30;
+      const pontos = [
+        { x: origem.x + nx * metadeEspessura, y: origem.y + ny * metadeEspessura },
+        { x: origem.x + ux * comprimento + nx * metadeEspessura, y: origem.y + uy * comprimento + ny * metadeEspessura },
+        { x: origem.x + ux * comprimento - nx * metadeEspessura, y: origem.y + uy * comprimento - ny * metadeEspessura },
+        { x: origem.x - nx * metadeEspessura, y: origem.y - ny * metadeEspessura },
+      ];
+      this.desenharHitboxAtaque(pontos);
+
+      const corpo = jogador?.body;
+      const personagem = this.obterPersonagemPorSprite(jogador);
+      const hurtboxes = personagem?.grupoHurtbox?.getChildren() ?? [];
+      const acertou = corpo && this.hitboxPoligonalSobrepoeCorpo({ pontos }, corpo) ||
+        hurtboxes.some((hurtbox) => this.hitboxPoligonalSobrepoeCorpo({ pontos }, hurtbox.body));
+      const agora = this.scene.time.now;
+      if (acertou && agora - ataque.ultimoHitRaio >= 180) {
+        ataque.ultimoHitRaio = agora;
+        personagem?.receberDano(5, {
+          tipoSomImpacto: "light",
+          knockbackX: Math.abs(ux * 85),
+          knockbackY: uy * 85 - 10,
+          knockbackFixo: true,
+          hitstunFixoFrames: 12,
+          ignorarHitstunDecay: true,
+        }, {
+          atacante: boss,
+          direcao: Math.sign(ux) || 1,
+          x: origem.x,
+          y: origem.y,
+        });
+      }
+      return;
+    }
+
+    if (ataque.fase === "raioFechando" && ataque.tempo <= 0) {
+      if (ataque.etapaRosto > 1) {
+        ataque.etapaRosto--;
+        this.definirRostoBoss(ataque.etapaRosto === 1 ? "forgotten-face" : `forgotten-face-${ataque.etapaRosto}`);
+        ataque.tempo = 110;
+      } else {
+        this.definirRostoBoss(this.rostoBase);
+        if (ataque.tipo === "golpeL") {
+          this.liberarJogadorEnquadrado();
+          this.iniciarRetornoMaosL(ataque);
+        } else {
+          this.finalizarEsmagamento(ataque);
+        }
+      }
+    }
+  }
+
+  limparRaioBucal() {
+    for (const raio of this.raiosBucais ?? []) raio.destroy();
+    this.raiosBucais?.clear();
+  }
+
   iniciarAtaqueArma(ataque) {
     const maos = [this.mao6, this.mao7];
     ataque.maosMovidas = new Set(maos);
@@ -853,9 +1725,10 @@ export default class ForgottenOne {
       for (const [indice, mao] of [this.mao6, this.mao7].entries()) {
         const origem = ataque.posicoesArmaInicio.get(mao);
         const lado = indice === 0 ? -1 : 1;
+        const base = this.obterPosicaoBaseMao(mao);
         mao.setPosition(
-          Phaser.Math.Linear(origem.x, this.xBaseAtual + lado * 590, suave),
-          Phaser.Math.Linear(origem.y, this.yBaseAtual + 170, suave),
+          Phaser.Math.Linear(origem.x, this.xBaseAtual + lado * (this.parMaosAtivo.alcanceX + 210), suave),
+          Phaser.Math.Linear(origem.y, base.y, suave),
         );
       }
       if (ataque.tempo <= 0) {
@@ -898,8 +1771,7 @@ export default class ForgottenOne {
       const suave = t * t * (3 - 2 * t);
       for (const mao of [this.mao6, this.mao7]) {
         const inicio = ataque.posicoesRetorno.get(mao);
-        const lado = mao === this.mao6 ? -1 : 1;
-        const base = { x: this.xBaseAtual + lado * 380, y: this.yBaseAtual + 170 + (lado < 0 ? this.gestoAtual : -this.gestoAtual) };
+        const base = this.obterPosicaoBaseMao(mao);
         mao.setPosition(Phaser.Math.Linear(inicio.x, base.x, suave), Phaser.Math.Linear(inicio.y, base.y, suave));
         mao.rotation = Phaser.Math.Angle.RotateTo(mao.rotation, 0, Math.min(Math.PI, delta * 0.006));
       }
@@ -917,14 +1789,14 @@ export default class ForgottenOne {
     projetil.body.setAllowGravity(false);
     projetil.body.setSize(36, 45, true);
     projetil.body.setVelocity(Math.cos(angulo) * 620, Math.sin(angulo) * 620);
-    const registro = { projetil, timer: null, numero, boss, angulo };
+    const registro = { projetil, timer: null, numero, boss, angulo, alvo: this.obterPersonagemPorSprite(jogador) };
     this.projeteisArma.add(registro);
     registro.timer = cena.time.delayedCall(3500, () => this.destruirProjetilArma(registro));
   }
 
   acertarProjetilArma(registro) {
     if (!this.projeteisArma.has(registro)) return;
-    this.scene.jogador1?.receberDano(registro.numero, {
+    registro.alvo?.receberDano(registro.numero, {
       knockbackX: 180,
       knockbackY: -55,
     }, {
@@ -1029,8 +1901,8 @@ export default class ForgottenOne {
     if (ataque.fase === "palmRetorno") {
       const progresso = 1 - Math.max(0, ataque.tempo) / 440;
       const alvosBase = new Map([
-        [this.mao6, { x: this.xBaseAtual - 380, y: this.yBaseAtual + 170 + this.gestoAtual }],
-        [this.mao7, { x: this.xBaseAtual + 380, y: this.yBaseAtual + 170 - this.gestoAtual }],
+        [this.mao6, this.obterPosicaoBaseMao(this.mao6)],
+        [this.mao7, this.obterPosicaoBaseMao(this.mao7)],
       ]);
       for (const mao of [this.mao6, this.mao7]) {
         const inicio = ataque.posicoesRetorno.get(mao);
@@ -1065,7 +1937,7 @@ export default class ForgottenOne {
     if (!acertou) return;
     ataque.acertoResolvido = true;
     const direcao = jogador.x >= ataque.alvoX ? 1 : -1;
-    this.scene.jogador1?.receberDano(40, {
+    this.obterPersonagemPorSprite(jogador)?.receberDano(40, {
       tipoSomImpacto: "heavy",
       knockbackX: 650,
       knockbackY: -850,
@@ -1125,11 +1997,10 @@ export default class ForgottenOne {
 
     if (ataque.fase === "varridaRetorno") {
       const progresso = 1 - Math.max(0, ataque.tempo) / 500;
-      const xBase = this.xBaseAtual + ataque.lado * 380;
-      const yBase = this.yBaseAtual + 170 + (ataque.lado < 0 ? this.gestoAtual : -this.gestoAtual);
+      const base = this.obterPosicaoBaseMao(mao);
       mao.setPosition(
-        Phaser.Math.Linear(ataque.xInicial, xBase, progresso),
-        Phaser.Math.Linear(ataque.yInicial, yBase, progresso),
+        Phaser.Math.Linear(ataque.xInicial, base.x, progresso),
+        Phaser.Math.Linear(ataque.yInicial, base.y, progresso),
       );
       if (ataque.tempo <= 0) {
         this.restaurarMaoVarredura(ataque);
@@ -1156,7 +2027,7 @@ export default class ForgottenOne {
     this.desenharHitboxAtaque(hitbox.pontos);
     if (ataque.acertoResolvido || !this.hitboxPoligonalSobrepoeCorpo(hitbox, corpo)) return;
     ataque.acertoResolvido = true;
-    this.scene.jogador1?.receberDano(30, {
+    this.obterPersonagemPorSprite(jogador)?.receberDano(30, {
       tipoSomImpacto: "heavy",
       knockbackX: 1050,
       knockbackY: -120,
@@ -1178,13 +2049,15 @@ export default class ForgottenOne {
   }
 
   acertarEsmagamento(ataque, boss, topoPlataforma) {
-    const personagem = this.scene.jogador1;
-    const jogador = personagem?.sprite;
     const mao = ataque.maoAtacante;
-    if (!mao || !jogador?.active || !jogador.body) return;
+    if (!mao) return;
     const hitbox = this.obterHitboxSprite(mao);
     this.desenharHitboxAtaque(hitbox.pontos);
-    if (ataque.acertoResolvido || !this.hitboxPoligonalSobrepoeCorpo(hitbox, jogador.body)) return;
+    const personagem = this.obterJogadoresAlvoBoss().find((alvo) =>
+      this.hitboxPoligonalSobrepoeCorpo(hitbox, alvo.sprite.body)
+    );
+    const jogador = personagem?.sprite;
+    if (ataque.acertoResolvido || !jogador) return;
     ataque.acertoResolvido = true;
     const direcao = jogador.x >= this.cabeca.x ? 1 : -1;
     personagem.receberDano(50, {

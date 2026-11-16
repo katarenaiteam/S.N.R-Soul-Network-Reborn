@@ -151,6 +151,23 @@ export function instalarComandosDebug(game) {
       return true;
     },
 
+    matarForgottenOne() {
+      const scene = game.scene.getScene("CenaForgottenOne");
+      const boss = scene?.mapaAtual?.boss;
+      if (!scene?.scene.isActive() || !boss?.receberDano) {
+        console.error("Entre na luta contra The Forgotten One antes de usar matarForgottenOne().");
+        return false;
+      }
+      if (scene.mapaAtual.bossDerrotado || boss.vidaBoss <= 0) {
+        console.error("The Forgotten One ja esta sendo derrotado.");
+        return false;
+      }
+
+      boss.receberDano(boss.vidaBoss);
+      console.log("The Forgotten One derrotado; a sequencia final foi iniciada.");
+      return true;
+    },
+
     lutaPingu(personagem = "FJ") {
       const nomes = {
         fj: "FJ", frederick: "Frederick", spiderman: "SpiderMan",
@@ -250,6 +267,7 @@ export function instalarComandosDebug(game) {
         "  carregarUlt()           carrega totalmente a ult do P1",
         "  carregarUlt(2)          carrega totalmente a ult do P2",
         "  matarBoss()             remove a ultima vida do boss da historia ativa",
+        "  matarForgottenOne()     derrota The Forgotten One e inicia a sequencia final",
         '  lutaPingu("FJ")         inicia a historia do Pingu usando o personagem escolhido (inclui TH30)',
         '  lutaSlenderman("FJ")   inicia a historia do Slenderman usando o personagem escolhido (inclui TH30)',
         '  lutaForgottenOne("FJ") abre a luta de teste contra The Forgotten One',
@@ -268,6 +286,7 @@ export function instalarComandosDebug(game) {
   window.resetar = api.resetar.bind(api);
   window.carregarUlt = api.carregarUlt.bind(api);
   window.matarBoss = api.matarBoss.bind(api);
+  window.matarForgottenOne = api.matarForgottenOne.bind(api);
   window.lutaPingu = api.lutaPingu.bind(api);
   window.lutaSlenderman = api.lutaSlenderman.bind(api);
   window.lutaForgottenOne = api.lutaForgottenOne.bind(api);

@@ -269,7 +269,7 @@ this.nomePersonagem = "Aigis";
         offsetVisualY: 5,
         largura: 220,
         altura: 400,
-        offsetX: 110,
+        offsetX: 105,
         offsetY: -28,
         escala: 0.33,
         hurtboxes: [],
@@ -1074,9 +1074,9 @@ this.nomePersonagem = "Aigis";
     }
 
     if (this.logicaAtaqueBaixoUlt) return;
-    this.logicaAtaqueBaixoUlt = new AigisPersonaDoSpecial(
+    this.logicaAtaqueBaixoUlt = new AigisDoSpecial(
       this,
-      AigisPersonaDoSpecial.configuracaoAtaqueNormal,
+      AigisDoSpecial.configuracaoAtaqueUlt,
       estadoAtack,
     );
     this.logicasEspeciaisAtivas.push(this.logicaAtaqueBaixoUlt);
@@ -1087,7 +1087,7 @@ this.nomePersonagem = "Aigis";
     if (this.specialsUltAigis) return;
     this.golpesUltAigis = {
       ...this.golpesNormaisAigis,
-      agachado: AigisPersonaDoSpecial.configuracaoAtaqueNormal,
+      agachado: AigisDoSpecial.configuracaoAtaqueUlt,
     };
     this.golpes = this.golpesUltAigis;
     this.specialsUltAigis = {

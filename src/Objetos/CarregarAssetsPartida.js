@@ -902,9 +902,19 @@ export function carregarAssetsVersus(scene, dados) {
   if (dados.mapa === "ForgottenOne" || dados.ClasseMapa?.name === "ForgottenOne") {
     const base = "assets/personagens/The forgoten one/Sprites/usavel/";
     queueAsset(scene, queued, "texture", "forgotten-face", () => scene.load.image("forgotten-face", `${base}face-1.png`));
+    queueAsset(scene, queued, "texture", "forgotten-face-2", () => scene.load.image("forgotten-face-2", `${base}face-2.png`));
+    queueAsset(scene, queued, "texture", "forgotten-face-3", () => scene.load.image("forgotten-face-3", `${base}face-3.png`));
+    queueAsset(scene, queued, "texture", "forgotten-face-4", () => scene.load.image("forgotten-face-4", `${base}face-4.png`));
+    queueAsset(scene, queued, "texture", "forgotten-face-5", () => scene.load.image("forgotten-face-5", `${base}face-5.png`));
+    queueAsset(scene, queued, "texture", "forgotten-face-67", () => scene.load.image("forgotten-face-67", `${base}face-67.png`));
+    queueAsset(scene, queued, "texture", "forgotten-eye-loop", () => scene.load.spritesheet("forgotten-eye-loop", `${base}eye.png`, { frameWidth: 400, frameHeight: 320 }));
+    queueAsset(scene, queued, "texture", "forgotten-beam-1", () => scene.load.spritesheet("forgotten-beam-1", "assets/personagens/Miku/Sprites/ult/miku_beam1.png", { frameWidth: 500, frameHeight: 123 }));
+    queueAsset(scene, queued, "texture", "forgotten-beam-2", () => scene.load.spritesheet("forgotten-beam-2", "assets/personagens/Miku/Sprites/ult/miku_beam2.png", { frameWidth: 385, frameHeight: 114 }));
     queueAsset(scene, queued, "texture", "forgotten-face-eye", () => scene.load.image("forgotten-face-eye", `${base}face-eye.png`));
     queueAsset(scene, queued, "texture", "forgotten-hand-6", () => scene.load.image("forgotten-hand-6", `${base}hand-6.png`));
     queueAsset(scene, queued, "texture", "forgotten-hand-7", () => scene.load.image("forgotten-hand-7", `${base}hand-7.png`));
+    queueAsset(scene, queued, "texture", "forgotten-hand-L", () => scene.load.image("forgotten-hand-L", `${base}hand-L.png`));
+    queueAsset(scene, queued, "texture", "forgotten-hand-glitter", () => scene.load.spritesheet("forgotten-hand-glitter", `${base}hand-gliter.png`, { frameWidth: 1150, frameHeight: 646 }));
     queueAsset(scene, queued, "texture", "forgotten-hand-punch", () => scene.load.image("forgotten-hand-punch", `${base}hand-punch.png`));
     queueAsset(scene, queued, "texture", "forgotten-hand-palm", () => scene.load.image("forgotten-hand-palm", `${base}hand-palm.png`));
     queueAsset(scene, queued, "texture", "forgotten-hand-palm2", () => scene.load.image("forgotten-hand-palm2", `${base}hand-palm2.png`));
@@ -937,5 +947,15 @@ export function carregarAssetsHistoria(scene) {
   carregarGrupo(scene, queued, assetsstory);
   carregarGrupo(scene, queued, assetsFinalMap);
 
+  return queued.size;
+}
+
+export function carregarAssetsForgottenSecret(scene) {
+  const queued = new Set();
+  const base = "assets/personagens/The forgoten one/Sprites/usavel/";
+  queueAsset(scene, queued, "texture", "forgotten-face", () => scene.load.image("forgotten-face", `${base}face-1.png`));
+  queueAsset(scene, queued, "texture", "forgotten-hand-6", () => scene.load.image("forgotten-hand-6", `${base}hand-6.png`));
+  queueAsset(scene, queued, "texture", "forgotten-hand-7", () => scene.load.image("forgotten-hand-7", `${base}hand-7.png`));
+  queueAsset(scene, queued, "texture", "forgotten-hand-catch", () => scene.load.image("forgotten-hand-catch", `${base}hand-catch.png`));
   return queued.size;
 }
