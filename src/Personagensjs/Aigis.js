@@ -1697,88 +1697,79 @@ scene.anims.create({
     repeat: 0
    });
 
-    scene.anims.create({
-      key: "ai_atack1",
-      frames: scene.anims.generateFrameNumbers("ai_combo", {
-        start: 0,
-        end: 4,
-      }),
-      frameRate: 18,
-      repeat: 0,
-    });
-    scene.anims.create({
-      key: "ai_atack2",
-      frames: scene.anims.generateFrameNumbers("ai_combo", {
-        start: 5,
-        end: 12,
-      }),
-      frameRate: 22,
-      repeat: 0,
-    });
-    scene.anims.create({
-      key: "ai_atack3",
-      frames: scene.anims.generateFrameNumbers("ai_combo", {
-        start: 13,
-        end: 20,
-      }),
-      frameRate: 18,
-      repeat: 0,
-    });
+    if (!scene.anims.exists("ai_atack1")) {
+      scene.anims.create({
+        key: "ai_atack1",
+        frames: scene.anims.generateFrameNumbers("ai_combo", { start: 0, end: 4 }),
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("ai_atack2")) {
+      scene.anims.create({
+        key: "ai_atack2",
+        frames: scene.anims.generateFrameNumbers("ai_combo", { start: 5, end: 12 }),
+        frameRate: 22,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("ai_atack3")) {
+      scene.anims.create({
+        key: "ai_atack3",
+        frames: scene.anims.generateFrameNumbers("ai_combo", { start: 13, end: 20 }),
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
    
-    scene.anims.create({
-      key: "ai_sideAtack",
-      frames: scene.anims.generateFrameNumbers("ai_sideAtack", {
-        start: 0,
-        end: 18,
-      }),
-      frameRate: 22,
-      repeat: 0,
-    });
-    scene.anims.create({
-      key: "ai_downAtack",
-      frames: scene.anims.generateFrameNumbers("ai_downAtack", {
-        start: 0,
-        end: 8,
-      }),
-      frameRate: 22,
-      repeat: 0,
-    });
-    scene.anims.create({
-      key: "ai_neutralAir",
-      frames: scene.anims.generateFrameNumbers("ai_neutralAir", {
-        start: 0,
-        end: 5,
-      }),
-      frameRate: 22,
-      repeat: 0,
-    });
-     scene.anims.create({
-      key: "ai_upAir",
-      frames: scene.anims.generateFrameNumbers("ai_upAir", {
-        start: 0,
-        end: 9,
-      }),
-      frameRate: 20,
-      repeat: 0,
-    });
-     scene.anims.create({
-      key: "ai_sideAir",
-      frames: scene.anims.generateFrameNumbers("ai_sideAir", {
-        start: 0,
-        end: 9,
-      }),
-      frameRate: 12,
-      repeat: 0,
-    });
-     scene.anims.create({
-      key: "ai_downAir",
-      frames: scene.anims.generateFrameNumbers("ai_downAir", {
-        start: 0,
-        end: 8,
-      }),
-      frameRate: 18,
-      repeat: 0,
-    });
+    if (!scene.anims.exists("ai_sideAtack")) {
+      scene.anims.create({
+        key: "ai_sideAtack",
+        frames: scene.anims.generateFrameNumbers("ai_sideAtack", { start: 0, end: 18 }),
+        frameRate: 22,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("ai_downAtack")) {
+      scene.anims.create({
+        key: "ai_downAtack",
+        frames: scene.anims.generateFrameNumbers("ai_downAtack", { start: 0, end: 8 }),
+        frameRate: 22,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("ai_neutralAir")) {
+      scene.anims.create({
+        key: "ai_neutralAir",
+        frames: scene.anims.generateFrameNumbers("ai_neutralAir", { start: 0, end: 5 }),
+        frameRate: 22,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("ai_upAir")) {
+      scene.anims.create({
+        key: "ai_upAir",
+        frames: scene.anims.generateFrameNumbers("ai_upAir", { start: 0, end: 9 }),
+        frameRate: 20,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("ai_sideAir")) {
+      scene.anims.create({
+        key: "ai_sideAir",
+        frames: scene.anims.generateFrameNumbers("ai_sideAir", { start: 0, end: 9 }),
+        frameRate: 12,
+        repeat: 0,
+      });
+    }
+    if (!scene.anims.exists("ai_downAir")) {
+      scene.anims.create({
+        key: "ai_downAir",
+        frames: scene.anims.generateFrameNumbers("ai_downAir", { start: 0, end: 8 }),
+        frameRate: 18,
+        repeat: 0,
+      });
+    }
     
   }
 }

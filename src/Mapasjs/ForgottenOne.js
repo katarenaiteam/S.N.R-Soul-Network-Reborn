@@ -451,6 +451,12 @@ export default class ForgottenOne {
     const morte = this.cinematicaDerrota;
     if (!morte) return;
     morte.tempo += delta;
+    if (morte.epilogoRevelado) {
+      const quadroOlho = Math.floor(morte.tempo * 0.015) % 93;
+      for (const olho of this.olhosFinaisHUD ?? []) {
+        if (olho?.active) olho.setTexture("forgotten-eye-loop", quadroOlho);
+      }
+    }
     const claridade = Phaser.Math.Clamp(morte.tempo / 5000, 0, 1);
     cena.camHUD?.setBackgroundColor(`rgba(255,255,255,${claridade})`);
     if (morte.tempo >= 5000 && !morte.hudEscondida) {
@@ -507,22 +513,13 @@ export default class ForgottenOne {
       .setDisplaySize(larguraRosto, larguraRosto).setScrollFactor(0).setDepth(10001);
     cena.camJogo?.ignore(this.rostoFinalHUD);
 
-    if (!cena.anims.exists("forgotten-eye-loop")) {
-      cena.anims.create({
-        key: "forgotten-eye-loop",
-        frames: cena.anims.generateFrameNumbers("forgotten-eye-loop", { start: 0, end: 92 }),
-        frameRate: 15,
-        repeat: -1,
-      });
-    }
     this.olhosFinaisHUD = [
       { x: centroX - 99 * escalaRosto, y: centroY - 77 * escalaRosto },
       { x: centroX + 64 * escalaRosto, y: centroY - 77 * escalaRosto },
     ].map(({ x, y }) => {
-      const olho = cena.add.sprite(x, y, "forgotten-eye-loop", 0)
+      const olho = cena.add.image(x, y, "forgotten-eye-loop", 0)
       .setDisplaySize(104 * escalaRosto, 84 * escalaRosto).setScrollFactor(0).setDepth(10002);
       cena.camJogo?.ignore(olho);
-      olho.play("forgotten-eye-loop");
       return olho;
     });
 
@@ -606,7 +603,7 @@ export default class ForgottenOne {
         }
         olho.setVisible(false);
       } else if (olho.getData("visivelAntesUlt")) {
-        olho.setVisible(true).removeData("visivelAntesUlt");
+        olho.setVisible(true).setData("visivelAntesUlt", false);
       }
     }
   }
