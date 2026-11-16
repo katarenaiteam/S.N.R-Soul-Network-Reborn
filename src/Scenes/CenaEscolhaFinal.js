@@ -103,6 +103,7 @@ export default class CenaEscolhaFinal extends Phaser.Scene {
 
   update(_time, delta) {
     for (const coluna of this.colunasMatrix || []) {
+      if (!coluna.cauda?.active || !coluna.cabeca?.active) continue;
       coluna.y += coluna.velocidade * (delta / 1000);
       if (coluna.y > this.scale.height + coluna.cauda.height) {
         coluna.y = Phaser.Math.Between(-coluna.cauda.height, -20);
