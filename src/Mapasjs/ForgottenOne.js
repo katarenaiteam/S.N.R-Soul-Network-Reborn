@@ -596,6 +596,21 @@ export default class ForgottenOne {
     )[0] ?? null;
   }
 
+  atualizarVisibilidadeOlhosUlt() {
+    const ultAtiva = Boolean(this.scene.ultEmAndamento);
+    for (const olho of this.olhosProgressao) {
+      if (!olho?.active) continue;
+      if (ultAtiva) {
+        if (!olho.getData("visivelAntesUlt") && olho.visible) {
+          olho.setData("visivelAntesUlt", true);
+        }
+        olho.setVisible(false);
+      } else if (olho.getData("visivelAntesUlt")) {
+        olho.setVisible(true).removeData("visivelAntesUlt");
+      }
+    }
+  }
+
   atualizarOponente(delta, boss) {
     if (this.bossDerrotado) {
       this.atualizarCinematicaDerrota(delta);
@@ -986,7 +1001,10 @@ export default class ForgottenOne {
     ataque.xInicial = mao.x;
     ataque.yInicial = mao.y;
     if (texturaGrab) {
-      mao.setTexture("forgotten-hand-catch").setRotation(0).setFlipX(false);
+      mao.setTexture("forgotten-hand-catch")
+        .setRotation(mao === this.mao6 ? -Math.PI / 2 : Math.PI / 2)
+        .setFlipX(false);
+      mao.setScale(ataque.escalasOriginais.get(mao).x * 1.15, ataque.escalasOriginais.get(mao).y * 1.15);
       if (superficie) {
         ataque.plataformasAtacadas.add(superficie);
         superficie.body.checkCollision.up = false;
@@ -1117,7 +1135,9 @@ export default class ForgottenOne {
       y: ataque.maoAtacante.y,
     });
     personagem.maquinaEstados.mudarEstado("atordoado");
-    ataque.maoAtacante.setTexture("forgotten-hand-punch").setRotation(-Math.PI / 2);
+    ataque.maoAtacante.setTexture("forgotten-hand-punch")
+      .setRotation(ataque.maoAtacante === this.mao6 ? -Math.PI / 2 : Math.PI / 2)
+      .setFlipX(false);
     ataque.fase = "grabPresa";
     ataque.tempo = 750;
   }

@@ -40,6 +40,7 @@ export default class CenaForgottenOne extends CenaPrincipal {
   }
 
   update(time, delta) {
+    this.mapaAtual?.atualizarVisibilidadeOlhosUlt();
     this.mapaAtual?.atualizar(delta);
     if (this.mapaAtual?.bossDerrotado || this.saindoParaMenu) return;
     super.update(time, delta);

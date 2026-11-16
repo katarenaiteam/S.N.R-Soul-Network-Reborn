@@ -607,6 +607,7 @@ this.indicadorP2 = this.criarIndicador(
       return {
         x: sprite.x,
         y: sprite.y,
+        profundidade: sprite.depth,
         texture: sprite.texture.key,
         frame: sprite.frame.name,
         animacao: sprite.anims.currentAnim?.key ?? null,
@@ -620,6 +621,7 @@ this.indicadorP2 = this.criarIndicador(
         tint: sprite.isTinted ? sprite.tintTopLeft : null,
         tintMode: sprite.isTinted ? sprite.tintMode : null,
         dano: jogador.porcentagemDano,
+        ki: jogador.cargaKi,
         ult: jogador.ultCarga,
         guard: jogador.vidaGuard,
       };
@@ -708,6 +710,7 @@ this.indicadorP2 = this.criarIndicador(
         sprite.play(remoto.animacao);
       }
       if (remoto.frame !== undefined) sprite.setFrame(remoto.frame);
+      if (remoto.profundidade !== undefined) sprite.setDepth(remoto.profundidade);
       jogador.alvoPosicaoMQTT = {
         xInicial: sprite.x,
         yInicial: sprite.y,
@@ -725,6 +728,7 @@ this.indicadorP2 = this.criarIndicador(
       if (remoto.tint === null || remoto.tint === undefined) sprite.clearTint();
       else sprite.setTint(remoto.tint).setTintMode(remoto.tintMode ?? Phaser.TintModes.NORMAL);
       jogador.porcentagemDano = remoto.dano;
+      if (remoto.ki !== undefined) jogador.cargaKi = remoto.ki;
       jogador.ultCarga = remoto.ult;
       jogador.vidaGuard = remoto.guard;
       jogador.textoDano?.setText(`${Math.floor(remoto.dano)}%`);
@@ -746,6 +750,8 @@ this.indicadorP2 = this.criarIndicador(
     }
     atualizarIndicadorVidas({ vidas: this.vidasP1 }, this.hudP1_Nome);
     atualizarIndicadorVidas({ vidas: this.vidasP2 }, this.hudP2_Nome);
+    this.atualizarBarraUlt(this.jogador1, this.hudP1_Nome);
+    this.atualizarBarraUlt(this.jogador2, this.hudP2_Nome);
     this.atualizarBarraUlt(this.jogador1, this.hudP1_Nome);
     this.atualizarBarraUlt(this.jogador2, this.hudP2_Nome);
 

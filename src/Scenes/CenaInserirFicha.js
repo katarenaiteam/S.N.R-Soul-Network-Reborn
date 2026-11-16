@@ -1,3 +1,5 @@
+import ClienteMQTT from "../Objetos/ClienteMQTT.js";
+
 export default class CenaInserirFicha extends Phaser.Scene {
   constructor() {
     super({ key: "CenaInserirFicha" });
@@ -11,6 +13,18 @@ export default class CenaInserirFicha extends Phaser.Scene {
   }
 
   create() {
+    if (new URLSearchParams(window.location.search).get("espectador") === "1") {
+      this.scene.start("CenaPreload");
+      return;
+    }
+
+    let mqtt = this.registry.get("clienteMQTT");
+    if (!mqtt) {
+      mqtt = new ClienteMQTT(this.registry.get("mqttConfig"), "host");
+      this.registry.set("clienteMQTT", mqtt);
+      mqtt.connect();
+    }
+
     document.fonts.load('28px "RetroFont"').then(() => this.criarTela());
   }
 
