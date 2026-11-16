@@ -44,6 +44,7 @@ export default class AigisAupSpecial {
     this.timerPersonaFinal = null;
     this.alvosAtingidosPersona = new Set();
     this.personaConcluida = false;
+    this.animacaoConcluida = false;
     this.finalizado = false;
     this.aoAtualizarAnimacao = this.aoAtualizarAnimacao.bind(this);
     this.aoCompletarAnimacao = this.aoCompletarAnimacao.bind(this);
@@ -84,6 +85,7 @@ export default class AigisAupSpecial {
         this.timerPersonaFinal = null;
         this.persona?.destroy();
         this.persona = null;
+        if (this.animacaoConcluida) this.encerrarSpecial();
       });
     });
     this.persona.play("ai_p_AupSpecial");
@@ -371,6 +373,15 @@ export default class AigisAupSpecial {
 
   aoCompletarAnimacao() {
     if (this.finalizado) return;
+    if (this.special.persona && this.timerPersonaFinal) {
+      this.animacaoConcluida = true;
+      return;
+    }
+    this.encerrarSpecial();
+  }
+
+  encerrarSpecial() {
+    if (this.finalizado) return;
     this.finalizar();
     if (this.personagem.maquinaEstados.estadoAtual === this.estado) {
       this.estado.finalizarSpecial();
@@ -415,7 +426,7 @@ AigisAupSpecial.configuracao = {
   quadroInicioFlutuacao: 3,
   quadroFimFlutuacao: 11,
   gravidadeFlutuacao: 90,
-  velocidadeVerticalFlutuacao: 125,
+  velocidadeVerticalFlutuacao: 150,
   velocidadeLateralFlutuacao: 42,
   offsetAuraY: -70,
   escalaAuraX: 1.05,
@@ -433,9 +444,9 @@ AigisAupSpecial.configuracao = {
   alturaHitboxChoque: 40,
   propriedadesAtaque: {
     tipoSomImpacto: "light",
-    dano: 5,
+    dano: 7,
     knockbackX: 160,
-    knockbackY: -80,
+    knockbackY: -130,
     knockbackFixo: true,
     tumbling: false,
   },
@@ -451,12 +462,12 @@ AigisAupSpecial.configuracaoPersona = {
     quadroFimSubida: 7,
     quadroInicioAtaque: 10,
     quadroFimAtaque: 14,
-    duracaoPoseFinal: 600,
+    duracaoPoseFinal: 1100,
     hitbox: {
       largura: 70,
-      altura: 82,
+      altura: 152,
       offsetX: 12,
-      offsetY: -190,
+      offsetY: -160,
     },
     propriedadesAtaque: {
       ...AigisAupSpecial.configuracao.propriedadesAtaque,

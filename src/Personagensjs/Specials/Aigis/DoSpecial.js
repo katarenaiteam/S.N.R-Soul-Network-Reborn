@@ -151,7 +151,11 @@ export default class AigisDoSpecial {
     if (this.finalizado) return;
     this.cancelar();
     if (this.personagem.maquinaEstados.estadoAtual === this.estado) {
-      this.estado.finalizarSpecial();
+      if (this.special.finalizarComoAtaque) {
+        this.estado.finalizarAtaque();
+      } else {
+        this.estado.finalizarSpecial();
+      }
     }
   }
 
@@ -199,4 +203,14 @@ AigisDoSpecial.configuracao = {
     hitstunFrames: 40,
     ignorarHitstunDecay: true,
   },
+};
+
+AigisDoSpecial.configuracaoAtaqueUlt = {
+  ...AigisDoSpecial.configuracao,
+  cooldown: 700,
+  duracao: 500,
+  frameHitbox: -1,
+  cancelavel: false,
+  propriedades: {},
+  finalizarComoAtaque: true,
 };

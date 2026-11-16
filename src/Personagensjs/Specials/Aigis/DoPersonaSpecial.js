@@ -151,6 +151,9 @@ export default class AigisPersonaDoSpecial {
     if (this.persona?.anims.currentAnim?.key === "ai_p_doSpecial") {
       this.atualizarPersona(this.persona.anims.currentFrame);
     }
+    if (this.special.aereo && this.personagem.sprite.body.blocked.down) {
+      this.personagem.sprite.setVelocityX(0);
+    }
   }
 
   destruirHitbox() {
@@ -190,7 +193,7 @@ const criarConfiguracao = (aereo) => ({
   logica: AigisPersonaDoSpecial,
   cooldown: 1000,
   deslocamentoVerticalPersona: aereo ? 70 : 0,
-  pausaFrameFinal: aereo ? 500 : 0,
+  pausaFrameFinal: 300,
   quadroAtaque: 9,
   quadroFimAtaque: 11,
   offsetPersonaX: 80,
@@ -206,7 +209,7 @@ const criarConfiguracao = (aereo) => ({
   propriedadesAtaque: {
     tipoSomImpacto: "heavy",
     dano: 25,
-    knockbackX: 480,
+    knockbackX: 580,
     knockbackY: -350,
     knockbackFixo: false,
     tumbling: true,

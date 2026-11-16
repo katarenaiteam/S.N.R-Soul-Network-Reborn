@@ -209,9 +209,9 @@ const criarConfiguracao = (aereo) => ({
   escalaPersona: 0.33,
   velocidadeMaximaPose: 85,
   hitbox: {
-    largura: 145,
+    largura: 190,
     altura: 58,
-    offsetX: 78,
+    offsetX: 60,
     offsetY: -100,
   },
   offsetCorteX: 95,

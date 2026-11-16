@@ -220,7 +220,7 @@ this.nomePersonagem = "Aigis";
       jump: {
         largura: 220,
         altura: 400,
-        offsetX: 8,
+        offsetX: 12,
         offsetY: -6,
         escala: 0.33,
         hurtboxes: [
@@ -269,7 +269,7 @@ this.nomePersonagem = "Aigis";
         offsetVisualY: 5,
         largura: 220,
         altura: 400,
-        offsetX: 130,
+        offsetX: 110,
         offsetY: -28,
         escala: 0.33,
         hurtboxes: [],
@@ -291,7 +291,7 @@ this.nomePersonagem = "Aigis";
       NeSpecialUltAir: {
         largura: 220,
         altura: 400,
-        offsetX: 10,
+        offsetX: 13,
         offsetY: 19,
         escala: 0.33,
         hurtboxes: [
@@ -304,8 +304,8 @@ this.nomePersonagem = "Aigis";
       DoSpecialUlt: {
         largura: 220,
         altura: 400,
-        offsetX: 20,
-        offsetY: -85,
+        offsetX: 23,
+        offsetY: -82,
         escala: 0.33,
         hurtboxes: [
           { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
@@ -331,7 +331,7 @@ this.nomePersonagem = "Aigis";
         largura: 220,
         altura: 400,
         offsetX: 0,
-        offsetY: -100,
+        offsetY: -75,
         escala: 0.33,
         hurtboxes: [
           { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
@@ -344,7 +344,7 @@ this.nomePersonagem = "Aigis";
         largura: 220,
         altura: 400,
         offsetX: 0,
-        offsetY: -8,
+        offsetY: 20,
         escala: 0.33,
         hurtboxes: [
           { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
@@ -356,7 +356,7 @@ this.nomePersonagem = "Aigis";
       guard: {
         largura: 220,
         altura: 400,
-        offsetX: 11,
+        offsetX: 12,
         offsetY: -55,  //-49
         escala: 0.33,
         hurtboxes: [
@@ -368,11 +368,11 @@ this.nomePersonagem = "Aigis";
       stun: {
         largura: 220,
         altura: 240,
-        offsetX: 95,
-        offsetY: 50,
+        offsetX: 50,
+        offsetY: 60,
         escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 70, offsetX: 23, offsetY: -38 },
+          { largura: 45, altura: 70, offsetX: 0, offsetY: -38 },
         ],
       },
 
@@ -380,13 +380,13 @@ this.nomePersonagem = "Aigis";
         
         largura: 220,
         altura: 400,
-        offsetX: 30,
+        offsetX: 0,
         offsetY: -15,
         escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
-          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
-          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
+          { largura: 40, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 50, altura: 40, offsetX: 0, offsetY: -25 },
         ],
       },
 
@@ -411,8 +411,8 @@ this.nomePersonagem = "Aigis";
         offsetY: 40,
         escala: 0.33,
         hurtboxes: [
-          { largura: 55, altura: 70, offsetX: 20, offsetY: -80 },
-          { largura: 45, altura: 40, offsetX: 0, offsetY: -15 },
+          { largura: 40, altura: 70, offsetX: 0, offsetY: -80 },
+          { largura: 25, altura: 40, offsetX: 0, offsetY: -20 },
         ],
       },
 
@@ -423,8 +423,8 @@ this.nomePersonagem = "Aigis";
         offsetY: 20,
         escala: 0.33,
         hurtboxes: [
-          { largura: 65, altura: 55, offsetX: -15, offsetY: -90 }, // Tronco inclinado
-          { largura: 50, altura: 45, offsetX: 30, offsetY: -70 },   // Pernas
+          { largura: 55, altura: 55, offsetX: -15, offsetY: -90 }, // Tronco inclinado
+          { largura: 45, altura: 45, offsetX: 30, offsetY: -70 },   // Pernas
         ],
       },
      
@@ -448,9 +448,9 @@ this.nomePersonagem = "Aigis";
         offsetY: 86,
         escala: 0.33,
         hurtboxes: [
-          { largura: 100, altura: 34, offsetX: -10, offsetY: -18 },
-          { largura: 40, altura: 20, offsetX: -60, offsetY: -12 },
-          { largura: 50, altura: 25, offsetX: 50, offsetY: -12 },
+          { largura: 100, altura: 30, offsetX: -10, offsetY: -15 },
+         // { largura: 40, altura: 20, offsetX: -60, offsetY: -12 },
+         // { largura: 50, altura: 25, offsetX: 50, offsetY: -12 },
         ],
       },
 
@@ -466,31 +466,31 @@ this.nomePersonagem = "Aigis";
 
       atack1: {
        
-        offsetVisualY: 0, // Positivo para baixo; negativo para cima.
+        offsetVisualX: 5, // Positivo para baixo; negativo para cima.
         largura: 220,
         altura: 400,
         offsetX: 73,
         offsetY: 47,
         escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
-          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
-          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
+          { largura: 35, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 0, offsetY: -25 },
         ],
       },
 
       atack2: {
         
-        offsetVisualY: 0, // Positivo para baixo; negativo para cima.
+        offsetVisualX: 5, // Positivo para baixo; negativo para cima.
         largura: 220,
         altura: 400,
         offsetX: 73,
         offsetY: 47,
         escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
-          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
-          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
+          { largura: 35, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 0, offsetY: -25 },
         ],
       },
 
@@ -503,9 +503,9 @@ this.nomePersonagem = "Aigis";
         offsetY: 47,
         escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
-          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
-          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
+          { largura: 35, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 67, altura: 40, offsetX: 0, offsetY: -25 },
         ],
       },
 
@@ -517,7 +517,7 @@ this.nomePersonagem = "Aigis";
         offsetY: -26,
         escala: 0.33,
         hurtboxes: [
-          { largura: 35, altura: 35, offsetX: 26, offsetY: -90 },
+          { largura: 35, altura: 35, offsetX: 23, offsetY: -90 },
           { largura: 26, altura: 25, offsetX: 0, offsetY: -72 },
           { largura: 18, altura: 40, offsetX: 0, offsetY: -30 },
         ],
@@ -531,9 +531,9 @@ this.nomePersonagem = "Aigis";
         offsetY: 46,
         escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 45, offsetX: 15, offsetY: -100 },
-          { largura: 40, altura: 25, offsetX: 14, offsetY: -60 },
-          { largura: 67, altura: 40, offsetX: 10, offsetY: -25 },
+          { largura: 45, altura: 45, offsetX: 0, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 0, offsetY: -60 },
+          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
         ],
       },
 
@@ -544,7 +544,7 @@ this.nomePersonagem = "Aigis";
         offsetY: 105,
         escala: 0.33,
         hurtboxes: [
-          { largura: 50, altura: 70, offsetX: 20, offsetY: -38 }],
+          { largura: 50, altura: 70, offsetX: -5, offsetY: -38 }],
       },
 
       sideAir: {
@@ -554,9 +554,9 @@ this.nomePersonagem = "Aigis";
         offsetY: -20,
         escala: 0.33,
         hurtboxes: [
-           { largura: 40, altura: 43, offsetX: 26, offsetY: -105 },
-          { largura: 46, altura: 25, offsetX: 32, offsetY: -72 },
-          { largura: 18, altura: 40, offsetX: 20, offsetY: -30 },
+           { largura: 30, altura: 43, offsetX: 0, offsetY: -105 },
+          { largura: 40, altura: 30, offsetX: 0, offsetY: -67 },
+          { largura: 18, altura: 40, offsetX: -35, offsetY: -30 },
         ],
       },
 
@@ -564,12 +564,12 @@ this.nomePersonagem = "Aigis";
         largura: 220,
         altura: 400,
         offsetX: 55,
-        offsetY: 40,
+        offsetY: 35,
         escala: 0.33,
         hurtboxes: [
-           { largura: 40, altura: 43, offsetX: 26, offsetY: -105 },
-          { largura: 46, altura: 25, offsetX: 32, offsetY: -72 },
-          { largura: 18, altura: 40, offsetX: 20, offsetY: -30 },
+           { largura: 35, altura: 43, offsetX: 0, offsetY: -105 },
+          { largura: 35, altura: 25, offsetX: 0, offsetY: -72 },
+          { largura: 24, altura: 40, offsetX: 0, offsetY: -30 },
         ],
       },
 
@@ -577,13 +577,13 @@ this.nomePersonagem = "Aigis";
   
          largura: 220,
         altura: 400,
-        offsetX: 40,
+        offsetX: 35,
         offsetY: 0,
         escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 45, offsetX: 25, offsetY: -100 },
-          { largura: 40, altura: 25, offsetX: 24, offsetY: -60 },
-          { largura: 67, altura: 40, offsetX: 20, offsetY: -25 },
+          { largura: 45, altura: 40, offsetX: 0, offsetY: -100 },
+          { largura: 40, altura: 25, offsetX: 0, offsetY: -60 },
+          
         ],
       },
 
@@ -608,8 +608,8 @@ this.nomePersonagem = "Aigis";
         escala: 0.33,
         hurtboxes: [
           { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
-          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
-          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+          { largura: 35, altura: 25, offsetX: -10, offsetY: -60 },
+          { largura: 30, altura: 40, offsetX: -5, offsetY: -25 },
         ],
       },
 
@@ -622,7 +622,7 @@ this.nomePersonagem = "Aigis";
         hurtboxes: [
           { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
           { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
-          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+          { largura: 20, altura: 40, offsetX: 30, offsetY: -40 },
         ],
       },
 
@@ -633,9 +633,9 @@ this.nomePersonagem = "Aigis";
         offsetY: 50,
         escala: 0.33,
         hurtboxes: [
-          { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
-          { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
-          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+          { largura: 30, altura: 45, offsetX: 5, offsetY: -100 },
+          { largura: 35, altura: 25, offsetX: 20, offsetY: -60 },
+          
         ],
       },
 
@@ -648,18 +648,17 @@ this.nomePersonagem = "Aigis";
         hurtboxes: [
           { largura: 30, altura: 45, offsetX: 0, offsetY: -100 },
           { largura: 35, altura: 25, offsetX: 0, offsetY: -60 },
-          { largura: 60, altura: 40, offsetX: 0, offsetY: -25 },
+          { largura: 20, altura: 40, offsetX: 0, offsetY: -25 },
         ],
       },
 
       doSpecial: {
         largura: 220,
         altura: 280,
-        offsetX: 0,
+        offsetX: 40,
         offsetY: -15,
         escala: 0.33,
         hurtboxes: [
-          { largura: 45, altura: 55, offsetX: 0, offsetY: -92 },
           { largura: 50, altura: 42, offsetX: 0, offsetY: -48 },
           { largura: 60, altura: 36, offsetX: 0, offsetY: -12 },
         ],
@@ -668,13 +667,12 @@ this.nomePersonagem = "Aigis";
       sideSpecial: {
         largura: 220,
         altura: 400,
-        offsetX: 0,
+        offsetX: 60,
         offsetY: 10,
         escala: 0.33,
         hurtboxes: [
           { largura: 34, altura: 45, offsetX: 0, offsetY: -100 },
           { largura: 38, altura: 28, offsetX: 0, offsetY: -62 },
-          { largura: 55, altura: 42, offsetX: 0, offsetY: -25 },
         ],
       },
 
@@ -700,10 +698,10 @@ this.nomePersonagem = "Aigis";
       neutro1: {
         animacao: "ai_atack1",
         frameHitbox: 2,
-        offsetX: 60,
-        offsetY: -100,
+        offsetX: 30,
+        offsetY: -70,
         largura: 65,
-        altura: 17,
+        altura: 40,
         cooldown: 700,
         duracao: 320,
         cancelavel: true,
@@ -733,10 +731,10 @@ this.nomePersonagem = "Aigis";
 
         frameHitbox: 5,
 
-        offsetX: 55,
-        offsetY: -80,
-        largura: 33,
-        altura: 45,
+        offsetX: 35,
+        offsetY: -105,
+        largura: 50,
+        altura: 75,
         duracao: 500,
         cancelavel: true,
         propriedades: {
@@ -775,10 +773,10 @@ this.nomePersonagem = "Aigis";
 
         frameHitbox: 3,
 
-        offsetX: 60,
+        offsetX: 45,
         offsetY: -89,
-        largura: 65,
-        altura: 26,
+        largura: 75,
+        altura: 50,
         duracao: 600,
         cancelavel: true,
 
@@ -816,10 +814,10 @@ this.nomePersonagem = "Aigis";
       //    ],
       //  },
        frameHitbox: 3,
-        offsetX: 40,
-        offsetY: -70,
-        largura: 78,
-        altura: 34,
+        offsetX: 30,
+        offsetY: -90,
+        largura: 70,
+        altura: 54,
         cooldown: 900,
         duracao: 500,
         cancelavel: true,
@@ -855,13 +853,13 @@ this.nomePersonagem = "Aigis";
          multiHit: {
           tipo: "automatico",
           hits: [
-            { inicio: 100, duracao: 60, offsetX:60, offsetY:-50,
+            { inicio: 100, duracao: 60, offsetX:60, offsetY:-55,
               propriedades: { dano: 2, knockbackX: -40, knockbackY: -20,
                 knockbackFixo: true, tumbling: false } },
             { inicio: 220, duracao: 60, offsetX:50, offsetY:-75,
               propriedades: { dano: 2, knockbackX: 80, knockbackY: -140,
                 knockbackFixo: true, tumbling: false } },
-            { inicio: 340, duracao: 60, offsetX:30, offsetY:-100,
+            { inicio: 340, duracao: 60, offsetX:30, offsetY:-110,
               propriedades: { dano: 5 } }, // Mantém o knockback forte do golpe.
           ],
         },
@@ -893,9 +891,9 @@ this.nomePersonagem = "Aigis";
         air_neutro: {
         animacao: "ai_neutralAir",
         frameHitbox: 3,
-        offsetX: 58,
-        offsetY: -97,
-        largura: 65,
+        offsetX: 40,
+        offsetY: -80,
+        largura: 60,
         altura: 25,
         cooldown: 400,
         duracao: 350,
@@ -920,8 +918,8 @@ this.nomePersonagem = "Aigis";
       air_cima: {
         animacao: "ai_upAir",
         frameHitbox: 3,
-        offsetX: 38,
-        offsetY: -130,
+        offsetX: 0,
+        offsetY: -110,
         largura: 35,
         altura: 55,
         cooldown: 400,
@@ -960,9 +958,9 @@ this.nomePersonagem = "Aigis";
         },
         frameHitbox: 2,
         offsetX: 40,
-        offsetY: -57,
-        largura: 75,
-        altura: 40,
+        offsetY: -85,
+        largura: 65,
+        altura: 30,
         cooldown: 650,
         duracao: 450,
          finalizarAoTocarChao: true,
@@ -999,8 +997,8 @@ this.nomePersonagem = "Aigis";
       air_agachado: {
         animacao: "ai_downAir",
         frameHitbox: 3,
-        offsetX: 60,
-        offsetY: -70,
+        offsetX: 15,
+        offsetY: -15,
         largura: 55,
         altura: 40,
         cooldown: 600,
