@@ -25,7 +25,41 @@ export default class CenaInserirFicha extends Phaser.Scene {
       mqtt.connect();
     }
 
-    document.fonts.load('28px "RetroFont"').then(() => this.criarTela());
+    this.conectarLojaMQTT();
+
+    document.fonts.load('28px "RetroFont"').then(() => {
+      if (!this.sys.isActive()) return;
+      this.criarTela();
+      if (this.fichaLiberadaPelaLoja) this.inserirFicha();
+    });
+  }
+
+  conectarLojaMQTT() {
+    const mqtt = globalThis.mqtt;
+    if (!mqtt?.connect) return;
+
+    this.fichaLiberadaPelaLoja = false;
+    this.clienteLojaMQTT = mqtt.connect(
+      "wss://mqtt.feira-de-jogos.dev.br/mqtt",
+      { clientId: `snr-arcade-${Math.random().toString(36).slice(2, 10)}` },
+    );
+    this.events.once("shutdown", () => this.clienteLojaMQTT?.end());
+    this.clienteLojaMQTT.on("connect", () => {
+      this.clienteLojaMQTT.subscribe("vending/comando/#");
+    });
+    this.clienteLojaMQTT.on("message", (_topico, mensagem) => {
+      let dados;
+      try {
+        dados = JSON.parse(mensagem.toString());
+      } catch {
+        return;
+      }
+
+      if (Number(dados?.product) !== 99 || this.fichaLiberadaPelaLoja) return;
+      this.fichaLiberadaPelaLoja = true;
+      this.clienteLojaMQTT.end();
+      if (this.textoFicha) this.inserirFicha();
+    });
   }
 
   criarTela() {
@@ -105,7 +139,7 @@ export default class CenaInserirFicha extends Phaser.Scene {
   }
 
   inserirFicha() {
-    if (this.fichaInserida) return;
+    if (this.fichaInserida || !this.textoFicha) return;
     this.fichaInserida = true;
     this.textoFicha.setText("FICHA INSERIDA");
     this.time.delayedCall(800, () => this.scene.start("CenaPreload"));
