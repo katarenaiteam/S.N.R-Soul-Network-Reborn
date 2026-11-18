@@ -20,6 +20,7 @@ import CenaEspectador from "./Scenes/CenaEspectador.js";
 import CenaForgottenOne from "./Scenes/CenaForgottenOne.js";
 import { instalarComandosDebug } from "./DebugConsole.js";
 import configMQTT from "./Objetos/ConfigMQTT.js";
+import iniciarRecebedorCompras from "./Objetos/RecebedorCompras.js";
 
 const config = {
   type: Phaser.AUTO,
@@ -60,6 +61,7 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+iniciarRecebedorCompras();
 window.__SNR_GAME_DEBUG__ = game;
 game.registry.set("mqttConfig", config.mqtt);
 if (new URLSearchParams(window.location.search).get("espectador") !== "1") {

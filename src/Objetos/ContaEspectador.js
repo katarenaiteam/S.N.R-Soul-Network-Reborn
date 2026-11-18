@@ -1,19 +1,8 @@
 const CLIENT_ID_GOOGLE = "14164817969-s43fpf0hi0vdh2lkjn372igr4lsv96lq.apps.googleusercontent.com";
-const URL_BROKER_FEIRA = "wss://mqtt.feira-de-jogos.dev.br/mqtt";
-const TOPICO_COMANDOS_FEIRA = "vending/comando/#";
 const CHAVE_TOKEN_GOOGLE = "snr-google-id-token";
 const PREFIXO_SALDO = "snr-espectador-saldo:";
 const CHAVE_COMPRAS_PENDENTES = "snr-compras-pendentes";
-const CHAVE_CLIENTE_MQTT_FEIRA = "snr-feira-mqtt-client-id";
-
-function obterClientIdFeira() {
-  const salvo = localStorage.getItem(CHAVE_CLIENTE_MQTT_FEIRA);
-  if (typeof salvo === "string" && /^snr-espectador-[a-z0-9]{8}$/.test(salvo)) return salvo;
-
-  const clientId = `snr-espectador-${Math.random().toString(36).slice(2, 10).padEnd(8, "0")}`;
-  localStorage.setItem(CHAVE_CLIENTE_MQTT_FEIRA, clientId);
-  return clientId;
-}
+const CHAVE_COMPRAS_CREDITADAS = "snr-compras-creditadas";
 
 function obterEmailDoToken(token) {
   try {
@@ -37,7 +26,11 @@ export default class ContaEspectador {
     this.comprasPendentes = this.carregarComprasPendentes();
     this.pedidosPendentes = new Set();
     this.criarInterface();
-    this.conectarFeira();
+    this.aoReceberCompraFeira = () => {
+      this.comprasPendentes = this.carregarComprasPendentes();
+      this.processarComprasPendentes();
+    };
+    window.addEventListener("snr-compra-recebida", this.aoReceberCompraFeira);
     if (this.email) this.entrarNaConta(this.email);
     this.carregarGoogleIdentity();
     this.scene.events.once("shutdown", () => this.destruir());
@@ -189,55 +182,6 @@ export default class ContaEspectador {
     this.statusLoja.hidden = false;
   }
 
-  conectarFeira() {
-    if (!globalThis.mqtt?.connect) {
-      this.statusLoja.textContent = "Cliente MQTT indisponivel.";
-      this.statusLoja.hidden = false;
-      return;
-    }
-    this.clienteFeira = globalThis.mqtt.connect(URL_BROKER_FEIRA, {
-      clientId: obterClientIdFeira(),
-      clean: false,
-      reconnectPeriod: 5000,
-    });
-    this.clienteFeira.on("connect", () => {
-      this.clienteFeira.subscribe(TOPICO_COMANDOS_FEIRA, { qos: 1 }, (erro) => {
-        if (erro) {
-          this.statusLoja.textContent = "Nao foi possivel ativar o recebimento de compras pendentes.";
-          this.statusLoja.hidden = false;
-        }
-      });
-      this.statusLoja.hidden = true;
-    });
-    this.clienteFeira.on("close", () => {
-      this.statusLoja.textContent = "Desconectado da loja da Feira.";
-      this.statusLoja.hidden = false;
-    });
-    this.clienteFeira.on("error", () => {
-      this.statusLoja.textContent = "Nao foi possivel conectar a loja da Feira.";
-      this.statusLoja.hidden = false;
-    });
-    this.clienteFeira.on("message", (_topico, mensagem) => {
-      let evento;
-      try {
-        evento = JSON.parse(mensagem.toString());
-      } catch {
-        return;
-      }
-      if (Number(evento?.product) !== 101 || typeof evento?.email !== "string") return;
-      const compra = {
-        product: 101,
-        email: evento.email.trim().toLowerCase(),
-        id: evento.transactionId || evento.purchaseId || evento.orderId || null,
-        recebidaEm: Date.now(),
-      };
-      if (compra.id && this.comprasPendentes.some((item) => item.id === compra.id)) return;
-      this.comprasPendentes.push(compra);
-      this.salvarComprasPendentes();
-      this.processarComprasPendentes();
-    });
-  }
-
   processarComprasPendentes() {
     const restantes = [];
     this.comprasPendentes.forEach((compra) => {
@@ -250,9 +194,24 @@ export default class ContaEspectador {
 
   creditarCompra(compra) {
     if (compra.product !== 101 || compra.email !== this.email) return;
+    const creditadas = this.carregarComprasCreditadas();
+    if (compra.id && creditadas.includes(compra.id)) return;
     this.saldo += 1;
     localStorage.setItem(`${PREFIXO_SALDO}${this.email}`, String(this.saldo));
+    if (compra.id) {
+      creditadas.push(compra.id);
+      localStorage.setItem(CHAVE_COMPRAS_CREDITADAS, JSON.stringify(creditadas.slice(-500)));
+    }
     this.atualizarSaldoTexto();
+  }
+
+  carregarComprasCreditadas() {
+    try {
+      const ids = JSON.parse(localStorage.getItem(CHAVE_COMPRAS_CREDITADAS) || "[]");
+      return Array.isArray(ids) ? ids : [];
+    } catch {
+      return [];
+    }
   }
 
   atualizarSaldoTexto() {
@@ -283,9 +242,9 @@ export default class ContaEspectador {
 
   destruir() {
     window.clearInterval(this.intervaloPresenca);
+    window.removeEventListener("snr-compra-recebida", this.aoReceberCompraFeira);
     this.scene.mqtt?.off("connect", this.aoConectarSala);
     if (this.topicoResposta) this.scene.mqtt?.off(`message:${this.topicoResposta}`, this.aoReceberResposta);
-    this.clienteFeira?.end();
     this.loginPainel?.remove();
     this.elemento?.remove();
   }
