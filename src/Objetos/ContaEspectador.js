@@ -1,39 +1,51 @@
 const CLIENT_ID_GOOGLE = "14164817969-s43fpf0hi0vdh2lkjn372igr4lsv96lq.apps.googleusercontent.com";
-const CHAVE_TOKEN_GOOGLE = "snr-google-id-token";
-const PREFIXO_SALDO = "snr-espectador-saldo:";
-const CHAVE_COMPRAS_PENDENTES = "snr-compras-pendentes";
-const CHAVE_COMPRAS_CREDITADAS = "snr-compras-creditadas";
-
-function obterEmailDoToken(token) {
-  try {
-    const parte = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-    const perfil = JSON.parse(atob(parte));
-    if (perfil.email_verified !== true || typeof perfil.email !== "string") return "";
-    if (!Number.isFinite(perfil.exp) || perfil.exp * 1000 <= Date.now()) return "";
-    return perfil.email.trim().toLowerCase();
-  } catch {
-    return "";
-  }
-}
+const CHAVE_TOKEN_CONTA = "snr-conta-token";
+const URL_API_CONTA = String(import.meta.env?.VITE_SNR_ACCOUNT_API_URL || "").replace(/\/$/, "");
 
 export default class ContaEspectador {
   constructor(scene) {
     this.scene = scene;
     this.clientIdGoogle = import.meta.env?.VITE_GOOGLE_CLIENT_ID || CLIENT_ID_GOOGLE;
-    this.idToken = sessionStorage.getItem(CHAVE_TOKEN_GOOGLE) || "";
-    this.email = obterEmailDoToken(this.idToken);
+    this.tokenConta = localStorage.getItem(CHAVE_TOKEN_CONTA) || "";
+    this.email = "";
     this.saldo = 0;
-    this.comprasPendentes = this.carregarComprasPendentes();
     this.pedidosPendentes = new Set();
     this.criarInterface();
-    this.aoReceberCompraFeira = () => {
-      this.comprasPendentes = this.carregarComprasPendentes();
-      this.processarComprasPendentes();
-    };
-    window.addEventListener("snr-compra-recebida", this.aoReceberCompraFeira);
-    if (this.email) this.entrarNaConta(this.email);
+    if (this.tokenConta) this.restaurarConta();
     this.carregarGoogleIdentity();
     this.scene.events.once("shutdown", () => this.destruir());
+  }
+
+  async requisicaoApi(caminho, { method = "GET", body, autenticada = true } = {}) {
+    const headers = { Accept: "application/json" };
+    if (body !== undefined) headers["Content-Type"] = "application/json";
+    if (autenticada && this.tokenConta) headers.Authorization = `Bearer ${this.tokenConta}`;
+    const response = await fetch(`${URL_API_CONTA}${caminho}`, {
+      method,
+      headers,
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const erro = new Error(payload.error || "Não foi possível sincronizar a conta.");
+      erro.status = response.status;
+      throw erro;
+    }
+    return payload;
+  }
+
+  async restaurarConta() {
+    try {
+      const conta = await this.requisicaoApi("/api/account");
+      if (this.scene.sys.isActive()) this.entrarNaConta(conta);
+    } catch (erro) {
+      if (erro.status === 401) {
+        this.tokenConta = "";
+        localStorage.removeItem(CHAVE_TOKEN_CONTA);
+      } else {
+        this.mostrarStatus("Não foi possível sincronizar as moedas com o servidor.");
+      }
+    }
   }
 
   criarInterface() {
@@ -111,43 +123,56 @@ export default class ContaEspectador {
     }, { once: true });
   }
 
-  entrarComGoogle(resposta) {
-    const token = resposta?.credential || "";
-    const email = obterEmailDoToken(token);
-    if (!email) {
-      this.mostrarStatus("O Google nao retornou um e-mail valido. Tente entrar novamente.");
+  async entrarComGoogle(resposta) {
+    const credential = resposta?.credential || "";
+    if (!credential) {
+      this.mostrarStatus("O Google não retornou uma credencial válida.");
       return;
     }
-    this.idToken = token;
-    sessionStorage.setItem(CHAVE_TOKEN_GOOGLE, token);
-    this.entrarNaConta(email);
+    try {
+      const conta = await this.requisicaoApi("/api/google/login", {
+        method: "POST",
+        body: { credential },
+        autenticada: false,
+      });
+      this.tokenConta = conta.token;
+      localStorage.setItem(CHAVE_TOKEN_CONTA, this.tokenConta);
+      this.entrarNaConta(conta);
+    } catch (erro) {
+      this.mostrarStatus(erro.message);
+    }
   }
 
-  entrarNaConta(email) {
-    this.email = email;
-    const saldoSalvo = Number(localStorage.getItem(`${PREFIXO_SALDO}${email}`));
-    this.saldo = Number.isFinite(saldoSalvo) && saldoSalvo > 0 ? saldoSalvo : 0;
-    this.mostrarStatus(`Conta Google: ${email}`);
+  entrarNaConta(conta) {
+    this.email = conta.email;
+    this.saldo = Math.max(0, Number(conta.balance) || 0);
+    this.mostrarStatus(`Conta Google: ${this.email}`);
     this.botaoGoogle.hidden = true;
     this.loginPainel.remove();
     this.saldoTexto.hidden = false;
     this.atualizarSaldoTexto();
     this.scene.iniciarConexaoEspectador();
     this.iniciarPresenca();
-    this.processarComprasPendentes();
+    window.clearInterval(this.intervaloSaldo);
+    this.intervaloSaldo = window.setInterval(() => this.sincronizarSaldo(), 15000);
   }
 
-  carregarComprasPendentes() {
+  async sincronizarSaldo() {
+    if (!this.tokenConta || !this.scene.sys.isActive()) return;
     try {
-      const compras = JSON.parse(localStorage.getItem(CHAVE_COMPRAS_PENDENTES) || "[]");
-      return Array.isArray(compras) ? compras : [];
-    } catch {
-      return [];
+      const conta = await this.requisicaoApi("/api/account");
+      this.saldo = Math.max(0, Number(conta.balance) || 0);
+      this.atualizarSaldoTexto();
+    } catch (erro) {
+      if (erro.status === 401) {
+        this.tokenConta = "";
+        localStorage.removeItem(CHAVE_TOKEN_CONTA);
+        this.mostrarStatus("Sua sessão expirou. Entre com Google novamente.");
+        if (!this.loginPainel.isConnected) document.body.append(this.loginPainel);
+        this.loginPainel.style.display = "flex";
+        this.botaoGoogle.hidden = false;
+      }
     }
-  }
-
-  salvarComprasPendentes() {
-    localStorage.setItem(CHAVE_COMPRAS_PENDENTES, JSON.stringify(this.comprasPendentes));
   }
 
   iniciarPresenca() {
@@ -168,49 +193,25 @@ export default class ContaEspectador {
     this.scene.mqtt?.publish("spectator/presence", { email: this.email });
   }
 
-  receberRespostaCompra(resposta) {
+  async receberRespostaCompra(resposta) {
     const mensagensDeRecusa = new Set([
       "Impossivel durante a ultimate",
       "Conta banida da loja",
     ]);
     if (!this.pedidosPendentes.has(resposta?.pedidoId) || !mensagensDeRecusa.has(resposta?.mensagem)) return;
-    this.pedidosPendentes.delete(resposta.pedidoId);
-    this.saldo += 1;
-    localStorage.setItem(`${PREFIXO_SALDO}${this.email}`, String(this.saldo));
-    this.atualizarSaldoTexto();
-    this.statusLoja.textContent = `${resposta.mensagem}. Moeda devolvida.`;
-    this.statusLoja.hidden = false;
-  }
-
-  processarComprasPendentes() {
-    const restantes = [];
-    this.comprasPendentes.forEach((compra) => {
-      if (compra.email === this.email) this.creditarCompra(compra);
-      else restantes.push(compra);
-    });
-    this.comprasPendentes = restantes;
-    this.salvarComprasPendentes();
-  }
-
-  creditarCompra(compra) {
-    if (compra.product !== 101 || compra.email !== this.email) return;
-    const creditadas = this.carregarComprasCreditadas();
-    if (compra.id && creditadas.includes(compra.id)) return;
-    this.saldo += 1;
-    localStorage.setItem(`${PREFIXO_SALDO}${this.email}`, String(this.saldo));
-    if (compra.id) {
-      creditadas.push(compra.id);
-      localStorage.setItem(CHAVE_COMPRAS_CREDITADAS, JSON.stringify(creditadas.slice(-500)));
-    }
-    this.atualizarSaldoTexto();
-  }
-
-  carregarComprasCreditadas() {
     try {
-      const ids = JSON.parse(localStorage.getItem(CHAVE_COMPRAS_CREDITADAS) || "[]");
-      return Array.isArray(ids) ? ids : [];
+      const conta = await this.requisicaoApi("/api/account/refund", {
+        method: "POST",
+        body: { purchaseId: resposta.pedidoId },
+      });
+      this.saldo = conta.balance;
+      this.atualizarSaldoTexto();
+      this.pedidosPendentes.delete(resposta.pedidoId);
+      this.statusLoja.textContent = `${resposta.mensagem}. Moeda devolvida.`;
+      this.statusLoja.hidden = false;
     } catch {
-      return [];
+      this.statusLoja.textContent = "Não foi possível devolver a moeda. Verifique a conexão.";
+      this.statusLoja.hidden = false;
     }
   }
 
@@ -220,29 +221,40 @@ export default class ContaEspectador {
 
   async comprar(efeito, jogador) {
     const mqtt = this.scene.registry.get("clienteMQTT");
-    if (!this.idToken || !this.email) throw new Error("ENTRE COM GOOGLE PARA COMPRAR");
+    if (!this.tokenConta || !this.email) throw new Error("ENTRE COM GOOGLE PARA COMPRAR");
     if (mqtt?.client?.connected !== true) throw new Error("LOJA INDISPONIVEL");
-    if (this.saldo < 1) throw new Error("SEM MOEDAS SNR");
-
-    this.saldo -= 1;
-    localStorage.setItem(`${PREFIXO_SALDO}${this.email}`, String(this.saldo));
-    this.atualizarSaldoTexto();
     const pedidoId = `${mqtt.clientId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const conta = await this.requisicaoApi("/api/account/spend", {
+      method: "POST",
+      body: { purchaseId: pedidoId },
+    });
+    this.saldo = conta.balance;
+    this.atualizarSaldoTexto();
     this.pedidosPendentes.add(pedidoId);
     while (this.pedidosPendentes.size > 100) {
       this.pedidosPendentes.delete(this.pedidosPendentes.values().next().value);
     }
-    mqtt.publish("shop/purchase", {
+    const enviado = mqtt.publish("shop/purchase", {
       efeito,
       jogador,
       email: this.email,
       pedidoId,
     });
+    if (!enviado) {
+      const reembolso = await this.requisicaoApi("/api/account/refund", {
+        method: "POST",
+        body: { purchaseId: pedidoId },
+      });
+      this.saldo = reembolso.balance;
+      this.atualizarSaldoTexto();
+      this.pedidosPendentes.delete(pedidoId);
+      throw new Error("LOJA INDISPONIVEL. MOEDA DEVOLVIDA");
+    }
   }
 
   destruir() {
     window.clearInterval(this.intervaloPresenca);
-    window.removeEventListener("snr-compra-recebida", this.aoReceberCompraFeira);
+    window.clearInterval(this.intervaloSaldo);
     this.scene.mqtt?.off("connect", this.aoConectarSala);
     if (this.topicoResposta) this.scene.mqtt?.off(`message:${this.topicoResposta}`, this.aoReceberResposta);
     this.loginPainel?.remove();

@@ -73,7 +73,7 @@ export default class ClienteMQTT extends Phaser.Events.EventEmitter {
   }
 
   publish(topico, dados, opcoes = {}) {
-    if (!this.client?.connected) return;
+    if (!this.client?.connected) return false;
     const envelope =
       typeof dados === "object" && dados !== null
         ? { ...dados, clientId: this.clientId }
@@ -83,6 +83,7 @@ export default class ClienteMQTT extends Phaser.Events.EventEmitter {
       JSON.stringify(envelope),
       opcoes,
     );
+    return true;
   }
 
   publishState(estado) {
