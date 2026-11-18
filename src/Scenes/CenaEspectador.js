@@ -1,4 +1,5 @@
 import ClienteMQTT from "../Objetos/ClienteMQTT.js";
+import ContaEspectador from "../Objetos/ContaEspectador.js";
 
 const ROTAS_ESPECTADOR = {
   "char-menu": "Charmenu",
@@ -38,6 +39,8 @@ export default class CenaEspectador extends Phaser.Scene {
 
     this.registry.set("modoEspectador", true);
     this.registry.set("assetsVersusEspectadorProntos", false);
+    this.contaEspectador = new ContaEspectador(this);
+    this.registry.set("contaEspectador", this.contaEspectador);
     this.cenaReplicada = null;
     this.estadoAtual = null;
     this.estadoRecebido = null;
@@ -77,6 +80,7 @@ export default class CenaEspectador extends Phaser.Scene {
       this.mqtt.disconnect();
       this.registry.set("modoEspectador", false);
       this.registry.set("clienteMQTT", null);
+      this.registry.set("contaEspectador", null);
     });
   }
 

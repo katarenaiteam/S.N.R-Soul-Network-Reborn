@@ -66,7 +66,7 @@ O jogo terá dois finais, que o jogador podera escolher dependendo da sua decis�
 
 ## Espectadores MQTT
 
-O jogo principal publica o estado da sala fixa `arena-01`. A transmissão começa no Versus, a partir da seleção de personagens; o modo História e as demais opções não publicam cenas assistíveis. Os dispositivos espectadores assinam os tópicos de status e estado, sem enviar comandos ao jogo.
+O jogo principal publica o estado da sala fixa `arena-01`. A transmissão começa no Versus, a partir da seleção de personagens; o modo História e as demais opções não publicam cenas assistíveis. O modo espectador assina os tópicos de estado e usa uma API para login, saldo SNR e pedidos da loja. A configuração da API está em `docs/moedas-espectador.md`.
 
 Para abrir a visualização em outro dispositivo, publique o jogo em um endereço HTTPS e use esse endereço com `?espectador=1` como destino do QR code. A sala e o QR permanecem fixos. Pessoas que entrarem durante uma partida recebem o estado atual, sem replay das cenas anteriores.
 

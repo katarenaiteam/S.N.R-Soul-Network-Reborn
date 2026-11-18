@@ -6,6 +6,7 @@ export default class LojaEspectador {
   constructor(scene, mqtt) {
     this.scene = scene;
     this.mqtt = mqtt;
+    this.conta = scene.registry.get("contaEspectador");
     this.aberta = false;
     this.arrastando = false;
     this.indiceSlot = 0;
@@ -72,7 +73,7 @@ export default class LojaEspectador {
       wordWrap: { width: 660 * this.escala },
       lineSpacing: 4 * this.escala,
     }).setOrigin(0, 0).setScrollFactor(0).setDepth(4003).setVisible(false);
-    this.preco = scene.add.text(0, 0, "GRÁTIS", {
+    this.preco = scene.add.text(0, 0, "1 MOEDA SNR", {
       fontFamily: "RetroFont, monospace",
       fontSize: `${26 * this.escala}px`,
       color: "#9cffbb",
@@ -364,13 +365,29 @@ export default class LojaEspectador {
     this.publicarCompra(this.itens[this.indiceSlot].efeito, jogador);
   }
 
-  publicarCompra(efeito, jogador) {
-    this.mqtt?.publish("shop/purchase", {
-      efeito,
-      jogador,
-      pedidoId: `${this.mqtt.clientId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+  async publicarCompra(efeito, jogador) {
+    if (this.compraEmAndamento) return;
+    if (!this.conta?.email) {
+      this.mostrarAviso("ENTRE COM GOOGLE PARA COMPRAR");
+      return;
+    }
+    this.compraEmAndamento = true;
+    try {
+      await this.conta.comprar(efeito, jogador);
+      this.fecharRoda();
+    } catch (erro) {
+      this.mostrarAviso(erro.message);
+    } finally {
+      this.compraEmAndamento = false;
+    }
+  }
+
+  mostrarAviso(texto) {
+    this.aviso.setText(texto).setVisible(true);
+    this.avisoTimer?.remove(false);
+    this.avisoTimer = this.scene.time.delayedCall(2500, () => {
+      this.aviso.setVisible(false);
     });
-    this.fecharRoda();
   }
 
   destruir() {
