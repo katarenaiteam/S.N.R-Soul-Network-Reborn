@@ -36,13 +36,42 @@ export default class CenaAvaliacao extends Phaser.Scene {
       this.encerrando = true;
       this.scene.start("CenaInserirFicha");
     };
+    this.botoesControleAnteriores = [[], []];
+    this.avancarTeclado = (evento) => {
+      if (["Enter", "f", "F", "j", "J", " "].includes(evento.key)) {
+        this.avancar();
+      }
+    };
     this.input.keyboard?.once("keydown", this.avancar);
+    this.input.keyboard?.on("keydown-ENTER", this.avancar);
+    this.input.keyboard?.on("keydown-F", this.avancar);
+    this.input.keyboard?.on("keydown-J", this.avancar);
+    this.input.keyboard?.on("keydown-SPACE", this.avancar);
+    window.addEventListener("keydown", this.avancarTeclado);
     this.input.on("pointerdown", this.avancar);
     this.input.gamepad?.once("down", this.avancar);
     this.events.once("shutdown", () => {
       this.input.keyboard?.off("keydown", this.avancar);
+      this.input.keyboard?.off("keydown-ENTER", this.avancar);
+      this.input.keyboard?.off("keydown-F", this.avancar);
+      this.input.keyboard?.off("keydown-J", this.avancar);
+      this.input.keyboard?.off("keydown-SPACE", this.avancar);
+      window.removeEventListener("keydown", this.avancarTeclado);
       this.input.off("pointerdown", this.avancar);
       this.input.gamepad?.off("down", this.avancar);
     });
+  }
+
+  update() {
+    const gamepads = this.input.gamepad?.gamepads ?? [];
+    for (let indice = 0; indice < this.botoesControleAnteriores.length; indice += 1) {
+      const botoes = gamepads[indice]?.buttons ?? [];
+      const anteriores = this.botoesControleAnteriores[indice];
+      const novoBotao = botoes.some((botao, botaoIndice) =>
+        !!botao?.pressed && !anteriores[botaoIndice],
+      );
+      if (novoBotao) this.avancar();
+      this.botoesControleAnteriores[indice] = botoes.map((botao) => !!botao?.pressed);
+    }
   }
 }

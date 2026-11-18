@@ -196,7 +196,7 @@ export default class DialogoHistoria {
     const pads = this.scene.input.gamepad?.gamepads ?? [];
     let ataquePressionado = false;
     for (let indice = 0; indice < pads.length; indice++) {
-      const pressionado = !!pads[indice]?.buttons?.[2]?.pressed;
+      const pressionado = !!pads[indice]?.buttons?.[9]?.pressed;
       if (pressionado && !this.botoesAtaquePad[indice]) ataquePressionado = true;
       this.botoesAtaquePad[indice] = pressionado;
     }
