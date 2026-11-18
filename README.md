@@ -70,4 +70,4 @@ O jogo principal publica o estado da sala fixa `arena-01`. A transmissão começ
 
 Para abrir a visualização em outro dispositivo, publique o jogo em um endereço HTTPS e use esse endereço com `?espectador=1` como destino do QR code. A sala e o QR permanecem fixos. Pessoas que entrarem durante uma partida recebem o estado atual, sem replay das cenas anteriores.
 
-O broker e o prefixo de tópicos são definidos em `src/Objetos/ConfigMQTT.js`, no formato usado pelo cliente MQTT do projeto da escola. O broker precisa oferecer MQTT sobre WebSocket seguro (`wss`). O endereço Mosquitto padrão serve apenas para desenvolvimento; para o evento, use um broker estável e configure acesso de leitura para espectadores e publicação somente para a máquina do jogo.
+O espectador assina o tópico MQTT `vending/comando/#` da Feira e filtra as mensagens do produto 101 pelo e-mail da conta Google. A loja publica os efeitos da partida no tópico MQTT da sala.
