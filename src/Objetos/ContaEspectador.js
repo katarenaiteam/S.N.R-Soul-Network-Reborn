@@ -57,11 +57,7 @@ export default class ContaEspectador {
         type: "standard", theme: "outline", size: "large", shape: "pill",
         text: "signin_with", locale: "pt-BR", width: 280,
       });
-      window.google.accounts.id.prompt((notificacao) => {
-        if (notificacao.isNotDisplayed()) {
-          console.info("Google One Tap nao exibido:", notificacao.getNotDisplayedReason());
-        }
-      });
+      window.google.accounts.id.prompt();
     };
 
     if (window.google?.accounts?.id) {
@@ -101,6 +97,12 @@ export default class ContaEspectador {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ ...dados, idToken: this.idToken }),
     });
+    const tipoConteudo = resposta.headers.get("content-type") || "";
+    if (!tipoConteudo.includes("application/json")) {
+      throw new Error(
+        "O login Google abriu, mas a API da conta nao esta ligada neste site (/api). O servico Node precisa estar hospedado e encaminhado para ca.",
+      );
+    }
     const resultado = await resposta.json();
     if (!resposta.ok) throw new Error(resultado.error || "Falha ao acessar a conta.");
     return resultado;
