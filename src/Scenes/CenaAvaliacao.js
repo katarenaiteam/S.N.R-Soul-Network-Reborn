@@ -34,12 +34,13 @@ export default class CenaAvaliacao extends Phaser.Scene {
     this.avancar = () => {
       if (this.encerrando) return;
       this.encerrando = true;
-      this.scene.start("CenaStart");
+      this.scene.start("CenaInserirFicha");
     };
     this.input.keyboard?.once("keydown", this.avancar);
     this.input.on("pointerdown", this.avancar);
-    this.input.gamepad?.on("down", this.avancar);
+    this.input.gamepad?.once("down", this.avancar);
     this.events.once("shutdown", () => {
+      this.input.keyboard?.off("keydown", this.avancar);
       this.input.off("pointerdown", this.avancar);
       this.input.gamepad?.off("down", this.avancar);
     });

@@ -419,7 +419,11 @@ export default class CenaGameOver extends Phaser.Scene {
       y: this.scale.height / 2,
       duration: 400,
       ease: "Cubic.easeIn",
-      onComplete: () => this.scene.start(this.resultado.modo === "versus" ? "CenaAvaliacao" : "CenaStart"),
+      onComplete: () => this.scene.start(
+        this.resultado.modo === "versus" || this.resultado.historia
+          ? "CenaAvaliacao"
+          : "CenaStart",
+      ),
     });
   }
 }

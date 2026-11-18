@@ -31,7 +31,7 @@ export default class CenaTransicaoHistoria extends Phaser.Scene {
     this.add.image(this.scale.width / 2, this.scale.height / 2, config.fundo)
       .setDisplaySize(this.scale.width, this.scale.height);
 
-    const barra = this.add.sprite(this.scale.width - 24, this.scale.height / 2, config.barra)
+    const barra = this.add.sprite(this.scale.width, this.scale.height / 2, config.barra)
       .setOrigin(1, 0.5)
       .setScale(Math.min(this.scale.height / 1080, 1));
 

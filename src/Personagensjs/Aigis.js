@@ -935,7 +935,7 @@ this.nomePersonagem = "Aigis";
           tipoSomImpacto: "heavy",
           dano: 9,
           knockbackX: 168,
-          knockbackY: -658,
+          knockbackY: -558,
           tumbling: true,
           knockbackFixo: false,
         },

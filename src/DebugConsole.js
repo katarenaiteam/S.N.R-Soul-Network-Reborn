@@ -1,3 +1,10 @@
+import {
+  banirUsuario,
+  desbanirUsuario,
+  listarEspectadoresOnline,
+  listarUsuariosBanidos,
+} from "./Objetos/ControleAcessoEspectador.js";
+
 const ALIASES_CENAS = {
   ficha: "CenaInserirFicha",
   inserirficha: "CenaInserirFicha",
@@ -221,6 +228,38 @@ export function instalarComandosDebug(game) {
       return api.ir("CenaEscolhaFinal", { p1: escolhido, numPlayers: 1 });
     },
 
+    usuarios() {
+      const lista = listarEspectadoresOnline();
+      if (lista.length) console.table(lista);
+      else console.log("Nenhum espectador conectado recentemente.");
+      return lista;
+    },
+
+    banir(email) {
+      if (!banirUsuario(email)) {
+        console.error("Informe um e-mail valido: SNR.banir('email@exemplo.com').");
+        return false;
+      }
+      console.log(`Conta banida da loja: ${String(email).trim().toLowerCase()}`);
+      return true;
+    },
+
+    desbanir(email) {
+      if (!email || !desbanirUsuario(email)) {
+        console.error("Essa conta nao estava banida.");
+        return false;
+      }
+      console.log(`Conta desbanida da loja: ${String(email).trim().toLowerCase()}`);
+      return true;
+    },
+
+    banidos() {
+      const lista = listarUsuariosBanidos();
+      if (lista.length) console.table(lista.map((email) => ({ email })));
+      else console.log("Nenhuma conta banida.");
+      return lista;
+    },
+
     diagnosticarSpecials() {
       removerDiagnosticoSpecial?.();
 
@@ -268,6 +307,10 @@ export function instalarComandosDebug(game) {
         "  carregarUlt(2)          carrega totalmente a ult do P2",
         "  matarBoss()             remove a ultima vida do boss da historia ativa",
         "  matarForgottenOne()     derrota The Forgotten One e inicia a sequencia final",
+        "  usuarios()              lista espectadores conectados recentemente",
+        "  banir('email')          bloqueia a conta de usar a loja",
+        "  desbanir('email')       libera novamente a conta",
+        "  banidos()               lista as contas banidas",
         '  lutaPingu("FJ")         inicia a historia do Pingu usando o personagem escolhido (inclui TH30)',
         '  lutaSlenderman("FJ")   inicia a historia do Slenderman usando o personagem escolhido (inclui TH30)',
         '  lutaForgottenOne("FJ") abre a luta de teste contra The Forgotten One',
@@ -287,6 +330,10 @@ export function instalarComandosDebug(game) {
   window.carregarUlt = api.carregarUlt.bind(api);
   window.matarBoss = api.matarBoss.bind(api);
   window.matarForgottenOne = api.matarForgottenOne.bind(api);
+  window.usuarios = api.usuarios.bind(api);
+  window.banir = api.banir.bind(api);
+  window.desbanir = api.desbanir.bind(api);
+  window.banidos = api.banidos.bind(api);
   window.lutaPingu = api.lutaPingu.bind(api);
   window.lutaSlenderman = api.lutaSlenderman.bind(api);
   window.lutaForgottenOne = api.lutaForgottenOne.bind(api);

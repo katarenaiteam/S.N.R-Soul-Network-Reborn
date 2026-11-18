@@ -16,8 +16,12 @@ export default class LojaEspectador {
       ? `shop/response/${mqtt.clientId}`
       : null;
     this.aoReceberResposta = (resposta) => {
-      if (resposta?.mensagem !== "Impossivel durante a ultimate") return;
+      if (![
+        "Impossivel durante a ultimate",
+        "Conta banida da loja",
+      ].includes(resposta?.mensagem)) return;
       this.aviso.setVisible(true);
+      this.aviso.setText(resposta.mensagem);
       this.avisoTimer?.remove(false);
       this.avisoTimer = this.scene.time.delayedCall(2500, () => {
         this.aviso.setVisible(false);

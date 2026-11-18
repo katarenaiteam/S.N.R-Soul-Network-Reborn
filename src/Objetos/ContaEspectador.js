@@ -3,6 +3,17 @@ const URL_BROKER_FEIRA = "wss://mqtt.feira-de-jogos.dev.br/mqtt";
 const TOPICO_COMANDOS_FEIRA = "vending/comando/#";
 const CHAVE_TOKEN_GOOGLE = "snr-google-id-token";
 const PREFIXO_SALDO = "snr-espectador-saldo:";
+const CHAVE_COMPRAS_PENDENTES = "snr-compras-pendentes";
+const CHAVE_CLIENTE_MQTT_FEIRA = "snr-feira-mqtt-client-id";
+
+function obterClientIdFeira() {
+  const salvo = localStorage.getItem(CHAVE_CLIENTE_MQTT_FEIRA);
+  if (typeof salvo === "string" && /^snr-espectador-[a-z0-9]{8}$/.test(salvo)) return salvo;
+
+  const clientId = `snr-espectador-${Math.random().toString(36).slice(2, 10).padEnd(8, "0")}`;
+  localStorage.setItem(CHAVE_CLIENTE_MQTT_FEIRA, clientId);
+  return clientId;
+}
 
 function obterEmailDoToken(token) {
   try {
@@ -23,15 +34,31 @@ export default class ContaEspectador {
     this.idToken = sessionStorage.getItem(CHAVE_TOKEN_GOOGLE) || "";
     this.email = obterEmailDoToken(this.idToken);
     this.saldo = 0;
-    this.comprasPendentes = [];
+    this.comprasPendentes = this.carregarComprasPendentes();
+    this.pedidosPendentes = new Set();
     this.criarInterface();
+    this.conectarFeira();
     if (this.email) this.entrarNaConta(this.email);
     this.carregarGoogleIdentity();
-    this.conectarFeira();
     this.scene.events.once("shutdown", () => this.destruir());
   }
 
   criarInterface() {
+    this.loginPainel = document.createElement("div");
+    this.loginPainel.style.cssText = [
+      "position:fixed", "z-index:10000", "left:50%", "top:50%",
+      "transform:translate(-50%,-50%)", "display:flex", "flex-direction:column",
+      "align-items:center", "gap:22px", "padding:28px 34px",
+      "background:rgba(0,0,0,.88)", "border:1px solid #43d96b",
+      "text-align:center", "box-shadow:0 0 28px rgba(67,217,107,.22)",
+    ].join(";");
+    this.loginTexto = document.createElement("div");
+    this.loginTexto.textContent = "CONECTE-SE PARA ASSISTIR A UM JOGO EM ANDAMENTO";
+    this.loginTexto.style.cssText = "max-width:560px;color:#9cffbb;font:22px RetroFont,monospace;line-height:1.5";
+    this.botaoGoogle = document.createElement("div");
+    this.loginPainel.append(this.loginTexto, this.botaoGoogle);
+    document.body.append(this.loginPainel);
+
     this.elemento = document.createElement("div");
     this.elemento.style.cssText = [
       "position:fixed", "z-index:10000", "top:20px", "right:20px",
@@ -46,8 +73,7 @@ export default class ContaEspectador {
     this.saldoTexto = document.createElement("div");
     this.saldoTexto.hidden = true;
     this.saldoTexto.style.cssText = "padding:6px 10px;background:rgba(0,0,0,.8);color:white;font:14px Arial,sans-serif";
-    this.botaoGoogle = document.createElement("div");
-    this.elemento.append(this.status, this.statusLoja, this.saldoTexto, this.botaoGoogle);
+    this.elemento.append(this.status, this.statusLoja, this.saldoTexto);
     document.body.append(this.elemento);
   }
 
@@ -70,7 +96,6 @@ export default class ContaEspectador {
         type: "standard", theme: "outline", size: "large", shape: "pill",
         text: "signin_with", locale: "pt-BR", width: 280,
       });
-      if (!this.email) window.google.accounts.id.prompt();
     };
 
     if (window.google?.accounts?.id) {
@@ -111,9 +136,57 @@ export default class ContaEspectador {
     this.saldo = Number.isFinite(saldoSalvo) && saldoSalvo > 0 ? saldoSalvo : 0;
     this.mostrarStatus(`Conta Google: ${email}`);
     this.botaoGoogle.hidden = true;
+    this.loginPainel.remove();
     this.saldoTexto.hidden = false;
     this.atualizarSaldoTexto();
+    this.scene.iniciarConexaoEspectador();
+    this.iniciarPresenca();
     this.processarComprasPendentes();
+  }
+
+  carregarComprasPendentes() {
+    try {
+      const compras = JSON.parse(localStorage.getItem(CHAVE_COMPRAS_PENDENTES) || "[]");
+      return Array.isArray(compras) ? compras : [];
+    } catch {
+      return [];
+    }
+  }
+
+  salvarComprasPendentes() {
+    localStorage.setItem(CHAVE_COMPRAS_PENDENTES, JSON.stringify(this.comprasPendentes));
+  }
+
+  iniciarPresenca() {
+    const mqtt = this.scene.mqtt;
+    if (!mqtt?.clientId || this.presencaIniciada) return;
+    this.presencaIniciada = true;
+    this.topicoResposta = `shop/response/${mqtt.clientId}`;
+    this.aoReceberResposta = (resposta) => this.receberRespostaCompra(resposta);
+    mqtt.on(`message:${this.topicoResposta}`, this.aoReceberResposta);
+    mqtt.subscribe(this.topicoResposta);
+    this.aoConectarSala = () => this.publicarPresenca();
+    mqtt.on("connect", this.aoConectarSala);
+    this.publicarPresenca();
+    this.intervaloPresenca = window.setInterval(() => this.publicarPresenca(), 15000);
+  }
+
+  publicarPresenca() {
+    this.scene.mqtt?.publish("spectator/presence", { email: this.email });
+  }
+
+  receberRespostaCompra(resposta) {
+    const mensagensDeRecusa = new Set([
+      "Impossivel durante a ultimate",
+      "Conta banida da loja",
+    ]);
+    if (!this.pedidosPendentes.has(resposta?.pedidoId) || !mensagensDeRecusa.has(resposta?.mensagem)) return;
+    this.pedidosPendentes.delete(resposta.pedidoId);
+    this.saldo += 1;
+    localStorage.setItem(`${PREFIXO_SALDO}${this.email}`, String(this.saldo));
+    this.atualizarSaldoTexto();
+    this.statusLoja.textContent = `${resposta.mensagem}. Moeda devolvida.`;
+    this.statusLoja.hidden = false;
   }
 
   conectarFeira() {
@@ -123,11 +196,17 @@ export default class ContaEspectador {
       return;
     }
     this.clienteFeira = globalThis.mqtt.connect(URL_BROKER_FEIRA, {
-      clientId: `snr-espectador-${Math.random().toString(36).slice(2, 10)}`,
+      clientId: obterClientIdFeira(),
+      clean: false,
       reconnectPeriod: 5000,
     });
     this.clienteFeira.on("connect", () => {
-      this.clienteFeira.subscribe(TOPICO_COMANDOS_FEIRA);
+      this.clienteFeira.subscribe(TOPICO_COMANDOS_FEIRA, { qos: 1 }, (erro) => {
+        if (erro) {
+          this.statusLoja.textContent = "Nao foi possivel ativar o recebimento de compras pendentes.";
+          this.statusLoja.hidden = false;
+        }
+      });
       this.statusLoja.hidden = true;
     });
     this.clienteFeira.on("close", () => {
@@ -146,15 +225,27 @@ export default class ContaEspectador {
         return;
       }
       if (Number(evento?.product) !== 101 || typeof evento?.email !== "string") return;
-      const compra = { product: 101, email: evento.email.trim().toLowerCase() };
-      if (this.email) this.creditarCompra(compra);
-      else this.comprasPendentes.push(compra);
+      const compra = {
+        product: 101,
+        email: evento.email.trim().toLowerCase(),
+        id: evento.transactionId || evento.purchaseId || evento.orderId || null,
+        recebidaEm: Date.now(),
+      };
+      if (compra.id && this.comprasPendentes.some((item) => item.id === compra.id)) return;
+      this.comprasPendentes.push(compra);
+      this.salvarComprasPendentes();
+      this.processarComprasPendentes();
     });
   }
 
   processarComprasPendentes() {
-    this.comprasPendentes.forEach((compra) => this.creditarCompra(compra));
-    this.comprasPendentes = [];
+    const restantes = [];
+    this.comprasPendentes.forEach((compra) => {
+      if (compra.email === this.email) this.creditarCompra(compra);
+      else restantes.push(compra);
+    });
+    this.comprasPendentes = restantes;
+    this.salvarComprasPendentes();
   }
 
   creditarCompra(compra) {
@@ -177,15 +268,25 @@ export default class ContaEspectador {
     this.saldo -= 1;
     localStorage.setItem(`${PREFIXO_SALDO}${this.email}`, String(this.saldo));
     this.atualizarSaldoTexto();
+    const pedidoId = `${mqtt.clientId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    this.pedidosPendentes.add(pedidoId);
+    while (this.pedidosPendentes.size > 100) {
+      this.pedidosPendentes.delete(this.pedidosPendentes.values().next().value);
+    }
     mqtt.publish("shop/purchase", {
       efeito,
       jogador,
-      pedidoId: `${mqtt.clientId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      email: this.email,
+      pedidoId,
     });
   }
 
   destruir() {
+    window.clearInterval(this.intervaloPresenca);
+    this.scene.mqtt?.off("connect", this.aoConectarSala);
+    if (this.topicoResposta) this.scene.mqtt?.off(`message:${this.topicoResposta}`, this.aoReceberResposta);
     this.clienteFeira?.end();
+    this.loginPainel?.remove();
     this.elemento?.remove();
   }
 }

@@ -39,8 +39,6 @@ export default class CenaEspectador extends Phaser.Scene {
 
     this.registry.set("modoEspectador", true);
     this.registry.set("assetsVersusEspectadorProntos", false);
-    this.contaEspectador = new ContaEspectador(this);
-    this.registry.set("contaEspectador", this.contaEspectador);
     this.cenaReplicada = null;
     this.estadoAtual = null;
     this.estadoRecebido = null;
@@ -54,7 +52,7 @@ export default class CenaEspectador extends Phaser.Scene {
     this.statusTexto = this.add.text(
       this.scale.width / 2,
       this.scale.height / 2,
-      "CONECTANDO À SALA SNR...",
+      "CONECTANDO A SALA SNR...",
       {
         fontFamily: "RetroFont, monospace",
         fontSize: `${34 * (this.scale.width / 1920)}px`,
@@ -62,15 +60,15 @@ export default class CenaEspectador extends Phaser.Scene {
         align: "center",
       },
     ).setOrigin(0.5);
+    this.statusTexto.setVisible(false);
 
     this.mqtt = new ClienteMQTT(this.registry.get("mqttConfig"), "espectador");
     this.registry.set("clienteMQTT", this.mqtt);
     this.aoReceberEstado = (estado) => this.receberEstado(estado);
     this.mqtt.on("message:state", this.aoReceberEstado);
     this.mqtt.on("connect", () => this.atualizarMensagem("CONECTADO. AGUARDANDO VERSUS..."));
-    this.mqtt.on("close", () => this.atualizarMensagem("CONEXÃO ENCERRADA. TENTANDO RECONECTAR..."));
-    this.mqtt.on("error", () => this.atualizarMensagem("NÃO FOI POSSÍVEL CONECTAR À SALA SNR."));
-    this.mqtt.connect();
+    this.mqtt.on("close", () => this.atualizarMensagem("CONEXAO ENCERRADA. TENTANDO RECONECTAR..."));
+    this.mqtt.on("error", () => this.atualizarMensagem("NAO FOI POSSIVEL CONECTAR A SALA SNR."));
 
     this.events.once("shutdown", () => {
       this.expiracaoEstado?.remove();
@@ -82,6 +80,16 @@ export default class CenaEspectador extends Phaser.Scene {
       this.registry.set("clienteMQTT", null);
       this.registry.set("contaEspectador", null);
     });
+
+    this.contaEspectador = new ContaEspectador(this);
+    this.registry.set("contaEspectador", this.contaEspectador);
+  }
+
+  iniciarConexaoEspectador() {
+    if (this.mqtt?.client) return;
+    this.statusTexto.setVisible(true);
+    this.atualizarMensagem("CONECTANDO A SALA SNR...");
+    this.mqtt?.connect();
   }
 
   receberEstado(estado) {
@@ -109,7 +117,7 @@ export default class CenaEspectador extends Phaser.Scene {
       this.estadoRecebido = null;
       this.registry.set("estadoEspectador", null);
       this.pararCenaReplicada();
-      this.atualizarMensagem("AGUARDANDO O INÍCIO DE UM VERSUS...");
+      this.atualizarMensagem("AGUARDANDO O INICIO DE UM VERSUS...");
       return;
     }
 

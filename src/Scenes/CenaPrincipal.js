@@ -29,6 +29,7 @@ import ChuvaMikuLoja from "../Objetos/ChuvaMikuLoja.js";
 import LojaEspectador from "../Objetos/LojaEspectador.js";
 import { MaoDeadLoja, RaioLoja } from "../Objetos/EfeitosAvancadosLoja.js";
 import PuppetLojaMiku from "../Objetos/PuppetLojaMiku.js";
+import { registrarPresencaEspectador, usuarioBanido } from "../Objetos/ControleAcessoEspectador.js";
 
 export default class cenaPrincipal extends Phaser.Scene {
   constructor() {
@@ -302,6 +303,15 @@ this.indicadorP2 = this.criarIndicador(
 
       const mqtt = this.registry.get("clienteMQTT");
       if (mqtt?.papel === "host") {
+        this.aoReceberPresencaEspectador = (presenca) => {
+          registrarPresencaEspectador(presenca?.email, presenca?.clientId);
+        };
+        mqtt.on("message:spectator/presence", this.aoReceberPresencaEspectador);
+        mqtt.subscribe("spectator/presence");
+        this.events.once("shutdown", () => {
+          mqtt.off("message:spectator/presence", this.aoReceberPresencaEspectador);
+        });
+
         this.chuvaMikuLoja = new ChuvaMikuLoja(this);
         this.pedidosLojaRecebidos = new Set();
         this.aoReceberPedidoLoja = (pedido) => {
@@ -311,12 +321,21 @@ this.indicadorP2 = this.criarIndicador(
               "froze-shop", "lava-shop", "raio", "ult-shop", "dead-shop",
             ].includes(pedido?.efeito) ||
             !pedido.clientId ||
-            !pedido.pedidoId
+            !pedido.pedidoId ||
+            typeof pedido.email !== "string"
           ) return;
 
           const idPedido = `${pedido.clientId}:${pedido.pedidoId}`;
           if (this.pedidosLojaRecebidos.has(idPedido)) return;
           this.pedidosLojaRecebidos.add(idPedido);
+
+          if (usuarioBanido(pedido.email)) {
+            mqtt.publish(`shop/response/${pedido.clientId}`, {
+              pedidoId: pedido.pedidoId,
+              mensagem: "Conta banida da loja",
+            });
+            return;
+          }
 
           if (pedido.efeito === "miku-rain") {
             this.chuvaMikuLoja.executar();
