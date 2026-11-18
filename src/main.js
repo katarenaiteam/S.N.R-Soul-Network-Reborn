@@ -20,6 +20,7 @@ import CenaEspectador from "./Scenes/CenaEspectador.js";
 import CenaForgottenOne from "./Scenes/CenaForgottenOne.js";
 import { instalarComandosDebug } from "./DebugConsole.js";
 import configMQTT from "./Objetos/ConfigMQTT.js";
+import CofreMoedasArcade from "./Objetos/CofreMoedasArcade.js";
 
 const config = {
   type: Phaser.AUTO,
@@ -63,5 +64,6 @@ const game = new Phaser.Game(config);
 window.__SNR_GAME_DEBUG__ = game;
 game.registry.set("mqttConfig", config.mqtt);
 if (new URLSearchParams(window.location.search).get("espectador") !== "1") {
+  game.registry.set("cofreMoedasArcade", new CofreMoedasArcade(config.mqtt));
   instalarComandosDebug(game);
 }
