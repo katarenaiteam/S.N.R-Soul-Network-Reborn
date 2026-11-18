@@ -183,6 +183,7 @@ export default class AigisNeSpecial {
     const x = granada.x;
     const y = granada.y;
     const profundidade = granada.depth;
+    this.personagem.tocarSomSorteado("ai_boom", { volume: 0.5 });
     granada.destroy();
 
     const efeito = this.scene.add.sprite(x, y, "ai_siExp", 0)

@@ -22,6 +22,7 @@ export default class AigisAdoSpecial {
   executar() {
     const sprite = this.personagem.sprite;
     this.direcao = sprite.flipX ? -1 : 1;
+    this.personagem.tocarSomSorteado("ai_AdoSpecial", { volume: 0.4 });
     sprite.on("animationupdate", this.aoAtualizarAnimacao);
     sprite.once(`animationcomplete-${this.special.animacao}`, this.aoCompletarAnimacao);
     this.aoAtualizarAnimacao(sprite.anims.currentAnim, sprite.anims.currentFrame);
@@ -96,6 +97,7 @@ export default class AigisAdoSpecial {
   atingirAlvo(alvo) {
     if (this.finalizado || !this.hitbox?.active || this.alvosAtingidos.has(alvo)) return;
     this.alvosAtingidos.add(alvo);
+    this.personagem.tocarSomSorteado(this.personagem.sons?.heavy, { volume: 0.15 });
     alvo.receberDano(this.special.propriedades.dano, this.special.propriedades, {
       x: this.personagem.sprite.x,
       direcao: this.direcao,

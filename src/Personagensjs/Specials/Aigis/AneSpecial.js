@@ -69,6 +69,7 @@ export default class AigisAneSpecial {
       ataque: null,
       timer: null,
       verificarProximidade: null,
+      timerBip: null,
     };
     this.minasAtivas.add(mina);
     mina.once("destroy", () => this.limparMina(mina, registroMina));
@@ -88,6 +89,14 @@ export default class AigisAneSpecial {
     mina.setFrame(3).anims.play("ai_mina_ativa");
 
     const registroMina = mina.getData("registroMina");
+    this.scene.sound.play("mina-bi", { volume: 0.4 });
+    registroMina.timerBip = this.scene.time.addEvent({
+      delay: 700,
+      loop: true,
+      callback: () => {
+        if (mina.active) this.scene.sound.play("mina-bi", { volume: 0.4 });
+      },
+    });
     registroMina.colisor = null;
     registroMina.verificarProximidade = () => {
       if (!mina.active) return;
@@ -109,6 +118,8 @@ export default class AigisAneSpecial {
     if (registroMina.colisor?.world) this.scene.physics.world.removeCollider(registroMina.colisor);
     registroMina.ataque?.remover();
     registroMina.timer?.remove(false);
+    registroMina.timerBip?.remove(false);
+    registroMina.timerBip = null;
     if (registroMina.verificarProximidade) {
       this.scene.events.off("postupdate", registroMina.verificarProximidade);
     }
@@ -122,6 +133,7 @@ export default class AigisAneSpecial {
     const x = mina.x;
     const y = mina.y;
     const profundidade = mina.depth;
+    this.personagem.tocarSomSorteado("mina-boom", { volume: 0.5 });
     mina.destroy();
 
     const efeito = this.scene.add.sprite(x, y, "ai_siExp", 0)

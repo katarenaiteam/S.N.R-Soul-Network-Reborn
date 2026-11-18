@@ -2,6 +2,7 @@ import CenaHistoria from "./CenaHistoria.js";
 import FinalMap from "../Mapasjs/Final.js";
 import TH30_IA from "../Objetos/TH30_IA.js";
 import DialogoHistoria from "../Objetos/DialogoHistoria.js";
+import CutsceneFinalTH30 from "../Objetos/CutsceneFinalTH30.js";
 import PuppetLojaMiku from "../Objetos/PuppetLojaMiku.js";
 import { RaioLoja } from "../Objetos/EfeitosAvancadosLoja.js";
 import { carregarAssetsHistoria } from "../Objetos/CarregarAssetsPartida.js";
@@ -416,6 +417,36 @@ export default class CenaHistoria4 extends CenaHistoria {
 
   aoVencerHistoria() {
     this.sound.stopAll();
+    this.aoConcluirCenaFinalTH30 = () => this.reproduzirVideoFinalTH30();
+    this.cutsceneFinalTH30 = new CutsceneFinalTH30(this);
+    this.events.once("shutdown", this.limparVideoFinalTH30, this);
+  }
+
+  reproduzirVideoFinalTH30() {
+    const video = document.createElement("video");
+    this.videoFinalTH30 = video;
+    video.src = "assets/Hud/dialogo/end2/end2.mp4";
+    video.autoplay = true;
+    video.playsInline = true;
+    video.preload = "auto";
+    video.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;object-fit:contain;background:#000;z-index:10000";
+    video.addEventListener("ended", this.aoTerminarVideoFinalTH30);
+    video.addEventListener("error", this.aoTerminarVideoFinalTH30);
+    document.body.appendChild(video);
+    video.play().catch(() => this.aoTerminarVideoFinalTH30());
+  }
+
+  aoTerminarVideoFinalTH30 = () => {
+    this.limparVideoFinalTH30();
     this.scene.start("CenaCreditos");
+  };
+
+  limparVideoFinalTH30() {
+    if (!this.videoFinalTH30) return;
+    this.videoFinalTH30.removeEventListener("ended", this.aoTerminarVideoFinalTH30);
+    this.videoFinalTH30.removeEventListener("error", this.aoTerminarVideoFinalTH30);
+    this.videoFinalTH30.pause();
+    this.videoFinalTH30.remove();
+    this.videoFinalTH30 = null;
   }
 }

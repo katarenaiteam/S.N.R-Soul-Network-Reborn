@@ -28,6 +28,7 @@ export default class AigisUlt {
     camera.stopFollow();
 
     sprite.body.setAllowGravity(false);
+    this.personagem.tocarSomSorteado("persona!", { volume: 0.7 });
     sprite.setVelocity(0, -145);
     sprite.once("animationcomplete-ai_ult_intro_pose", this.manterPoseUlt, this);
     sprite.once("animationcomplete-ai_ult_intro_fim", this.ativarModo, this);

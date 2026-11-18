@@ -113,6 +113,7 @@ export default class AigisSideSpecial {
   acertar(alvo) {
     if (this.finalizado || !this.hitbox?.active || this.alvosAtingidos.has(alvo)) return;
     this.alvosAtingidos.add(alvo);
+    this.personagem.tocarSomSorteado(this.personagem.sons?.heavy, { volume: 0.15 });
     this.personagem.vfx?.tocarListaImpacto(
       [{ escolherUm: ["punch1", "punch2", "punch3"] }],
       alvo,

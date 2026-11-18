@@ -106,6 +106,7 @@ export default class AigisPersonaSideSpecial {
   atingirAlvo(alvo) {
     if (this.finalizado || this.alvosAtingidos.has(alvo)) return;
     this.alvosAtingidos.add(alvo);
+    this.personagem.tocarSomSorteado(this.personagem.sons?.heavy, { volume: 0.15 });
     alvo.receberDano(this.special.propriedadesAtaque.dano, this.special.propriedadesAtaque, {
       x: this.persona?.x ?? this.personagem.sprite.x,
       direcao: this.direcao,

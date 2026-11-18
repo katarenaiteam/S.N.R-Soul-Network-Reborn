@@ -145,7 +145,7 @@ GokuAupSpecial.configuracao = {
     tipoSomImpacto: "heavy",
     dano: 15,
     knockbackX: 150,
-    knockbackY: -760,
+    knockbackY: -600,
     hitstunBaseFrames: 30,
     tumbling: true,
   },

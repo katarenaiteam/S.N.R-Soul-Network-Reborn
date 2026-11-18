@@ -63,6 +63,7 @@ export default class AigisAsiSpecial {
   criarMissil() {
     const sprite = this.personagem.sprite;
     if (!sprite?.active) return;
+    this.personagem.tocarSomSorteado("ai_bazshot", { volume: 0.5 });
     const x = sprite.x + this.special.offsetMissilX * this.direcao;
     const y = sprite.y + this.special.offsetMissilY;
     const missil = this.scene.physics.add.sprite(
@@ -161,6 +162,7 @@ export default class AigisAsiSpecial {
     const x = missil.x;
     const y = missil.y;
     const depth = missil.depth;
+    this.personagem.tocarSomSorteado("ai_boom", { volume: 0.5 });
     this.limparMissil(registro);
     missil.destroy();
 

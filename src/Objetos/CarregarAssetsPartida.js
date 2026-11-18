@@ -782,7 +782,28 @@ const assetsAigis = [
   (scene, queued) => queueAsset(scene, queued, "texture", "ai_eyes", () => { scene.load.spritesheet("ai_eyes", "assets/personagens/Aigis/atacks/ult/ai_eyes.png", { frameWidth: 1897, frameHeight: 279 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "fundo_eyes", () => { scene.load.image("fundo_eyes", "assets/personagens/Aigis/atacks/ult/fundo_eyes.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "exclamaçao", () => { scene.load.image("exclamaçao", "assets/personagens/Aigis/atacks/ult/exclamaçao.png"); }),
-  
+
+  (scene, queued) => queueAsset(scene, queued, "audio", "aigis-attack1", () => { scene.load.audio("aigis-attack1", "assets/personagens/Aigis/Sounds/aigis-attack1.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "aigis-attack2", () => { scene.load.audio("aigis-attack2", "assets/personagens/Aigis/Sounds/aigis-attack2.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "aigis-attack3", () => { scene.load.audio("aigis-attack3", "assets/personagens/Aigis/Sounds/aigis-attack3.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "aigis-attack4", () => { scene.load.audio("aigis-attack4", "assets/personagens/Aigis/Sounds/aigis-attack4.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "aigis-attack5", () => { scene.load.audio("aigis-attack5", "assets/personagens/Aigis/Sounds/aigis-attack5.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "aigis-hurt1", () => { scene.load.audio("aigis-hurt1", "assets/personagens/Aigis/Sounds/aigis-hurt1.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "aigis-hurt2", () => { scene.load.audio("aigis-hurt2", "assets/personagens/Aigis/Sounds/aigis-hurt2.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "aigis-hurt3", () => { scene.load.audio("aigis-hurt3", "assets/personagens/Aigis/Sounds/aigis-hurt3.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "aigis-hurt4", () => { scene.load.audio("aigis-hurt4", "assets/personagens/Aigis/Sounds/aigis-hurt4.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "ai_AdoSpecial", () => { scene.load.audio("ai_AdoSpecial", "assets/personagens/Aigis/Sounds/ai-AdoSpecial.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "ai_AupSpecial", () => { scene.load.audio("ai_AupSpecial", "assets/personagens/Aigis/Sounds/ai-AupSpecial.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "ai_bazshot", () => { scene.load.audio("ai_bazshot", "assets/personagens/Aigis/Sounds/ai-bazshot.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "ai_boom", () => { scene.load.audio("ai_boom", "assets/personagens/Aigis/Sounds/ai-boom.mp3"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "ai_side", () => { scene.load.audio("ai_side", "assets/personagens/Aigis/Sounds/ai-side.wav"); }),
+    (scene, queued) => queueAsset(scene, queued, "audio", "mina-bi", () => { scene.load.audio("mina-bi", "assets/personagens/Aigis/Sounds/mina-bi.wav"); }),
+      (scene, queued) => queueAsset(scene, queued, "audio", "mina-boom", () => { scene.load.audio("mina-boom", "assets/personagens/Aigis/Sounds/mina-boom.wav"); }),
+  (scene, queued) => queueAsset(scene, queued, "audio", "persona!", () => { scene.load.audio("persona!", "assets/personagens/Aigis/Sounds/persona!.mp3"); }),
+
+
+
+
 ];
 
 const assetsIce = [
@@ -848,6 +869,7 @@ const assetsstory = [
   (scene, queued) => queueAsset(scene, queued, "texture", "puppet", () => { scene.load.image("puppet", "assets/Hud/dialogo/Miku/puppet.png"); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "Mk_deaf", () => { scene.load.spritesheet("Mk_deaf", "assets/personagens/Miku/Sprites/Mk_deaf.png", { frameWidth: 169, frameHeight: 163 }); }),
   (scene, queued) => queueAsset(scene, queued, "texture", "FJ_N", () => { scene.load.image("FJ_N", "assets/Hud/dialogo/FJ/FJ-N.png"); }),
+  (scene, queued) => queueAsset(scene, queued, "texture", "TH_N", () => { scene.load.image("TH_N", "assets/Hud/dialogo/FJ/TH_N.png"); }),
     (scene, queued) => queueAsset(scene, queued, "texture", "FJ_true", () => { scene.load.image("FJ_true", "assets/Hud/dialogo/FJ/FJ_true.png"); }),
 
   (scene, queued) => queueAsset(scene, queued, "texture", "Pg_ok", () => { scene.load.image("Pg_ok", "assets/Hud/dialogo/Pingu/Pg_ok.png"); }),

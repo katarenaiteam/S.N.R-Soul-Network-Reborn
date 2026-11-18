@@ -54,6 +54,9 @@ export default class AigisAupSpecial {
   executar() {
     const sprite = this.personagem.sprite;
     this.direcao = sprite.flipX ? -1 : 1;
+    if (!this.special.persona) {
+      this.personagem.tocarSomSorteado("ai_AupSpecial", { volume: 0.4 });
+    }
     sprite.on("animationupdate", this.aoAtualizarAnimacao);
     sprite.once(`animationcomplete-${this.special.animacao}`, this.aoCompletarAnimacao);
     if (this.special.persona) this.criarPersona();
@@ -149,6 +152,7 @@ export default class AigisAupSpecial {
   atingirAlvoPersona(alvo) {
     if (this.finalizado || this.alvosAtingidosPersona.has(alvo)) return;
     this.alvosAtingidosPersona.add(alvo);
+    this.personagem.tocarSomSorteado(this.personagem.sons?.heavy, { volume: 0.15 });
     const sprite = this.personagem.sprite;
     alvo.receberDano(this.special.persona.propriedadesAtaque.dano,
       this.special.persona.propriedadesAtaque, {
@@ -338,6 +342,7 @@ export default class AigisAupSpecial {
   atingirAlvo(registro, alvo) {
     if (this.finalizado || !registro.hitbox?.active || registro.alvosAtingidos.has(alvo)) return;
     registro.alvosAtingidos.add(alvo);
+    this.personagem.tocarSomSorteado(this.personagem.sons?.heavy, { volume: 0.15 });
     alvo.receberDano(this.special.propriedadesAtaque.dano, this.special.propriedadesAtaque, {
       x: registro.hitbox.x,
       direcao: alvo.sprite.x >= registro.hitbox.x ? 1 : -1,
