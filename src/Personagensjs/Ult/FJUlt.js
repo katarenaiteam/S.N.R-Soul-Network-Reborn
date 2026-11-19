@@ -5,7 +5,6 @@ const TEMPO_VOO = 6000;
 const DESCIDA_LEVITACAO = 55;
 const VELOCIDADE_SUBIDA_ULT = 850;
 const VELOCIDADE_CENTRO_ULT = 600;
-const GRAVIDADE_SUBIDA_ULT = -500;
 const COMPENSACAO_GRAVIDADE_LEVITACAO = -900;
 const IMPULSO_MERGULHO = 1750;
 import { gerarQuadrosUltimateBackground } from "../../Objetos/QuadrosUltimateBackground.js";
@@ -219,24 +218,12 @@ export default class FJUlt {
     body.updateFromGameObject();
     sprite.y += baseCorpoY - body.bottom;
     body.updateFromGameObject();
-    body.setAllowGravity(true);
-    body.setGravityY(GRAVIDADE_SUBIDA_ULT - this.scene.physics.world.gravity.y);
+    body.setAllowGravity(false);
+    body.setGravityY(0);
     body.setVelocityY(-VELOCIDADE_SUBIDA_ULT);
     sprite.play("fj_jump", true);
     const limitesArena = this.scene.mapaAtual?.configCamera?.limites;
-    const plataformas = this.scene.mapaAtual?.plataformas?.getChildren?.() ?? [];
-    const pisoPrincipal = plataformas
-      .filter((plataforma) => plataforma.body?.enable)
-      .sort((a, b) => b.body.width - a.body.width)[0];
-    const alturaVisivel = cam.height / cam.zoom;
-    this.alvoVoo = {
-      x: limitesArena
-        ? limitesArena.x + limitesArena.largura / 2
-        : cam.scrollX + cam.width / cam.zoom / 2,
-      y: pisoPrincipal
-        ? pisoPrincipal.body.top - alturaVisivel * 1.2
-        : cam.scrollY - alturaVisivel * 0.2,
-    };
+    const centroCameraOriginalY = this.scrollOriginal.y + cam.height / (2 * this.zoomOriginal);
     const margem = 70 * (this.scene.scale.width / 1920);
     const zoomMapaAjustado = limitesArena
       ? Math.min(
@@ -245,7 +232,13 @@ export default class FJUlt {
       )
       : this.zoomOriginal * 0.65;
     const zoomSubida = Math.min(this.zoomOriginal, zoomMapaAjustado * 1.45);
-    const centroCameraOriginalY = this.scrollOriginal.y + cam.height / (2 * this.zoomOriginal);
+    const topoTelaVoo = centroCameraOriginalY - cam.height / (2 * zoomSubida);
+    this.alvoVoo = {
+      x: limitesArena
+        ? limitesArena.x + limitesArena.largura / 2
+        : this.scrollOriginal.x + cam.width / (2 * this.zoomOriginal),
+      y: topoTelaVoo - sprite.displayHeight,
+    };
     cam.pan(this.alvoVoo.x, centroCameraOriginalY, 850, "Cubic.easeInOut");
     cam.zoomTo(zoomSubida, 850);
     this.subindoUlt = true;
@@ -324,7 +317,9 @@ export default class FJUlt {
     if (this.subindoUlt) {
       const sprite = this.personagem.sprite;
       const body = sprite.body;
-      body.setGravityY(GRAVIDADE_SUBIDA_ULT - this.scene.physics.world.gravity.y);
+      body.setAllowGravity(false);
+      body.setGravityY(0);
+      body.setVelocityY(-VELOCIDADE_SUBIDA_ULT);
       const dx = this.alvoVoo.x - sprite.x;
       body.setVelocityX(Math.abs(dx) < 12 ? 0 : Math.sign(dx) * VELOCIDADE_CENTRO_ULT);
       if (sprite.y <= this.alvoVoo.y && Math.abs(dx) < 12) {
