@@ -268,7 +268,7 @@ export default class ContaEspectador {
     if (mqtt?.client?.connected !== true) throw new Error("LOJA INDISPONIVEL");
 
     const pedidoId = this.criarPedidoId();
-    const resultadoGasto = await this.enviarPedidoMoedas("spend", { purchaseId: pedidoId });
+    const resultadoGasto = await this.enviarPedidoMoedas("spend", { purchaseId: pedidoId, efeito });
     this.pedidosPendentes.add(pedidoId);
     while (this.pedidosPendentes.size > 100) {
       this.pedidosPendentes.delete(this.pedidosPendentes.values().next().value);

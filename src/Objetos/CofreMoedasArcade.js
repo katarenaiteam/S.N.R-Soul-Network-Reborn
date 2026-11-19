@@ -1,10 +1,11 @@
+import PRECOS_LOJA_ESPECTADOR from "./PrecosLojaEspectador.js";
+
 const URL_BROKER_FEIRA = "wss://mqtt.feira-de-jogos.dev.br/mqtt";
 const TOPICO_COMPRAS_FEIRA = "vending/comando/#";
 const TOPICO_ARMAZENAMENTO = "spectator/coins/storage";
 const CHAVE_CACHE_ANTIGO = "snr-cofre-moedas-arcade-v1";
 const CLIENT_ID_COMPRAS = "snr-arcade-compras-v1";
 const CLIENT_ID_GOOGLE_PADRAO = "14164817969-s43fpf0hi0vdh2lkjn372igr4lsv96lq.apps.googleusercontent.com";
-
 function normalizarEmail(email) {
   return typeof email === "string" ? email.trim().toLowerCase() : "";
 }
@@ -316,18 +317,23 @@ export default class CofreMoedasArcade {
     if (!idPedido) return;
     const anterior = JSON.stringify(conta);
     if (acao === "spend") {
-      if (conta.gastos[idPedido] === "gasta") {
+      const preco = PRECOS_LOJA_ESPECTADOR[pedido.efeito];
+      if (!preco) {
+        this.responder(pedido, { tipo, ok: false, saldo: conta.saldo, erro: "ITEM INVÁLIDO" });
+        return;
+      }
+      if (conta.gastos[idPedido] === "gasta" || typeof conta.gastos[idPedido] === "number") {
         this.responder(pedido, { tipo, ok: true, saldo: conta.saldo });
         return;
       }
-      if (conta.saldo < 1) {
+      if (conta.saldo < preco) {
         this.responder(pedido, { tipo, ok: false, saldo: conta.saldo, erro: "SEM MOEDAS SNR" });
         return;
       }
-      conta.saldo -= 1;
-      conta.gastos[idPedido] = "gasta";
-    } else if (conta.gastos[idPedido] === "gasta") {
-      conta.saldo += 1;
+      conta.saldo -= preco;
+      conta.gastos[idPedido] = preco;
+    } else if (conta.gastos[idPedido] === "gasta" || typeof conta.gastos[idPedido] === "number") {
+      conta.saldo += typeof conta.gastos[idPedido] === "number" ? conta.gastos[idPedido] : 1;
       conta.gastos[idPedido] = "devolvida";
     }
     try {

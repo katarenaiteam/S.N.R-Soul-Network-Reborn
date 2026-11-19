@@ -4,9 +4,9 @@ export default class FinalMap {
     constructor(scene) {
         this.scene = scene;
 
-      //  if (scene.sound) {
-       //     this.musica = tocarMusicaSegura(scene, 'Gathers_Under_Night', { loop: true, volume: 0.0 });
-        //}
+       if (scene.sound) {
+            this.musica = tocarMusicaSegura(scene, 'finalsong', { loop: true, volume: 0.1 });
+        }
 
         // 1. TAMANHO REDUZIDO DO MUNDO (Fica menor e mais proporcional)
         const larguraMundo = 2600; 

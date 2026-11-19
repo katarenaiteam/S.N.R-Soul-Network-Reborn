@@ -203,7 +203,11 @@ export default class CenaHistoria extends Phaser.Scene {
     this.participantes.forEach((entrada, indice) => {
       const jogador = entrada.jogador;
       jogador.vidas = this[entrada.vidas];
-      jogador.eliminado = false;
+      jogador.eliminado = jogador !== this.boss && jogador.vidas <= 0;
+      if (jogador.eliminado) {
+        jogador.sprite.setActive(false).setVisible(false);
+        jogador.sprite.body.enable = false;
+      }
       const direita = jogador === this.boss;
       const x = direita ? 1920 - 30 : 30 + indice * 500;
       const y = 1080 - 358 * escalaHUD - 20;
@@ -328,6 +332,7 @@ this.indicadorCPU = this.criarIndicador(
   }
 
   update(time, delta) {
+    this.atualizarVisibilidadeP2Cutscene();
     if (this.dialogoHistoria?.ativa) {
       this.dialogoHistoria.atualizar(delta);
       return;
@@ -377,6 +382,29 @@ this.indicadorCPU = this.criarIndicador(
     this.atualizarIndicador(this.indicadorP2);
     }
     this.atualizarIndicador(this.indicadorCPU);
+  }
+
+  atualizarVisibilidadeP2Cutscene() {
+    const p2 = this.jogador2?.sprite;
+    if (!p2) return;
+    const emCutscene = [
+      this.dialogoHistoria,
+      this.introPartida,
+      this.cutsceneFinalHistoria,
+      this.cutsceneFinalSlenderman,
+      this.cutsceneFinalTH30,
+    ].some((cena) => cena?.ativa);
+
+    if (emCutscene && !this.p2OcultoNaCutscene) {
+      this.p2VisivelAntesDaCutscene = p2.visible;
+      this.p2OcultoNaCutscene = true;
+    } else if (!emCutscene && this.p2OcultoNaCutscene) {
+      p2.setVisible(this.p2VisivelAntesDaCutscene);
+      this.p2VisivelAntesDaCutscene = undefined;
+      this.p2OcultoNaCutscene = false;
+    }
+
+    if (emCutscene) p2.setVisible(false);
   }
 
   verificarMorte(jogador, spawn) {

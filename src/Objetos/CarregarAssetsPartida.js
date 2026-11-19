@@ -852,6 +852,8 @@ const assetsFinalMap = [
 (scene, queued) => queueAsset(scene, queued, "texture", "crio", () => { scene.load.image("crio", "assets/cenarios/finalmap/crio.png"); }),
 (scene, queued) => queueAsset(scene, queued, "texture", "frente", () => { scene.load.image("frente", "assets/cenarios/finalmap/frente.png"); }),
 (scene, queued) => queueAsset(scene, queued, "texture", "fundo", () => { scene.load.image("fundo", "assets/cenarios/finalmap/fundo.png"); }),
+(scene, queued) => queueAsset(scene, queued, "audio", "finalsong", () => { scene.load.audio("finalsong", "assets/cenarios/finalmap/finalsong.mp3"); }),
+
 ];
 const assetsstory = [
   (scene, queued) => queueAsset(scene, queued, "texture", "barra1", () => { scene.load.spritesheet("barra1", "assets/Menus/chaveamento/barra1.png", { frameWidth: 480, frameHeight: 1080 }); }),

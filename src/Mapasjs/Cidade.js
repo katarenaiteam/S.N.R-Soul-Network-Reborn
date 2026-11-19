@@ -49,8 +49,8 @@ export default class Cidade {
         // Areas de recuperacao: centro x/y, largura e altura em pixels.
         this.areasLedge = [
             { x: 860, y: 890, largura: 30, altura: 35, direcao: 1 },
-            { x: 1740, y: 890, largura: 30, altura: 35, direcao: -1 },
-            { x: 2105, y: 640, largura: 40, altura: 50, direcao: -1 },
+            { x: 1744, y: 890, largura: 30, altura: 35, direcao: -1 },
+            { x: 2120, y: 640, largura: 40, altura: 50, direcao: -1 },
             { x: 490, y: 612, largura: 40, altura: 50, direcao: 1 },
         ];
 

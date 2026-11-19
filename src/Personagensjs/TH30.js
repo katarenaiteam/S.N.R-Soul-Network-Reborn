@@ -112,9 +112,9 @@ this.nomePersonagem = "TH30";
 
       stun: {
         largura: 65,
-        altra: 60,
+        altura: 120,
         offsetX: 32,
-        offsetY: 0,
+        offsetY: 12,
         escuala: 1,
         hurtboxes: [
           { largura: 75, altura: 70, offsetX: 20, offsetY: -40 },
@@ -171,7 +171,7 @@ this.nomePersonagem = "TH30";
         largura: 65,
         altura: 120,
         offsetX: 40,
-        offsetY: 50,
+        offsetY: 10,
         escala: 1,
         hurtboxes: [
           { largura: 70, altura: 60, offsetX: -30, offsetY: -80 },
@@ -181,9 +181,9 @@ this.nomePersonagem = "TH30";
 
       danoSide: {
         largura: 65,
-        altura: 100,
+        altura: 120,
         offsetX: 40,
-        offsetY: 45,
+        offsetY: 30,
         escala: 1,
         hurtboxes: [
           { largura: 70, altura: 60, offsetX: -30, offsetY: -80 },
@@ -193,9 +193,9 @@ this.nomePersonagem = "TH30";
 
       danoDown: {
         largura: 65,
-        altura: 100,
+        altura: 120,
         offsetX: 40,
-        offsetY: 55,
+        offsetY: 30,
         escala: 1,
         hurtboxes: [
           { largura: 70, altura: 60, offsetX: -10, offsetY: -70 },
@@ -207,7 +207,7 @@ this.nomePersonagem = "TH30";
       dead: {
         offsetVisualY: 20,
         largura: 80,
-        altura: 33,
+        altura: 120,
         offsetX: 35,
         offsetY: 52,
         escala: 1,
@@ -221,9 +221,9 @@ this.nomePersonagem = "TH30";
       
       getup: {
         largura: 65,
-        altura: 100,
-        offsetX: 30,
-        offsetY: 70,
+        altura: 120,
+        offsetX: 32,
+        offsetY: 32,
         escala: 1,
         hurtboxes: [],
       },
@@ -669,7 +669,7 @@ this.nomePersonagem = "TH30";
 
          movimento: {
     inicio: 80,   //80
-    fim: 500,
+    fim: 800,
     x: {
       de: 700,
       para: 500,

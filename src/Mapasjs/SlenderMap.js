@@ -31,13 +31,13 @@ export default class SlenderMap {
 
         // 3. SPAWNS INICIAIS (Em cima das plataformas centralizadas)
         this.spawnsIniciais = {
-            p1: { x: 660, y: 687 },
-            p2: { x: 1700, y: 807 }
+            p1: { x: 660, y: 680 },
+            p2: { x: 1700, y: 800 }
         };
 
         this.spawnsRespawn = {
-            p1: { x: 660, y: 687 },
-            p2: { x: 1700, y: 807 }
+            p1: { x: 660, y: 680 },
+            p2: { x: 1700, y: 800 }
         };
 
         this.plataformas = scene.physics.add.staticGroup();

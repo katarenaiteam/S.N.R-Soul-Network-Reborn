@@ -1,3 +1,5 @@
+import PRECOS_LOJA_ESPECTADOR from "./PrecosLojaEspectador.js";
+
 const RAIO_RODA = 650;
 const TAMANHO_ITEM = 400;
 const ANGULO_INICIAL_SLOT = Math.PI / 4;
@@ -279,6 +281,8 @@ export default class LojaEspectador {
     const item = this.itens[this.indiceSlot];
     this.iconeItem.setDisplaySize(tamanhoItem, tamanhoItem);
     this.rotulo.setText(item.rotulo);
+    const preco = PRECOS_LOJA_ESPECTADOR[item.efeito];
+    this.preco.setText(`${preco} MOEDA${preco === 1 ? "" : "S"} SNR`);
     const textoX = this.iconeItem.x + tamanhoItem * 0.48;
     const textoY = this.iconeItem.y - 45 * this.escala;
     this.rotulo.setPosition(textoX, textoY);

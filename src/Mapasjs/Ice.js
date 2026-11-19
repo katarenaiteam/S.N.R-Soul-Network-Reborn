@@ -36,13 +36,13 @@ export default class Ice {
 
         // 3. SPAWNS INICIAIS (Em cima das plataformas centralizadas)
         this.spawnsIniciais = {
-            p1: { x: 600, y: 940 },
-            p2: { x: 1600, y: 840 }
+            p1: { x: 600, y: 933 },
+            p2: { x: 1600, y: 833 }
         };
 
         this.spawnsRespawn = {
-            p1: { x: 600, y: 930 },
-            p2: { x: 1600, y: 840 }
+            p1: { x: 600, y: 923 },
+            p2: { x: 1600, y: 833 }
         };
 
         this.plataformas = scene.physics.add.staticGroup();

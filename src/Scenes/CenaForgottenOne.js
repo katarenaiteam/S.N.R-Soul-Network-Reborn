@@ -17,6 +17,7 @@ export default class CenaForgottenOne extends CenaPrincipal {
   }
 
   create() {
+    this.registry.get("clienteMQTT")?.clearState();
     super.create();
     this.introPartida?.finalizar();
     if (this.numPlayersForgotten === 2) {

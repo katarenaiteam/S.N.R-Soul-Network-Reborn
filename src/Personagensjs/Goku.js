@@ -428,7 +428,7 @@ export default class Goku extends Personagem {
         largura: 85,
         altura: 100,
         offsetX: -1,
-        offsetY: 30,
+        offsetY: 37,
         escala: 1,
         hurtboxes: [
           { largura: 30, altura: 35, offsetX: -7, offsetY: -55 },

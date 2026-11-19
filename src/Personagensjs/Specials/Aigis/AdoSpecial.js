@@ -170,7 +170,7 @@ AigisAdoSpecial.configuracao = {
   },
   propriedades: {
     impulsoX: 130,
-    impulsoY: -150,
+    impulsoY: 90,
     travarMovimentoAir: true,
     dano: 20,
     knockbackX: 110,
