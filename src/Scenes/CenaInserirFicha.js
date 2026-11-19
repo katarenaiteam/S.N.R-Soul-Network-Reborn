@@ -1,4 +1,5 @@
 import ClienteMQTT from "../Objetos/ClienteMQTT.js";
+import CofreMoedasArcade from "../Objetos/CofreMoedasArcade.js";
 
 export default class CenaInserirFicha extends Phaser.Scene {
   constructor() {
@@ -23,6 +24,13 @@ export default class CenaInserirFicha extends Phaser.Scene {
       mqtt = new ClienteMQTT(this.registry.get("mqttConfig"), "host");
       this.registry.set("clienteMQTT", mqtt);
       mqtt.connect();
+    }
+
+    if (!this.registry.get("cofreMoedasArcade")) {
+      this.registry.set(
+        "cofreMoedasArcade",
+        new CofreMoedasArcade(this.registry.get("mqttConfig"), mqtt),
+      );
     }
 
     this.conectarLojaMQTT();

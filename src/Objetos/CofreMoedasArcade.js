@@ -2,8 +2,6 @@ const URL_BROKER_FEIRA = "wss://mqtt.feira-de-jogos.dev.br/mqtt";
 const TOPICO_COMPRAS_FEIRA = "vending/comando/#";
 const TOPICO_ARMAZENAMENTO = "spectator/coins/storage";
 const CHAVE_CACHE_ANTIGO = "snr-cofre-moedas-arcade-v1";
-// Usa o mesmo papel e formato de clientId do host do jogo para manter as permissões MQTT.
-const CLIENT_ID_COFRE = "snr-host-COFR";
 const CLIENT_ID_COMPRAS = "snr-arcade-compras-v1";
 const CLIENT_ID_GOOGLE_PADRAO = "14164817969-s43fpf0hi0vdh2lkjn372igr4lsv96lq.apps.googleusercontent.com";
 
@@ -15,9 +13,15 @@ function novoArmazenamento() {
   return { schema: 1, revision: 0, updatedAt: 0, contas: {} };
 }
 
+function interpretarMensagem(mensagem) {
+  if (mensagem && typeof mensagem === "object" && !ArrayBuffer.isView(mensagem)) return mensagem;
+  return JSON.parse(typeof mensagem === "string" ? mensagem : mensagem.toString());
+}
+
 export default class CofreMoedasArcade {
-  constructor(config) {
+  constructor(config, clienteHost) {
     this.mqtt = globalThis.mqtt;
+    this.clienteHost = clienteHost;
     this.config = config;
     this.clientIdGoogle = import.meta.env?.VITE_GOOGLE_CLIENT_ID || CLIENT_ID_GOOGLE_PADRAO;
     this.prefixoTopico = config.topicPrefix.replace(/\/$/, "");
@@ -30,8 +34,8 @@ export default class CofreMoedasArcade {
     this.chavesGoogle = null;
     this.promessaChavesGoogle = null;
     this.validacoesToken = new Map();
-    if (!this.mqtt?.connect) {
-      console.error("O cofre SNR não iniciou: cliente MQTT indisponível.");
+    if (!this.mqtt?.connect || !clienteHost?.client) {
+      console.error("O cofre SNR não iniciou: conexão MQTT host indisponível.");
       return;
     }
     this.conectarJogo();
@@ -39,21 +43,17 @@ export default class CofreMoedasArcade {
   }
 
   conectarJogo() {
-    this.clienteJogo = this.mqtt.connect(this.config.brokerUrl, {
-      clientId: CLIENT_ID_COFRE,
-      clean: false,
-      reconnectPeriod: 5000,
-    });
-    this.clienteJogo.on("connect", () => {
+    this.clienteJogo = this.clienteHost.client;
+    this.aoConectarJogo = () => {
       this.pronto = false;
       this.recebeuRetidoNestaConexao = false;
       this.assinaturaArmazenamentoAceita = false;
-      console.info("Cofre conectado ao broker MQTT do jogo.");
+      console.info("Cofre usando a conexão MQTT host já aberta pelo jogo.");
       window.clearTimeout(this.timerInicializacao);
       window.clearTimeout(this.timerAssinaturaArmazenamento);
       const assinarArmazenamento = () => {
         if (!this.clienteJogo?.connected) return;
-        this.clienteJogo.subscribe(this.topicoArmazenamento, { qos: 1 }, (erro) => {
+        this.clienteJogo.subscribe(`${this.prefixoTopico}/${TOPICO_ARMAZENAMENTO}`, { qos: 1 }, (erro) => {
           if (erro) {
             console.error("Falha ao assinar o armazenamento MQTT:", erro.message);
             this.timerAssinaturaArmazenamento = window.setTimeout(assinarArmazenamento, 5000);
@@ -78,23 +78,24 @@ export default class CofreMoedasArcade {
         });
       };
       assinarArmazenamento();
-    });
-    this.clienteJogo.on("message", (topico, mensagem) => {
-      if (topico === this.topicoArmazenamento) {
+    };
+    this.aoReceberMensagemJogo = (topico, mensagem) => {
+      if (topico === TOPICO_ARMAZENAMENTO) {
         this.receberArmazenamentoRetido(mensagem);
         return;
       }
-      const prefixo = `${this.prefixoTopico}/`;
-      if (!topico.startsWith(prefixo)) return;
-      this.enfileirar(() => this.receberPedidoJogo(topico.slice(prefixo.length), mensagem));
-    });
-    this.clienteJogo.on("error", (erro) => console.error("MQTT do cofre SNR:", erro.message));
-    this.clienteJogo.on("close", () => console.error("Conexão do cofre com o broker MQTT do jogo foi encerrada."));
+      if (!topico.startsWith("spectator/coins/")) return;
+      this.enfileirar(() => this.receberPedidoJogo(topico, mensagem));
+    };
+    this.clienteHost.on("connect", this.aoConectarJogo);
+    this.clienteHost.on("message", this.aoReceberMensagemJogo);
+    this.clienteHost.on("error", (erro) => console.error("MQTT do cofre SNR:", erro.message));
+    if (this.clienteJogo.connected) this.aoConectarJogo();
   }
 
   receberArmazenamentoRetido(mensagem) {
     try {
-      const salvo = JSON.parse(mensagem.toString());
+      const salvo = interpretarMensagem(mensagem);
       if (salvo?.schema !== 1 || !Number.isFinite(Number(salvo.revision)) || !salvo.contas || typeof salvo.contas !== "object") return;
       this.recebeuRetidoNestaConexao = true;
       this.armazenamentoDisponivel = true;
@@ -259,7 +260,7 @@ export default class CofreMoedasArcade {
   async receberPedidoJogo(topico, mensagem) {
     let pedido;
     try {
-      pedido = JSON.parse(mensagem.toString());
+      pedido = interpretarMensagem(mensagem);
     } catch {
       return;
     }
@@ -328,7 +329,7 @@ export default class CofreMoedasArcade {
   async receberCompra(mensagem, topico) {
     let evento;
     try {
-      evento = JSON.parse(mensagem.toString());
+      evento = interpretarMensagem(mensagem);
     } catch {
       return;
     }
