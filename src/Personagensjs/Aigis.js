@@ -659,8 +659,8 @@ this.nomePersonagem = "Aigis";
         offsetY: -15,
         escala: 0.33,
         hurtboxes: [
-          { largura: 50, altura: 42, offsetX: 0, offsetY: -48 },
-          { largura: 60, altura: 36, offsetX: 0, offsetY: -12 },
+        //  { largura: 50, altura: 42, offsetX: 0, offsetY: -48 },
+         // { largura: 60, altura: 36, offsetX: 0, offsetY: -12 },
         ],
       },
 

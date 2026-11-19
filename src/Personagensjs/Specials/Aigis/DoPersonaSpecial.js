@@ -203,8 +203,8 @@ const criarConfiguracao = (aereo) => ({
   hitbox: {
     largura: 140,
     altura: 82,
-    offsetX: 84,
-    offsetY: -82,
+    offsetX: 72,
+    offsetY: -62,
   },
   propriedades: aereo ? { travarMovimentoAir: true } : {},
   propriedadesAtaque: {

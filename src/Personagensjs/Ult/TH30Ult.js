@@ -10,12 +10,22 @@ const CAMPOS_COPIADOS = [
   "acertosSpecialStun", "cargaKi", "cargaKiMaxima", "kaioken",
   "kaiokenAtivo", "kaiokenDisponivelEm", "tempoCargaKi", "sequenciaKiBall",
   "ultimaKiBallAte", "cooldownKiBallAte", "cooldownKamehamehaAte", "carregandoKi",
+  "modoUltAigisAtivo", "aigisUltAtivando", "guardMaximo", "guardMaximoNormal",
+  "vidaGuard", "ultimaGuardaModoUlt", "personaGuardaUlt", "auraModoUlt",
+  "tweenAuraModoUlt", "golpesNormaisAigis", "golpesUltAigis", "specialsNormaisAigis",
+  "specialsUltAigis", "logicaAtaqueBaixoUlt", "logicasEspeciaisAtivas",
+  "ultCargaMax", "ultTempoCarga", "ultMultiplicadorCarga", "ultBoostAte",
 ];
 const METODOS_COPIADOS = [
   "aplicarDanoSpecialStun", "obterIndicadorHabilidade", "update",
   "adicionarCargaKiPorDano", "aplicarBonusDanoKaioken", "iniciarCooldownSpecial",
   "podeUsarSpecial", "registrarUsoSpecialAereo", "registrarUsoNeutroAereoConfirmado",
   "consumirCargaKi",
+  "atualizarAtaqueBaixoUlt", "ativarSpecialsUltAigis", "restaurarSpecialsNormaisAigis",
+  "atualizarCargaUlt", "aplicarBoostUltPorDano", "ganharCargaUltPorMorte",
+  "consumirUlt",
+  "encerrarModoUltAigis", "criarAuraModoUlt", "atualizarAuraModoUlt",
+  "atualizarPersonaGuarda", "invocarPersonaGuarda", "recolherPersonaGuarda",
 ];
 
 export default class TH30Ult {
@@ -192,11 +202,32 @@ export default class TH30Ult {
       : { x: this.alvo.sprite.scaleX, y: this.alvo.sprite.scaleY };
     for (const campo of CAMPOS_COPIADOS) personagem[campo] = this.alvo[campo];
     for (const metodo of METODOS_COPIADOS) {
-      if (this.alvo.nomePersonagem !== "Goku" &&
+      const metodoAigis = [
+        "atualizarAtaqueBaixoUlt", "ativarSpecialsUltAigis", "restaurarSpecialsNormaisAigis",
+        "atualizarCargaUlt", "aplicarBoostUltPorDano", "ganharCargaUltPorMorte",
+        "consumirUlt",
+        "encerrarModoUltAigis", "criarAuraModoUlt", "atualizarAuraModoUlt",
+        "atualizarPersonaGuarda", "invocarPersonaGuarda", "recolherPersonaGuarda",
+      ].includes(metodo);
+      if (this.alvo.nomePersonagem === "Aigis" ? !metodoAigis &&
+          !["aplicarDanoSpecialStun", "obterIndicadorHabilidade", "update"].includes(metodo) :
+          this.alvo.nomePersonagem !== "Goku" &&
           !["aplicarDanoSpecialStun", "obterIndicadorHabilidade"].includes(metodo)) continue;
       if (typeof this.alvo[metodo] === "function") {
         personagem[metodo] = this.alvo[metodo].bind(personagem);
       }
+    }
+    if (this.alvo.nomePersonagem === "Aigis") {
+      personagem.modoUltAigisAtivo = false;
+      personagem.aigisUltAtivando = false;
+      personagem.ultimaGuardaModoUlt = false;
+      personagem.personaGuardaUlt = null;
+      personagem.auraModoUlt = null;
+      personagem.tweenAuraModoUlt = null;
+      personagem.golpesUltAigis = null;
+      personagem.specialsUltAigis = null;
+      personagem.logicaAtaqueBaixoUlt = null;
+      personagem.logicasEspeciaisAtivas = [];
     }
     if (this.alvo.nomePersonagem === "Goku") {
       personagem.kaioken = new GokuKaioken(personagem);
@@ -321,6 +352,12 @@ export default class TH30Ult {
     const personagem = this.personagem;
     const cargaRestante = personagem.ultCarga > 0;
     personagem.kaioken?.encerrar?.();
+    if (this.alvo?.nomePersonagem === "Aigis") {
+      personagem.encerrarModoUltAigis?.();
+      personagem.auraModoUlt?.destroy();
+      personagem.personaGuardaUlt?.destroy();
+      personagem.tweenAuraModoUlt?.stop();
+    }
     this.barraKiHudTemporaria?.barra?.destroy();
     if (this.barraKiHudTemporaria?.hud) {
       this.barraKiHudTemporaria.hud.barraKi = null;

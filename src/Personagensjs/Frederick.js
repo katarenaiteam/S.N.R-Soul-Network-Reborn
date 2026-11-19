@@ -241,7 +241,7 @@ this.nomePersonagem = "FJ";
         largura: 250,
         altura: 400,
         offsetX: 90,
-        offsetY: 84,
+        offsetY: 74,
         escala: 0.33,
         hurtboxes: [
           { largura: 55, altura: 70, offsetX: 20, offsetY: -80 },
@@ -478,8 +478,8 @@ this.nomePersonagem = "FJ";
       AupSpecial: {
         largura: 250,
         altura: 400,
-        offsetX: 98,
-        offsetY: 153,
+        offsetX: 110,
+        offsetY: 140,
         escala: 0.33,
         hurtboxes: [
           { largura: 55, altura: 60, offsetX: 0, offsetY: -70 },
@@ -511,8 +511,8 @@ this.nomePersonagem = "FJ";
       AsiSpecial: {
         largura: 250,
         altura: 400,
-        offsetX: 86,
-        offsetY: 153,
+        offsetX: 96,
+        offsetY: 133,
         escala: 0.33,
         hurtboxes: [
           { largura: 55, altura: 75, offsetX: 0, offsetY: -65 },
