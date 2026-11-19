@@ -130,22 +130,39 @@ export default class ContaEspectador {
     }
     this.topicoRespostaMoedas = `spectator/coins/response/${mqtt.clientId}`;
     this.topicoRespostaLoja = `shop/response/${mqtt.clientId}`;
+    this.topicoAtualizacaoSaldo = null;
     this.aoReceberMoedas = (resposta) => this.receberRespostaMoedas(resposta);
+    this.aoReceberAtualizacaoSaldo = (atualizacao) => this.receberAtualizacaoSaldo(atualizacao);
     this.aoReceberRespostaLoja = (resposta) => this.receberRespostaCompra(resposta);
     this.aoConectarSala = () => this.aoConectarMQTT();
     mqtt.on(`message:${this.topicoRespostaMoedas}`, this.aoReceberMoedas);
     mqtt.on(`message:${this.topicoRespostaLoja}`, this.aoReceberRespostaLoja);
     mqtt.on("connect", this.aoConectarSala);
+    this.prepararTopicoAtualizacaoSaldo();
 
     this.scene.iniciarConexaoEspectador();
     if (mqtt.client.connected) this.aoConectarMQTT();
     this.iniciarPresenca();
-    this.intervaloSaldo = window.setInterval(() => this.solicitarSaldo(), 5000);
+  }
+
+  async prepararTopicoAtualizacaoSaldo() {
+    try {
+      const bytes = new TextEncoder().encode(this.email);
+      const digest = await crypto.subtle.digest("SHA-256", bytes);
+      const idConta = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+      this.topicoAtualizacaoSaldo = `spectator/coins/balance/${idConta}`;
+      this.scene.mqtt.on(`message:${this.topicoAtualizacaoSaldo}`, this.aoReceberAtualizacaoSaldo);
+      if (this.scene.mqtt.client?.connected) this.scene.mqtt.subscribe(this.topicoAtualizacaoSaldo);
+    } catch (erro) {
+      this.mostrarErroSincronizacao(new Error("Não foi possível preparar a sincronização do saldo."));
+      console.error("Falha ao preparar atualização de moedas:", erro.message);
+    }
   }
 
   aoConectarMQTT() {
     const mqtt = this.scene.mqtt;
     mqtt.subscribe([this.topicoRespostaMoedas, this.topicoRespostaLoja]);
+    if (this.topicoAtualizacaoSaldo) mqtt.subscribe(this.topicoAtualizacaoSaldo);
     this.publicarPresenca();
     this.solicitarSaldo();
   }
@@ -189,7 +206,16 @@ export default class ContaEspectador {
 
   solicitarSaldo() {
     if (!this.email || !this.scene.sys.isActive()) return;
+    if (Date.now() - (this.ultimaConsultaSaldo || 0) < 10000) return;
+    this.ultimaConsultaSaldo = Date.now();
     this.enviarPedidoMoedas("get").catch((erro) => this.mostrarErroSincronizacao(erro));
+  }
+
+  receberAtualizacaoSaldo(atualizacao) {
+    if (!Number.isFinite(Number(atualizacao?.saldo))) return;
+    this.saldo = Math.max(0, Math.floor(Number(atualizacao.saldo)));
+    this.atualizarSaldoTexto();
+    this.statusLoja.hidden = true;
   }
 
   receberRespostaMoedas(resposta) {
@@ -264,9 +290,9 @@ export default class ContaEspectador {
 
   destruir() {
     window.clearInterval(this.intervaloPresenca);
-    window.clearInterval(this.intervaloSaldo);
     this.scene.mqtt?.off("connect", this.aoConectarSala);
     if (this.topicoRespostaMoedas) this.scene.mqtt?.off(`message:${this.topicoRespostaMoedas}`, this.aoReceberMoedas);
+    if (this.topicoAtualizacaoSaldo) this.scene.mqtt?.off(`message:${this.topicoAtualizacaoSaldo}`, this.aoReceberAtualizacaoSaldo);
     if (this.topicoRespostaLoja) this.scene.mqtt?.off(`message:${this.topicoRespostaLoja}`, this.aoReceberRespostaLoja);
     for (const pedido of this.pedidosMoedas.values()) {
       window.clearTimeout(pedido.timer);

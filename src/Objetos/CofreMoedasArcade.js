@@ -30,6 +30,7 @@ export default class CofreMoedasArcade {
     this.armazenamentoDisponivel = false;
     this.pronto = false;
     this.operacoesPendentes = [];
+    this.respostasPendentes = [];
     this.fila = Promise.resolve();
     this.chavesGoogle = null;
     this.promessaChavesGoogle = null;
@@ -49,6 +50,7 @@ export default class CofreMoedasArcade {
       this.recebeuRetidoNestaConexao = false;
       this.assinaturaArmazenamentoAceita = false;
       console.info("Cofre usando a conexão MQTT host já aberta pelo jogo.");
+      this.enviarRespostasPendentes();
       window.clearTimeout(this.timerInicializacao);
       window.clearTimeout(this.timerAssinaturaArmazenamento);
       const assinarArmazenamento = () => {
@@ -172,7 +174,9 @@ export default class CofreMoedasArcade {
   async obterChavesGoogle() {
     if (this.chavesGoogle) return this.chavesGoogle;
     if (!this.promessaChavesGoogle) {
-      this.promessaChavesGoogle = fetch("https://www.googleapis.com/oauth2/v3/certs")
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), 4000);
+      this.promessaChavesGoogle = fetch("https://www.googleapis.com/oauth2/v3/certs", { signal: controller.signal })
         .then((resposta) => {
           if (!resposta.ok) throw new Error("Falha ao obter chaves públicas do Google.");
           return resposta.json();
@@ -181,7 +185,10 @@ export default class CofreMoedasArcade {
           this.chavesGoogle = dados.keys || [];
           return this.chavesGoogle;
         })
-        .finally(() => { this.promessaChavesGoogle = null; });
+        .finally(() => {
+          window.clearTimeout(timer);
+          this.promessaChavesGoogle = null;
+        });
     }
     return this.promessaChavesGoogle;
   }
@@ -257,6 +264,15 @@ export default class CofreMoedasArcade {
     this.armazenamentoDisponivel = true;
   }
 
+  publicarSaldoConta(idConta, saldo) {
+    const publicado = this.clienteHost.publish(
+      `spectator/coins/balance/${idConta}`,
+      { saldo, revision: this.armazenamento.revision, updatedAt: this.armazenamento.updatedAt },
+      { qos: 1, retain: true },
+    );
+    if (!publicado) console.error("Não foi possível publicar a atualização imediata do saldo.");
+  }
+
   async receberPedidoJogo(topico, mensagem) {
     let pedido;
     try {
@@ -277,7 +293,14 @@ export default class CofreMoedasArcade {
       this.responder(pedido, { tipo, ok: false, saldo: 0, erro: "LOGIN GOOGLE INVÁLIDO" });
       return;
     }
-    const idConta = await this.hashEmail(email);
+    let idConta;
+    try {
+      idConta = await this.hashEmail(email);
+    } catch (erro) {
+      console.error("Falha ao gerar a chave da conta de moedas:", erro.message);
+      this.responder(pedido, { tipo, ok: false, saldo: 0, erro: "NÃO FOI POSSÍVEL IDENTIFICAR A CONTA" });
+      return;
+    }
     const conta = this.obterContaPorId(idConta);
     if (acao === "get") {
       this.responder(pedido, this.armazenamentoDisponivel
@@ -309,6 +332,7 @@ export default class CofreMoedasArcade {
     }
     try {
       await this.salvarArmazenamento();
+      this.publicarSaldoConta(idConta, conta.saldo);
       this.responder(pedido, {
         tipo,
         ok: acao === "spend" ? conta.gastos[idPedido] === "gasta" : conta.gastos[idPedido] === "devolvida",
@@ -358,6 +382,7 @@ export default class CofreMoedasArcade {
     if (conta.compras.length > 2000) conta.compras.splice(0, conta.compras.length - 2000);
     try {
       await this.salvarArmazenamento();
+      this.publicarSaldoConta(idConta, conta.saldo);
       console.info(`Compra creditada no armazenamento MQTT. Saldo: ${conta.saldo}.`);
     } catch (erro) {
       this.armazenamento.contas[idConta] = JSON.parse(anterior);
@@ -386,14 +411,28 @@ export default class CofreMoedasArcade {
 
   responder(pedido, resposta) {
     const clientId = String(pedido?.clientId || "");
-    if (!/^snr-espectador-[A-Z]{4}$/.test(clientId) || !this.clienteJogo?.connected) return;
-    this.clienteJogo.publish(
-      `${this.prefixoTopico}/spectator/coins/response/${clientId}`,
-      JSON.stringify({ ...resposta, email: normalizarEmail(pedido.email), requestId: pedido.requestId }),
-      { qos: 1 },
-      (erro) => {
-        if (erro) console.error("Falha ao publicar resposta de moedas:", erro.message);
-      },
-    );
+    if (!/^snr-espectador-[A-Z]{4}$/.test(clientId)) {
+      console.error("Pedido de moedas com clientId inválido:", clientId);
+      return;
+    }
+    const mensagem = {
+      topico: `spectator/coins/response/${clientId}`,
+      dados: { ...resposta, email: normalizarEmail(pedido.email), requestId: pedido.requestId },
+    };
+    if (!this.clienteHost.publish(mensagem.topico, mensagem.dados, { qos: 1 })) {
+      this.respostasPendentes.push(mensagem);
+      if (this.respostasPendentes.length > 200) this.respostasPendentes.shift();
+      console.warn("Resposta de moedas aguardando reconexão do MQTT host.");
+      return;
+    }
+    console.info("Resposta de moedas publicada pelo MQTT host.");
+  }
+
+  enviarRespostasPendentes() {
+    while (this.respostasPendentes.length > 0) {
+      const mensagem = this.respostasPendentes[0];
+      if (!this.clienteHost.publish(mensagem.topico, mensagem.dados, { qos: 1 })) return;
+      this.respostasPendentes.shift();
+    }
   }
 }
