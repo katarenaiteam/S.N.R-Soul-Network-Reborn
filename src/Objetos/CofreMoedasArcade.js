@@ -2,7 +2,8 @@ const URL_BROKER_FEIRA = "wss://mqtt.feira-de-jogos.dev.br/mqtt";
 const TOPICO_COMPRAS_FEIRA = "vending/comando/#";
 const TOPICO_ARMAZENAMENTO = "spectator/coins/storage";
 const CHAVE_CACHE_ANTIGO = "snr-cofre-moedas-arcade-v1";
-const CLIENT_ID_COFRE = "snr-arcade-cofre-v1";
+// Usa o mesmo papel e formato de clientId do host do jogo para manter as permissões MQTT.
+const CLIENT_ID_COFRE = "snr-host-COFR";
 const CLIENT_ID_COMPRAS = "snr-arcade-compras-v1";
 const CLIENT_ID_GOOGLE_PADRAO = "14164817969-s43fpf0hi0vdh2lkjn372igr4lsv96lq.apps.googleusercontent.com";
 
@@ -46,20 +47,37 @@ export default class CofreMoedasArcade {
     this.clienteJogo.on("connect", () => {
       this.pronto = false;
       this.recebeuRetidoNestaConexao = false;
-      this.clienteJogo.subscribe(this.topicoArmazenamento, { qos: 1 }, (erro) => {
-        if (erro) console.error("Falha ao ler saldo retido do MQTT:", erro.message);
-      });
+      this.assinaturaArmazenamentoAceita = false;
+      console.info("Cofre conectado ao broker MQTT do jogo.");
       window.clearTimeout(this.timerInicializacao);
-      this.timerInicializacao = window.setTimeout(() => {
-        if (!this.pronto) {
-          this.migrarCacheAntigo()
-            .then((migrado) => this.salvarArmazenamento().then(() => {
-              if (migrado) localStorage.removeItem(CHAVE_CACHE_ANTIGO);
-            }))
-            .catch((erro) => console.error("Falha ao inicializar saldo retido no MQTT:", erro.message))
-            .finally(() => this.ativarComArmazenamentoAtual());
-        }
-      }, 2000);
+      window.clearTimeout(this.timerAssinaturaArmazenamento);
+      const assinarArmazenamento = () => {
+        if (!this.clienteJogo?.connected) return;
+        this.clienteJogo.subscribe(this.topicoArmazenamento, { qos: 1 }, (erro) => {
+          if (erro) {
+            console.error("Falha ao assinar o armazenamento MQTT:", erro.message);
+            this.timerAssinaturaArmazenamento = window.setTimeout(assinarArmazenamento, 5000);
+            return;
+          }
+          this.assinaturaArmazenamentoAceita = true;
+          console.info("Assinatura do armazenamento MQTT aceita.");
+          if (this.recebeuRetidoNestaConexao) {
+            this.ativarComArmazenamentoAtual();
+            return;
+          }
+          this.timerInicializacao = window.setTimeout(() => {
+            if (!this.pronto && !this.recebeuRetidoNestaConexao) {
+              this.migrarCacheAntigo()
+                .then((migrado) => this.salvarArmazenamento().then(() => {
+                  if (migrado) localStorage.removeItem(CHAVE_CACHE_ANTIGO);
+                }))
+                .catch((falha) => console.error("Falha ao inicializar saldo retido no MQTT:", falha.message))
+                .finally(() => this.ativarComArmazenamentoAtual());
+            }
+          }, 2000);
+        });
+      };
+      assinarArmazenamento();
     });
     this.clienteJogo.on("message", (topico, mensagem) => {
       if (topico === this.topicoArmazenamento) {
@@ -71,6 +89,7 @@ export default class CofreMoedasArcade {
       this.enfileirar(() => this.receberPedidoJogo(topico.slice(prefixo.length), mensagem));
     });
     this.clienteJogo.on("error", (erro) => console.error("MQTT do cofre SNR:", erro.message));
+    this.clienteJogo.on("close", () => console.error("Conexão do cofre com o broker MQTT do jogo foi encerrada."));
   }
 
   receberArmazenamentoRetido(mensagem) {
@@ -94,15 +113,24 @@ export default class CofreMoedasArcade {
   }
 
   ativarComArmazenamentoAtual() {
-    if (this.pronto || !this.clienteJogo?.connected) return;
-    this.pronto = true;
+    if (this.pronto || this.ativando || !this.assinaturaArmazenamentoAceita || !this.clienteJogo?.connected) return;
+    this.ativando = true;
     this.clienteJogo.subscribe([
       `${this.prefixoTopico}/spectator/coins/get`,
       `${this.prefixoTopico}/spectator/coins/spend`,
       `${this.prefixoTopico}/spectator/coins/refund`,
-    ], { qos: 1 });
-    const pendentes = this.operacoesPendentes.splice(0);
-    for (const operacao of pendentes) this.enfileirar(operacao);
+    ], { qos: 1 }, (erro) => {
+      this.ativando = false;
+      if (erro) {
+        console.error("Falha ao assinar pedidos de moedas:", erro.message);
+        this.timerAssinaturaPedidos = window.setTimeout(() => this.ativarComArmazenamentoAtual(), 5000);
+        return;
+      }
+      this.pronto = true;
+      console.info("Cofre pronto: assinatura dos pedidos de moedas aceita.");
+      const pendentes = this.operacoesPendentes.splice(0);
+      for (const operacao of pendentes) this.enfileirar(operacao);
+    });
   }
 
   enfileirar(tarefa) {
@@ -219,7 +247,10 @@ export default class CofreMoedasArcade {
     await new Promise((resolve, reject) => {
       this.clienteJogo.publish(this.topicoArmazenamento, conteudo, { qos: 1, retain: true }, (erro) => {
         if (erro) reject(erro);
-        else resolve();
+        else {
+          console.info(`Saldo retido confirmado pelo broker (revisão ${this.armazenamento.revision}).`);
+          resolve();
+        }
       });
     });
     this.armazenamentoDisponivel = true;
@@ -234,6 +265,7 @@ export default class CofreMoedasArcade {
     }
     const acao = topico.split("/").pop();
     if (!["get", "spend", "refund"].includes(acao)) return;
+    console.info(`Pedido MQTT de moedas recebido: ${acao}.`);
     if (!this.pronto) {
       this.operacoesPendentes.push(() => this.receberPedidoJogo(topico, mensagem));
       return;
@@ -293,7 +325,7 @@ export default class CofreMoedasArcade {
     }
   }
 
-  async receberCompra(mensagem) {
+  async receberCompra(mensagem, topico) {
     let evento;
     try {
       evento = JSON.parse(mensagem.toString());
@@ -301,6 +333,11 @@ export default class CofreMoedasArcade {
       return;
     }
     const email = normalizarEmail(evento?.email);
+    console.info("Evento MQTT da Feira recebido:", {
+      topico,
+      produto: evento?.product,
+      temEmail: Boolean(email),
+    });
     if (Number(evento?.product) !== 101 || !email) return;
     if (!this.pronto) {
       this.operacoesPendentes.push(() => this.receberCompra(mensagem));
@@ -334,12 +371,14 @@ export default class CofreMoedasArcade {
       reconnectPeriod: 5000,
     });
     this.clienteCompras.on("connect", () => {
+      console.info("Cofre conectado ao MQTT da Feira.");
       this.clienteCompras.subscribe(TOPICO_COMPRAS_FEIRA, { qos: 1 }, (erro) => {
         if (erro) console.error("Não foi possível assinar as compras da Feira:", erro.message);
+        else console.info("Assinatura das compras da Feira aceita.");
       });
     });
-    this.clienteCompras.on("message", (_topic, mensagem) => {
-      this.enfileirar(() => this.receberCompra(mensagem));
+    this.clienteCompras.on("message", (topico, mensagem) => {
+      this.enfileirar(() => this.receberCompra(mensagem, topico));
     });
     this.clienteCompras.on("error", (erro) => console.error("MQTT de compras SNR:", erro.message));
   }
@@ -351,6 +390,9 @@ export default class CofreMoedasArcade {
       `${this.prefixoTopico}/spectator/coins/response/${clientId}`,
       JSON.stringify({ ...resposta, email: normalizarEmail(pedido.email), requestId: pedido.requestId }),
       { qos: 1 },
+      (erro) => {
+        if (erro) console.error("Falha ao publicar resposta de moedas:", erro.message);
+      },
     );
   }
 }
