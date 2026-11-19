@@ -221,7 +221,8 @@ export default class ContaEspectador {
   receberRespostaMoedas(resposta) {
     if (resposta?.email !== this.email || !Number.isFinite(Number(resposta.saldo))) return;
     const pendente = this.pedidosMoedas.get(resposta.requestId);
-    if (!pendente || (pendente.acao && pendente.acao !== resposta.tipo)) return;
+    const tiposPorAcao = { get: "saldo", spend: "gasto", refund: "devolucao" };
+    if (!pendente || tiposPorAcao[pendente.acao] !== resposta.tipo) return;
     window.clearTimeout(pendente.timer);
     this.pedidosMoedas.delete(resposta.requestId);
     this.saldo = Math.max(0, Math.floor(Number(resposta.saldo)));
