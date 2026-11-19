@@ -203,7 +203,7 @@ export default class ContaEspectador {
     if (resposta.tipo === "gasto" && !resposta.ok) {
       pendente.reject(new Error(resposta.erro || "SEM MOEDAS SNR"));
     } else if (!resposta.ok) {
-      pendente.reject(new Error("NÃO FOI POSSÍVEL ATUALIZAR O SALDO CENTRAL"));
+      pendente.reject(new Error(resposta.erro || "NÃO FOI POSSÍVEL ATUALIZAR O SALDO CENTRAL"));
     } else {
       pendente.resolve(resposta);
     }

@@ -22,6 +22,7 @@ export default class CofreMoedasArcade {
     this.prefixoTopico = config.topicPrefix.replace(/\/$/, "");
     this.topicoArmazenamento = `${this.prefixoTopico}/${TOPICO_ARMAZENAMENTO}`;
     this.armazenamento = novoArmazenamento();
+    this.armazenamentoDisponivel = false;
     this.pronto = false;
     this.operacoesPendentes = [];
     this.fila = Promise.resolve();
@@ -54,9 +55,9 @@ export default class CofreMoedasArcade {
           this.migrarCacheAntigo()
             .then((migrado) => this.salvarArmazenamento().then(() => {
               if (migrado) localStorage.removeItem(CHAVE_CACHE_ANTIGO);
-              this.ativarComArmazenamentoAtual();
             }))
-            .catch((erro) => console.error("Falha ao inicializar saldo retido no MQTT:", erro.message));
+            .catch((erro) => console.error("Falha ao inicializar saldo retido no MQTT:", erro.message))
+            .finally(() => this.ativarComArmazenamentoAtual());
         }
       }, 2000);
     });
@@ -77,6 +78,7 @@ export default class CofreMoedasArcade {
       const salvo = JSON.parse(mensagem.toString());
       if (salvo?.schema !== 1 || !Number.isFinite(Number(salvo.revision)) || !salvo.contas || typeof salvo.contas !== "object") return;
       this.recebeuRetidoNestaConexao = true;
+      this.armazenamentoDisponivel = true;
       if (Number(salvo.revision) >= this.armazenamento.revision) {
         this.armazenamento = {
           schema: 1,
@@ -220,6 +222,7 @@ export default class CofreMoedasArcade {
         else resolve();
       });
     });
+    this.armazenamentoDisponivel = true;
   }
 
   async receberPedidoJogo(topico, mensagem) {
@@ -244,7 +247,13 @@ export default class CofreMoedasArcade {
     const idConta = await this.hashEmail(email);
     const conta = this.obterContaPorId(idConta);
     if (acao === "get") {
-      this.responder(pedido, { tipo, ok: true, saldo: conta.saldo });
+      this.responder(pedido, this.armazenamentoDisponivel
+        ? { tipo, ok: true, saldo: conta.saldo }
+        : { tipo, ok: false, saldo: conta.saldo, erro: "ARMAZENAMENTO MQTT DE MOEDAS INDISPONÍVEL" });
+      return;
+    }
+    if (!this.armazenamentoDisponivel) {
+      this.responder(pedido, { tipo, ok: false, saldo: conta.saldo, erro: "ARMAZENAMENTO MQTT DE MOEDAS INDISPONÍVEL" });
       return;
     }
     const idPedido = String(pedido.purchaseId || "");
@@ -275,7 +284,12 @@ export default class CofreMoedasArcade {
     } catch (erro) {
       this.armazenamento.contas[idConta] = JSON.parse(anterior);
       console.error("Não foi possível gravar o saldo no MQTT:", erro.message);
-      this.responder(pedido, { tipo, ok: false, saldo: conta.saldo, erro: "SALDO INDISPONÍVEL" });
+      this.responder(pedido, {
+        tipo,
+        ok: false,
+        saldo: this.armazenamento.contas[idConta].saldo,
+        erro: "SALDO INDISPONÍVEL",
+      });
     }
   }
 
@@ -293,6 +307,10 @@ export default class CofreMoedasArcade {
       return;
     }
     const idConta = await this.hashEmail(email);
+    if (!this.armazenamentoDisponivel) {
+      console.error("Compra recebida, mas o armazenamento MQTT de moedas não está disponível.");
+      return;
+    }
     const conta = this.obterContaPorId(idConta);
     const idCompra = evento.transactionId || evento.purchaseId || evento.orderId || evento.id;
     if (idCompra && conta.compras.includes(String(idCompra))) return;

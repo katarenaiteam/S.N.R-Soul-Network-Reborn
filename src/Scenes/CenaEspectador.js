@@ -83,6 +83,8 @@ export default class CenaEspectador extends Phaser.Scene {
 
     this.contaEspectador = new ContaEspectador(this);
     this.registry.set("contaEspectador", this.contaEspectador);
+    // Assistir à sala não depende do login nem da sincronização de moedas.
+    this.iniciarConexaoEspectador();
   }
 
   iniciarConexaoEspectador() {
